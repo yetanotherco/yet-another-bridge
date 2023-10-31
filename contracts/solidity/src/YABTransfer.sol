@@ -5,30 +5,24 @@ contract YABTransfer {
     struct TransferInfo {
         uint256 destAddress;
         uint128 amount;
+        bool isUsed;
     }
 
-    event Transfer(
-        uint256 indexed transferId,
-        address srcAddress,
-        TransferInfo transferInfo);
-
-    uint256 public currentTransferId = 0;
+    event Transfer(uint256 indexed orderId, address srcAddress, TransferInfo transferInfo);
 
     mapping(uint256 => TransferInfo) public transfers;
 
-    function transfer(
-        TransferInfo calldata transferInfo
-    ) payable external {
-        require(transferInfo.destAddress != 0, "Invalid destination address.");
-        require(transferInfo.amount > 0, "Invalid amount, should be higher than 0.");
-        require(msg.value == transferInfo.amount, "Invalid amount, should match msg.value.");
+    function transfer(uint256 orderId, uint256 destAddress, uint128 amount) external payable {
+        require(destAddress != 0, "Invalid destination address.");
+        require(amount > 0, "Invalid amount, should be higher than 0.");
+        require(msg.value == amount, "Invalid amount, should match msg.value.");
+        require(transfers[orderId].isUsed == false, "Transfer already processed.");
 
-        transfers[currentTransferId] = transferInfo;
-        currentTransferId += 1;
+        transfers[orderId] = TransferInfo({destAddress: destAddress, amount: amount, isUsed: true});
 
-        (bool success, ) = payable(address(uint160(transferInfo.destAddress))).call{value: msg.value}("");
+        (bool success,) = payable(address(uint160(destAddress))).call{value: msg.value}("");
 
         require(success, "Transfer failed.");
-        emit Transfer(currentTransferId, msg.sender, transferInfo);
+        emit Transfer(orderId, msg.sender, transfers[orderId]);
     }
 }
