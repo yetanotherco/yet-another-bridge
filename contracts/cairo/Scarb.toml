@@ -1,0 +1,15 @@
+[package]
+name = "yab"
+version = "0.1.0"
+
+[dependencies]
+starknet = ">=2.2.0"
+snforge_std = { git = "https://github.com/foundry-rs/starknet-foundry.git", tag = "v0.7.1" }
+
+[[target.starknet-contract]]
+sierra = true
+casm = true
+
+[tool.snforge]
+exit_first = true
+
