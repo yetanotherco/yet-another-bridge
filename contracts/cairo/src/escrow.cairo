@@ -1,11 +1,9 @@
-use yab::interfaces::herodotus::{StorageProof, StorageSlot};
-
 #[derive(Serde, Drop, starknet::Store)]
 struct Order {
     #[key]
     order_id: u256,
     recipient_address: felt252,
-    amount: u128,
+    amount: u256,
     fee: u64,
     expiry: u64
 }
@@ -27,11 +25,8 @@ trait IEscrow<ContractState> {
     fn withdraw(
         ref self: ContractState,
         order_id: u256,
-        transfer_id: u256,
-        block: felt252,
-        slot: StorageSlot,
-        proof_0: StorageProof,
-        proof_1: StorageProof
+        block: u256,
+        slot: u256
     );
 }
 
@@ -39,15 +34,18 @@ trait IEscrow<ContractState> {
 mod Escrow {
     use super::{IEscrow, Order};
 
-    use yab::interfaces::herodotus::{
-        StorageProof, StorageSlot, IFactsRegistryDispatcher, IFactsRegistryDispatcherTrait
+    use yab::interfaces::IERC20::{
+        IERC20Dispatcher, IERC20DispatcherTrait
+    };
+    use yab::interfaces::IEVMFactsRegistry::{
+        IEVMFactsRegistryDispatcher, IEVMFactsRegistryDispatcherTrait
     };
 
     // https://github.com/starknet-io/starknet-addresses
     // MAINNET = GOERLI = GOERLI2
     // 0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7
     const NATIVE_TOKEN: felt252 = 0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7;
-    const HERODOTUS_FACTS_REGISTRY: felt252 = 0x07c88f02f0757b25547af4d946445f92dbe3416116d46d7b2bd88bcfad65a06f;
+    const HERODOTUS_FACTS_REGISTRY: felt252 = 0x02c8c8543a57ac55d76b3d8a2051cd5e4111dd65ca2cfc0444d8f87a0df46faf;
     const ETH_TRANSFER_CONTRACT: felt252 = 0x0;
 
     #[event]
@@ -61,7 +59,7 @@ mod Escrow {
         #[key]
         order_id: u256,
         address: felt252,
-        amount: u128,
+        amount: u256,
     }
 
     #[storage]
@@ -113,69 +111,60 @@ mod Escrow {
         fn withdraw(
             ref self: ContractState,
             order_id: u256,
-            transfer_id: u256,
-            block: felt252,
-            slot: StorageSlot,
-            proof_0: StorageProof,
-            proof_1: StorageProof
+            block: u256,
+            slot: u256,
         ) {
-            // TODO revalidate all the logic for withdraw
+            assert(!self.orders_used.read(order_id), 'Order already withdrawed');
 
-            // 1. Verify order has not been used
-            assert(!self.orders_used.read(order_id), 'Order already used');
-
-            // 2. Read transfer info from the facts registry
+            // Read transfer info from the facts registry
             // struct TransferInfo {
             //     uint256 destAddress;
             //     uint128 amount;
+            //     bool isUsed;
             // }
 
             let mut slot_1 = slot.clone();
-            slot_1.word_4 += 1;
+            // TODO confirm this, probably it's not true
+            slot_1 += 1;
 
             let slot_0 = slot;
 
             // Slot n contains the address of the recipient
-            let slot_0_value = IFactsRegistryDispatcher {
+            let slot_0_value = IEVMFactsRegistryDispatcher {
                 contract_address: HERODOTUS_FACTS_REGISTRY.try_into().unwrap()
             }
-                .get_storage_uint(
-                    block,
+                .get_slot_value(
                     ETH_TRANSFER_CONTRACT,
+                    block,
                     slot_0,
-                    proof_0.proof_sizes_bytes_len,
-                    proof_0.proof_sizes_bytes,
-                    proof_0.proof_sizes_words_len,
-                    proof_0.proof_sizes_words,
-                    proof_0.proofs_concat_len,
-                    proof_0.proofs_concat
-                );
+                ).unwrap();
             let address: felt252 = slot_0_value.try_into().expect('Invalid address');
 
-            // Slot n+1 contains the amount
-            let slot_1_value = IFactsRegistryDispatcher {
+            // Slot n+1 contains the amount and isUsed
+            let amount = IEVMFactsRegistryDispatcher {
                 contract_address: HERODOTUS_FACTS_REGISTRY.try_into().unwrap()
             }
-                .get_storage_uint(
-                    block,
+                .get_slot_value(
                     ETH_TRANSFER_CONTRACT,
+                    block,
                     slot_1,
-                    proof_1.proof_sizes_bytes_len,
-                    proof_1.proof_sizes_bytes,
-                    proof_1.proof_sizes_words_len,
-                    proof_1.proof_sizes_words,
-                    proof_1.proofs_concat_len,
-                    proof_1.proofs_concat
-                );
+                ).unwrap();
 
-            let amount = slot_1_value.high;
-
-            // 3. Mark order as used
             self.orders_used.write(order_id, true);
 
-            // 4. TODO Withdraw
+            // Withdraw
+            let recipient = self.reservations.read(order_id);
 
-            self.emit(Withdraw { order_id, address, amount });
+            // TODO
+            // - add fee
+            // - confirm slot values against local order
+            IERC20Dispatcher { contract_address: NATIVE_TOKEN.try_into().unwrap() }.transfer(recipient.try_into().unwrap(), amount);
+
+            self.emit(Withdraw {
+                order_id,
+                address: recipient,
+                amount
+            });
         }
     }
 }
