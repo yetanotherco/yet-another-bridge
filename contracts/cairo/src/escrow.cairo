@@ -1,24 +1,33 @@
 use yab::interfaces::herodotus::{StorageProof, StorageSlot};
 
-#[starknet::interface]
-trait IEscrow<TContractState> {
-    fn get_orders_list(self: @ContractState) -> Array<u256>;
+#[derive(Serde, Drop, starknet::Store)]
+struct Order {
+    #[key]
+    order_id: u256,
+    recipient_address: felt252,
+    amount: u128,
+    fee: u64,
+    expiry: u64
+}
 
+#[starknet::interface]
+trait IEscrow<ContractState> {
     fn get_order(self: @ContractState, order_id: u256) -> Order;
 
-    fn set_order(self: @ContractState, order_id: u256, order: Order);
+    fn set_order(ref self: ContractState, order_id: u256, order: Order);
 
-    fn cancel_order(self: @ContractState, order_id: u256);
+    fn cancel_order(ref self: ContractState, order_id: u256);
 
-    fn get_order_status(self: @ContractState, order_id: u256) -> bool;
+    fn get_order_used(self: @ContractState, order_id: u256) -> bool;
 
-    fn get_reservation(self: @ContractState, order_id: u256) -> ContractAddress;
+    fn get_reservation(self: @ContractState, order_id: u256) -> felt252;
 
-    fn set_reservation(self: @ContractState, order_id: u256, address: ContractAddress);
+    fn set_reservation(ref self: ContractState, order_id: u256, address: felt252);
 
     fn withdraw(
-        ref self: TContractState,
+        ref self: ContractState,
         order_id: u256,
+        transfer_id: u256,
         block: felt252,
         slot: StorageSlot,
         proof_0: StorageProof,
@@ -28,7 +37,8 @@ trait IEscrow<TContractState> {
 
 #[starknet::contract]
 mod Escrow {
-    use starknet::{ContractAddress, EthAddress};
+    use super::{IEscrow, Order};
+
     use yab::interfaces::herodotus::{
         StorageProof, StorageSlot, IFactsRegistryDispatcher, IFactsRegistryDispatcherTrait
     };
@@ -37,73 +47,67 @@ mod Escrow {
     // MAINNET = GOERLI = GOERLI2
     // 0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7
     const NATIVE_TOKEN: felt252 = 0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7;
-    const HERODOTUS_FACTS_REGISTRY: felt252 =
-        0x07c88f02f0757b25547af4d946445f92dbe3416116d46d7b2bd88bcfad65a06f;
+    const HERODOTUS_FACTS_REGISTRY: felt252 = 0x07c88f02f0757b25547af4d946445f92dbe3416116d46d7b2bd88bcfad65a06f;
+    const ETH_TRANSFER_CONTRACT: felt252 = 0x0;
 
     #[event]
     #[derive(Drop, starknet::Event)]
     enum Event {
-        Order: Order,
+        Withdraw: Withdraw,
     }
 
     #[derive(Drop, starknet::Event)]
-    struct Order {
+    struct Withdraw {
         #[key]
         order_id: u256,
-        amount: u256,
-        recipient_address: EthAddress,
-        fee: u64,
-        expiry: u64
+        address: felt252,
+        amount: u128,
     }
 
     #[storage]
     struct Storage {
-        nonce: u256,
+        current_order_id: u256,
         orders: LegacyMap::<u256, Order>,
-        orders_list: Array<u256>,
-        orders_status: LegacyMap::<u256, bool>,
-        reservations: LegacyMap::<u256, ContractAddress>
+        orders_used: LegacyMap::<u256, bool>,
+        reservations: LegacyMap::<u256, felt252>
     }
 
     #[constructor]
-    fn constructor(ref self: ContractState, yab_eth: ContractAddress) {
-        nonce = 0;
+    fn constructor(ref self: ContractState, yab_eth: felt252) {
+        self.current_order_id.write(0);
     }
 
     #[external(v0)]
-    impl Escrow of super::IEscrow<ContractState> {
-        fn get_orders_list(self: @ContractState) -> Array<u256> {
-            self.orders_list
-        }
-
+    impl Escrow of IEscrow<ContractState> {
         fn get_order(self: @ContractState, order_id: u256) -> Order {
             self.orders.read(order_id)
         }
 
-        fn set_order(self: @ContractState, order_id: u256, order: Order) {
+        fn set_order(ref self: ContractState, order_id: u256, order: Order) {
             // TODO expiry can't be less than 24h
             self.orders.write(order_id, order);
         }
 
-        fn cancel_order(self: @ContractState, order_id: u256) {
+        fn cancel_order(ref self: ContractState, order_id: u256) {
             // TODO the order can be cancelled if no one reserved yet
             // the user can retrieve all the funds without waiting for the expiry
-            self.orders.remove(order_id);
         }
 
-        fn get_order_status(self: @ContractState, order_id: u256) -> bool {
-            self.orders_status.read(order_id)
+        fn get_order_used(self: @ContractState, order_id: u256) -> bool {
+            self.orders_used.read(order_id)
         }
 
-        fn get_reservation(self: @ContractState, order_id: u256) -> ContractAddress {
+        fn get_reservation(self: @ContractState, order_id: u256) -> felt252 {
             self.reservations.read(order_id)
         }
 
-        fn set_reservation(self: @ContractState, order_id: u256, address: ContractAddress) {
-            assert(!self.reservations.read(order_id), 'Order already reserved');
-            // TODO validate if it's already reserved
+        fn set_reservation(ref self: ContractState, order_id: u256, address: felt252) {
+            // TODO validate if the non used == 0x0
+            assert(self.reservations.read(order_id) == 0x0, 'Order already reserved');
+            // TODO
+            // we allow reservations other than the caller address
             // stake amount to avoid DoS
-            self.reservations.write(order_id, reservation);
+            self.reservations.write(order_id, address);
         }
 
         fn withdraw(
@@ -118,11 +122,7 @@ mod Escrow {
             // TODO revalidate all the logic for withdraw
 
             // 1. Verify order has not been used
-            assert(!self.order_status.read(order_id), 'Order already used');
-            assert(
-                self.reservations.read(order_id) == msg.sender,
-                'Message sender is not the person who reserved'
-            );
+            assert(!self.orders_used.read(order_id), 'Order already used');
 
             // 2. Read transfer info from the facts registry
             // struct TransferInfo {
@@ -141,7 +141,7 @@ mod Escrow {
             }
                 .get_storage_uint(
                     block,
-                    ETH_DEPOSIT_CONTRACT,
+                    ETH_TRANSFER_CONTRACT,
                     slot_0,
                     proof_0.proof_sizes_bytes_len,
                     proof_0.proof_sizes_bytes,
@@ -150,8 +150,7 @@ mod Escrow {
                     proof_0.proofs_concat_len,
                     proof_0.proofs_concat
                 );
-            let address_felt252: felt252 = slot_0_value.try_into().expect('Invalid address');
-            let address: ContractAddress = address_felt252.try_into().unwrap();
+            let address: felt252 = slot_0_value.try_into().expect('Invalid address');
 
             // Slot n+1 contains the amount
             let slot_1_value = IFactsRegistryDispatcher {
@@ -159,7 +158,7 @@ mod Escrow {
             }
                 .get_storage_uint(
                     block,
-                    ETH_DEPOSIT_CONTRACT,
+                    ETH_TRANSFER_CONTRACT,
                     slot_1,
                     proof_1.proof_sizes_bytes_len,
                     proof_1.proof_sizes_bytes,
@@ -172,7 +171,7 @@ mod Escrow {
             let amount = slot_1_value.high;
 
             // 3. Mark order as used
-            self.used_orders.write(order_id, true);
+            self.orders_used.write(order_id, true);
 
             // 4. TODO Withdraw
 
