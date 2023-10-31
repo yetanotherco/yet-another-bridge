@@ -26,7 +26,7 @@ contract YABTransfer {
         transfers[currentTransferId] = transferInfo;
         currentTransferId += 1;
 
-        (bool success, ) = payable(transferInfo.destAddress).call{value: msg.value}("");
+        (bool success, ) = payable(address(uint160(transferInfo.destAddress))).call{value: msg.value}("");
 
         require(success, "Transfer failed.");
         emit Transfer(currentTransferId, msg.sender, transferInfo);
