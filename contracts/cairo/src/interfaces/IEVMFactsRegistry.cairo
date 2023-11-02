@@ -1,9 +1,6 @@
 #[starknet::interface]
-trait IEVMFactsRegistry<T> {
+trait IEVMFactsRegistry<TContractState> {
     fn get_slot_value(
-        self: T,
-        account: felt252,
-        block: u256,
-        slot: u256
+        self: @TContractState, account: felt252, block: u256, slot: u256
     ) -> Option<u256>;
 }

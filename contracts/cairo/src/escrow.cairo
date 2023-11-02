@@ -1,43 +1,32 @@
-#[derive(Serde, Drop, starknet::Store)]
+use starknet::EthAddress;
+
+#[derive(Copy, Drop, Serde, starknet::Store)]
 struct Order {
-    #[key]
-    order_id: u256,
-    recipient_address: felt252,
-    amount: u256,
-    fee: u64,
-    expiry: u64
+    recipient_address: EthAddress,
+    amount: u256
 }
 
 #[starknet::interface]
 trait IEscrow<ContractState> {
     fn get_order(self: @ContractState, order_id: u256) -> Order;
 
-    fn set_order(ref self: ContractState, order_id: u256, order: Order);
+    fn set_order(ref self: ContractState, order: Order);
 
     fn cancel_order(ref self: ContractState, order_id: u256);
 
     fn get_order_used(self: @ContractState, order_id: u256) -> bool;
 
-    fn get_reservation(self: @ContractState, order_id: u256) -> felt252;
-
-    fn set_reservation(ref self: ContractState, order_id: u256, address: felt252);
-
-    fn withdraw(
-        ref self: ContractState,
-        order_id: u256,
-        block: u256,
-        slot: u256
-    );
+    fn withdraw(ref self: ContractState, order_id: u256, block: u256, slot: u256);
 }
 
 #[starknet::contract]
 mod Escrow {
+    use core::option::OptionTrait;
+    use core::traits::TryInto;
     use super::{IEscrow, Order};
 
-    use starknet::{ContractAddress, get_caller_address};
-    use yab::interfaces::IERC20::{
-        IERC20Dispatcher, IERC20DispatcherTrait
-    };
+    use starknet::{ContractAddress, EthAddress, get_caller_address};
+    use yab::interfaces::IERC20::{IERC20Dispatcher, IERC20DispatcherTrait};
     use yab::interfaces::IEVMFactsRegistry::{
         IEVMFactsRegistryDispatcher, IEVMFactsRegistryDispatcherTrait
     };
@@ -45,21 +34,35 @@ mod Escrow {
     // https://github.com/starknet-io/starknet-addresses
     // MAINNET = GOERLI = GOERLI2
     // 0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7
-    const NATIVE_TOKEN: felt252 = 0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7;
-    const HERODOTUS_FACTS_REGISTRY: felt252 = 0x02c8c8543a57ac55d76b3d8a2051cd5e4111dd65ca2cfc0444d8f87a0df46faf;
+    const NATIVE_TOKEN: felt252 =
+        0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7;
+    const HERODOTUS_FACTS_REGISTRY: felt252 =
+        0x02c8c8543a57ac55d76b3d8a2051cd5e4111dd65ca2cfc0444d8f87a0df46faf;
+    // our transfer contract in L1
     const ETH_TRANSFER_CONTRACT: felt252 = 0x0;
+    const MM_ETHEREUM_ADDRESS: felt252 = 0x12345;
+    const MM_STARKNET_ADDRESS: felt252 = 0x12345;
 
     #[event]
     #[derive(Drop, starknet::Event)]
     enum Event {
         Withdraw: Withdraw,
+        SetOrder: SetOrder
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct SetOrder {
+        #[key]
+        order_id: u256,
+        recipient_address: EthAddress,
+        amount: u256,
     }
 
     #[derive(Drop, starknet::Event)]
     struct Withdraw {
         #[key]
         order_id: u256,
-        address: felt252,
+        address: ContractAddress,
         amount: u256,
     }
 
@@ -84,40 +87,35 @@ mod Escrow {
             self.orders.read(order_id)
         }
 
-        fn set_order(ref self: ContractState, order_id: u256, order: Order) {
+        fn set_order(ref self: ContractState, order: Order) {
             // TODO expiry can't be less than 24h
+
+            let mut order_id = self.current_order_id.read();
             self.orders.write(order_id, order);
+            self.orders_used.write(order_id, false);
+
+            self
+                .emit(
+                    SetOrder {
+                        order_id, recipient_address: order.recipient_address, amount: order.amount
+                    }
+                );
+
+            order_id += 1;
+            self.current_order_id.write(order_id);
         }
 
-        fn cancel_order(ref self: ContractState, order_id: u256) {
-            // TODO the order can be cancelled if no one reserved yet
-            // the user can retrieve all the funds without waiting for the expiry
+        fn cancel_order(
+            ref self: ContractState, order_id: u256
+        ) { // TODO the order can be cancelled if no one reserved yet
+        // the user can retrieve all the funds without waiting for the expiry
         }
 
         fn get_order_used(self: @ContractState, order_id: u256) -> bool {
             self.orders_used.read(order_id)
         }
 
-        fn get_reservation(self: @ContractState, order_id: u256) -> felt252 {
-            self.reservations.read(order_id)
-        }
-
-        fn set_reservation(ref self: ContractState, order_id: u256, address: felt252) {
-            // TODO validate if the non used == 0x0
-            assert(self.reservations.read(order_id) == 0x0, 'Order already reserved');
-            assert(get_caller_address() != self.owner.read(), 'Need to be the owner to reserve');
-            // TODO
-            // we allow reservations other than the caller address
-            // stake amount to avoid DoS
-            self.reservations.write(order_id, address);
-        }
-
-        fn withdraw(
-            ref self: ContractState,
-            order_id: u256,
-            block: u256,
-            slot: u256,
-        ) {
+        fn withdraw(ref self: ContractState, order_id: u256, block: u256, slot: u256,) {
             assert(!self.orders_used.read(order_id), 'Order already withdrawed');
 
             // Read transfer info from the facts registry
@@ -137,38 +135,38 @@ mod Escrow {
             let slot_0_value = IEVMFactsRegistryDispatcher {
                 contract_address: HERODOTUS_FACTS_REGISTRY.try_into().unwrap()
             }
-                .get_slot_value(
-                    ETH_TRANSFER_CONTRACT,
-                    block,
-                    slot_0,
-                ).unwrap();
-            let address: felt252 = slot_0_value.try_into().expect('Invalid address');
+                .get_slot_value(ETH_TRANSFER_CONTRACT.into(), block, slot_0,)
+                .unwrap();
+
+            let recipient_address: felt252 = slot_0_value.try_into().expect('Invalid address');
+            let recipient_address: EthAddress = recipient_address
+                .try_into()
+                .expect('Invalid address');
+
+            let order = self.orders.read(order_id);
+            assert(order.recipient_address == recipient_address, '');
 
             // Slot n+1 contains the amount and isUsed
             let amount = IEVMFactsRegistryDispatcher {
                 contract_address: HERODOTUS_FACTS_REGISTRY.try_into().unwrap()
             }
-                .get_slot_value(
-                    ETH_TRANSFER_CONTRACT,
-                    block,
-                    slot_1,
-                ).unwrap();
+                .get_slot_value(ETH_TRANSFER_CONTRACT.into(), block, slot_1,)
+                .unwrap();
+
+            assert(order.amount == amount, '');
 
             self.orders_used.write(order_id, true);
-
-            // Withdraw
-            let recipient = self.reservations.read(order_id);
 
             // TODO
             // - add fee
             // - confirm slot values against local order
-            IERC20Dispatcher { contract_address: NATIVE_TOKEN.try_into().unwrap() }.transfer(recipient.try_into().unwrap(), amount);
+            IERC20Dispatcher { contract_address: NATIVE_TOKEN.try_into().unwrap() }
+                .transfer(MM_STARKNET_ADDRESS.try_into().unwrap(), amount);
 
-            self.emit(Withdraw {
-                order_id,
-                address: recipient,
-                amount
-            });
+            self
+                .emit(
+                    Withdraw { order_id, address: MM_STARKNET_ADDRESS.try_into().unwrap(), amount }
+                );
         }
     }
 }
