@@ -34,6 +34,7 @@ trait IEscrow<ContractState> {
 mod Escrow {
     use super::{IEscrow, Order};
 
+    use starknet::{ContractAddress, get_caller_address};
     use yab::interfaces::IERC20::{
         IERC20Dispatcher, IERC20DispatcherTrait
     };
@@ -64,6 +65,7 @@ mod Escrow {
 
     #[storage]
     struct Storage {
+        owner: ContractAddress,
         current_order_id: u256,
         orders: LegacyMap::<u256, Order>,
         orders_used: LegacyMap::<u256, bool>,
@@ -72,6 +74,7 @@ mod Escrow {
 
     #[constructor]
     fn constructor(ref self: ContractState, yab_eth: felt252) {
+        self.owner.write(get_caller_address());
         self.current_order_id.write(0);
     }
 
@@ -102,6 +105,7 @@ mod Escrow {
         fn set_reservation(ref self: ContractState, order_id: u256, address: felt252) {
             // TODO validate if the non used == 0x0
             assert(self.reservations.read(order_id) == 0x0, 'Order already reserved');
+            assert(get_caller_address() != self.owner.read(), 'Need to be the owner to reserve');
             // TODO
             // we allow reservations other than the caller address
             // stake amount to avoid DoS
