@@ -20,9 +20,11 @@ trait IEscrow<ContractState> {
 
     fn get_herodotus_facts_registry_contract(self: @ContractState) -> ContractAddress;
     fn get_eth_transfer_contract(self: @ContractState) -> EthAddress;
-    fn get_mm_ethereum_contract(self: @ContractState) ->  EthAddress;
-    fn get_mm_starknet_contract(self: @ContractState) ->  ContractAddress;
-    fn set_herodotus_facts_registry_contract(ref self: ContractState, new_contract: ContractAddress);
+    fn get_mm_ethereum_contract(self: @ContractState) -> EthAddress;
+    fn get_mm_starknet_contract(self: @ContractState) -> ContractAddress;
+    fn set_herodotus_facts_registry_contract(
+        ref self: ContractState, new_contract: ContractAddress
+    );
     fn set_eth_transfer_contract(ref self: ContractState, new_contract: EthAddress);
     fn set_mm_ethereum_contract(ref self: ContractState, new_contract: EthAddress);
     fn set_mm_starknet_contract(ref self: ContractState, new_contract: ContractAddress);
@@ -86,9 +88,9 @@ mod Escrow {
 
     #[constructor]
     fn constructor(
-        ref self: ContractState, 
+        ref self: ContractState,
         herodotus_facts_registry_contract: ContractAddress,
-        eth_transfer_contract: EthAddress, 
+        eth_transfer_contract: EthAddress,
         mm_ethereum_contract: EthAddress,
         mm_starknet_contract: ContractAddress
     ) {
@@ -185,10 +187,7 @@ mod Escrow {
             IERC20Dispatcher { contract_address: NATIVE_TOKEN.try_into().unwrap() }
                 .transfer(self.mm_starknet_contract.read(), amount);
 
-            self
-                .emit(
-                    Withdraw { order_id, address: self.mm_starknet_contract.read(), amount }
-                );
+            self.emit(Withdraw { order_id, address: self.mm_starknet_contract.read(), amount });
         }
 
         fn get_herodotus_facts_registry_contract(self: @ContractState) -> ContractAddress {
@@ -199,15 +198,17 @@ mod Escrow {
             self.eth_transfer_contract.read()
         }
 
-        fn get_mm_ethereum_contract(self: @ContractState) ->  EthAddress {
+        fn get_mm_ethereum_contract(self: @ContractState) -> EthAddress {
             self.mm_ethereum_contract.read()
         }
 
-        fn get_mm_starknet_contract(self: @ContractState) ->  ContractAddress {
+        fn get_mm_starknet_contract(self: @ContractState) -> ContractAddress {
             self.mm_starknet_contract.read()
         }
 
-        fn set_herodotus_facts_registry_contract(ref self: ContractState, new_contract: ContractAddress) {
+        fn set_herodotus_facts_registry_contract(
+            ref self: ContractState, new_contract: ContractAddress
+        ) {
             let unsafe_state = Ownable::unsafe_new_contract_state();
             Ownable::InternalImpl::assert_only_owner(@unsafe_state);
             self.herodotus_facts_registry_contract.write(new_contract);
