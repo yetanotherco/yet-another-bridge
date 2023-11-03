@@ -5,9 +5,9 @@ mod Escrow {
     use starknet::syscalls::deploy_syscall;
     use starknet::testing::{set_contract_address, set_caller_address};
 
-    use yab::ERC20::{ERC20, IERC20Dispatcher, IERC20DispatcherTrait};
+    use yab::contracts::ERC20::{ERC20, IERC20Dispatcher, IERC20DispatcherTrait};
 
-    use yab::escrow::{Escrow, IEscrowDispatcher, IEscrowDispatcherTrait, Order};
+    use yab::contracts::escrow::{Escrow, IEscrowDispatcher, IEscrowDispatcherTrait, Order};
 
     use yab::mocks::mock_EVMFactsRegistry::{
         EVMFactsRegistry, IEVMFactsRegistryDispatcher, IEVMFactsRegistryDispatcherTrait
@@ -15,25 +15,9 @@ mod Escrow {
 
     use integer::BoundedInt;
 
-    fn USER() -> ContractAddress {
-        contract_address_const::<'USER'>()
-    }
-
-    fn OWNER() -> ContractAddress {
-        contract_address_const::<'OWNER'>()
-    }
-
-    fn MM_STARKNET() -> ContractAddress {
-        contract_address_const::<'HERODOTUS_FACTS_REGISTRY'>()
-    }
-
-    fn MM_ETHEREUM() -> EthAddress {
-        50.try_into().unwrap()
-    }
-
-    fn ETH_TRANSFER_CONTRACT() -> EthAddress {
-        69.try_into().unwrap()
-    }
+    use yab::tests::utils::constants::EscrowConstants::{
+        USER, OWNER, MM_STARKNET, MM_ETHEREUM, ETH_TRANSFER_CONTRACT
+    };
 
     fn setup() -> (IEscrowDispatcher, IERC20Dispatcher) {
         let eth_token = deploy_erc20('ETH', '$ETH', BoundedInt::max(), OWNER());
