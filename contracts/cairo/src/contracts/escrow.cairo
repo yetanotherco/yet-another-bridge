@@ -120,8 +120,8 @@ mod Escrow {
             self.orders.write(order_id, order);
             self.orders_used.write(order_id, false);
 
-            // IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
-            //     .transfer(get_contract_address(), order.amount);
+            IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
+                .transfer(get_contract_address(), order.amount);
 
             self
                 .emit(
@@ -195,8 +195,8 @@ mod Escrow {
             // TODO
             // - add fee
             // - confirm slot values against local order
-            // IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
-            //     .transfer(self.mm_starknet_contract.read(), amount);
+            IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
+                .transfer(self.mm_starknet_contract.read(), amount);
 
             self.emit(Withdraw { order_id, address: self.mm_starknet_contract.read(), amount });
         }
