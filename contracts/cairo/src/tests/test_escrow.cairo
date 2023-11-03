@@ -22,15 +22,15 @@ mod Escrow {
     };
 
     fn setup() -> (IEscrowDispatcher, IERC20Dispatcher) {
-        let eth_token = deploy_erc20('ETH', '$ETH', BoundedInt::max(), OWNER());
-        let evm_facts_registry = deploy_mock_EVMFactsRegistry();
+        let eth_token = deploy_erc20('ETH', '$ETH', BoundedInt::max(), OWNER()); // 0x1
+        let evm_facts_registry = deploy_mock_EVMFactsRegistry(); // 0x2
         let escrow = deploy_escrow(
             evm_facts_registry.contract_address,
             ETH_TRANSFER_CONTRACT(),
             MM_ETHEREUM(),
             MM_STARKNET(),
             eth_token.contract_address
-        );
+        ); // 0x3
 
         set_contract_address(OWNER());
         eth_token.transfer(USER(), BoundedInt::max());
@@ -93,11 +93,33 @@ mod Escrow {
     fn test_happy_path() {
         let (escrow, eth_token) = setup();
 
+        // check balance
+        assert(eth_token.balanceOf(escrow.contract_address) == 0, 'init: wrong balance');
+        assert(eth_token.balanceOf(MM_STARKNET()) == 0, 'init: wrong balance');
+
         set_contract_address(USER());
         let order = Order { recipient_address: 12345.try_into().unwrap(), amount: 500 };
         let order_id = escrow.set_order(order);
 
+        // check balance
+        assert(eth_token.balanceOf(escrow.contract_address) == 500, 'set_order: wrong balance ');
+        assert(eth_token.balanceOf(MM_STARKNET()) == 0, 'set_order: wrong balance');
+
+        // check Order
+        assert(order_id == 0, 'wrong order_id');
+        let order_save = escrow.get_order(order_id);
+        assert(order.recipient_address == order_save.recipient_address , 'wrong recipient_address');
+        assert(order.amount == order_save.amount, 'wrong amount');
+        assert(!escrow.get_order_used(order_id), 'wrong order used');
+
         set_contract_address(MM_STARKNET());
         escrow.withdraw(order_id, 0, 0);
+
+        // check Order
+        assert(escrow.get_order_used(order_id), 'wrong order used');
+
+        // check balance
+        assert(eth_token.balanceOf(escrow.contract_address) == 0, 'withdraw: wrong balance');
+        assert(eth_token.balanceOf(MM_STARKNET()) == 500, 'withdraw: wrong balance');
     }
 }
