@@ -1,13 +1,6 @@
-#[starknet::interface]
-trait IEVMFactsRegistry<TContractState> {
-    fn get_slot_value(
-        self: @TContractState, account: felt252, block: u256, slot: u256
-    ) -> Option<u256>;
-}
-
 #[starknet::contract]
 mod EVMFactsRegistry {
-    use super::IEVMFactsRegistry;
+    use yab::interfaces::IEVMFactsRegistry::IEVMFactsRegistry;
 
     #[storage]
     struct Storage {

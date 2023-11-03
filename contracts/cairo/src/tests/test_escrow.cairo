@@ -5,12 +5,14 @@ mod Escrow {
     use starknet::syscalls::deploy_syscall;
     use starknet::testing::{set_contract_address, set_caller_address};
 
-    use yab::contracts::ERC20::{ERC20, IERC20Dispatcher, IERC20DispatcherTrait};
+    use yab::contracts::ERC20::ERC20;
+    use yab::interfaces::IERC20::{IERC20Dispatcher, IERC20DispatcherTrait};
 
     use yab::contracts::escrow::{Escrow, IEscrowDispatcher, IEscrowDispatcherTrait, Order};
 
-    use yab::mocks::mock_EVMFactsRegistry::{
-        EVMFactsRegistry, IEVMFactsRegistryDispatcher, IEVMFactsRegistryDispatcherTrait
+    use yab::mocks::mock_EVMFactsRegistry::EVMFactsRegistry;
+    use yab::interfaces::IEVMFactsRegistry::{
+        IEVMFactsRegistryDispatcher, IEVMFactsRegistryDispatcherTrait
     };
 
     use integer::BoundedInt;
