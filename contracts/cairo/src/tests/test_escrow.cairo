@@ -108,7 +108,7 @@ mod Escrow {
         // check Order
         assert(order_id == 0, 'wrong order_id');
         let order_save = escrow.get_order(order_id);
-        assert(order.recipient_address == order_save.recipient_address , 'wrong recipient_address');
+        assert(order.recipient_address == order_save.recipient_address, 'wrong recipient_address');
         assert(order.amount == order_save.amount, 'wrong amount');
         assert(!escrow.get_order_used(order_id), 'wrong order used');
 
