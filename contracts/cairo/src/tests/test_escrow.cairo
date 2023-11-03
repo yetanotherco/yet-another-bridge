@@ -117,7 +117,6 @@ mod Escrow {
 
         // check Order
         assert(escrow.get_order_used(order_id), 'wrong order used');
-
         // check balance
         assert(eth_token.balanceOf(escrow.contract_address) == 0, 'withdraw: wrong balance');
         assert(eth_token.balanceOf(MM_STARKNET()) == 500, 'withdraw: wrong balance');

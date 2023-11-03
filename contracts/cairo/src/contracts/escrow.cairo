@@ -120,8 +120,10 @@ mod Escrow {
             self.orders.write(order_id, order);
             self.orders_used.write(order_id, false);
 
+            // TODO: add allowance ?
+
             IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
-                .transfer(get_contract_address(), order.amount);
+                .transferFrom(get_caller_address(), get_contract_address(), order.amount);
 
             self
                 .emit(
