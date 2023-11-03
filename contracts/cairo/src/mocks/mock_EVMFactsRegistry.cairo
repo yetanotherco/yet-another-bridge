@@ -1,0 +1,31 @@
+#[starknet::interface]
+trait IEVMFactsRegistry<TContractState> {
+    fn get_slot_value(
+        self: @TContractState, account: felt252, block: u256, slot: u256
+    ) -> Option<u256>;
+}
+
+#[starknet::contract]
+mod EVMFactsRegistry {
+    use super::IEVMFactsRegistry;
+
+    #[storage]
+    struct Storage {
+        slots: LegacyMap::<u256, u256>
+    }
+
+    #[constructor]
+    fn constructor(ref self: ContractState) {
+        self.slots.write(0, 12345); // TODO: 
+        self.slots.write(1, 500);
+    }
+
+    #[external(v0)]
+    impl EVMFactsRegistry of IEVMFactsRegistry<ContractState> {
+        fn get_slot_value(
+            self: @ContractState, account: felt252, block: u256, slot: u256
+        ) -> Option<u256> {
+            Option::Some(self.slots.read(slot))
+        }
+    }
+}

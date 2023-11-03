@@ -10,7 +10,7 @@ struct Order {
 trait IEscrow<ContractState> {
     fn get_order(self: @ContractState, order_id: u256) -> Order;
 
-    fn set_order(ref self: ContractState, order: Order);
+    fn set_order(ref self: ContractState, order: Order) -> u256;
 
     fn cancel_order(ref self: ContractState, order_id: u256);
 
@@ -34,7 +34,7 @@ trait IEscrow<ContractState> {
 mod Escrow {
     use super::{IEscrow, Order};
 
-    use starknet::{ContractAddress, EthAddress, get_caller_address};
+    use starknet::{ContractAddress, EthAddress, get_caller_address, get_contract_address};
 
     // Ownable
     use openzeppelin::access::ownable::interface::IOwnable;
@@ -48,8 +48,8 @@ mod Escrow {
     // https://github.com/starknet-io/starknet-addresses
     // MAINNET = GOERLI = GOERLI2
     // 0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7
-    const NATIVE_TOKEN: felt252 =
-        0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7;
+    // const NATIVE_TOKEN: felt252 =
+    //     0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7;
 
     #[event]
     #[derive(Drop, starknet::Event)]
@@ -83,7 +83,8 @@ mod Escrow {
         herodotus_facts_registry_contract: ContractAddress,
         eth_transfer_contract: EthAddress, // our transfer contract in L1
         mm_ethereum_contract: EthAddress,
-        mm_starknet_contract: ContractAddress
+        mm_starknet_contract: ContractAddress,
+        native_token_eth_starknet: ContractAddress
     }
 
     #[constructor]
@@ -92,7 +93,8 @@ mod Escrow {
         herodotus_facts_registry_contract: ContractAddress,
         eth_transfer_contract: EthAddress,
         mm_ethereum_contract: EthAddress,
-        mm_starknet_contract: ContractAddress
+        mm_starknet_contract: ContractAddress,
+        native_token_eth_starknet: ContractAddress
     ) {
         let mut unsafe_state = Ownable::unsafe_new_contract_state();
         Ownable::InternalImpl::initializer(ref unsafe_state, get_caller_address());
@@ -102,6 +104,7 @@ mod Escrow {
         self.eth_transfer_contract.write(eth_transfer_contract);
         self.mm_ethereum_contract.write(mm_ethereum_contract);
         self.mm_starknet_contract.write(mm_starknet_contract);
+        self.native_token_eth_starknet.write(native_token_eth_starknet);
     }
 
     #[external(v0)]
@@ -110,12 +113,15 @@ mod Escrow {
             self.orders.read(order_id)
         }
 
-        fn set_order(ref self: ContractState, order: Order) {
+        fn set_order(ref self: ContractState, order: Order) -> u256 {
             // TODO expiry can't be less than 24h
 
             let mut order_id = self.current_order_id.read();
             self.orders.write(order_id, order);
             self.orders_used.write(order_id, false);
+
+            // IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
+            //     .transfer(get_contract_address(), order.amount);
 
             self
                 .emit(
@@ -124,8 +130,8 @@ mod Escrow {
                     }
                 );
 
-            order_id += 1;
-            self.current_order_id.write(order_id);
+            self.current_order_id.write(order_id + 1);
+            order_id
         }
 
         fn cancel_order(
@@ -139,7 +145,10 @@ mod Escrow {
         }
 
         fn withdraw(ref self: ContractState, order_id: u256, block: u256, slot: u256,) {
-            assert(self.mm_starknet_contract.read() == get_caller_address(), '');
+            assert(
+                self.mm_starknet_contract.read() == get_caller_address(),
+                'Only MM_STARKNET_CONTRACT'
+            );
             assert(!self.orders_used.read(order_id), 'Order already withdrawed');
 
             // Read transfer info from the facts registry
@@ -162,13 +171,15 @@ mod Escrow {
                 .get_slot_value(self.eth_transfer_contract.read().into(), block, slot_0,)
                 .unwrap();
 
-            let recipient_address: felt252 = slot_0_value.try_into().expect('Invalid address');
+            let recipient_address: felt252 = slot_0_value
+                .try_into()
+                .expect('Invalid addres parse felt252');
             let recipient_address: EthAddress = recipient_address
                 .try_into()
-                .expect('Invalid address');
+                .expect('Invalid address parse EthAddres');
 
             let order = self.orders.read(order_id);
-            assert(order.recipient_address == recipient_address, '');
+            assert(order.recipient_address == recipient_address, 'recipient_address not match L1');
 
             // Slot n+1 contains the amount and isUsed
             let amount = IEVMFactsRegistryDispatcher {
@@ -177,15 +188,15 @@ mod Escrow {
                 .get_slot_value(self.eth_transfer_contract.read().into(), block, slot_1,)
                 .unwrap();
 
-            assert(order.amount == amount, '');
+            assert(order.amount == amount, 'amount not match L1');
 
             self.orders_used.write(order_id, true);
 
             // TODO
             // - add fee
             // - confirm slot values against local order
-            IERC20Dispatcher { contract_address: NATIVE_TOKEN.try_into().unwrap() }
-                .transfer(self.mm_starknet_contract.read(), amount);
+            // IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
+            //     .transfer(self.mm_starknet_contract.read(), amount);
 
             self.emit(Withdraw { order_id, address: self.mm_starknet_contract.read(), amount });
         }
