@@ -36,7 +36,6 @@ mod Escrow {
 
     use starknet::{ContractAddress, EthAddress, get_caller_address, get_contract_address};
 
-    // Ownable
     use openzeppelin::access::ownable::interface::IOwnable;
     use openzeppelin::access::ownable::ownable::Ownable;
 

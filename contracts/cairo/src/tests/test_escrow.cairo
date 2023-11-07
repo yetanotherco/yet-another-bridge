@@ -1,42 +1,37 @@
 mod Escrow {
-    use starknet::{
-        EthAddress, ContractAddress, ClassHash, SyscallResultTrait, contract_address_const
-    };
-    use starknet::syscalls::deploy_syscall;
-    use starknet::testing::{set_contract_address, set_caller_address};
+    use starknet::{EthAddress, ContractAddress};
+    use integer::BoundedInt;
 
-    use yab::contracts::ERC20::ERC20;
+    use snforge_std::{declare, ContractClassTrait};
+    use snforge_std::{start_prank, stop_prank};
+
     use yab::interfaces::IERC20::{IERC20Dispatcher, IERC20DispatcherTrait};
-
-    use yab::contracts::escrow::{Escrow, IEscrowDispatcher, IEscrowDispatcherTrait, Order};
-
-    use yab::mocks::mock_EVMFactsRegistry::EVMFactsRegistry;
+    use yab::contracts::escrow::{IEscrowDispatcher, IEscrowDispatcherTrait, Order};
     use yab::interfaces::IEVMFactsRegistry::{
         IEVMFactsRegistryDispatcher, IEVMFactsRegistryDispatcherTrait
     };
-
-    use integer::BoundedInt;
-
     use yab::tests::utils::constants::EscrowConstants::{
         USER, OWNER, MM_STARKNET, MM_ETHEREUM, ETH_TRANSFER_CONTRACT
     };
 
     fn setup() -> (IEscrowDispatcher, IERC20Dispatcher) {
-        let eth_token = deploy_erc20('ETH', '$ETH', BoundedInt::max(), OWNER()); // 0x1
-        let evm_facts_registry = deploy_mock_EVMFactsRegistry(); // 0x2
+        let eth_token = deploy_erc20('ETH', '$ETH', BoundedInt::max(), OWNER());
+        let evm_facts_registry = deploy_mock_EVMFactsRegistry();
         let escrow = deploy_escrow(
             evm_facts_registry.contract_address,
             ETH_TRANSFER_CONTRACT(),
             MM_ETHEREUM(),
             MM_STARKNET(),
             eth_token.contract_address
-        ); // 0x3
+        );
 
-        set_contract_address(OWNER());
+        start_prank(eth_token.contract_address, OWNER());
         eth_token.transfer(USER(), BoundedInt::max());
+        stop_prank(eth_token.contract_address);
 
-        set_contract_address(USER());
+        start_prank(eth_token.contract_address, USER());
         eth_token.approve(escrow.contract_address, BoundedInt::max());
+        stop_prank(eth_token.contract_address);
 
         (escrow, eth_token)
     }
@@ -48,43 +43,32 @@ mod Escrow {
         mm_starknet_contract: ContractAddress,
         native_token_eth_starknet: ContractAddress
     ) -> IEscrowDispatcher {
+        let escrow = declare('Escrow');
         let mut calldata: Array<felt252> = ArrayTrait::new();
         calldata.append(herodotus_facts_registry_contract.into());
         calldata.append(eth_transfer_contract.into());
         calldata.append(mm_ethereum_contract.into());
         calldata.append(mm_starknet_contract.into());
         calldata.append(native_token_eth_starknet.into());
-
-        let (address, _) = deploy_syscall(
-            Escrow::TEST_CLASS_HASH.try_into().unwrap(), 0, calldata.span(), true
-        )
-            .unwrap_syscall();
-
+        let address = escrow.deploy(@calldata).unwrap();
         return IEscrowDispatcher { contract_address: address };
     }
 
     fn deploy_mock_EVMFactsRegistry() -> IEVMFactsRegistryDispatcher {
-        let mut calldata: Array<felt252> = ArrayTrait::new();
-        let (address, _) = deploy_syscall(
-            EVMFactsRegistry::TEST_CLASS_HASH.try_into().unwrap(), 0, calldata.span(), true
-        )
-            .unwrap_syscall();
-
+        let mock_EVMFactsRegistry = declare('EVMFactsRegistry');
+        let calldata: Array<felt252> = ArrayTrait::new();
+        let address = mock_EVMFactsRegistry.deploy(@calldata).unwrap();
         return IEVMFactsRegistryDispatcher { contract_address: address };
     }
 
     fn deploy_erc20(
         name: felt252, symbol: felt252, initial_supply: u256, recipent: ContractAddress
     ) -> IERC20Dispatcher {
+        let erc20 = declare('ERC20');
         let mut calldata = array![name, symbol];
         Serde::serialize(@initial_supply, ref calldata);
         calldata.append(recipent.into());
-
-        let (address, _) = deploy_syscall(
-            ERC20::TEST_CLASS_HASH.try_into().unwrap(), 0, calldata.span(), true
-        )
-            .unwrap_syscall();
-
+        let address = erc20.deploy(@calldata).unwrap();
         return IERC20Dispatcher { contract_address: address };
     }
 
@@ -97,9 +81,10 @@ mod Escrow {
         assert(eth_token.balanceOf(escrow.contract_address) == 0, 'init: wrong balance');
         assert(eth_token.balanceOf(MM_STARKNET()) == 0, 'init: wrong balance');
 
-        set_contract_address(USER());
+        start_prank(escrow.contract_address, USER());
         let order = Order { recipient_address: 12345.try_into().unwrap(), amount: 500 };
         let order_id = escrow.set_order(order);
+        stop_prank(escrow.contract_address);
 
         // check balance
         assert(eth_token.balanceOf(escrow.contract_address) == 500, 'set_order: wrong balance ');
@@ -112,8 +97,9 @@ mod Escrow {
         assert(order.amount == order_save.amount, 'wrong amount');
         assert(!escrow.get_order_used(order_id), 'wrong order used');
 
-        set_contract_address(MM_STARKNET());
+        start_prank(escrow.contract_address, MM_STARKNET());
         escrow.withdraw(order_id, 0, 0);
+        stop_prank(escrow.contract_address);
 
         // check Order
         assert(escrow.get_order_used(order_id), 'wrong order used');
