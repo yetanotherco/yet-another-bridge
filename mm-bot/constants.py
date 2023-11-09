@@ -1,7 +1,7 @@
 import os
 
 ETH_RPC_URL = 'https://goerli.nodeguardians.io'
-SN_RPC_URL = 'https://goerli.infura.io/v3/'
+SN_RPC_URL = ''
 
 ETH_CONTRACT_ADDR = '0x'
 SN_CONTRACT_ADDR = '0x'
