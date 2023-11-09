@@ -78,7 +78,6 @@ mod Escrow {
         current_order_id: u256,
         orders: LegacyMap::<u256, Order>,
         orders_used: LegacyMap::<u256, bool>,
-        reservations: LegacyMap::<u256, felt252>,
         herodotus_facts_registry_contract: ContractAddress,
         eth_transfer_contract: EthAddress, // our transfer contract in L1
         mm_ethereum_contract: EthAddress,
