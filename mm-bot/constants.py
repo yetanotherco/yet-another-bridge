@@ -3,10 +3,11 @@ import os
 ETH_RPC_URL = 'https://goerli.nodeguardians.io'
 SN_RPC_URL = os.getenv('SN_RPC_URL')
 
-ETH_CONTRACT_ADDR = '0x'
+ETH_CONTRACT_ADDR = os.getenv('ETH_CONTRACT_ADDR')
 SN_CONTRACT_ADDR = os.getenv('SN_CONTRACT_ADDR')
 
 ETH_PRIVATE_KEY = os.getenv('ETH_PRIVATE_KEY')
+SN_PRIVATE_KEY = os.getenv('SN_PRIVATE_KEY')
 
 HERODOTUS_API_KEY = os.getenv('HERODOTUS_API_KEY')
 HERODOTUS_ORIGIN_CHAIN = '5'

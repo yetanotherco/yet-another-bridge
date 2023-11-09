@@ -10,8 +10,7 @@ def get_latest_block() -> int:
 
 def transfer(dst_addr, amount):
     acct = w3.eth.account.from_key(constants.ETH_PRIVATE_KEY)
-    abi = json.load(open('abi/YABTransfer.json'))
-
+    abi = json.load(open('./mm-bot/abi/YABTransfer.json'))['abi']
     yab_transfer = w3.eth.contract(address=constants.ETH_CONTRACT_ADDR, abi=abi)
 
     unsent_tx = billboard.functions.transfer(dst_addr, amount).build_transaction({

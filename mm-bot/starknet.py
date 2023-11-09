@@ -10,6 +10,18 @@ class SetOrderEvent:
     def __str__(self):
         return f"recipent: {self.recipient_address}, amount: {self.amount}"
 
+def starknet_invoke(contract_abi, address, inputs, network: str):
+    print(
+        os.popen(
+            f"starknet invoke "
+            f"--address {address} "
+            f"--abi {contract_abi} "
+            f"--function fun_ENTRY_POINT "
+            f"--inputs {inputs} "
+            f"--network {network} "
+        ).read()
+    )
+
 def get_starknet_events() -> int:
     body = {
         "id": 1,
@@ -43,7 +55,7 @@ def get_latest_order():
     else:
         return None
 
-print(get_latest_order())
+print(">>> EVENT RESULT: ", get_latest_order())
 # main
 # wait x secs
 # call check_new_events
