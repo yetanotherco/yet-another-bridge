@@ -78,8 +78,8 @@ mod Escrow {
         let (escrow, eth_token) = setup();
 
         // check balance
-        assert(eth_token.balanceOf(escrow.contract_address) == 0, 'init: wrong balance');
-        assert(eth_token.balanceOf(MM_STARKNET()) == 0, 'init: wrong balance');
+        assert(eth_token.balance_of(escrow.contract_address) == 0, 'init: wrong balance');
+        assert(eth_token.balance_of(MM_STARKNET()) == 0, 'init: wrong balance');
 
         start_prank(escrow.contract_address, USER());
         let order = Order { recipient_address: 12345.try_into().unwrap(), amount: 500 };
@@ -87,8 +87,8 @@ mod Escrow {
         stop_prank(escrow.contract_address);
 
         // check balance
-        assert(eth_token.balanceOf(escrow.contract_address) == 500, 'set_order: wrong balance ');
-        assert(eth_token.balanceOf(MM_STARKNET()) == 0, 'set_order: wrong balance');
+        assert(eth_token.balance_of(escrow.contract_address) == 500, 'set_order: wrong balance ');
+        assert(eth_token.balance_of(MM_STARKNET()) == 0, 'set_order: wrong balance');
 
         // check Order
         assert(order_id == 0, 'wrong order_id');
@@ -104,7 +104,7 @@ mod Escrow {
         // check Order
         assert(escrow.get_order_used(order_id), 'wrong order used');
         // check balance
-        assert(eth_token.balanceOf(escrow.contract_address) == 0, 'withdraw: wrong balance');
-        assert(eth_token.balanceOf(MM_STARKNET()) == 500, 'withdraw: wrong balance');
+        assert(eth_token.balance_of(escrow.contract_address) == 0, 'withdraw: wrong balance');
+        assert(eth_token.balance_of(MM_STARKNET()) == 500, 'withdraw: wrong balance');
     }
 }

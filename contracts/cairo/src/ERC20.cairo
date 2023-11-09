@@ -78,11 +78,11 @@ mod ERC20 {
             18
         }
 
-        fn totalSupply(self: @ContractState) -> u256 {
+        fn total_supply(self: @ContractState) -> u256 {
             self.ERC20_total_supply.read()
         }
 
-        fn balanceOf(self: @ContractState, account: ContractAddress) -> u256 {
+        fn balance_of(self: @ContractState, account: ContractAddress) -> u256 {
             self.ERC20_balances.read(account)
         }
 
@@ -98,7 +98,7 @@ mod ERC20 {
             true
         }
 
-        fn transferFrom(
+        fn transfer_from(
             ref self: ContractState,
             sender: ContractAddress,
             recipient: ContractAddress,
