@@ -14,7 +14,7 @@ def transfer(dst_addr, amount):
 
     yab_transfer = w3.eth.contract(address=constants.ETH_CONTRACT_ADDR, abi=abi)
 
-    unsent_tx = billboard.functions.transfer(dst_addr, amount).build_transaction({
+    unsent_tx = yab_transfer.functions.transfer(dst_addr, amount).build_transaction({
         "from": acct.address,
         "nonce": w3.eth.get_transaction_count(acct.address),
     })
