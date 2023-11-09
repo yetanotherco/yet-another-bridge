@@ -6,7 +6,7 @@ mod Escrow {
     use snforge_std::{start_prank, stop_prank};
 
     use yab::interfaces::IERC20::{IERC20Dispatcher, IERC20DispatcherTrait};
-    use yab::contracts::escrow::{IEscrowDispatcher, IEscrowDispatcherTrait, Order};
+    use yab::escrow::{IEscrowDispatcher, IEscrowDispatcherTrait, Order};
     use yab::interfaces::IEVMFactsRegistry::{
         IEVMFactsRegistryDispatcher, IEVMFactsRegistryDispatcherTrait
     };

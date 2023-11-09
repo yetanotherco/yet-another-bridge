@@ -1,7 +1,5 @@
-mod contracts {
-    mod ERC20;
-    mod escrow;
-}
+mod ERC20;
+mod escrow;
 
 mod interfaces {
     mod IERC20;
