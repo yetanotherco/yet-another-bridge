@@ -14,12 +14,12 @@ def herodotus_prove(block) -> str:
     	    HERODOTUS_ORIGIN_CHAIN: {
                 "block:{}".format(block): {
                     "header": [
-    		            "PARENT_HASH",
-    	                "TRANSACTIONS_ROOT"
+                        "PARENT_HASH",
+                        "TRANSACTIONS_ROOT"
     	            ],
     	            "accounts": {
                         constants.ETH_CONTRACT_ADDR: {
-    		                "props": ["STORAGE_ROOT"]
+                            "props": ["STORAGE_ROOT"]
                         }
                     }
                 }
