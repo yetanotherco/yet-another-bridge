@@ -1,10 +1,10 @@
 import os
 
 ETH_RPC_URL = 'https://goerli.nodeguardians.io'
-SN_RPC_URL = ''
+SN_RPC_URL = os.getenv('SN_RPC_URL')
 
 ETH_CONTRACT_ADDR = '0x'
-SN_CONTRACT_ADDR = '0x'
+SN_CONTRACT_ADDR = os.getenv('SN_CONTRACT_ADDR')
 
 ETH_PRIVATE_KEY = os.getenv('ETH_PRIVATE_KEY')
 
