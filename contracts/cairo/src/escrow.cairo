@@ -80,8 +80,8 @@ mod Escrow {
         orders_used: LegacyMap::<u256, bool>,
         herodotus_facts_registry_contract: ContractAddress,
         eth_transfer_contract: EthAddress, // our transfer contract in L1
-        mm_ethereum_contract: EthAddress,
-        mm_starknet_contract: ContractAddress,
+        mm_ethereum_wallet: EthAddress,
+        mm_starknet_wallet: ContractAddress,
         native_token_eth_starknet: ContractAddress
     }
 
@@ -90,8 +90,8 @@ mod Escrow {
         ref self: ContractState,
         herodotus_facts_registry_contract: ContractAddress,
         eth_transfer_contract: EthAddress,
-        mm_ethereum_contract: EthAddress,
-        mm_starknet_contract: ContractAddress,
+        mm_ethereum_wallet: EthAddress,
+        mm_starknet_wallet: ContractAddress,
         native_token_eth_starknet: ContractAddress
     ) {
         let mut unsafe_state = Ownable::unsafe_new_contract_state();
@@ -100,8 +100,8 @@ mod Escrow {
         self.current_order_id.write(0);
         self.herodotus_facts_registry_contract.write(herodotus_facts_registry_contract);
         self.eth_transfer_contract.write(eth_transfer_contract);
-        self.mm_ethereum_contract.write(mm_ethereum_contract);
-        self.mm_starknet_contract.write(mm_starknet_contract);
+        self.mm_ethereum_wallet.write(mm_ethereum_wallet);
+        self.mm_starknet_wallet.write(mm_starknet_wallet);
         self.native_token_eth_starknet.write(native_token_eth_starknet);
     }
 
@@ -121,7 +121,7 @@ mod Escrow {
             // TODO: add allowance ?
 
             IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
-                .transfer_from(get_caller_address(), get_contract_address(), order.amount);
+                .transferFrom(get_caller_address(), get_contract_address(), order.amount);
 
             self
                 .emit(
@@ -146,8 +146,7 @@ mod Escrow {
 
         fn withdraw(ref self: ContractState, order_id: u256, block: u256, slot: u256,) {
             assert(
-                self.mm_starknet_contract.read() == get_caller_address(),
-                'Only MM_STARKNET_CONTRACT'
+                self.mm_starknet_wallet.read() == get_caller_address(), 'Only MM_STARKNET_CONTRACT'
             );
             assert(!self.orders_used.read(order_id), 'Order already withdrawed');
 
@@ -196,9 +195,9 @@ mod Escrow {
             // - add fee
             // - confirm slot values against local order
             IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
-                .transfer(self.mm_starknet_contract.read(), amount);
+                .transfer(self.mm_starknet_wallet.read(), amount);
 
-            self.emit(Withdraw { order_id, address: self.mm_starknet_contract.read(), amount });
+            self.emit(Withdraw { order_id, address: self.mm_starknet_wallet.read(), amount });
         }
 
         fn get_herodotus_facts_registry_contract(self: @ContractState) -> ContractAddress {
@@ -210,11 +209,11 @@ mod Escrow {
         }
 
         fn get_mm_ethereum_contract(self: @ContractState) -> EthAddress {
-            self.mm_ethereum_contract.read()
+            self.mm_ethereum_wallet.read()
         }
 
         fn get_mm_starknet_contract(self: @ContractState) -> ContractAddress {
-            self.mm_starknet_contract.read()
+            self.mm_starknet_wallet.read()
         }
 
         fn set_herodotus_facts_registry_contract(
@@ -234,13 +233,13 @@ mod Escrow {
         fn set_mm_ethereum_contract(ref self: ContractState, new_contract: EthAddress) {
             let unsafe_state = Ownable::unsafe_new_contract_state();
             Ownable::InternalImpl::assert_only_owner(@unsafe_state);
-            self.mm_ethereum_contract.write(new_contract);
+            self.mm_ethereum_wallet.write(new_contract);
         }
 
         fn set_mm_starknet_contract(ref self: ContractState, new_contract: ContractAddress) {
             let unsafe_state = Ownable::unsafe_new_contract_state();
             Ownable::InternalImpl::assert_only_owner(@unsafe_state);
-            self.mm_starknet_contract.write(new_contract);
+            self.mm_starknet_wallet.write(new_contract);
         }
     }
 

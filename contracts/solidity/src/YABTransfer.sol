@@ -4,7 +4,7 @@ pragma solidity ^0.8.21;
 contract YABTransfer {
     struct TransferInfo {
         uint256 destAddress;
-        uint128 amount;
+        uint256 amount;
         bool isUsed;
     }
 
