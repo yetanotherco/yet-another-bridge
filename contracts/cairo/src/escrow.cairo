@@ -192,9 +192,6 @@ mod Escrow {
 
             self.orders_used.write(order_id, true);
 
-            // TODO
-            // - add fee
-            // - confirm slot values against local order
             IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
                 .transfer(self.mm_starknet_contract.read(), amount);
 
