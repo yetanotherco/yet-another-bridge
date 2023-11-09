@@ -1,6 +1,5 @@
 import constants
 import requests
-import os
 
 def herodotus_prove(block) -> str:
     headers = {
