@@ -3,12 +3,10 @@ import requests
 import time
 from web3 import Web3
 
-def herodotus_prove(block, order_id) -> str:
+def herodotus_prove(block, order_id, slot) -> str:
     headers = {
         "Content-Type": "application/json",
     }
-
-    slot = Web3.solidity_keccak(['uint256', 'uint256'], [order_id, 0])
 
     request_data = {
     	"destinationChainId": constants.HERODOTUS_DESTINATION_CHAIN,

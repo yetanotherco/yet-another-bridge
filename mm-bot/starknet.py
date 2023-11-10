@@ -1,6 +1,26 @@
 import requests
 import constants
 import json
+import os
+
+from starknet_py.contract import Contract
+from starknet_py.net.full_node_client import FullNodeClient
+from starknet_py.net.account.account import Account
+from starknet_py.net.models.chains import StarknetChainId
+from starknet_py.net.signer.stark_curve_signer import KeyPair
+from starknet_py.hash.selector import get_selector_from_name
+from starknet_py.net.client_models import Call
+from starknet_py.cairo.felt import decode_shortstring
+
+full_node_client = FullNodeClient(node_url=constants.SN_RPC_URL)
+
+key_pair = KeyPair.from_private_key(key=constants.SN_PRIVATE_KEY)
+account = Account(
+    client=full_node_client,
+    address=constants.SN_WALLET_ADDR,
+    key_pair=key_pair,
+    chain=StarknetChainId.TESTNET,
+)
 
 class SetOrderEvent:
     def __init__(self, order_id, recipient_address, amount):
@@ -11,53 +31,67 @@ class SetOrderEvent:
     def __str__(self):
         return f"order_id:{self.order_id}, recipent: {self.recipient_address}, amount: {self.amount}"
 
-def starknet_invoke(contract_abi, address, inputs, network: str):
-    print(
-        os.popen(
-            f"starknet invoke "
-            f"--address {address} "
-            f"--abi {contract_abi} "
-            f"--function fun_ENTRY_POINT "
-            f"--inputs {inputs} "
-            f"--network {network} "
-        ).read()
+async def get_starknet_events() -> int:
+    events_response = await full_node_client.get_events(
+        address=constants.SN_CONTRACT_ADDR,
+        chunk_size=1000,
     )
 
-def get_starknet_events() -> int:
-    body = {
-        "id": 1,
-        "jsonrpc": "2.0",
-        "method": "starknet_getEvents",
-        "params": [
-            {
-            "address": constants.SN_CONTRACT_ADDR,
-            "chunk_size": 1000
-            }
-        ]
-    }
-    return requests.post(constants.SN_RPC_URL, json = body)
+    return events_response
 
-def get_latest_order(): 
-    request_result = get_starknet_events().json()
-    events = request_result['result']['events']
+async def get_is_used_order(order_id) -> bool:
+    call = Call(
+        to_addr=constants.SN_CONTRACT_ADDR,
+        selector=get_selector_from_name("get_order_used"),
+        calldata=[order_id, 0],
+    )
+    try :
+        status = await account.client.call_contract(call)
+        return status[0]
+    except Exception as e:
+        return True
 
-    # orders = []
-    SET_ORDER_KEY_EVENT='0x2c75a60b5bdad73ebbf539cc807fccd09875c3cbf3f44041f852cdb96d8acd3'
-    for i in reversed(range(len(events))):
-        # Obtain first event that match with SET_ORDER_KEY_EVENT
-        # We assume that we have a single SetOrder event
-        if (len(events[i]['keys']) > 0 and events[i]['keys'][0] == SET_ORDER_KEY_EVENT):
-            # orders.append(SetOrderEvent(event['data'][0], event['data'][1]))
-            order = SetOrderEvent(events[i]['data'][0], events[i]['data'][1], events[i]['data'][2])
-            break
+async def get_latest_unfulfilled_order(): 
+    request_result = await get_starknet_events()
+    events = request_result.events
+
+    SET_ORDER_KEY_EVENT=0x2c75a60b5bdad73ebbf539cc807fccd09875c3cbf3f44041f852cdb96d8acd3
+    order = None
+    for event in events:
+        if event.keys[0] == SET_ORDER_KEY_EVENT:
+            if event.data[3] == 0:
+                # TODO fix this in the contracts
+                # amount should be > 0
+                continue
+            status = await get_is_used_order(event.data[0])
+            if status == False:
+                order = SetOrderEvent(
+                    order_id=event.data[0],
+                    recipient_address=event.data[2],
+                    amount=event.data[3],
+                )
+                break
 
     if (order):
         return order
     else:
         return None
 
-print(">>> EVENT RESULT: ", get_latest_order())
-# main
-# wait x secs
-# call check_new_events
-# track latest order_id that was processed
+async def withdraw(order_id, block, slot) -> bool:
+    slot = slot.hex()
+    slot_high = int(slot.replace("0x", "")[0:32], 16)
+    slot_low = int(slot.replace("0x", "")[32:64], 16)
+    print(order_id, block, slot_high, slot_low)
+    call = Call(
+        to_addr=int(constants.SN_CONTRACT_ADDR, 0),
+        selector=get_selector_from_name("withdraw"),
+        calldata=[order_id, 0, block, 0, slot_low, slot_high]
+    )
+    try :
+        transaction = await account.sign_invoke_transaction(call, max_fee=10000000000000)
+        result = await account.client.send_transaction(transaction)
+        await account.client.wait_for_tx(result.transaction_hash)
+
+        print("Withdrawn from starknet:", result.transaction_hash)
+    except Exception as e:
+        print("[-] Failed to withdraw from starknet", e)

@@ -1,6 +1,7 @@
 
 import constants
 import json
+import os
 from web3 import Web3, AsyncWeb3
 
 w3 = Web3(Web3.HTTPProvider(constants.ETH_RPC_URL))
@@ -11,10 +12,10 @@ def get_latest_block() -> int:
 def transfer(deposit_id, dst_addr, amount):
     acct = w3.eth.account.from_key(constants.ETH_PRIVATE_KEY)
     # get only the abi not the entire file
-    abi = json.load(open('abi/YABTransfer.json'))['abi']
+    abi = json.load(open(os.path.dirname(os.path.realpath(__file__))+'/abi/YABTransfer.json'))['abi']
 
     yab_transfer = w3.eth.contract(address=constants.ETH_CONTRACT_ADDR, abi=abi)
-    dst_addr_bytes = Web3.to_int(hexstr=dst_addr)
+    dst_addr_bytes = Web3.to_int(dst_addr)
     deposit_id = Web3.to_int(deposit_id)
     amount = Web3.to_int(amount)
     # we need amount so the transaction is valid with the trasnfer that will be transfered

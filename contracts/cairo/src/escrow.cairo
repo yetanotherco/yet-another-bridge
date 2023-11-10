@@ -59,7 +59,6 @@ mod Escrow {
 
     #[derive(Drop, starknet::Event)]
     struct SetOrder {
-        #[key]
         order_id: u256,
         recipient_address: EthAddress,
         amount: u256,
@@ -67,7 +66,6 @@ mod Escrow {
 
     #[derive(Drop, starknet::Event)]
     struct Withdraw {
-        #[key]
         order_id: u256,
         address: ContractAddress,
         amount: u256,

@@ -1,18 +1,19 @@
+import asyncio
 import ethereum
 import herodotus
 import json
-from starknet import get_latest_order
+import starknet
+from web3 import Web3
 
-
-if __name__ == '__main__':
+async def run():
+    print("[+] Listening events on starknet")
     while True:
         # 1. Listen event on starknet
-        print("[+] Listening event on starknet")
-        latest_order = get_latest_order()
-        print("latest order: ", latest_order)
-        
+        latest_order = await starknet.get_latest_unfulfilled_order()
         if latest_order is None:
             continue
+
+        print("New event: ", latest_order)
         
         order_id = latest_order.order_id
         dst_addr = latest_order.recipient_address
@@ -21,15 +22,19 @@ if __name__ == '__main__':
         # 2. Transfer eth on ethereum
         # (bridging is complete for the user)
         print("[+] Transfering eth on ethereum")
-        # TODO check the tx receipt
-        ethereum.transfer(order_id, dst_addr, amount)
+        try:
+            # in case it's processed on ethereum, but not processed on starknet
+            ethereum.transfer(order_id, dst_addr, amount)
+        except Exception as e:
+            print(e)
         print("[+] Transfer complete")
         
         # 3. Call herodotus to prove
         # extra: validate w3.eth.get_storage_at(addr, pos) before calling herodotus
         block = ethereum.get_latest_block()
+        slot = Web3.solidity_keccak(['uint256', 'uint256'], [order_id, 0])
         print("[+] Proving block {}".format(block))
-        task_id = herodotus.herodotus_prove(block, order_id)
+        task_id = herodotus.herodotus_prove(block, order_id, slot)
         print("[+] Block being proved with task id: {}".format(task_id))
         
         # 4. Poll herodotus to check task status
@@ -41,4 +46,7 @@ if __name__ == '__main__':
         # (bridging is complete for the mm)
         if completed:
             print("[+] Withdraw eth from starknet")
-            # TODO
+            await starknet.withdraw(order_id, block, slot)
+
+if __name__ == '__main__':
+    asyncio.run(run())
