@@ -153,7 +153,7 @@ mod Escrow {
             // Read transfer info from the facts registry
             // struct TransferInfo {
             //     uint256 destAddress;
-            //     uint128 amount;
+            //     uint256 amount;
             //     bool isUsed;
             // }
 
