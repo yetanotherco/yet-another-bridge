@@ -10,13 +10,16 @@ def get_latest_block() -> int:
 
 def transfer(dst_addr, amount):
     acct = w3.eth.account.from_key(constants.ETH_PRIVATE_KEY)
-    abi = json.load(open('abi/YABTransfer.json'))
+    # get only the abi not the entire file
+    abi = json.load(open('abi/YABTransfer.json'))['abi']
 
     yab_transfer = w3.eth.contract(address=constants.ETH_CONTRACT_ADDR, abi=abi)
 
+    # we need amount so the transaction is valid with the trasnfer that will be transfered
     unsent_tx = yab_transfer.functions.transfer(dst_addr, amount).build_transaction({
         "from": acct.address,
         "nonce": w3.eth.get_transaction_count(acct.address),
+        "value": amount,
     })
     signed_tx = w3.eth.account.sign_transaction(unsent_tx, private_key=acct.key)
     
