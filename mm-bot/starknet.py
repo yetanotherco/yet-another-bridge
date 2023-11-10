@@ -3,12 +3,13 @@ import constants
 import json
 
 class SetOrderEvent:
-    def __init__(self, recipient_address, amount):
+    def __init__(self, order_id, recipient_address, amount):
+        self.order_id = order_id
         self.recipient_address = recipient_address
         self.amount = amount
     
     def __str__(self):
-        return f"recipent: {self.recipient_address}, amount: {self.amount}"
+        return f"order_id:{self.order_id}, recipent: {self.recipient_address}, amount: {self.amount}"
 
 def starknet_invoke(contract_abi, address, inputs, network: str):
     print(
@@ -47,7 +48,7 @@ def get_latest_order():
         # We assume that we have a single SetOrder event
         if (len(events[i]['keys']) > 0 and events[i]['keys'][0] == SET_ORDER_KEY_EVENT):
             # orders.append(SetOrderEvent(event['data'][0], event['data'][1]))
-            order = SetOrderEvent(events[i]['data'][0], events[i]['data'][1])
+            order = SetOrderEvent(events[i]['data'][0], events[i]['data'][1], events[i]['data'][2])
             break
 
     if (order):

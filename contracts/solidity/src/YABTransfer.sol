@@ -4,7 +4,7 @@ pragma solidity ^0.8.21;
 contract YABTransfer {
     struct TransferInfo {
         uint256 destAddress;
-        uint128 amount;
+        uint256 amount;
         bool isUsed;
     }
 
@@ -12,7 +12,7 @@ contract YABTransfer {
 
     mapping(uint256 => TransferInfo) public transfers;
 
-    function transfer(uint256 orderId, uint256 destAddress, uint128 amount) external payable {
+    function transfer(uint256 orderId, uint256 destAddress, uint256 amount) external payable {
         require(destAddress != 0, "Invalid destination address.");
         require(amount > 0, "Invalid amount, should be higher than 0.");
         require(msg.value == amount, "Invalid amount, should match msg.value.");
