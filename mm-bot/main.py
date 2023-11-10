@@ -21,7 +21,7 @@ if __name__ == '__main__':
         # extra: validate w3.eth.get_storage_at(addr, pos) before calling herodotus
         block = ethereum.get_latest_block()
         print("[+] Proving block {}".format(block))
-        task_id = herodotus.herodotus_prove(block)
+        task_id = herodotus.herodotus_prove(block, order_id)
         print("[+] Block being proved with task id: {}".format(task_id))
         
         # 4. Poll herodotus to check task status
