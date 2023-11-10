@@ -10,7 +10,7 @@ mod EVMFactsRegistry {
     #[constructor]
     fn constructor(ref self: ContractState) {
         self.slots.write(0, 12345); // mock recipient_address
-        self.slots.write(1, 500); // mock amount
+        self.slots.write(2, 500); // mock amount
     }
 
     #[external(v0)]

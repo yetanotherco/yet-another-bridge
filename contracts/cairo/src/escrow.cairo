@@ -158,8 +158,7 @@ mod Escrow {
             // }
 
             let mut slot_1 = slot.clone();
-            // TODO confirm this, probably it's not true
-            slot_1 += 1;
+            slot_1 += 2;
 
             let slot_0 = slot;
 
@@ -167,7 +166,7 @@ mod Escrow {
             let slot_0_value = IEVMFactsRegistryDispatcher {
                 contract_address: self.herodotus_facts_registry_contract.read()
             }
-                .get_slot_value(self.eth_transfer_contract.read().into(), block, slot_0,)
+                .get_slot_value(self.eth_transfer_contract.read().into(), block, slot_0)
                 .unwrap();
 
             let recipient_address: felt252 = slot_0_value
@@ -184,7 +183,7 @@ mod Escrow {
             let amount = IEVMFactsRegistryDispatcher {
                 contract_address: self.herodotus_facts_registry_contract.read()
             }
-                .get_slot_value(self.eth_transfer_contract.read().into(), block, slot_1,)
+                .get_slot_value(self.eth_transfer_contract.read().into(), block, slot_1)
                 .unwrap();
 
             assert(order.amount == amount, 'amount not match L1');
