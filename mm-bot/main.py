@@ -3,6 +3,7 @@ import ethereum
 import herodotus
 import json
 import starknet
+import time
 from web3 import Web3
 
 async def run():
@@ -39,6 +40,8 @@ async def run():
         
         # 4. Poll herodotus to check task status
         print("[+] Polling herodotus for task status")
+        # avoid weird case where herodotus insta says done
+        time.sleep(10)
         completed = herodotus.herodotus_poll_status(task_id)
         print("[+] Task completed")
         

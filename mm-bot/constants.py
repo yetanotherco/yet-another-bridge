@@ -15,4 +15,4 @@ HERODOTUS_ORIGIN_CHAIN = '5'
 HERODOTUS_DESTINATION_CHAIN = 'SN_GOERLI'
 
 MAX_RETRIES = 30
-RETRIES_DELAY = 30 # 30 seconds, 30 tries within 15 minutes
+RETRIES_DELAY = 60 # 60 seconds, 30 tries within 30 minutes

@@ -63,6 +63,7 @@ def herodotus_poll_status(task_id) -> bool:
     while retries <= constants.MAX_RETRIES:
         try:
             status = herodotus_status(task_id)
+            print("[!] Herodotus status: {}".format(status))
             if status == 'DONE':
                 return True
             retries += 1

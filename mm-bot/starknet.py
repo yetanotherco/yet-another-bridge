@@ -63,6 +63,8 @@ async def get_latest_unfulfilled_order():
                 # TODO fix this in the contracts
                 # amount should be > 0
                 continue
+            if event.data[0] < 2:
+                continue
             status = await get_is_used_order(event.data[0])
             if status == False:
                 order = SetOrderEvent(
