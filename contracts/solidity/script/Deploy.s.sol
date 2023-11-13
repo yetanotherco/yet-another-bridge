@@ -9,7 +9,14 @@ contract Deploy is Script {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
 
-        new YABTransfer();
+        address snMessagingAddress = 0xde29d060D45901Fb19ED6C6e959EB22d8626708e;
+        uint256 snEscrowAddress = 0x0;
+        uint256 snEscrowWithdrawSelector = 0x0;
+
+        new YABTransfer(
+            snMessagingAddress,
+            snEscrowAddress,
+            snEscrowWithdrawSelector);
 
         vm.stopBroadcast();
     }
