@@ -142,7 +142,7 @@ mod Escrow {
             self.orders_used.read(order_id)
         }
 
-        fn withdraw(ref self: ContractState, order_id: u256, block: u256, slot: u256,) {
+        fn withdraw(ref self: ContractState, order_id: u256, block: u256, slot: u256) {
             assert(
                 self.mm_starknet_wallet.read() == get_caller_address(), 'Only MM_STARKNET_CONTRACT'
             );
@@ -169,7 +169,7 @@ mod Escrow {
 
             let recipient_address: felt252 = slot_0_value
                 .try_into()
-                .expect('Invalid addres parse felt252');
+                .expect('Invalid address parse felt252');
             let recipient_address: EthAddress = recipient_address
                 .try_into()
                 .expect('Invalid address parse EthAddres');
@@ -235,6 +235,31 @@ mod Escrow {
             Ownable::InternalImpl::assert_only_owner(@unsafe_state);
             self.mm_starknet_wallet.write(new_contract);
         }
+    }
+
+    #[l1_handler]
+    fn withdraw_fallback(
+        ref self: ContractState,
+        from_address: felt252,
+        order_id: u256,
+        recipient_address: EthAddress,
+        amount: u256) {
+        let eth_transfer_contract_felt: felt252 = self.eth_transfer_contract.read().into();
+        assert(
+            eth_transfer_contract_felt == from_address, 'Only ETH_TRANSFER_CONTRACT'
+        );
+        assert(!self.orders_used.read(order_id), 'Order already withdrawed');
+
+        let order = self.orders.read(order_id);
+        assert(order.recipient_address == recipient_address, 'recipient_address not match L1');
+        assert(order.amount == amount, 'amount not match L1');
+
+        self.orders_used.write(order_id, true);
+
+        IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
+            .transfer(self.mm_starknet_wallet.read(), amount);
+
+        self.emit(Withdraw { order_id, address: self.mm_starknet_wallet.read(), amount });
     }
 
     // Ownable
