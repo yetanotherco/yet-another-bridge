@@ -13,6 +13,7 @@ contract YABTransfer {
     event Transfer(uint256 indexed orderId, address srcAddress, TransferInfo transferInfo);
 
     mapping(uint256 => TransferInfo) public transfers;
+    address private _owner;
     IStarknetMessaging private _snMessaging;
     uint256 private _snEscrowAddress;
     uint256 private _snEscrowWithdrawSelector;
@@ -21,6 +22,7 @@ contract YABTransfer {
         address snMessaging,
         uint256 snEscrowAddress,
         uint256 snEscrowWithdrawSelector) {
+        _owner = msg.sender;
         _snMessaging = IStarknetMessaging(snMessaging);
         _snEscrowAddress = snEscrowAddress;
         _snEscrowWithdrawSelector = snEscrowWithdrawSelector;
@@ -53,5 +55,15 @@ contract YABTransfer {
             _snEscrowAddress,
             _snEscrowWithdrawSelector,
             payload);
+    }
+
+    function setEscrowAddress(uint256 snEscrowAddress) external {
+        require(msg.sender == _owner, "Only owner can call this function.");
+        _snEscrowAddress = snEscrowAddress;
+    }
+
+    function setEscrowWithdrawSelector(uint256 snEscrowWithdrawSelector) external {
+        require(msg.sender == _owner, "Only owner can call this function.");
+        _snEscrowWithdrawSelector = snEscrowWithdrawSelector;
     }
 }
