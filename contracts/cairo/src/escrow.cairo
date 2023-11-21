@@ -108,6 +108,7 @@ mod Escrow {
 
         fn set_order(ref self: ContractState, order: Order) -> u256 {
             // TODO expiry can't be less than 24h
+            assert(order.amount > 0, 'Amount must be greater than 0');
 
             let mut order_id = self.current_order_id.read();
             self.orders.write(order_id, order);
