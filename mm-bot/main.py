@@ -27,7 +27,7 @@ async def run():
             # in case it's processed on ethereum, but not processed on starknet
             ethereum.transfer(order_id, dst_addr, amount)
         except Exception as e:
-            print(e)
+            print("[-] Transfer failed: {}".format(e))
         print("[+] Transfer complete")
         
         # 3. Call herodotus to prove

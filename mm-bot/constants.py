@@ -1,4 +1,7 @@
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 ETH_RPC_URL = 'https://goerli.nodeguardians.io'
 SN_RPC_URL = os.getenv('SN_RPC_URL')

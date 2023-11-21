@@ -15,7 +15,7 @@ def transfer(deposit_id, dst_addr, amount):
     abi = json.load(open(os.path.dirname(os.path.realpath(__file__))+'/abi/YABTransfer.json'))['abi']
 
     yab_transfer = w3.eth.contract(address=constants.ETH_CONTRACT_ADDR, abi=abi)
-    dst_addr_bytes = Web3.to_int(dst_addr)
+    dst_addr_bytes = int(dst_addr, 0)
     deposit_id = Web3.to_int(deposit_id)
     amount = Web3.to_int(amount)
     # we need amount so the transaction is valid with the trasnfer that will be transfered
@@ -29,4 +29,4 @@ def transfer(deposit_id, dst_addr, amount):
     
     tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
     w3.eth.wait_for_transaction_receipt(tx_hash)
-    print("[+] Transfer tx hash: {}".format(tx_hash))
+    print("[+] Transfer tx hash: 0x{}".format(tx_hash.hex()))
