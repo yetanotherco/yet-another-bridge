@@ -12,7 +12,7 @@ contract YABTransfer {
 
     event Transfer(uint256 indexed orderId, address srcAddress, TransferInfo transferInfo);
 
-    mapping(uint256 => TransferInfo) public transfers;
+    mapping(bytes32 => TransferInfo) public transfers;
     address private _owner;
     IStarknetMessaging private _snMessaging;
     uint256 private _snEscrowAddress;
@@ -32,18 +32,21 @@ contract YABTransfer {
         require(destAddress != 0, "Invalid destination address.");
         require(amount > 0, "Invalid amount, should be higher than 0.");
         require(msg.value == amount, "Invalid amount, should match msg.value.");
-        require(transfers[orderId].isUsed == false, "Transfer already processed.");
 
-        transfers[orderId] = TransferInfo({destAddress: destAddress, amount: amount, isUsed: true});
+        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount));
+        require(transfers[index].isUsed == false, "Transfer already processed.");
+
+        transfers[index] = TransferInfo({destAddress: destAddress, amount: amount, isUsed: true});
 
         (bool success,) = payable(address(uint160(destAddress))).call{value: msg.value}("");
 
         require(success, "Transfer failed.");
-        emit Transfer(orderId, msg.sender, transfers[orderId]);
+        emit Transfer(orderId, msg.sender, transfers[index]);
     }
 
-    function withdraw(uint256 orderId) external payable {
-        TransferInfo storage transferInfo = transfers[orderId];
+    function withdraw(uint256 orderId, uint256 destAddress, uint256 amount) external payable {
+        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount));
+        TransferInfo storage transferInfo = transfers[index];
         require(transferInfo.isUsed == true, "Transfer not found.");
 
         uint256[] memory payload = new uint256[](3);
