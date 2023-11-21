@@ -36,9 +36,6 @@ mod Escrow {
 
     use starknet::{ContractAddress, EthAddress, get_caller_address, get_contract_address};
 
-    use openzeppelin::access::ownable::interface::IOwnable;
-    use openzeppelin::access::ownable::ownable::Ownable;
-
     use yab::interfaces::IERC20::{IERC20Dispatcher, IERC20DispatcherTrait};
     use yab::interfaces::IEVMFactsRegistry::{
         IEVMFactsRegistryDispatcher, IEVMFactsRegistryDispatcherTrait
@@ -73,6 +70,7 @@ mod Escrow {
 
     #[storage]
     struct Storage {
+        owner: ContractAddress,
         current_order_id: u256,
         orders: LegacyMap::<u256, Order>,
         orders_used: LegacyMap::<u256, bool>,
@@ -92,8 +90,7 @@ mod Escrow {
         mm_starknet_wallet: ContractAddress,
         native_token_eth_starknet: ContractAddress
     ) {
-        let mut unsafe_state = Ownable::unsafe_new_contract_state();
-        Ownable::InternalImpl::initializer(ref unsafe_state, get_caller_address());
+        self.owner.write(get_caller_address());
 
         self.current_order_id.write(0);
         self.herodotus_facts_registry_contract.write(herodotus_facts_registry_contract);
@@ -143,9 +140,6 @@ mod Escrow {
         }
 
         fn withdraw(ref self: ContractState, order_id: u256, block: u256, slot: u256) {
-            assert(
-                self.mm_starknet_wallet.read() == get_caller_address(), 'Only MM_STARKNET_CONTRACT'
-            );
             assert(!self.orders_used.read(order_id), 'Order already withdrawed');
 
             // Read transfer info from the facts registry
@@ -213,26 +207,34 @@ mod Escrow {
         fn set_herodotus_facts_registry_contract(
             ref self: ContractState, new_contract: ContractAddress
         ) {
-            let unsafe_state = Ownable::unsafe_new_contract_state();
-            Ownable::InternalImpl::assert_only_owner(@unsafe_state);
+            assert(
+                self.owner.read() == get_caller_address(),
+                'Only owner allowed'
+            );
             self.herodotus_facts_registry_contract.write(new_contract);
         }
 
         fn set_eth_transfer_contract(ref self: ContractState, new_contract: EthAddress) {
-            let unsafe_state = Ownable::unsafe_new_contract_state();
-            Ownable::InternalImpl::assert_only_owner(@unsafe_state);
+            assert(
+                self.owner.read() == get_caller_address(),
+                'Only owner allowed'
+            );
             self.eth_transfer_contract.write(new_contract);
         }
 
         fn set_mm_ethereum_contract(ref self: ContractState, new_contract: EthAddress) {
-            let unsafe_state = Ownable::unsafe_new_contract_state();
-            Ownable::InternalImpl::assert_only_owner(@unsafe_state);
+            assert(
+                self.owner.read() == get_caller_address(),
+                'Only owner allowed'
+            );
             self.mm_ethereum_wallet.write(new_contract);
         }
 
         fn set_mm_starknet_contract(ref self: ContractState, new_contract: ContractAddress) {
-            let unsafe_state = Ownable::unsafe_new_contract_state();
-            Ownable::InternalImpl::assert_only_owner(@unsafe_state);
+            assert(
+                self.owner.read() == get_caller_address(),
+                'Only owner allowed'
+            );
             self.mm_starknet_wallet.write(new_contract);
         }
     }
@@ -260,25 +262,5 @@ mod Escrow {
             .transfer(self.mm_starknet_wallet.read(), amount);
 
         self.emit(Withdraw { order_id, address: self.mm_starknet_wallet.read(), amount });
-    }
-
-    // Ownable
-
-    #[external(v0)]
-    impl OwnableImpl of IOwnable<ContractState> {
-        fn owner(self: @ContractState) -> ContractAddress {
-            let unsafe_state = Ownable::unsafe_new_contract_state();
-            Ownable::OwnableImpl::owner(@unsafe_state)
-        }
-
-        fn transfer_ownership(ref self: ContractState, new_owner: ContractAddress) {
-            let mut unsafe_state = Ownable::unsafe_new_contract_state();
-            Ownable::OwnableImpl::transfer_ownership(ref unsafe_state, new_owner)
-        }
-
-        fn renounce_ownership(ref self: ContractState) {
-            let mut unsafe_state = Ownable::unsafe_new_contract_state();
-            Ownable::OwnableImpl::renounce_ownership(ref unsafe_state)
-        }
     }
 }
