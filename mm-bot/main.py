@@ -33,7 +33,9 @@ async def run():
         # 3. Call herodotus to prove
         # extra: validate w3.eth.get_storage_at(addr, pos) before calling herodotus
         block = ethereum.get_latest_block()
-        slot = Web3.solidity_keccak(['uint256', 'uint256'], [order_id, 0])
+        index = Web3.solidity_keccak(['uint256', 'uint256', 'uint256'],
+                                     [order_id, int(dst_addr, 0), amount])
+        slot = Web3.solidity_keccak(['uint256', 'uint256'], [int(index.hex(),0), 0])
         print("[+] Proving block {}".format(block))
         task_id = herodotus.herodotus_prove(block, order_id, slot)
         print("[+] Block being proved with task id: {}".format(task_id))
