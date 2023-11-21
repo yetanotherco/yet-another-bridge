@@ -28,5 +28,5 @@ def transfer(deposit_id, dst_addr, amount):
     signed_tx = w3.eth.account.sign_transaction(unsent_tx, private_key=acct.key)
     
     tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
-    print(w3.eth.wait_for_transaction_receipt(tx_hash))
-    
+    w3.eth.wait_for_transaction_receipt(tx_hash)
+    print("[+] Transfer tx hash: {}".format(tx_hash))

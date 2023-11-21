@@ -3,6 +3,8 @@ import requests
 import time
 from web3 import Web3
 
+reqs = []
+
 def herodotus_prove(block, order_id, slot) -> str:
     headers = {
         "Content-Type": "application/json",
@@ -60,11 +62,17 @@ def herodotus_status(task_id) -> str:
 def herodotus_poll_status(task_id) -> bool:
     # instead of returning a bool we can store it in a mapping
     retries = 0
+    start_time = time.time()
     while retries <= constants.MAX_RETRIES:
         try:
             status = herodotus_status(task_id)
             print("[!] Herodotus status: {}".format(status))
             if status == 'DONE':
+                end_time = time.time()
+                request_time = end_time - start_time
+                print("[!] Herodotus request time: {}".format(request_time))
+                reqs.append(request_time)
+                print("[!] Herodotus average request time (total): {}".format(sum(reqs) / len(reqs)))
                 return True
             retries += 1
             time.sleep(constants.RETRIES_DELAY)

@@ -59,17 +59,11 @@ async def get_latest_unfulfilled_order():
     order = None
     for event in events:
         if event.keys[0] == SET_ORDER_KEY_EVENT:
-            if event.data[3] == 0:
-                # TODO fix this in the contracts
-                # amount should be > 0
-                continue
-            if event.data[0] < 2:
-                continue
             status = await get_is_used_order(event.data[0])
             if status == False:
                 order = SetOrderEvent(
                     order_id=event.data[0],
-                    recipient_address=event.data[2],
+                    recipient_address=hex(event.data[2]),
                     amount=event.data[3],
                 )
                 break
@@ -83,7 +77,6 @@ async def withdraw(order_id, block, slot) -> bool:
     slot = slot.hex()
     slot_high = int(slot.replace("0x", "")[0:32], 16)
     slot_low = int(slot.replace("0x", "")[32:64], 16)
-    print(order_id, block, slot_high, slot_low)
     call = Call(
         to_addr=int(constants.SN_CONTRACT_ADDR, 0),
         selector=get_selector_from_name("withdraw"),
@@ -94,6 +87,6 @@ async def withdraw(order_id, block, slot) -> bool:
         result = await account.client.send_transaction(transaction)
         await account.client.wait_for_tx(result.transaction_hash)
 
-        print("Withdrawn from starknet:", result.transaction_hash)
+        print("[+] Withdrawn from starknet:", hex(result.transaction_hash))
     except Exception as e:
         print("[-] Failed to withdraw from starknet", e)

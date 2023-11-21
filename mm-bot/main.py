@@ -14,7 +14,7 @@ async def run():
         if latest_order is None:
             continue
 
-        print("New event: ", latest_order)
+        print("[+] New event: ", latest_order)
         
         order_id = latest_order.order_id
         dst_addr = latest_order.recipient_address
