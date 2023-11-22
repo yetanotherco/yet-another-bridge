@@ -20,7 +20,7 @@ def herodotus_prove(block, order_id, slot) -> str:
                         constants.ETH_CONTRACT_ADDR: {
                             "slots": [
                                 slot.hex(),
-                                hex(int(slot.hex(), 16) + 2),
+                                hex(int(slot.hex(), 16) + 1),
                             ]
                         }
                     }
