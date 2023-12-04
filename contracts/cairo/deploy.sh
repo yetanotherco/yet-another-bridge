@@ -16,7 +16,7 @@ load_env() {
 }
 load_env
 
-CLASS_HASH=`starkli declare target/dev/yab_Escrow.sierra.json 2>&1 | grep -A1 "Class hash" | sed '1d'`
+CLASS_HASH=`starkli declare --rpc $SN_RPC_URL target/dev/yab_Escrow.sierra.json 2>&1 | grep -A1 "Class hash" | sed '1d'`
 
 echo $CLASS_HASH
 echo $HERODOTUS_FACTS_REGISTRY
@@ -25,6 +25,6 @@ echo $MM_ETHEREUM_WALLET
 echo $SN_WALLET_ADDR
 echo $NATIVE_TOKEN_ETH_STARKNET
 
-CONTRACT_ADDRESS=`starkli deploy $CLASS_HASH $HERODOTUS_FACTS_REGISTRY $ETH_CONTRACT_ADDR $MM_ETHEREUM_WALLET $SN_WALLET_ADDR $NATIVE_TOKEN_ETH_STARKNET 2>&1 | grep -A1 "Contract deployed" | sed '1d'`
+CONTRACT_ADDRESS=`starkli deploy --rpc $SN_RPC_URL $CLASS_HASH $HERODOTUS_FACTS_REGISTRY $ETH_CONTRACT_ADDR $MM_ETHEREUM_WALLET $SN_WALLET_ADDR $NATIVE_TOKEN_ETH_STARKNET 2>&1 | grep -A1 "Contract deployed" | sed '1d'`
 
 echo $CONTRACT_ADDRESS

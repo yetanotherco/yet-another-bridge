@@ -49,10 +49,12 @@ contract YABTransfer {
         TransferInfo storage transferInfo = transfers[index];
         require(transferInfo.isUsed == true, "Transfer not found.");
 
-        uint256[] memory payload = new uint256[](3);
+        uint256[] memory payload = new uint256[](5);
         payload[0] = orderId;
-        payload[1] = transferInfo.destAddress;
-        payload[2] = transferInfo.amount;
+        payload[1] = 0;
+        payload[2] = transferInfo.destAddress;
+        payload[3] = transferInfo.amount;
+        payload[4] = 0;
         
         _snMessaging.sendMessageToL2{value: msg.value}(
             _snEscrowAddress,
