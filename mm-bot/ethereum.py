@@ -19,6 +19,7 @@ def transfer(deposit_id, dst_addr, amount):
     deposit_id = Web3.to_int(deposit_id)
     amount = Web3.to_int(amount)
     # we need amount so the transaction is valid with the trasnfer that will be transfered
+    print(yab_transfer.functions.transfer(deposit_id, dst_addr_bytes, amount))
     unsent_tx = yab_transfer.functions.transfer(deposit_id, dst_addr_bytes, amount).build_transaction({
         "chainId": 5,
         "from": acct.address,

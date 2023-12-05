@@ -60,13 +60,17 @@ async def get_latest_unfulfilled_order():
     order = None
     for event in events:
         if event.keys[0] == SET_ORDER_KEY_EVENT:
+            fee_threshold = 0.0001 * event.data[3]
+            if event.data[5] < fee_threshold:
+                print("[-] Order %s has a fee to low to process (%d < %d). Skippping" % (event.data[0], event.data[5], fee_threshold))
+                continue
             status = await get_is_used_order(event.data[0])
             if status == False:
                 order = SetOrderEvent(
                     order_id=event.data[0],
                     recipient_address=hex(event.data[2]),
                     amount=event.data[3],
-                    fee=event.data[4]
+                    fee=event.data[5]
                 )
                 break
 
