@@ -37,7 +37,7 @@ trait IEscrow<ContractState> {
 mod Escrow {
     use super::{IEscrow, Order};
 
-    use starknet::{ContractAddress, EthAddress, get_caller_address, get_contract_address};
+    use starknet::{ContractAddress, EthAddress, get_caller_address, get_contract_address, get_block_timestamp};
 
     use yab::interfaces::IERC20::{IERC20Dispatcher, IERC20DispatcherTrait};
     use yab::interfaces::IEVMFactsRegistry::{
@@ -78,6 +78,8 @@ mod Escrow {
         current_order_id: u256,
         orders: LegacyMap::<u256, Order>,
         orders_used: LegacyMap::<u256, bool>,
+        orders_senders: LegacyMap::<u256, ContractAddress>,
+        orders_timestamps: LegacyMap::<u256, u64>,
         herodotus_facts_registry_contract: ContractAddress,
         eth_transfer_contract: EthAddress, // our transfer contract in L1
         mm_ethereum_wallet: EthAddress,
@@ -111,12 +113,13 @@ mod Escrow {
         }
 
         fn set_order(ref self: ContractState, order: Order) -> u256 {
-            // TODO expiry can't be less than 24h
             assert(order.amount > 0, 'Amount must be greater than 0');
 
             let mut order_id = self.current_order_id.read();
             self.orders.write(order_id, order);
             self.orders_used.write(order_id, false);
+            self.orders_senders.write(order_id, get_caller_address());
+            self.orders_timestamps.write(order_id, get_block_timestamp());
             let payment_amount = order.amount + order.fee;
 
             IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
@@ -135,7 +138,18 @@ mod Escrow {
 
         fn cancel_order(
             ref self: ContractState, order_id: u256
-        ) { }
+        ) {
+            assert(!self.orders_used.read(order_id), 'Order already withdrawed');
+            assert(get_block_timestamp() - self.orders_timestamps.read(order_id) < 43200, 'Didnt passed enough time');
+
+            let sender = self.orders_senders.read(order_id);
+            assert(sender == get_caller_address(), 'Only sender allowed');
+            let order = self.orders.read(order_id);
+            let payment_amount = order.amount + order.fee;
+
+            IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
+                .transfer(sender, payment_amount);
+        }
 
         fn get_order_used(self: @ContractState, order_id: u256) -> bool {
             self.orders_used.read(order_id)
