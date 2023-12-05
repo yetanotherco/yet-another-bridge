@@ -47,13 +47,17 @@ async def run():
         # avoid weird case where herodotus insta says done
         time.sleep(10)
         completed = herodotus.herodotus_poll_status(task_id)
-        print("[+] Task completed")
         
         # 5. Withdraw eth from starknet
         # (bridging is complete for the mm)
         if completed:
+            print("[+] Herodotus task completed")
             print("[+] Withdraw eth from starknet")
             await starknet.withdraw(order_id, block, slot)
+        else:
+            print("[-] Herodotus task failed/timed out")
+            print("[+] Start withdraw (fallback)")
+            ethereum.withdraw_fallback(order_id, dst_addr, amount)
 
 if __name__ == '__main__':
     asyncio.run(run())

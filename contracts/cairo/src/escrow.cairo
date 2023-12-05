@@ -3,7 +3,8 @@ use starknet::{ContractAddress, EthAddress};
 #[derive(Copy, Drop, Serde, starknet::Store)]
 struct Order {
     recipient_address: EthAddress,
-    amount: u256
+    amount: u256,
+    fee: u256
 }
 
 #[starknet::interface]
@@ -15,6 +16,8 @@ trait IEscrow<ContractState> {
     fn cancel_order(ref self: ContractState, order_id: u256);
 
     fn get_order_used(self: @ContractState, order_id: u256) -> bool;
+
+    fn get_order_fee(self: @ContractState, order_id: u256) -> u256;
 
     fn withdraw(ref self: ContractState, order_id: u256, block: u256, slot: u256);
 
@@ -59,6 +62,7 @@ mod Escrow {
         order_id: u256,
         recipient_address: EthAddress,
         amount: u256,
+        fee: u256
     }
 
     #[derive(Drop, starknet::Event)]
@@ -113,16 +117,15 @@ mod Escrow {
             let mut order_id = self.current_order_id.read();
             self.orders.write(order_id, order);
             self.orders_used.write(order_id, false);
-
-            // TODO: add allowance ?
+            let payment_amount = order.amount + order.fee;
 
             IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
-                .transferFrom(get_caller_address(), get_contract_address(), order.amount);
+                .transferFrom(get_caller_address(), get_contract_address(), payment_amount);
 
             self
                 .emit(
                     SetOrder {
-                        order_id, recipient_address: order.recipient_address, amount: order.amount
+                        order_id, recipient_address: order.recipient_address, amount: order.amount, fee: order.fee
                     }
                 );
 
@@ -132,12 +135,15 @@ mod Escrow {
 
         fn cancel_order(
             ref self: ContractState, order_id: u256
-        ) { // TODO the order can be cancelled if no one reserved yet
-        // the user can retrieve all the funds without waiting for the expiry
-        }
+        ) { }
 
         fn get_order_used(self: @ContractState, order_id: u256) -> bool {
             self.orders_used.read(order_id)
+        }
+
+        fn get_order_fee(self: @ContractState, order_id: u256) -> u256 {
+            let order: Order = self.orders.read(order_id);
+            order.fee
         }
 
         fn withdraw(ref self: ContractState, order_id: u256, block: u256, slot: u256) {
@@ -182,9 +188,10 @@ mod Escrow {
             assert(order.amount == amount, 'amount not match L1');
 
             self.orders_used.write(order_id, true);
+            let payment_amount = order.amount + order.fee;
 
             IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
-                .transfer(self.mm_starknet_wallet.read(), amount);
+                .transfer(self.mm_starknet_wallet.read(), payment_amount);
 
             self.emit(Withdraw { order_id, address: self.mm_starknet_wallet.read(), amount });
         }
@@ -258,9 +265,10 @@ mod Escrow {
         assert(order.amount == amount, 'amount not match L1');
 
         self.orders_used.write(order_id, true);
+        let payment_amount = order.amount + order.fee;
 
         IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
-            .transfer(self.mm_starknet_wallet.read(), amount);
+            .transfer(self.mm_starknet_wallet.read(), payment_amount);
 
         self.emit(Withdraw { order_id, address: self.mm_starknet_wallet.read(), amount });
     }

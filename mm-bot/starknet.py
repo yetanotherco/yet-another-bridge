@@ -23,13 +23,14 @@ account = Account(
 )
 
 class SetOrderEvent:
-    def __init__(self, order_id, recipient_address, amount):
+    def __init__(self, order_id, recipient_address, amount, fee):
         self.order_id = order_id
         self.recipient_address = recipient_address
         self.amount = amount
+        self.fee = fee
     
     def __str__(self):
-        return f"order_id:{self.order_id}, recipent: {self.recipient_address}, amount: {self.amount}"
+        return f"order_id:{self.order_id}, recipent: {self.recipient_address}, amount: {self.amount}, fee: {self.fee}"
 
 async def get_starknet_events() -> int:
     events_response = await full_node_client.get_events(
@@ -65,6 +66,7 @@ async def get_latest_unfulfilled_order():
                     order_id=event.data[0],
                     recipient_address=hex(event.data[2]),
                     amount=event.data[3],
+                    fee=event.data[4]
                 )
                 break
 
