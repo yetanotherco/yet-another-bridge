@@ -3,6 +3,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+ENVIRONMENT = os.getenv('ENVIRONMENT')
+
 ETH_RPC_URL = 'https://goerli.nodeguardians.io'
 SN_RPC_URL = os.getenv('SN_RPC_URL')
 
@@ -18,4 +20,7 @@ HERODOTUS_ORIGIN_CHAIN = '5'
 HERODOTUS_DESTINATION_CHAIN = 'SN_GOERLI'
 
 MAX_RETRIES = 30
-RETRIES_DELAY = 60 # 60 seconds, 30 tries within 30 minutes
+RETRIES_DELAY = 60  # 60 seconds, 30 tries within 30 minutes
+
+LOGGING_LEVEL = os.getenv('LOGGING_LEVEL')
+LOGGING_DIR = os.getenv('LOGGING_DIR')
