@@ -13,6 +13,8 @@ from starknet_py.hash.selector import get_selector_from_name
 from starknet_py.net.client_models import Call
 from starknet_py.cairo.felt import decode_shortstring
 
+SET_ORDER_EVENT_KEY = 0x2c75a60b5bdad73ebbf539cc807fccd09875c3cbf3f44041f852cdb96d8acd3
+
 full_node_client = FullNodeClient(node_url=constants.SN_RPC_URL)
 
 key_pair = KeyPair.from_private_key(key=constants.SN_PRIVATE_KEY)
@@ -39,7 +41,9 @@ class SetOrderEvent:
 async def get_starknet_events() -> int:
     events_response = await full_node_client.get_events(
         address=constants.SN_CONTRACT_ADDR,
-        chunk_size=1000,
+        chunk_size=10,
+        keys=[[SET_ORDER_EVENT_KEY]],
+        from_block_number='pending'
     )
 
     return events_response
@@ -58,27 +62,21 @@ async def get_is_used_order(order_id) -> bool:
         return True
 
 
-async def get_latest_unfulfilled_order():
+async def get_latest_unfulfilled_orders():
     request_result = await get_starknet_events()
     events = request_result.events
 
-    SET_ORDER_KEY_EVENT = 0x2c75a60b5bdad73ebbf539cc807fccd09875c3cbf3f44041f852cdb96d8acd3
-    order = None
+    orders = set()
     for event in events:
-        if event.keys[0] == SET_ORDER_KEY_EVENT:
-            status = await get_is_used_order(event.data[0])
-            if status == False:
-                order = SetOrderEvent(
-                    order_id=event.data[0],
-                    recipient_address=hex(event.data[2]),
-                    amount=event.data[3],
-                )
-                break
-
-    if (order):
-        return order
-    else:
-        return None
+        status = await get_is_used_order(event.data[0])
+        if not status:
+            order = SetOrderEvent(
+                order_id=event.data[0],
+                recipient_address=hex(event.data[2]),
+                amount=event.data[3],
+            )
+            orders.add(order)
+    return orders
 
 
 async def withdraw(order_id, block, slot) -> bool:

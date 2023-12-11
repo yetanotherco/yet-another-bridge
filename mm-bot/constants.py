@@ -5,7 +5,7 @@ load_dotenv()
 
 ENVIRONMENT = os.getenv('ENVIRONMENT')
 
-ETH_RPC_URL = 'https://goerli.nodeguardians.io'
+ETH_RPC_URL = os.getenv('ETH_RPC_URL')
 SN_RPC_URL = os.getenv('SN_RPC_URL')
 
 ETH_CONTRACT_ADDR = os.getenv('ETH_CONTRACT_ADDR')
