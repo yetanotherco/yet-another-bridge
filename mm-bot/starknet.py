@@ -38,14 +38,17 @@ class SetOrderEvent:
         return f"order_id:{self.order_id}, recipent: {self.recipient_address}, amount: {self.amount}"
 
 
-async def get_starknet_events() -> int:
-    events_response = await full_node_client.get_events(
-        address=constants.SN_CONTRACT_ADDR,
-        chunk_size=10,
-        keys=[[SET_ORDER_EVENT_KEY]],
-        from_block_number='pending'
-    )
-
+async def get_starknet_events():
+    try:
+        events_response = await full_node_client.get_events(
+            address=constants.SN_CONTRACT_ADDR,
+            chunk_size=10,
+            keys=[[SET_ORDER_EVENT_KEY]],
+            from_block_number='pending'
+        )
+    except Exception as e:
+        logger.error(f"[-] Failed to get events: {e}")
+        return None
     return events_response
 
 
@@ -64,8 +67,10 @@ async def get_is_used_order(order_id) -> bool:
 
 async def get_latest_unfulfilled_orders():
     request_result = await get_starknet_events()
-    events = request_result.events
+    if request_result is None:
+        return set()
 
+    events = request_result.events
     orders = set()
     for event in events:
         status = await get_is_used_order(event.data[0])
