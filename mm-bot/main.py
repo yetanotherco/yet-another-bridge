@@ -27,7 +27,7 @@ async def run():
             # 1. Listen event on starknet
             latest_orders: set = await starknet.get_latest_unfulfilled_orders()
             if len(latest_orders) == 0:
-                logger.info(f"[+] No new events")
+                logger.debug(f"[+] No new events")
                 time.sleep(SLEEP_TIME)
                 continue
 
