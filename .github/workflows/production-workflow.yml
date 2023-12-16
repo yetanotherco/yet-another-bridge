@@ -1,0 +1,30 @@
+name: "Production Build"
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  Deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy
+        run: echo I am deploying the api to AWS
+
+      - name: Deploy in EC2
+        env:
+          PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          HOST_NAME: ${{ secrets.HOST_NAME }}
+          USER_NAME: ${{ secrets.USER_NAME }}
+          APP_DIR: ${{ secrets.APP_DIR }}
+          SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
+        run:
+          echo "$PRIVATE_KEY" > private_key &&
+          chmod 400 private_key &&
+          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOST_NAME} "
+            cd ${APP_DIR} &&
+            sudo systemctl stop ${SERVICE_NAME} &&
+            git pull &&
+            sudo systemctl start ${SERVICE_NAME} "
