@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import sys
@@ -9,7 +10,7 @@ def setup_logger():
     logger.setLevel(logging.DEBUG)
 
     # Formatter for log messages
-    log_format = "%(asctime)s %(levelname)6s - [%(threadName)15s] : %(message)s"
+    log_format = "%(asctime)s %(levelname)6s - [%(threadName)15s] [%(taskName)s] : %(message)s"
     formatter = logging.Formatter(log_format, datefmt="%Y-%m-%dT%H:%M:%S")
 
     # Add handlers based on the environment
@@ -17,6 +18,7 @@ def setup_logger():
         handler = get_production_handler(formatter)
     else:
         handler = get_development_handler(formatter)
+    handler.addFilter(AsyncioFilter())
     logger.addHandler(handler)
 
 
@@ -44,3 +46,15 @@ def get_production_handler(formatter):
     file_handler.setLevel(constants.LOGGING_LEVEL)
     file_handler.setFormatter(formatter)
     return file_handler
+
+
+class AsyncioFilter(logging.Filter):
+    """
+    This is a filter which injects contextual information into the log.
+    """
+    def filter(self, record):
+        try:
+            record.taskName = asyncio.current_task().get_name()
+        except RuntimeError:
+            record.taskName = "Main"
+        return True
