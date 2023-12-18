@@ -1,12 +1,10 @@
 import asyncio
 import logging
-import threading
 
 import ethereum
 import herodotus
 import json
 import starknet
-import time
 from web3 import Web3
 from logging_config import setup_logger
 
@@ -17,8 +15,7 @@ SLEEP_TIME = 5
 
 async def run():
     logger.info(f"[+] Listening events on starknet")
-    eth_lock = threading.Lock()
-    threads = []
+    eth_lock = asyncio.Lock()
     orders = set()
 
     try:
@@ -28,31 +25,26 @@ async def run():
             latest_orders: set = await starknet.get_latest_unfulfilled_orders()
             if len(latest_orders) == 0:
                 logger.debug(f"[+] No new events")
-                time.sleep(SLEEP_TIME)
+                await asyncio.sleep(SLEEP_TIME)
                 continue
 
             for order in latest_orders:
-                logger.info(f"[+] New event: {order}")
-
                 order_id = order.order_id
                 dst_addr = order.recipient_address
                 amount = order.amount
 
                 if order_id in orders:
-                    logger.info(f"[+] Order already processed: {order_id}")
+                    logger.debug(f"[+] Order already processed: {order_id}")
                     continue
 
-                orders.add(order_id)
-                t = threading.Thread(target=asyncio.run, args=(process_order(order_id, dst_addr, amount, eth_lock),))
-                threads.append(t)
-                t.start()
+                logger.info(f"[+] New order: {order}")
 
-            time.sleep(SLEEP_TIME)
+                orders.add(order_id)
+                asyncio.create_task(process_order(order_id, dst_addr, amount, eth_lock), name=f"Order-{order_id}")
+
+            await asyncio.sleep(SLEEP_TIME)
     except Exception as e:
         logger.error(f"[-] Error: {e}")
-        logger.info(f"[+] Waiting for threads to finish")
-        for t in threads:
-            t.join()
     logger.info(f"[+] All threads finished")
 
 
@@ -60,10 +52,10 @@ async def process_order(order_id, dst_addr, amount, eth_lock):
     # 2. Transfer eth on ethereum
     # (bridging is complete for the user)
     logger.info(f"[+] Transferring eth on ethereum")
-    with eth_lock:
+    async with eth_lock:
         try:
             # in case it's processed on ethereum, but not processed on starknet
-            ethereum.transfer(order_id, dst_addr, amount)
+            await asyncio.to_thread(ethereum.transfer, order_id, dst_addr, amount)
             logger.info(f"[+] Transfer complete")
         except Exception as e:
             logger.error(f"[-] Transfer failed: {e}")
@@ -77,14 +69,14 @@ async def process_order(order_id, dst_addr, amount, eth_lock):
     logger.info(f"[+] Index: {index.hex()}")
     logger.info(f"[+] Slot: {slot.hex()}")
     logger.info(f"[+] Proving block {block}")
-    task_id = herodotus.herodotus_prove(block, order_id, slot)
+    task_id = await herodotus.herodotus_prove(block, order_id, slot)
     logger.info(f"[+] Block being proved with task id: {task_id}")
 
     # 4. Poll herodotus to check task status
     logger.info(f"[+] Polling herodotus for task status")
     # avoid weird case where herodotus insta says done
-    time.sleep(10)
-    completed = herodotus.herodotus_poll_status(task_id)
+    await asyncio.sleep(10)
+    completed = await herodotus.herodotus_poll_status(task_id)
     logger.info(f"[+] Task completed")
 
     # 5. Withdraw eth from starknet
