@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import constants
 import requests
@@ -8,7 +9,7 @@ reqs = []
 logger = logging.getLogger(__name__)
 
 
-def herodotus_prove(block, order_id, slot) -> str:
+async def herodotus_prove(block, order_id, slot) -> str:
     headers = {
         "Content-Type": "application/json",
     }
@@ -48,7 +49,7 @@ def herodotus_prove(block, order_id, slot) -> str:
             retries += 1
             if retries == constants.MAX_RETRIES:
                 raise err
-            time.sleep(constants.RETRIES_DELAY)
+        await asyncio.sleep(constants.RETRIES_DELAY)
 
 
 def herodotus_status(task_id) -> str:
@@ -65,7 +66,7 @@ def herodotus_status(task_id) -> str:
         raise err
 
 
-def herodotus_poll_status(task_id) -> bool:
+async def herodotus_poll_status(task_id) -> bool:
     # instead of returning a bool we can store it in a mapping
     retries = 0
     start_time = time.time()
@@ -81,12 +82,10 @@ def herodotus_poll_status(task_id) -> bool:
                 logger.info(f"[+] Herodotus average request time (total): {sum(reqs) / len(reqs)}")
                 return True
             retries += 1
-            time.sleep(constants.RETRIES_DELAY)
         except requests.exceptions.RequestException as err:
             logger.error(err)
             retries += 1
             if retries == constants.MAX_RETRIES:
                 raise err
-            time.sleep(constants.RETRIES_DELAY)
-
+        await asyncio.sleep(constants.RETRIES_DELAY)
     return False
