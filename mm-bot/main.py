@@ -55,7 +55,8 @@ async def process_order(order_id, dst_addr, amount, eth_lock):
     async with eth_lock:
         try:
             # in case it's processed on ethereum, but not processed on starknet
-            await asyncio.to_thread(ethereum.transfer, order_id, dst_addr, amount)
+            tx_hash_hex = await asyncio.to_thread(ethereum.transfer, order_id, dst_addr, amount)
+            logger.info(f"[+] Transfer tx hash: 0x{tx_hash_hex}")
             logger.info(f"[+] Transfer complete")
         except Exception as e:
             logger.error(f"[-] Transfer failed: {e}")
