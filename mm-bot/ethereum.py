@@ -46,4 +46,5 @@ def transfer(deposit_id, dst_addr, amount):
         except Exception as exception:
             logger.error(f"[-] Failed to transfer eth on node: {exception}")
     logger.error(f"[-] Failed to transfer eth on all nodes")
+    raise Exception("Failed to transfer eth on all nodes")
 
