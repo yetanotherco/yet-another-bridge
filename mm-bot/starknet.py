@@ -1,29 +1,34 @@
 import logging
-import requests
-import constants
-import json
-import os
 
-from starknet_py.contract import Contract
-from starknet_py.net.full_node_client import FullNodeClient
+from starknet_py.hash.selector import get_selector_from_name
 from starknet_py.net.account.account import Account
+from starknet_py.net.client_models import Call
+from starknet_py.net.full_node_client import FullNodeClient
 from starknet_py.net.models.chains import StarknetChainId
 from starknet_py.net.signer.stark_curve_signer import KeyPair
-from starknet_py.hash.selector import get_selector_from_name
-from starknet_py.net.client_models import Call
-from starknet_py.cairo.felt import decode_shortstring
+
+import constants
 
 SET_ORDER_EVENT_KEY = 0x2c75a60b5bdad73ebbf539cc807fccd09875c3cbf3f44041f852cdb96d8acd3
 
-full_node_client = FullNodeClient(node_url=constants.SN_RPC_URL)
+main_full_node_client = FullNodeClient(node_url=constants.SN_RPC_URL)
+fallback_full_node_client = FullNodeClient(node_url=constants.SN_FALLBACK_RPC_URL)
+full_node_clients = [main_full_node_client, fallback_full_node_client]
 
 key_pair = KeyPair.from_private_key(key=constants.SN_PRIVATE_KEY)
-account = Account(
-    client=full_node_client,
+main_account = Account(
+    client=main_full_node_client,
     address=constants.SN_WALLET_ADDR,
     key_pair=key_pair,
     chain=StarknetChainId.TESTNET,
 )
+fallback_account = Account(
+    client=fallback_full_node_client,
+    address=constants.SN_WALLET_ADDR,
+    key_pair=key_pair,
+    chain=StarknetChainId.TESTNET,
+)
+accounts = [main_account, fallback_account]
 
 logger = logging.getLogger(__name__)
 
@@ -35,21 +40,24 @@ class SetOrderEvent:
         self.amount = amount
 
     def __str__(self):
-        return f"order_id:{self.order_id}, recipent: {self.recipient_address}, amount: {self.amount}"
+        return f"order_id:{self.order_id}, recipient: {self.recipient_address}, amount: {self.amount}"
 
 
 async def get_starknet_events():
-    try:
-        events_response = await full_node_client.get_events(
-            address=constants.SN_CONTRACT_ADDR,
-            chunk_size=10,
-            keys=[[SET_ORDER_EVENT_KEY]],
-            from_block_number='pending'
-        )
-    except Exception as e:
-        logger.error(f"[-] Failed to get events: {e}")
-        return None
-    return events_response
+    for client in full_node_clients:
+        try:
+            events_response = await client.get_events(
+                address=constants.SN_CONTRACT_ADDR,
+                chunk_size=10,
+                keys=[[SET_ORDER_EVENT_KEY]],
+                from_block_number='pending'
+            )
+            return events_response
+        except Exception as exception:
+            logger.error(f"[-] Failed to get events from node: {exception}")
+
+    logger.error(f"[-] Failed to get events from all nodes")
+    return None
 
 
 async def get_is_used_order(order_id) -> bool:
@@ -58,11 +66,14 @@ async def get_is_used_order(order_id) -> bool:
         selector=get_selector_from_name("get_order_used"),
         calldata=[order_id, 0],
     )
-    try:
-        status = await account.client.call_contract(call)
-        return status[0]
-    except Exception as e:
-        return True
+    for account in accounts:
+        try:
+            status = await account.client.call_contract(call)
+            return status[0]
+        except Exception as exception:
+            logger.error(f"[-] Failed to get order status from node: {exception}")
+    logger.error(f"[-] Failed to get order status from all nodes")
+    return True
 
 
 async def get_latest_unfulfilled_orders():
@@ -93,11 +104,15 @@ async def withdraw(order_id, block, slot) -> bool:
         selector=get_selector_from_name("withdraw"),
         calldata=[order_id, 0, block, 0, slot_low, slot_high]
     )
-    try:
-        transaction = await account.sign_invoke_transaction(call, max_fee=10000000000000)
-        result = await account.client.send_transaction(transaction)
-        await account.client.wait_for_tx(result.transaction_hash)
+    for account in accounts:
+        try:
+            transaction = await account.sign_invoke_transaction(call, max_fee=10000000000000)
+            result = await account.client.send_transaction(transaction)
+            await account.client.wait_for_tx(result.transaction_hash)
 
-        logger.info(f"[+] Withdrawn from starknet: {hex(result.transaction_hash)}")
-    except Exception as e:
-        logger.error(f"[-] Failed to withdraw from starknet: {e}")
+            logger.info(f"[+] Withdrawn from starknet: {hex(result.transaction_hash)}")
+            return True
+        except Exception as e:
+            logger.error(f"[-] Failed to withdraw from starknet: {e}")
+    logger.error(f"[-] Failed to withdraw from all nodes")
+    return False
