@@ -106,7 +106,7 @@ async def withdraw(order_id, block, slot) -> bool:
     )
     for account in accounts:
         try:
-            transaction = await account.sign_invoke_transaction(call, max_fee=10000000000000)
+            transaction = await account.sign_invoke_transaction(call, max_fee=10000000000000)  # TODO manage fee better
             result = await account.client.send_transaction(transaction)
             await account.client.wait_for_tx(result.transaction_hash)
 
