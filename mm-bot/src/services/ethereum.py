@@ -1,8 +1,9 @@
 import logging
-import constants
 import json
 import os
-from web3 import Web3, AsyncWeb3
+from web3 import Web3
+
+from config import constants
 
 main_w3 = Web3(Web3.HTTPProvider(constants.ETH_RPC_URL))
 fallback_w3 = Web3(Web3.HTTPProvider(constants.ETH_FALLBACK_RPC_URL))
@@ -25,7 +26,7 @@ def transfer(deposit_id, dst_addr, amount):
         try:
             acct = w3.eth.account.from_key(constants.ETH_PRIVATE_KEY)
             # get only the abi not the entire file
-            abi = json.load(open(os.path.dirname(os.path.realpath(__file__)) + '/abi/YABTransfer.json'))['abi']
+            abi = json.load(open(os.getcwd() + '/abi/YABTransfer.json'))['abi']
 
             yab_transfer = w3.eth.contract(address=constants.ETH_CONTRACT_ADDR, abi=abi)
             dst_addr_bytes = int(dst_addr, 0)

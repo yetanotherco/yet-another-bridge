@@ -1,12 +1,11 @@
 import asyncio
 import logging
-
-import ethereum
-import herodotus
-import json
-import starknet
 from web3 import Web3
-from logging_config import setup_logger
+
+from services import ethereum
+from services import herodotus
+from services import starknet
+from config.logging_config import setup_logger
 
 setup_logger()
 logger = logging.getLogger(__name__)

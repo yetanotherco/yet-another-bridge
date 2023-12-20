@@ -7,7 +7,7 @@ from starknet_py.net.full_node_client import FullNodeClient
 from starknet_py.net.models.chains import StarknetChainId
 from starknet_py.net.signer.stark_curve_signer import KeyPair
 
-import constants
+from config import constants
 
 SET_ORDER_EVENT_KEY = 0x2c75a60b5bdad73ebbf539cc807fccd09875c3cbf3f44041f852cdb96d8acd3
 
@@ -76,7 +76,7 @@ async def get_is_used_order(order_id) -> bool:
     return True
 
 
-async def get_latest_unfulfilled_orders():
+async def get_latest_unfulfilled_orders() -> set[SetOrderEvent]:
     request_result = await get_starknet_events()
     if request_result is None:
         return set()
@@ -84,8 +84,8 @@ async def get_latest_unfulfilled_orders():
     events = request_result.events
     orders = set()
     for event in events:
-        status = await get_is_used_order(event.data[0])
-        if not status:
+        is_used = await get_is_used_order(event.data[0])
+        if not is_used:
             order = SetOrderEvent(
                 order_id=event.data[0],
                 recipient_address=hex(event.data[2]),
