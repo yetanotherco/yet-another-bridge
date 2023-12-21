@@ -54,8 +54,7 @@ async def get_starknet_events():
             )
             return events_response
         except Exception as exception:
-            logger.error(f"[-] Failed to get events from node: {exception}")
-
+            logger.warning(f"[-] Failed to get events from node: {exception}")
     logger.error(f"[-] Failed to get events from all nodes")
     return None
 
@@ -71,7 +70,7 @@ async def get_is_used_order(order_id) -> bool:
             status = await account.client.call_contract(call)
             return status[0]
         except Exception as exception:
-            logger.error(f"[-] Failed to get order status from node: {exception}")
+            logger.warning(f"[-] Failed to get order status from node: {exception}")
     logger.error(f"[-] Failed to get order status from all nodes")
     return True
 
@@ -104,15 +103,46 @@ async def withdraw(order_id, block, slot) -> bool:
         selector=get_selector_from_name("withdraw"),
         calldata=[order_id, 0, block, 0, slot_low, slot_high]
     )
+    try:
+        transaction = await sign_invoke_transaction(call, max_fee=10000000000000)  # TODO manage fee better
+        result = await send_transaction(transaction)
+        await wait_for_tx(result.transaction_hash)
+
+        logger.info(f"[+] Withdrawn from starknet: {hex(result.transaction_hash)}")
+        return True
+    except Exception as e:
+        logger.error(f"[-] Failed to withdraw from starknet: {e}")
+    return False
+
+
+async def sign_invoke_transaction(call: Call, max_fee: int):
     for account in accounts:
         try:
-            transaction = await account.sign_invoke_transaction(call, max_fee=10000000000000)  # TODO manage fee better
-            result = await account.client.send_transaction(transaction)
-            await account.client.wait_for_tx(result.transaction_hash)
-
-            logger.info(f"[+] Withdrawn from starknet: {hex(result.transaction_hash)}")
-            return True
+            transaction = await account.sign_invoke_transaction(call, max_fee=max_fee)
+            return transaction
         except Exception as e:
-            logger.error(f"[-] Failed to withdraw from starknet: {e}")
-    logger.error(f"[-] Failed to withdraw from all nodes")
-    return False
+            logger.warning(f"[-] Failed to sign invoke transaction: {e}")
+    logger.error(f"[-] Failed to sign invoke transaction from all nodes")
+    raise Exception("Failed to sign invoke transaction from all nodes")
+
+
+async def send_transaction(transaction):
+    for account in accounts:
+        try:
+            result = await account.client.send_transaction(transaction)
+            return result
+        except Exception as e:
+            logger.warning(f"[-] Failed to send transaction: {e}")
+    logger.error(f"[-] Failed to send transaction from all nodes")
+    raise Exception("Failed to send transaction from all nodes")
+
+
+async def wait_for_tx(transaction_hash):
+    for account in accounts:
+        try:
+            await account.client.wait_for_tx(transaction_hash)
+            return
+        except Exception as e:
+            logger.warning(f"[-] Failed to wait for tx: {e}")
+    logger.error(f"[-] Failed to wait for tx from all nodes")
+    raise Exception("Failed to wait for tx from all nodes")
