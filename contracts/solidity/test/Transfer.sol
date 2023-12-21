@@ -12,12 +12,12 @@ contract TransferTest is Test {
         uint256 snEscrowAddress = 0x0;
         uint256 snEscrowWithdrawSelector = 0x0;
         yab = new YABTransfer();
-        yab.setSnMessagingAddress(snMessagingAddress);
-        yab.setSnEscrowAddress(snEscrowAddress);
-        yab.setSnEscrowWithdrawSelector(snEscrowWithdrawSelector);
+        //yab.setSnMessagingAddress(snMessagingAddress);
+        //yab.setSnEscrowAddress(snEscrowAddress);
+        //yab.setSnEscrowWithdrawSelector(snEscrowWithdrawSelector);
     }
 
     function testTransfer() public {
-        yab.transfer{value: 100}(1, 1, 0x1, 100);
+        yab.transfer{value: 100}(1, 1, 1, 0x1, 100);
     }
 }

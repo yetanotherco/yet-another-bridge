@@ -15,10 +15,10 @@ contract Deploy is Script {
         uint256 opL1BridgeAddress = uint256(uint160(0x636Af16bf2f682dD3109e60102b8E1A089FedAa8));
 
         YABTransfer yab = new YABTransfer();
-        yab.setSnMessagingAddress(snMessagingAddress);
-        yab.setSnEscrowAddress(snEscrowAddress);
-        yab.setSnEscrowWithdrawSelector(snEscrowWithdrawSelector);
-        yab.setOpL1BridgeAddress(opL1BridgeAddress);
+        // yab.setSnMessagingAddress(snMessagingAddress);
+        // yab.setSnEscrowAddress(snEscrowAddress);
+        // yab.setSnEscrowWithdrawSelector(snEscrowWithdrawSelector);
+        // yab.setOpL1BridgeAddress(opL1BridgeAddress);
         // call sets for each
 
         vm.stopBroadcast();
