@@ -1,3 +1,4 @@
+import logging
 import requests
 import constants
 import json
@@ -12,6 +13,8 @@ from starknet_py.hash.selector import get_selector_from_name
 from starknet_py.net.client_models import Call
 from starknet_py.cairo.felt import decode_shortstring
 
+SET_ORDER_EVENT_KEY = 0x2c75a60b5bdad73ebbf539cc807fccd09875c3cbf3f44041f852cdb96d8acd3
+
 full_node_client = FullNodeClient(node_url=constants.SN_RPC_URL)
 
 key_pair = KeyPair.from_private_key(key=constants.SN_PRIVATE_KEY)
@@ -21,6 +24,9 @@ account = Account(
     key_pair=key_pair,
     chain=StarknetChainId.TESTNET,
 )
+
+logger = logging.getLogger(__name__)
+
 
 class SetOrderEvent:
     def __init__(self, order_id, recipient_address, amount, fee):
@@ -32,13 +38,20 @@ class SetOrderEvent:
     def __str__(self):
         return f"order_id:{self.order_id}, recipent: {self.recipient_address}, amount: {self.amount}, fee: {self.fee}"
 
-async def get_starknet_events() -> int:
-    events_response = await full_node_client.get_events(
-        address=constants.SN_CONTRACT_ADDR,
-        chunk_size=1000,
-    )
 
+async def get_starknet_events():
+    try:
+        events_response = await full_node_client.get_events(
+            address=constants.SN_CONTRACT_ADDR,
+            chunk_size=10,
+            keys=[[SET_ORDER_EVENT_KEY]],
+            from_block_number='pending'
+        )
+    except Exception as e:
+        logger.error(f"[-] Failed to get events: {e}")
+        return None
     return events_response
+
 
 async def get_is_used_order(order_id) -> bool:
     call = Call(
@@ -46,38 +59,35 @@ async def get_is_used_order(order_id) -> bool:
         selector=get_selector_from_name("get_order_used"),
         calldata=[order_id, 0],
     )
-    try :
+    try:
         status = await account.client.call_contract(call)
         return status[0]
     except Exception as e:
         return True
 
-async def get_latest_unfulfilled_order(): 
+
+async def get_latest_unfulfilled_orders():
     request_result = await get_starknet_events()
+    if request_result is None:
+        return set()
+
     events = request_result.events
-
-    SET_ORDER_KEY_EVENT=0x2c75a60b5bdad73ebbf539cc807fccd09875c3cbf3f44041f852cdb96d8acd3
-    order = None
+    orders = set()
     for event in events:
-        if event.keys[0] == SET_ORDER_KEY_EVENT:
-            fee_threshold = 0.0001 * event.data[3]
-            if event.data[5] < fee_threshold:
-                print("[-] Order %s has a fee to low to process (%d < %d). Skippping" % (event.data[0], event.data[5], fee_threshold))
-                continue
-            status = await get_is_used_order(event.data[0])
-            if status == False:
-                order = SetOrderEvent(
-                    order_id=event.data[0],
-                    recipient_address=hex(event.data[2]),
-                    amount=event.data[3],
-                    fee=event.data[5]
-                )
-                break
+        fee_threshold = 0.0001 * event.data[3]
+        if event.data[5] < fee_threshold:
+            print("[-] Order %s has a fee too low to process (%d < %d). Skipping" % (event.data[0], event.data[5], fee_threshold))
+            continue
+        status = await get_is_used_order(event.data[0])
+        if not status:
+            order = SetOrderEvent(
+                order_id=event.data[0],
+                recipient_address=hex(event.data[2]),
+                amount=event.data[3],
+            )
+            orders.add(order)
+    return orders
 
-    if (order):
-        return order
-    else:
-        return None
 
 async def withdraw(order_id, block, slot) -> bool:
     slot = slot.hex()
@@ -88,11 +98,11 @@ async def withdraw(order_id, block, slot) -> bool:
         selector=get_selector_from_name("withdraw"),
         calldata=[order_id, 0, block, 0, slot_low, slot_high]
     )
-    try :
+    try:
         transaction = await account.sign_invoke_transaction(call, max_fee=10000000000000)
         result = await account.client.send_transaction(transaction)
         await account.client.wait_for_tx(result.transaction_hash)
 
-        print("[+] Withdrawn from starknet:", hex(result.transaction_hash))
+        logger.info(f"[+] Withdrawn from starknet: {hex(result.transaction_hash)}")
     except Exception as e:
-        print("[-] Failed to withdraw from starknet", e)
+        logger.error(f"[-] Failed to withdraw from starknet: {e}")
