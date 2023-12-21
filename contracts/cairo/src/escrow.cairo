@@ -3,7 +3,8 @@ use starknet::{ContractAddress, EthAddress};
 #[derive(Copy, Drop, Serde, starknet::Store)]
 struct Order {
     recipient_address: EthAddress,
-    amount: u256
+    amount: u256,
+    fee: u256
 }
 
 #[starknet::interface]
@@ -15,6 +16,8 @@ trait IEscrow<ContractState> {
     fn cancel_order(ref self: ContractState, order_id: u256);
 
     fn get_order_used(self: @ContractState, order_id: u256) -> bool;
+
+    fn get_order_fee(self: @ContractState, order_id: u256) -> u256;
 
     fn withdraw(ref self: ContractState, order_id: u256, block: u256, slot: u256);
 
@@ -34,7 +37,7 @@ trait IEscrow<ContractState> {
 mod Escrow {
     use super::{IEscrow, Order};
 
-    use starknet::{ContractAddress, EthAddress, get_caller_address, get_contract_address};
+    use starknet::{ContractAddress, EthAddress, get_caller_address, get_contract_address, get_block_timestamp};
 
     use yab::interfaces::IERC20::{IERC20Dispatcher, IERC20DispatcherTrait};
     use yab::interfaces::IEVMFactsRegistry::{
@@ -59,6 +62,7 @@ mod Escrow {
         order_id: u256,
         recipient_address: EthAddress,
         amount: u256,
+        fee: u256
     }
 
     #[derive(Drop, starknet::Event)]
@@ -74,6 +78,8 @@ mod Escrow {
         current_order_id: u256,
         orders: LegacyMap::<u256, Order>,
         orders_used: LegacyMap::<u256, bool>,
+        orders_senders: LegacyMap::<u256, ContractAddress>,
+        orders_timestamps: LegacyMap::<u256, u64>,
         herodotus_facts_registry_contract: ContractAddress,
         eth_transfer_contract: EthAddress, // our transfer contract in L1
         mm_ethereum_wallet: EthAddress,
@@ -107,22 +113,22 @@ mod Escrow {
         }
 
         fn set_order(ref self: ContractState, order: Order) -> u256 {
-            // TODO expiry can't be less than 24h
             assert(order.amount > 0, 'Amount must be greater than 0');
 
             let mut order_id = self.current_order_id.read();
             self.orders.write(order_id, order);
             self.orders_used.write(order_id, false);
-
-            // TODO: add allowance ?
+            self.orders_senders.write(order_id, get_caller_address());
+            self.orders_timestamps.write(order_id, get_block_timestamp());
+            let payment_amount = order.amount + order.fee;
 
             IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
-                .transferFrom(get_caller_address(), get_contract_address(), order.amount);
+                .transferFrom(get_caller_address(), get_contract_address(), payment_amount);
 
             self
                 .emit(
                     SetOrder {
-                        order_id, recipient_address: order.recipient_address, amount: order.amount
+                        order_id, recipient_address: order.recipient_address, amount: order.amount, fee: order.fee
                     }
                 );
 
@@ -132,12 +138,26 @@ mod Escrow {
 
         fn cancel_order(
             ref self: ContractState, order_id: u256
-        ) { // TODO the order can be cancelled if no one reserved yet
-        // the user can retrieve all the funds without waiting for the expiry
+        ) {
+            assert(!self.orders_used.read(order_id), 'Order already withdrawed');
+            assert(get_block_timestamp() - self.orders_timestamps.read(order_id) < 43200, 'Didnt passed enough time');
+
+            let sender = self.orders_senders.read(order_id);
+            assert(sender == get_caller_address(), 'Only sender allowed');
+            let order = self.orders.read(order_id);
+            let payment_amount = order.amount + order.fee;
+
+            IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
+                .transfer(sender, payment_amount);
         }
 
         fn get_order_used(self: @ContractState, order_id: u256) -> bool {
             self.orders_used.read(order_id)
+        }
+
+        fn get_order_fee(self: @ContractState, order_id: u256) -> u256 {
+            let order: Order = self.orders.read(order_id);
+            order.fee
         }
 
         fn withdraw(ref self: ContractState, order_id: u256, block: u256, slot: u256) {
@@ -182,9 +202,10 @@ mod Escrow {
             assert(order.amount == amount, 'amount not match L1');
 
             self.orders_used.write(order_id, true);
+            let payment_amount = order.amount + order.fee;
 
             IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
-                .transfer(self.mm_starknet_wallet.read(), amount);
+                .transfer(self.mm_starknet_wallet.read(), payment_amount);
 
             self.emit(Withdraw { order_id, address: self.mm_starknet_wallet.read(), amount });
         }
@@ -258,9 +279,10 @@ mod Escrow {
         assert(order.amount == amount, 'amount not match L1');
 
         self.orders_used.write(order_id, true);
+        let payment_amount = order.amount + order.fee;
 
         IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
-            .transfer(self.mm_starknet_wallet.read(), amount);
+            .transfer(self.mm_starknet_wallet.read(), payment_amount);
 
         self.emit(Withdraw { order_id, address: self.mm_starknet_wallet.read(), amount });
     }
