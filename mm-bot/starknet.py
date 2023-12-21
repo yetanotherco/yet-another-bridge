@@ -29,13 +29,14 @@ logger = logging.getLogger(__name__)
 
 
 class SetOrderEvent:
-    def __init__(self, order_id, recipient_address, amount):
+    def __init__(self, order_id, recipient_address, amount, fee):
         self.order_id = order_id
         self.recipient_address = recipient_address
         self.amount = amount
-
+        self.fee = fee
+    
     def __str__(self):
-        return f"order_id:{self.order_id}, recipent: {self.recipient_address}, amount: {self.amount}"
+        return f"order_id:{self.order_id}, recipent: {self.recipient_address}, amount: {self.amount}, fee: {self.fee}"
 
 
 async def get_starknet_events():
@@ -73,6 +74,10 @@ async def get_latest_unfulfilled_orders():
     events = request_result.events
     orders = set()
     for event in events:
+        fee_threshold = 0.0001 * event.data[3]
+        if event.data[5] < fee_threshold:
+            print("[-] Order %s has a fee too low to process (%d < %d). Skipping" % (event.data[0], event.data[5], fee_threshold))
+            continue
         status = await get_is_used_order(event.data[0])
         if not status:
             order = SetOrderEvent(

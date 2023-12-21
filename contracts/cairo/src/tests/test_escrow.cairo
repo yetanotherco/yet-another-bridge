@@ -82,7 +82,7 @@ mod Escrow {
         assert(eth_token.balanceOf(MM_STARKNET()) == 0, 'init: wrong balance');
 
         start_prank(escrow.contract_address, USER());
-        let order = Order { recipient_address: 12345.try_into().unwrap(), amount: 500 };
+        let order = Order { recipient_address: 12345.try_into().unwrap(), amount: 500, fee: 0 };
         let order_id = escrow.set_order(order);
         stop_prank(escrow.contract_address);
 
