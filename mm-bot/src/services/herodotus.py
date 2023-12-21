@@ -1,9 +1,8 @@
 import asyncio
 import logging
-import constants
 import requests
 import time
-from web3 import Web3
+from config import constants
 
 reqs = []
 logger = logging.getLogger(__name__)

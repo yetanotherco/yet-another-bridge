@@ -2,7 +2,7 @@ import asyncio
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import sys
-import constants
+from config import constants
 
 
 def setup_logger():
