@@ -8,13 +8,16 @@ contract TransferTest is Test {
     YABTransfer public yab;
 
     function setUp() public {
-        address snMessagingAddress = 0xde29d060D45901Fb19ED6C6e959EB22d8626708e;
+        uint256 snMessagingAddress = uint256(uint160(0xde29d060D45901Fb19ED6C6e959EB22d8626708e));
         uint256 snEscrowAddress = 0x0;
         uint256 snEscrowWithdrawSelector = 0x0;
-        yab = new YABTransfer(snMessagingAddress, snEscrowAddress, snEscrowWithdrawSelector);
+        yab = new YABTransfer();
+        yab.setSnMessagingAddress(snMessagingAddress);
+        yab.setSnEscrowAddress(snEscrowAddress);
+        yab.setSnEscrowWithdrawSelector(snEscrowWithdrawSelector);
     }
 
     function testTransfer() public {
-        yab.transfer{value: 100}(1, 0x1, 100);
+        yab.transfer{value: 100}(1, 1, 0x1, 100);
     }
 }
