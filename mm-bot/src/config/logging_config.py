@@ -55,6 +55,6 @@ class AsyncioFilter(logging.Filter):
     def filter(self, record):
         try:
             record.taskName = asyncio.current_task().get_name()
-        except RuntimeError:
+        except Exception:
             record.taskName = "Main"
         return True
