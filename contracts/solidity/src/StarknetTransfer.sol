@@ -14,15 +14,7 @@ contract StarknetTransfer is IChainTransfer {
 
     function transfer(
         uint256 destAddress,
-        uint256 amount) external payable {
-        require(destAddress != 0, "Invalid destination address.");
-        require(amount > 0, "Invalid amount, should be higher than 0.");
-        require(msg.value > amount, "Invalid amount, should be lower than msg.value.");
-
-        (bool success,) = payable(address(uint160(destAddress))).call{value: msg.value}("");
-
-        require(success, "Transfer failed.");
-    }
+        uint256 amount) external payable { }
 
     function withdraw(uint256[] calldata payload) external payable {
         IStarknetMessaging snMessaging = IStarknetMessaging(address(uint160(_addresses["snMessagingAddress"])));
