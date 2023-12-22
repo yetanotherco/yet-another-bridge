@@ -57,19 +57,35 @@ async def process_order(order: Order, eth_lock: asyncio.Lock, order_dao: OrderDa
     order_dao.update_order(order, OrderStatus.PROCESSING)
     # 2. Transfer eth on ethereum
     # (bridging is complete for the user)
-    logger.info(f"[+] Transferring eth on ethereum")
     async with eth_lock:
         try:
-            # in case it's processed on ethereum, but not processed on starknet
-            tx_hash_hex = await asyncio.to_thread(ethereum.transfer, order.order_id, order.recipient_address, order.get_int_amount())
-            order_dao.update_order(order, OrderStatus.FULFILLED)
-            logger.info(f"[+] Transfer tx hash: 0x{tx_hash_hex}")
-            logger.info(f"[+] Transfer complete")
+            await transfer(order, eth_lock, order_dao)
         except Exception as e:
             logger.error(f"[-] Transfer failed: {e}")
 
     # 3. Call herodotus to prove
     # extra: validate w3.eth.get_storage_at(addr, pos) before calling herodotus
+    task_id, block, slot = await prove(order, order_dao)
+
+    # 4. Poll herodotus to check task status
+    completed = await wait_herodotus_prove(order, order_dao)
+
+    # 5. Withdraw eth from starknet
+    # (bridging is complete for the mm)
+    if completed:
+        await withdraw(order, block, slot, order_dao)
+
+
+async def transfer(order: Order, eth_lock: asyncio.Lock, order_dao: OrderDao):
+    logger.info(f"[+] Transferring eth on ethereum")
+    # in case it's processed on ethereum, but not processed on starknet
+    tx_hash_hex = await asyncio.to_thread(ethereum.transfer, order.order_id, order.recipient_address, order.get_int_amount())
+    order_dao.update_order(order, OrderStatus.FULFILLED)
+    logger.info(f"[+] Transfer tx hash: 0x{tx_hash_hex}")
+    logger.info(f"[+] Transfer complete")
+
+
+async def prove(order: Order, order_dao: OrderDao):
     block = ethereum.get_latest_block()
     index = Web3.solidity_keccak(['uint256', 'uint256', 'uint256'],
                                  [order.order_id, int(order.recipient_address, 0), order.get_int_amount()])
@@ -81,21 +97,25 @@ async def process_order(order: Order, eth_lock: asyncio.Lock, order_dao: OrderDa
     order_dao.update_order(order, OrderStatus.PROVING)
     order_dao.set_order_herodotus_task_id(order, task_id)
     logger.info(f"[+] Block being proved with task id: {task_id}")
+    return task_id, block, slot
 
-    # 4. Poll herodotus to check task status
+
+async def wait_herodotus_prove(order: Order, order_dao: OrderDao):
     logger.info(f"[+] Polling herodotus for task status")
     # avoid weird case where herodotus insta says done
     await asyncio.sleep(10)
-    completed = await herodotus.herodotus_poll_status(task_id)
+    completed = await herodotus.herodotus_poll_status(order.herodotus_task_id)
     order_dao.update_order(order, OrderStatus.PROVED)
     logger.info(f"[+] Task completed")
+    return completed
 
-    # 5. Withdraw eth from starknet
-    # (bridging is complete for the mm)
-    if completed:
-        logger.info(f"[+] Withdraw eth from starknet")
-        await starknet.withdraw(order.order_id, block, slot)
-        order_dao.update_order(order, OrderStatus.COMPLETED)
+
+async def withdraw(order: Order, block, slot, order_dao: OrderDao):
+    logger.info(f"[+] Withdrawing eth from starknet")
+    await starknet.withdraw(order.order_id, block, slot)
+    order_dao.update_order(order, OrderStatus.COMPLETED)
+    logger.info(f"[+] Withdraw complete")
+
 
 if __name__ == '__main__':
     asyncio.run(run())
