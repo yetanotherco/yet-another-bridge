@@ -1,7 +1,8 @@
 import decimal
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, DateTime, Enum, Numeric
+from hexbytes import HexBytes
+from sqlalchemy import Column, Integer, String, DateTime, Enum, Numeric, LargeBinary
 
 from config.database_config import Base
 from models.order_status import OrderStatus
@@ -13,7 +14,10 @@ class Order(Base):
     recipient_address: str = Column(String(42), nullable=False)
     amount: decimal = Column(Numeric(78, 0), nullable=False)
     status: OrderStatus = Column(Enum(OrderStatus), nullable=False, default=OrderStatus.PENDING)
-    herodotus_task_id: str | None = Column(String, nullable=True)
+    tx_hash: HexBytes = Column(LargeBinary, nullable=True)
+    herodotus_task_id: str = Column(String, nullable=True)
+    herodotus_block: int = Column(Integer, nullable=True)
+    herodotus_slot: HexBytes = Column(LargeBinary, nullable=True)
     created_at: datetime = Column(DateTime, nullable=False, default=datetime.now())
 
     def __str__(self):

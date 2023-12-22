@@ -39,8 +39,7 @@ def transfer(deposit_id, dst_addr, amount):
     signed_tx = create_transfer(deposit_id, dst_addr_bytes, amount)
 
     tx_hash = send_raw_transaction(signed_tx)
-    wait_for_transaction_receipt(tx_hash)
-    return tx_hash.hex()
+    return tx_hash
 
 
 # we need amount so the transaction is valid with the transfer that will be transferred

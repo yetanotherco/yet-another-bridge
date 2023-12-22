@@ -16,7 +16,9 @@ class OrderDao:
         return order
 
     def get_order(self, order_id) -> Order | None:
-        return self.db.query(Order).filter(Order.order_id == order_id).first()
+        return (self.db.query(Order)
+                .filter(Order.order_id == order_id)
+                .first())
 
     def already_exists(self, order_id) -> bool:
         return self.get_order(order_id) is not None
@@ -26,8 +28,33 @@ class OrderDao:
         self.db.commit()
         return order
 
-    def set_order_herodotus_task_id(self, order: Order, herodotus_task_id: str) -> Order:
-        order.herodotus_task_id = herodotus_task_id
+    def set_order_processing(self, order: Order) -> Order:
+        return self.update_order(order, OrderStatus.PROCESSING)
+
+    def set_order_transferring(self, order: Order, tx_hash) -> Order:
+        order.tx_hash = tx_hash
+        order.status = OrderStatus.TRANSFERRING.name
         self.db.commit()
         return order
 
+    def set_order_fulfilled(self, order: Order) -> Order:
+        return self.update_order(order, OrderStatus.FULFILLED)
+
+    def set_order_proving(self, order: Order, task_id, block, slot) -> Order:
+        order.herodotus_task_id = task_id
+        order.herodotus_block = block
+        order.herodotus_slot = slot
+        order.status = OrderStatus.PROVING.name
+        self.db.commit()
+        return order
+
+    def set_order_proved(self, order: Order) -> Order:
+        return self.update_order(order, OrderStatus.PROVED)
+
+    def set_order_completed(self, order: Order) -> Order:
+        return self.update_order(order, OrderStatus.COMPLETED)
+
+    def get_incomplete_orders(self):
+        return (self.db.query(Order)
+                .filter(Order.status != OrderStatus.COMPLETED)
+                .all())
