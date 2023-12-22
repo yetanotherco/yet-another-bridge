@@ -3,7 +3,7 @@ mod Escrow {
     use integer::BoundedInt;
 
     use snforge_std::{declare, ContractClassTrait};
-    use snforge_std::{start_prank, stop_prank};
+    use snforge_std::{CheatTarget, start_prank, stop_prank};
 
     use yab::interfaces::IERC20::{IERC20Dispatcher, IERC20DispatcherTrait};
     use yab::escrow::{IEscrowDispatcher, IEscrowDispatcherTrait, Order};
@@ -25,13 +25,13 @@ mod Escrow {
             eth_token.contract_address
         );
 
-        start_prank(eth_token.contract_address, OWNER());
+        start_prank(CheatTarget::One(eth_token.contract_address), OWNER());
         eth_token.transfer(USER(), BoundedInt::max());
-        stop_prank(eth_token.contract_address);
+        stop_prank(CheatTarget::One(eth_token.contract_address));
 
-        start_prank(eth_token.contract_address, USER());
+        start_prank(CheatTarget::One(eth_token.contract_address), USER());
         eth_token.approve(escrow.contract_address, BoundedInt::max());
-        stop_prank(eth_token.contract_address);
+        stop_prank(CheatTarget::One(eth_token.contract_address));
 
         (escrow, eth_token)
     }
@@ -73,7 +73,6 @@ mod Escrow {
     }
 
     #[test]
-    #[available_gas(200000000)]
     fn test_happy_path() {
         let (escrow, eth_token) = setup();
 
@@ -81,10 +80,10 @@ mod Escrow {
         assert(eth_token.balanceOf(escrow.contract_address) == 0, 'init: wrong balance');
         assert(eth_token.balanceOf(MM_STARKNET()) == 0, 'init: wrong balance');
 
-        start_prank(escrow.contract_address, USER());
+        start_prank(CheatTarget::One(escrow.contract_address), USER());
         let order = Order { recipient_address: 12345.try_into().unwrap(), amount: 500, fee: 0 };
         let order_id = escrow.set_order(order);
-        stop_prank(escrow.contract_address);
+        stop_prank(CheatTarget::One(escrow.contract_address));
 
         // check balance
         assert(eth_token.balanceOf(escrow.contract_address) == 500, 'set_order: wrong balance ');
@@ -97,9 +96,9 @@ mod Escrow {
         assert(order.amount == order_save.amount, 'wrong amount');
         assert(!escrow.get_order_used(order_id), 'wrong order used');
 
-        start_prank(escrow.contract_address, MM_STARKNET());
+        start_prank(CheatTarget::One(escrow.contract_address), MM_STARKNET());
         escrow.withdraw(order_id, 0, 0);
-        stop_prank(escrow.contract_address);
+        stop_prank(CheatTarget::One(escrow.contract_address));
 
         // check Order
         assert(escrow.get_order_used(order_id), 'wrong order used');
