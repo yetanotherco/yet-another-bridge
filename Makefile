@@ -1,5 +1,4 @@
-
-deps: install-scarb install-starknet-foundry install-eth-foundry
+deps: install-scarb install-starknet-foundry install-ethereum-foundry
 
 install-scarb:
 	curl --proto '=https' --tlsv1.2 -sSf https://docs.swmansion.com/scarb/install.sh | sh -s -- -v  2.4.1
@@ -7,28 +6,28 @@ install-scarb:
 install-starknet-foundry:
 	curl -L https://raw.githubusercontent.com/foundry-rs/starknet-foundry/master/scripts/install.sh | sh -s -- -v 0.12.0
 
-install-eth-foundry:
+install-ethereum-foundry:
 	curl -L https://foundry.paradigm.xyz | bash && foundryup
 
-solidity-clean:
+ethereum-clean:
 	@cd ./contracts/solidity/ && forge clean
 
-solidity-build: solidity-clean
+ethereum-build: solidity-clean
 	@cd ./contracts/solidity/ && forge build
 
-solidity-test: solidity-clean
+ethereum-test: solidity-clean
 	@cd ./contracts/solidity/ && forge test
 
 ethereum-deploy: solidity-clean
 	@./contracts/solidity/deploy.sh
 
-cairo-clean:
+starknet-clean:
 	@cd ./contracts/cairo/ && scarb clean
 
-cairo-build: cairo-clean
+starknet-build: cairo-clean
 	@cd ./contracts/cairo/ && scarb build
 
-cairo-test: cairo-clean
+starknet-test: cairo-clean
 	@cd ./contracts/cairo/ && snforge test
 
 starknet-deploy: cairo-build
