@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # ANSI format
-# Colors
 GREEN='\e[32m'
 PURPLE='\033[1;34m'
 PINK='\033[1;35m'
