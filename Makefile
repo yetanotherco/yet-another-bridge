@@ -15,23 +15,23 @@ install-ethereum-foundry:
 ethereum-clean:
 	@cd ./contracts/solidity/ && forge clean
 
-ethereum-build: solidity-clean
+ethereum-build: ethereum-clean
 	@cd ./contracts/solidity/ && forge build
 
-ethereum-test: solidity-clean
+ethereum-test: ethereum-clean
 	@cd ./contracts/solidity/ && forge test
 
-ethereum-deploy: solidity-clean
+ethereum-deploy: ethereum-clean
 	@./contracts/solidity/deploy.sh
 
 starknet-clean:
 	@cd ./contracts/cairo/ && scarb clean
 
-starknet-build: cairo-clean
+starknet-build: starknet-clean
 	@cd ./contracts/cairo/ && scarb build
 
-starknet-test: cairo-clean
+starknet-test: starknet-clean
 	@cd ./contracts/cairo/ && snforge test
 
-starknet-deploy: cairo-build
+starknet-deploy: starknet-build
 	@./contracts/cairo/deploy.sh
