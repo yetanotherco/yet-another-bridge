@@ -14,7 +14,9 @@ This will end up installing:
 
 - [Scarb](https://docs.swmansion.com/scarb) (Cairo/Starknet packet manager) -
   Includes a specific version of the Cairo compiler.
-- [Starkli](https://github.com/xJonathanLEI/starkli) (Starknet CLI)
+- [Starkli](https://github.com/xJonathanLEI/starkli) - Starkli is a command line tool for interacting with Starknet.
+- [Starknet Foundry](https://foundry-rs.github.io/starknet-foundry/) - Is a toolchain for developing Starknet smart contracts.
+- [Ethereum Foundry](https://book.getfoundry.sh/) - Is a toolchain for developing Ethereum smart contracts.
 
 ## Setting up a Starknet Testnet Wallet
 
@@ -116,7 +118,6 @@ On Starknet, the deployment process is in two steps:
    SN_CONTRACT_ADDR=<STARKNET_MM_CONTRACT_ADDR>
    ..
    ```
-   NOTES:
 
 2. Declare and Deploy: We sequentially declare and deploy the contracts.
 
@@ -124,7 +125,8 @@ On Starknet, the deployment process is in two steps:
       make starknet-deploy
    ```
 
-   For Ethereum, the deployment process you will need:
+For Ethereum the deployment process you will need:
+
 3. Updated `.env` file: Please modify the variables with your Testnet account and your RPC provider.
 
    ```bash
