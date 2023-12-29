@@ -49,7 +49,7 @@ def create_transfer(deposit_id, dst_addr_bytes, amount):
             unsent_tx = contracts[index].functions.transfer(deposit_id, dst_addr_bytes, amount).build_transaction({
                 "chainId": 5,
                 "from": accounts[index].address,
-                "nonce": w3.eth.get_transaction_count(accounts[index].address),
+                "nonce": get_nonce(w3, accounts[index].address),
                 "value": amount,
             })
             signed_tx = w3.eth.account.sign_transaction(unsent_tx, private_key=accounts[index].key)
@@ -58,6 +58,38 @@ def create_transfer(deposit_id, dst_addr_bytes, amount):
             logger.warning(f"[-] Failed to create transfer eth on node: {exception}")
     logger.error(f"[-] Failed to create transfer eth on all nodes")
     raise Exception("Failed to create transfer eth on all nodes")
+
+
+def withdraw(deposit_id, dst_addr, amount):
+    deposit_id = Web3.to_int(deposit_id)
+    dst_addr_bytes = int(dst_addr, 0)
+    amount = Web3.to_int(amount)
+
+    signed_tx = create_withdraw(deposit_id, dst_addr_bytes, amount)
+
+    tx_hash = send_raw_transaction(signed_tx)
+    return tx_hash
+
+
+def create_withdraw(deposit_id, dst_addr_bytes, amount):
+    for index, w3 in enumerate(w3_clients):
+        try:
+            unsent_tx = contracts[index].functions.withdraw(deposit_id, dst_addr_bytes, amount).build_transaction({
+                "chainId": 5,
+                "from": accounts[index].address,
+                "nonce": get_nonce(w3, accounts[index].address),
+                "value": amount,
+            })
+            signed_tx = w3.eth.account.sign_transaction(unsent_tx, private_key=accounts[index].key)
+            return signed_tx
+        except Exception as exception:
+            logger.warning(f"[-] Failed to create withdraw eth on node: {exception}")
+    logger.error(f"[-] Failed to create withdraw eth on all nodes")
+    raise Exception("Failed to create withdraw eth on all nodes")
+
+
+def get_nonce(w3: Web3, address):
+    return w3.eth.get_transaction_count(address)
 
 
 def send_raw_transaction(signed_tx):
