@@ -37,7 +37,9 @@ trait IEscrow<ContractState> {
 mod Escrow {
     use super::{IEscrow, Order};
 
-    use starknet::{ContractAddress, EthAddress, get_caller_address, get_contract_address, get_block_timestamp};
+    use starknet::{
+        ContractAddress, EthAddress, get_caller_address, get_contract_address, get_block_timestamp
+    };
 
     use yab::interfaces::IERC20::{IERC20Dispatcher, IERC20DispatcherTrait};
     use yab::interfaces::IEVMFactsRegistry::{
@@ -128,7 +130,10 @@ mod Escrow {
             self
                 .emit(
                     SetOrder {
-                        order_id, recipient_address: order.recipient_address, amount: order.amount, fee: order.fee
+                        order_id,
+                        recipient_address: order.recipient_address,
+                        amount: order.amount,
+                        fee: order.fee
                     }
                 );
 
@@ -136,11 +141,12 @@ mod Escrow {
             order_id
         }
 
-        fn cancel_order(
-            ref self: ContractState, order_id: u256
-        ) {
+        fn cancel_order(ref self: ContractState, order_id: u256) {
             assert(!self.orders_used.read(order_id), 'Order already withdrawed');
-            assert(get_block_timestamp() - self.orders_timestamps.read(order_id) < 43200, 'Didnt passed enough time');
+            assert(
+                get_block_timestamp() - self.orders_timestamps.read(order_id) < 43200,
+                'Didnt passed enough time'
+            );
 
             let sender = self.orders_senders.read(order_id);
             assert(sender == get_caller_address(), 'Only sender allowed');
@@ -229,34 +235,22 @@ mod Escrow {
         fn set_herodotus_facts_registry_contract(
             ref self: ContractState, new_contract: ContractAddress
         ) {
-            assert(
-                self.owner.read() == get_caller_address(),
-                'Only owner allowed'
-            );
+            assert(self.owner.read() == get_caller_address(), 'Only owner allowed');
             self.herodotus_facts_registry_contract.write(new_contract);
         }
 
         fn set_eth_transfer_contract(ref self: ContractState, new_contract: EthAddress) {
-            assert(
-                self.owner.read() == get_caller_address(),
-                'Only owner allowed'
-            );
+            assert(self.owner.read() == get_caller_address(), 'Only owner allowed');
             self.eth_transfer_contract.write(new_contract);
         }
 
         fn set_mm_ethereum_contract(ref self: ContractState, new_contract: EthAddress) {
-            assert(
-                self.owner.read() == get_caller_address(),
-                'Only owner allowed'
-            );
+            assert(self.owner.read() == get_caller_address(), 'Only owner allowed');
             self.mm_ethereum_wallet.write(new_contract);
         }
 
         fn set_mm_starknet_contract(ref self: ContractState, new_contract: ContractAddress) {
-            assert(
-                self.owner.read() == get_caller_address(),
-                'Only owner allowed'
-            );
+            assert(self.owner.read() == get_caller_address(), 'Only owner allowed');
             self.mm_starknet_wallet.write(new_contract);
         }
     }
@@ -267,11 +261,10 @@ mod Escrow {
         from_address: felt252,
         order_id: u256,
         recipient_address: EthAddress,
-        amount: u256) {
+        amount: u256
+    ) {
         let eth_transfer_contract_felt: felt252 = self.eth_transfer_contract.read().into();
-        assert(
-            eth_transfer_contract_felt == from_address, 'Only ETH_TRANSFER_CONTRACT'
-        );
+        assert(eth_transfer_contract_felt == from_address, 'Only ETH_TRANSFER_CONTRACT');
         assert(!self.orders_used.read(order_id), 'Order already withdrawed');
 
         let order = self.orders.read(order_id);
