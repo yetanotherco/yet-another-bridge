@@ -1,3 +1,4 @@
+from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 from models.order import Order
@@ -56,5 +57,5 @@ class OrderDao:
 
     def get_incomplete_orders(self):
         return (self.db.query(Order)
-                .filter(Order.status != OrderStatus.COMPLETED)
+                .filter(and_(Order.status != OrderStatus.COMPLETED, Order.status != OrderStatus.FAILED))
                 .all())
