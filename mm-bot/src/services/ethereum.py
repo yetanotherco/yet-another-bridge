@@ -46,11 +46,10 @@ def transfer(deposit_id, dst_addr, amount):
 def create_transfer(deposit_id, dst_addr_bytes, amount):
     for index, w3 in enumerate(w3_clients):
         try:
-            nonce = w3.eth.get_transaction_count(accounts[index].address)
             unsent_tx = contracts[index].functions.transfer(deposit_id, dst_addr_bytes, amount).build_transaction({
                 "chainId": 5,
                 "from": accounts[index].address,
-                "nonce": nonce,
+                "nonce": get_nonce(w3, accounts[index].address),
                 "value": amount,
             })
             signed_tx = w3.eth.account.sign_transaction(unsent_tx, private_key=accounts[index].key)
@@ -75,11 +74,10 @@ def withdraw(deposit_id, dst_addr, amount):
 def create_withdraw(deposit_id, dst_addr_bytes, amount):
     for index, w3 in enumerate(w3_clients):
         try:
-            nonce = w3.eth.get_transaction_count(accounts[index].address)
             unsent_tx = contracts[index].functions.withdraw(deposit_id, dst_addr_bytes, amount).build_transaction({
                 "chainId": 5,
                 "from": accounts[index].address,
-                "nonce": nonce,
+                "nonce": get_nonce(w3, accounts[index].address),
                 "value": amount,
             })
             signed_tx = w3.eth.account.sign_transaction(unsent_tx, private_key=accounts[index].key)
@@ -88,6 +86,10 @@ def create_withdraw(deposit_id, dst_addr_bytes, amount):
             logger.warning(f"[-] Failed to create withdraw eth on node: {exception}")
     logger.error(f"[-] Failed to create withdraw eth on all nodes")
     raise Exception("Failed to create withdraw eth on all nodes")
+
+
+def get_nonce(w3: Web3, address):
+    return w3.eth.get_transaction_count(address)
 
 
 def send_raw_transaction(signed_tx):

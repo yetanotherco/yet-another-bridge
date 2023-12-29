@@ -43,19 +43,17 @@ async def run():
         latest_block = block_dao.get_latest_block()
         order_events = await starknet.get_order_events(latest_block, "latest")
         process_order_events(order_events, order_dao, eth_lock, herodotus_semaphore)
-        block_dao.update_latest_block(max(map(lambda x: x.block_number, order_events)))
+        if len(order_events) > 0:
+            block_dao.update_latest_block(max(map(lambda x: x.block_number, order_events)))
 
         while True:
             # 3. Listen event on starknet
             set_order_events: list = await starknet.get_order_events("pending", "pending")
-            if len(set_order_events) == 0:
-                logger.debug(f"[+] No new events")
-                await asyncio.sleep(SLEEP_TIME)
-                continue
 
+            # 4. Process events (create order, transfer eth, prove, withdraw eth)
             process_order_events(set_order_events, order_dao, eth_lock, herodotus_semaphore)
 
-            # 4. Update latest block
+            # 5. Update latest block
             block_dao.update_latest_block(await starknet.get_latest_block())
 
             await asyncio.sleep(SLEEP_TIME)
@@ -134,7 +132,6 @@ async def process_order(order: Order, order_dao: OrderDao,
 async def transfer(order: Order, order_dao: OrderDao):
     logger.info(f"[+] Transferring eth on ethereum")
     # in case it's processed on ethereum, but not processed on starknet
-    order_dao.set_order_transferring(order, None)
     tx_hash = await asyncio.to_thread(ethereum.transfer, order.order_id, order.recipient_address,
                                       order.get_int_amount())
     order_dao.set_order_transferring(order, tx_hash)

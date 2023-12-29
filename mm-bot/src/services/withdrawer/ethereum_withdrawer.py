@@ -19,6 +19,7 @@ class EthereumWithdrawer(Withdrawer):
             tx_hash = await asyncio.to_thread(ethereum.withdraw,
                                               order.order_id, order.recipient_address, order.get_int_amount())
             order_dao.set_order_proving_ethereum(order, tx_hash)
+            self.logger.info(f"[+] Withdraw tx hash: {tx_hash.hex()}")
         except Exception as e:
             self.logger.error(f"[-] Withdraw failed: {e}")
 
