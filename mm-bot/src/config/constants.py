@@ -32,3 +32,5 @@ POSTGRES_DB = os.getenv('POSTGRES_DB')
 
 LOGGING_LEVEL = os.getenv('LOGGING_LEVEL')
 LOGGING_DIR = os.getenv('LOGGING_DIR')
+
+WITHDRAWER = os.getenv('WITHDRAWER')

@@ -41,10 +41,16 @@ class OrderDao:
     def set_order_fulfilled(self, order: Order) -> Order:
         return self.update_order(order, OrderStatus.FULFILLED)
 
-    def set_order_proving(self, order: Order, task_id, block, slot) -> Order:
+    def set_order_proving_herodotus(self, order: Order, task_id, block, slot) -> Order:
         order.herodotus_task_id = task_id
         order.herodotus_block = block
         order.herodotus_slot = slot
+        order.status = OrderStatus.PROVING.name
+        self.db.commit()
+        return order
+
+    def set_order_proving_ethereum(self, order: Order, tx_hash) -> Order:
+        order.eth_withdraw_tx_hash = tx_hash
         order.status = OrderStatus.PROVING.name
         self.db.commit()
         return order
