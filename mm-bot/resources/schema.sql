@@ -17,6 +17,4 @@ CREATE TABLE IF NOT EXISTS block
     id           SERIAL PRIMARY KEY,
     latest_block BIGINT    NOT NULL DEFAULT 0,
     created_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-)
-
-ALTER TABLE orders ADD COLUMN eth_withdraw_tx_hash BYTEA NULL;
+);
