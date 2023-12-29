@@ -9,9 +9,9 @@ cd "$(dirname "$0")"
 load_env() {
     unamestr=$(uname)
     if [ "$unamestr" = 'Linux' ]; then
-      export $(grep -v '^#' ../../mm-bot/.env | xargs -d '\n')
+      export $(grep -v '^#' ./.env | xargs -d '\n')
     elif [ "$unamestr" = 'FreeBSD' ] || [ "$unamestr" = 'Darwin' ]; then
-      export $(grep -v '^#' ../../mm-bot/.env | xargs -0)
+      export $(grep -v '^#' ./.env | xargs -0)
     fi
 }
 load_env

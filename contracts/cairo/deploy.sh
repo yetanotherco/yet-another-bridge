@@ -40,6 +40,3 @@ ESCROW_CONTRACT_ADDRESS=$(starkli deploy --watch --rpc $SN_RPC_URL $ESCROW_CLASS
     $SN_WALLET_ADDR \
     $NATIVE_TOKEN_ETH_STARKNET)
 echo -e "- ${PURPLE}[SN] Escrow ContractAddress: $ESCROW_CONTRACT_ADDRESS${COLOR_RESET}"
-
-echo -e "${GREEN}\n=> [SN] Approve${COLOR_RESET}"
-starkli invoke --rpc $SN_RPC_URL eth approve $ESCROW_CONTRACT_ADDRESS 1000000000 1000000000

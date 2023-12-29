@@ -118,7 +118,6 @@ On Starknet, the deployment process is in two steps:
    SN_CONTRACT_ADDR=<STARKNET_MM_CONTRACT_ADDR>
    ..
    ```
-
 2. Declare and Deploy: We sequentially declare and deploy the contracts.
 
    ```bash
@@ -130,18 +129,18 @@ For Ethereum the deployment process you will need:
 3. Updated `.env` file: Please modify the variables with your Testnet account and your RPC provider.
 
    ```bash
-   // For the deploy, you just need to configure the following variables in the .env file on the mm-bot folder
+   // For the deploy, you just need to configure the following variables in the .env file on the contracts/solidity/ folder
    ..
    ETH_RPC_URL=<ETH_RPC_URL> // Infura or Alchemy RPC URL
    ETH_PRIVATE_KEY=<ETH_PRIVATE_KEY>
    ETHERSCAN_API_KEY=<ETHERSCAN_API_KEY>
    ..
    ```
-   **NOTE**: 
-      - You can generate ETHERSCAN_API_KEY [following this steps](https://docs.etherscan.io/getting-started/viewing-api-usage-statistics).
-      - For the deploy, you will need some GoerliETH that you can get from this [faucet](https://goerlifaucet.com/).
+   **NOTE**:
 
-4. Deploy Solidity contract 
+   - You can generate ETHERSCAN_API_KEY [following this steps](https://docs.etherscan.io/getting-started/viewing-api-usage-statistics).
+   - For the deploy, you will need some GoerliETH that you can get from this [faucet](https://goerlifaucet.com/).
+4. Deploy Solidity contract
 
    ```bash
       make ethereum-deploy
