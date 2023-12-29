@@ -17,4 +17,4 @@ load_env() {
 load_env
 
 echo -e "${GREEN}\n=> [ETH] Deploy Escrow${COLOR_RESET}"
-forge script ./script/Deploy.s.sol --fork-url $ETH_RPC_URL --broadcast --verify -vvvv
+forge script ./script/Deploy.s.sol --fork-url $GOERLI_RPC_URL --broadcast --verify -vvvv
