@@ -10,7 +10,7 @@ def setup_logger():
     logger.setLevel(logging.DEBUG)
 
     # Formatter for log messages
-    log_format = "%(asctime)s %(levelname)6s - [%(threadName)15s] [%(taskName)s] : %(message)s"
+    log_format = "%(asctime)s %(levelname)6s - [%(threadName)15s] [%(taskName)15s] : %(message)s"
     formatter = logging.Formatter(log_format, datefmt="%Y-%m-%dT%H:%M:%S")
 
     # Add handlers based on the environment
@@ -55,6 +55,6 @@ class AsyncioFilter(logging.Filter):
     def filter(self, record):
         try:
             record.taskName = asyncio.current_task().get_name()
-        except RuntimeError:
+        except Exception:
             record.taskName = "Main"
         return True
