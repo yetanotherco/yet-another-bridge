@@ -31,6 +31,20 @@ def get_latest_block() -> int:
     logger.error(f"[-] Failed to get block number from all nodes")
 
 
+def get_is_used_order(order_id, recipient_address, amount) -> bool:
+    is_used_index = 2
+    order_data = Web3.solidity_keccak(['uint256', 'uint256', 'uint256'],
+                                      [order_id, int(recipient_address, 0), amount])
+    for contract in contracts:
+        try:
+            res = contract.functions.transfers(order_data).call()
+            return res[is_used_index]
+        except Exception as exception:
+            logger.warning(f"[-] Failed to get is used order from node: {exception}")
+    logger.error(f"[-] Failed to get is used order from all nodes")
+    raise Exception("Failed to get is used order from all nodes")
+
+
 def transfer(deposit_id, dst_addr, amount):
     dst_addr_bytes = int(dst_addr, 0)
     deposit_id = Web3.to_int(deposit_id)
