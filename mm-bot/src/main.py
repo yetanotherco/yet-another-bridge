@@ -107,7 +107,7 @@ async def process_order(order: Order, order_dao: OrderDao,
         async with eth_lock:
             if not ethereum.has_funds(order.get_int_amount()):
                 order_dao.set_order_no_balance(order)
-                logger.info(f"[+] Order {order.order_id} has no balance")
+                logger.info(f"[+] MM does not have balance for order {order.order_id}")
                 return
             if order.status is OrderStatus.PROCESSING:
                 try:
