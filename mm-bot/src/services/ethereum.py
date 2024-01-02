@@ -9,9 +9,13 @@ main_w3 = Web3(Web3.HTTPProvider(constants.ETH_RPC_URL))
 fallback_w3 = Web3(Web3.HTTPProvider(constants.ETH_FALLBACK_RPC_URL))
 w3_clients = [main_w3, fallback_w3]
 
-main_account = main_w3.eth.account.from_key(constants.ETH_PRIVATE_KEY)
-fallback_account = fallback_w3.eth.account.from_key(constants.ETH_PRIVATE_KEY)
-accounts = [main_account, fallback_account]
+"""
+accounts are instances from the same account but from different nodes
+So if a node is down we can use the other one
+"""
+main_account_rpc = main_w3.eth.account.from_key(constants.ETH_PRIVATE_KEY)
+fallback_account_rpc = fallback_w3.eth.account.from_key(constants.ETH_PRIVATE_KEY)
+accounts_rpc = [main_account_rpc, fallback_account_rpc]
 
 # get only the abi not the entire file
 abi = json.load(open(os.getcwd() + '/abi/YABTransfer.json'))['abi']
@@ -50,9 +54,9 @@ def get_is_used_order(order_id, recipient_address, amount) -> bool:
 
 
 def get_balance() -> int:
-    for w3 in w3_clients:
+    for index, w3 in enumerate(w3_clients):
         try:
-            return w3.eth.get_balance(main_account.address)
+            return w3.eth.get_balance(accounts_rpc[index].address)
         except Exception as exception:
             logger.warning(f"[-] Failed to get balance from node: {exception}")
     logger.error(f"[-] Failed to get balance from all nodes")
@@ -80,11 +84,11 @@ def create_transfer(deposit_id, dst_addr_bytes, amount):
         try:
             unsent_tx = contracts_rpc[index].functions.transfer(deposit_id, dst_addr_bytes, amount).build_transaction({
                 "chainId": 5,
-                "from": accounts[index].address,
-                "nonce": get_nonce(w3, accounts[index].address),
+                "from": accounts_rpc[index].address,
+                "nonce": get_nonce(w3, accounts_rpc[index].address),
                 "value": amount,
             })
-            signed_tx = w3.eth.account.sign_transaction(unsent_tx, private_key=accounts[index].key)
+            signed_tx = w3.eth.account.sign_transaction(unsent_tx, private_key=accounts_rpc[index].key)
             return signed_tx
         except Exception as exception:
             logger.warning(f"[-] Failed to create transfer eth on node: {exception}")
@@ -108,11 +112,11 @@ def create_withdraw(deposit_id, dst_addr_bytes, amount):
         try:
             unsent_tx = contracts_rpc[index].functions.withdraw(deposit_id, dst_addr_bytes, amount).build_transaction({
                 "chainId": 5,
-                "from": accounts[index].address,
-                "nonce": get_nonce(w3, accounts[index].address),
+                "from": accounts_rpc[index].address,
+                "nonce": get_nonce(w3, accounts_rpc[index].address),
                 "value": amount,
             })
-            signed_tx = w3.eth.account.sign_transaction(unsent_tx, private_key=accounts[index].key)
+            signed_tx = w3.eth.account.sign_transaction(unsent_tx, private_key=accounts_rpc[index].key)
             return signed_tx
         except Exception as exception:
             logger.warning(f"[-] Failed to create withdraw eth on node: {exception}")
