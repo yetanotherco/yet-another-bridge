@@ -15,9 +15,13 @@ accounts = [main_account, fallback_account]
 
 # get only the abi not the entire file
 abi = json.load(open(os.getcwd() + '/abi/YABTransfer.json'))['abi']
-main_contract = main_w3.eth.contract(address=constants.ETH_CONTRACT_ADDR, abi=abi)
-fallback_contract = fallback_w3.eth.contract(address=constants.ETH_CONTRACT_ADDR, abi=abi)
-contracts = [main_contract, fallback_contract]
+"""
+contracts_rpc are instances from the same contract but from different nodes
+So if a node is down we can use the other one
+"""
+main_contract_rpc = main_w3.eth.contract(address=constants.ETH_CONTRACT_ADDR, abi=abi)
+fallback_contract_rpc = fallback_w3.eth.contract(address=constants.ETH_CONTRACT_ADDR, abi=abi)
+contracts_rpc = [main_contract_rpc, fallback_contract_rpc]
 
 logger = logging.getLogger(__name__)
 
@@ -35,9 +39,9 @@ def get_is_used_order(order_id, recipient_address, amount) -> bool:
     is_used_index = 2
     order_data = Web3.solidity_keccak(['uint256', 'uint256', 'uint256'],
                                       [order_id, int(recipient_address, 0), amount])
-    for contract in contracts:
+    for contract_rpc in contracts_rpc:
         try:
-            res = contract.functions.transfers(order_data).call()
+            res = contract_rpc.functions.transfers(order_data).call()
             return res[is_used_index]
         except Exception as exception:
             logger.warning(f"[-] Failed to get is used order from node: {exception}")
@@ -60,7 +64,7 @@ def transfer(deposit_id, dst_addr, amount):
 def create_transfer(deposit_id, dst_addr_bytes, amount):
     for index, w3 in enumerate(w3_clients):
         try:
-            unsent_tx = contracts[index].functions.transfer(deposit_id, dst_addr_bytes, amount).build_transaction({
+            unsent_tx = contracts_rpc[index].functions.transfer(deposit_id, dst_addr_bytes, amount).build_transaction({
                 "chainId": 5,
                 "from": accounts[index].address,
                 "nonce": get_nonce(w3, accounts[index].address),
@@ -88,7 +92,7 @@ def withdraw(deposit_id, dst_addr, amount):
 def create_withdraw(deposit_id, dst_addr_bytes, amount):
     for index, w3 in enumerate(w3_clients):
         try:
-            unsent_tx = contracts[index].functions.withdraw(deposit_id, dst_addr_bytes, amount).build_transaction({
+            unsent_tx = contracts_rpc[index].functions.withdraw(deposit_id, dst_addr_bytes, amount).build_transaction({
                 "chainId": 5,
                 "from": accounts[index].address,
                 "nonce": get_nonce(w3, accounts[index].address),
