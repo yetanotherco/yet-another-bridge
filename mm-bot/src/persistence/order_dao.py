@@ -65,10 +65,11 @@ class OrderDao:
         return self.update_order(order, OrderStatus.NO_BALANCE)
 
     """
-    An order is incomplete if it's not completed, failed or has no balance
+    An order is incomplete if it's not completed, not failed or has balance
     An order in NO_BALANCE state is considered COMPLETED and will be re-processed in the next iteration
         when the balance is enough
     """
+
     def get_incomplete_orders(self):
         return (self.db.query(Order)
                 .filter(and_(Order.status != OrderStatus.COMPLETED,
