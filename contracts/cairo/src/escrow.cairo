@@ -41,7 +41,6 @@ mod Escrow {
     use starknet::{
         ContractAddress, EthAddress, ClassHash, get_caller_address, get_contract_address,
         get_block_timestamp
-    };
 
     use yab::interfaces::IERC20::{IERC20Dispatcher, IERC20DispatcherTrait};
     use yab::interfaces::IEVMFactsRegistry::{
