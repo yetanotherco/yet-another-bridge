@@ -9,6 +9,7 @@ from starknet_py.net.models.chains import StarknetChainId
 from starknet_py.net.signer.stark_curve_signer import KeyPair
 
 from config import constants
+from services import ethereum
 from services.mm_full_node_client import MmFullNodeClient
 
 SET_ORDER_EVENT_KEY = 0x2c75a60b5bdad73ebbf539cc807fccd09875c3cbf3f44041f852cdb96d8acd3
@@ -106,12 +107,15 @@ async def get_order_events(from_block_number, to_block_number) -> list[SetOrderE
 
 
 async def create_set_order_event(event):
-    is_used = await get_is_used_order(event.data[0])
+    order_id = event.data[0]
+    recipient_address = hex(event.data[2])
+    amount = event.data[3]
+    is_used = await asyncio.to_thread(ethereum.get_is_used_order, order_id, recipient_address, amount)
     fee = get_fee(event)
     return SetOrderEvent(
-        order_id=event.data[0],
-        recipient_address=hex(event.data[2]),
-        amount=event.data[3],
+        order_id=order_id,
+        recipient_address=recipient_address,
+        amount=amount,
         fee=fee,
         block_number=event.block_number,
         is_used=is_used

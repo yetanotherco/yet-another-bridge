@@ -39,7 +39,8 @@ class EthereumWithdrawer(Withdrawer):
     async def close_withdraw(self, order: Order, order_dao: OrderDao):
         retries = 0
         while retries < constants.MAX_RETRIES:
-            if await starknet.get_is_used_order(order.order_id):
+            if await asyncio.to_thread(ethereum.get_is_used_order,
+                                       order.order_id, order.recipient_address, order.get_int_amount()):
                 break
             retries += 1
             await asyncio.sleep(10)
