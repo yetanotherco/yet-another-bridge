@@ -150,8 +150,8 @@ async def process_no_balance_orders(order_dao: OrderDao,
     orders = order_dao.get_no_balance_orders()
     for order in orders:
         order_dao.set_order_processing(order)
+        logger.info(f"[+] Processing no balance order: {order}")
         create_order_task(order, order_dao, eth_lock, herodotus_semaphore)
-        # logger.info(f"[+] Processing no balance order: {order}")
 
 
 async def transfer(order: Order, order_dao: OrderDao):
