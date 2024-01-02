@@ -1,6 +1,8 @@
 import asyncio
 import logging
 
+import schedule
+
 from config import constants
 from config.database_config import get_db
 from config.logging_config import setup_logger
@@ -17,6 +19,7 @@ from services.withdrawer.withdrawer import Withdrawer
 setup_logger()
 logger = logging.getLogger(__name__)
 SLEEP_TIME = 5
+PROCESS_NO_BALANCE_ORDERS_MINUTES_TIMER = 5
 
 
 def using_herodotus():
@@ -32,6 +35,8 @@ async def run():
     block_dao = BlockDao(get_db())
     eth_lock = asyncio.Lock()
     herodotus_semaphore = asyncio.Semaphore(100)
+    (schedule.every(PROCESS_NO_BALANCE_ORDERS_MINUTES_TIMER).minutes
+     .do(no_balance_orders_job, order_dao, eth_lock, herodotus_semaphore))
 
     try:
         # 1 Get all orders that are not completed from the db
@@ -56,6 +61,7 @@ async def run():
             # 5. Update latest block
             block_dao.update_latest_block(await starknet.get_latest_block())
 
+            schedule.run_pending()
             await asyncio.sleep(SLEEP_TIME)
     except Exception as e:
         logger.error(f"[-] Error: {e}")
@@ -99,6 +105,10 @@ async def process_order(order: Order, order_dao: OrderDao,
     # (bridging is complete for the user)
     if order.status in [OrderStatus.PROCESSING, OrderStatus.TRANSFERRING]:
         async with eth_lock:
+            if not ethereum.has_funds(order.get_int_amount()):
+                order_dao.set_order_no_balance(order)
+                logger.info(f"[+] Order {order.order_id} has no balance")
+                return
             if order.status is OrderStatus.PROCESSING:
                 try:
                     await transfer(order, order_dao)
@@ -127,6 +137,21 @@ async def process_order(order: Order, order_dao: OrderDao,
 
     if order.status is OrderStatus.COMPLETED:
         logger.info(f"[+] Order {order.order_id} completed")
+
+
+def no_balance_orders_job(order_dao: OrderDao,
+                          eth_lock: asyncio.Lock, herodotus_semaphore: asyncio.Semaphore):
+    asyncio.create_task(process_no_balance_orders(order_dao, eth_lock, herodotus_semaphore), name="No-balance-orders")
+
+
+async def process_no_balance_orders(order_dao: OrderDao,
+                                    eth_lock: asyncio.Lock, herodotus_semaphore: asyncio.Semaphore):
+    logger.debug(f"[+] Processing no balance orders")
+    orders = order_dao.get_no_balance_orders()
+    for order in orders:
+        order_dao.set_order_processing(order)
+        create_order_task(order, order_dao, eth_lock, herodotus_semaphore)
+        # logger.info(f"[+] Processing no balance order: {order}")
 
 
 async def transfer(order: Order, order_dao: OrderDao):

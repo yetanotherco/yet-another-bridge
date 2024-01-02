@@ -49,6 +49,20 @@ def get_is_used_order(order_id, recipient_address, amount) -> bool:
     raise Exception("Failed to get is used order from all nodes")
 
 
+def get_balance() -> int:
+    for w3 in w3_clients:
+        try:
+            return w3.eth.get_balance(main_account.address)
+        except Exception as exception:
+            logger.warning(f"[-] Failed to get balance from node: {exception}")
+    logger.error(f"[-] Failed to get balance from all nodes")
+    raise Exception("Failed to get balance from all nodes")
+
+
+def has_funds(amount: int) -> bool:
+    return get_balance() >= amount
+
+
 def transfer(deposit_id, dst_addr, amount):
     dst_addr_bytes = int(dst_addr, 0)
     deposit_id = Web3.to_int(deposit_id)
