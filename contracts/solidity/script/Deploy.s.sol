@@ -6,7 +6,7 @@ import "../src/YABTransfer.sol";
 
 contract Deploy is Script {
     function run() external {
-        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+        uint256 deployerPrivateKey = vm.envUint("ETH_PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
 
         address snMessagingAddress = 0xde29d060D45901Fb19ED6C6e959EB22d8626708e;
