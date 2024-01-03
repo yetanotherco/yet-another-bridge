@@ -61,7 +61,23 @@ class OrderDao:
     def set_order_completed(self, order: Order) -> Order:
         return self.update_order(order, OrderStatus.COMPLETED)
 
+    def set_order_no_balance(self, order: Order) -> Order:
+        return self.update_order(order, OrderStatus.NO_BALANCE)
+
+    """
+    An order is incomplete if it's not completed, not failed or has balance
+    An order in NO_BALANCE state is considered COMPLETED and will be re-processed in the next iteration
+        when the balance is enough
+    """
+
     def get_incomplete_orders(self):
         return (self.db.query(Order)
-                .filter(and_(Order.status != OrderStatus.COMPLETED, Order.status != OrderStatus.FAILED))
+                .filter(and_(Order.status != OrderStatus.COMPLETED,
+                             Order.status != OrderStatus.FAILED,
+                             Order.status != OrderStatus.NO_BALANCE))
+                .all())
+
+    def get_no_balance_orders(self):
+        return (self.db.query(Order)
+                .filter(Order.status == OrderStatus.NO_BALANCE)
                 .all())
