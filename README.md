@@ -18,6 +18,10 @@ This will end up installing:
 - [Starknet Foundry](https://foundry-rs.github.io/starknet-foundry/) - Is a toolchain for developing Starknet smart contracts.
 - [Ethereum Foundry](https://book.getfoundry.sh/) - Is a toolchain for developing Ethereum smart contracts.
 
+### Starknet dependencies
+
+- [OpenZeppelin cairo contracts](https://github.com/OpenZeppelin/cairo-contracts/)
+
 ## Setting up a Starknet Testnet Wallet
 
 **This guide will help you declare and deploy contracts on a testnet. Please
@@ -118,7 +122,6 @@ On Starknet, the deployment process is in two steps:
    SN_CONTRACT_ADDR=<STARKNET_MM_CONTRACT_ADDR>
    ..
    ```
-
 2. Declare and Deploy: We sequentially declare and deploy the contracts.
 
    ```bash
