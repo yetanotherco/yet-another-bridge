@@ -107,9 +107,9 @@ async def get_order_events(from_block_number, to_block_number) -> list[SetOrderE
 
 
 async def create_set_order_event(event):
-    order_id = event.data[0]
-    recipient_address = hex(event.data[2])
-    amount = event.data[3]
+    order_id = get_order_id(event)
+    recipient_address = get_recipient_address(event)
+    amount = get_amount(event)
     is_used = await asyncio.to_thread(ethereum.get_is_used_order, order_id, recipient_address, amount)
     fee = get_fee(event)
     return SetOrderEvent(
@@ -120,6 +120,22 @@ async def create_set_order_event(event):
         block_number=event.block_number,
         is_used=is_used
     )
+
+
+def get_order_id(event) -> int:
+    return parse_u256_from_double_u128(event.data[0], event.data[1])
+
+
+def get_recipient_address(event) -> str:
+    return hex(event.data[2])
+
+
+def get_amount(event) -> int:
+    return parse_u256_from_double_u128(event.data[3], event.data[4])
+
+
+def parse_u256_from_double_u128(low, high) -> int:
+    return high << 128 | low
 
 
 def get_fee(event) -> int:
