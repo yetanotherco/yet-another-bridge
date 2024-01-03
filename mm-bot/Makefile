@@ -8,12 +8,17 @@ database = mm-bot
 # Application Commands
 run:
 	@echo "Running application..."
-	@. venv/bin/activate && python3 main.py
+	@. venv/bin/activate && python3 src/main.py
 
 create_env:
 	@echo "Creating environment variables files .env",
 	@cp .env.example .env
 	@echo "Environment variables files created successfully!"
+
+create_venv:
+	@echo "Creating virtual environment..."
+	@python3 -m venv venv
+	@echo "Virtual environment created successfully!"
 
 # Database Commands
 start_db:
