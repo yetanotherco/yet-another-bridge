@@ -44,6 +44,10 @@ contract YABTransfer {
         emit Transfer(orderId, msg.sender, transfers[index]);
     }
 
+    // TODO: REMOVE test upgradeable
+    function transfer1() external payable {
+    }
+
     function withdraw(uint256 orderId, uint256 destAddress, uint256 amount) external payable {
         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount));
         TransferInfo storage transferInfo = transfers[index];

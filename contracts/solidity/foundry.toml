@@ -3,6 +3,9 @@ src = "src"
 out = "out"
 libs = ["lib"]
 gas_reports = ["*"]
+remappings = [
+    "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
+]
 
 [rpc_endpoints]
 goerli = "${GOERLI_RPC_URL}"

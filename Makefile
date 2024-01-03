@@ -24,6 +24,9 @@ ethereum-test: ethereum-clean
 ethereum-deploy: ethereum-clean
 	@./contracts/solidity/deploy.sh
 
+ethereum-upgrade: ethereum-clean
+	@./contracts/solidity/upgrade.sh
+
 starknet-clean:
 	@cd ./contracts/cairo/ && scarb clean
 
