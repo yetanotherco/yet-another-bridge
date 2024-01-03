@@ -13,6 +13,7 @@ from services import ethereum
 from services.mm_full_node_client import MmFullNodeClient
 
 SET_ORDER_EVENT_KEY = 0x2c75a60b5bdad73ebbf539cc807fccd09875c3cbf3f44041f852cdb96d8acd3
+EVENT_DATA_SIZE = 128  # 128 bits = 16 bytes
 
 main_full_node_client = MmFullNodeClient(node_url=constants.SN_RPC_URL)
 fallback_full_node_client = MmFullNodeClient(node_url=constants.SN_FALLBACK_RPC_URL)
@@ -107,9 +108,9 @@ async def get_order_events(from_block_number, to_block_number) -> list[SetOrderE
 
 
 async def create_set_order_event(event):
-    order_id = event.data[0]
-    recipient_address = hex(event.data[2])
-    amount = event.data[3]
+    order_id = get_order_id(event)
+    recipient_address = get_recipient_address(event)
+    amount = get_amount(event)
     is_used = await asyncio.to_thread(ethereum.get_is_used_order, order_id, recipient_address, amount)
     fee = get_fee(event)
     return SetOrderEvent(
@@ -120,6 +121,18 @@ async def create_set_order_event(event):
         block_number=event.block_number,
         is_used=is_used
     )
+
+
+def get_order_id(event) -> int:
+    return event.data[1] << EVENT_DATA_SIZE | event.data[0]
+
+
+def get_recipient_address(event) -> str:
+    return hex(event.data[2])
+
+
+def get_amount(event) -> int:
+    return event.data[4] << EVENT_DATA_SIZE | event.data[3]
 
 
 def get_fee(event) -> int:
