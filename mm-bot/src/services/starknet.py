@@ -13,7 +13,6 @@ from services import ethereum
 from services.mm_full_node_client import MmFullNodeClient
 
 SET_ORDER_EVENT_KEY = 0x2c75a60b5bdad73ebbf539cc807fccd09875c3cbf3f44041f852cdb96d8acd3
-EVENT_DATA_SIZE = 128  # 128 bits = 16 bytes
 
 main_full_node_client = MmFullNodeClient(node_url=constants.SN_RPC_URL)
 fallback_full_node_client = MmFullNodeClient(node_url=constants.SN_FALLBACK_RPC_URL)
@@ -124,7 +123,7 @@ async def create_set_order_event(event):
 
 
 def get_order_id(event) -> int:
-    return event.data[1] << EVENT_DATA_SIZE | event.data[0]
+    return parse_u256_from_double_u128(event.data[0], event.data[1])
 
 
 def get_recipient_address(event) -> str:
@@ -132,7 +131,11 @@ def get_recipient_address(event) -> str:
 
 
 def get_amount(event) -> int:
-    return event.data[4] << EVENT_DATA_SIZE | event.data[3]
+    return parse_u256_from_double_u128(event.data[3], event.data[4])
+
+
+def parse_u256_from_double_u128(low, high) -> int:
+    return high << 128 | low
 
 
 def get_fee(event) -> int:
