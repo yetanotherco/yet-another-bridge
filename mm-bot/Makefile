@@ -15,7 +15,7 @@ create_env:
 	@cp .env.example .env
 	@echo "Environment variables files created successfully!"
 
-create_venv:
+create_python_venv:
 	@echo "Creating virtual environment..."
 	@python3 -m venv venv
 	@echo "Virtual environment created successfully!"
