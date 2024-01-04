@@ -45,7 +45,7 @@ contract YABTransfer {
     }
 
     // TODO: REMOVE test upgradeable
-    function transfer1() external payable {
+    function transfer777() external payable {
     }
 
     function withdraw(uint256 orderId, uint256 destAddress, uint256 amount) external payable {
