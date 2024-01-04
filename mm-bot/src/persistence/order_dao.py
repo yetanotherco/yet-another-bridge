@@ -61,6 +61,9 @@ class OrderDao:
     def set_order_completed(self, order: Order) -> Order:
         return self.update_order(order, OrderStatus.COMPLETED)
 
+    def set_order_failed(self, order: Order) -> Order:
+        return self.update_order(order, OrderStatus.FAILED)
+
     def set_order_no_balance(self, order: Order) -> Order:
         return self.update_order(order, OrderStatus.NO_BALANCE)
 
