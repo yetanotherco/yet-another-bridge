@@ -21,7 +21,8 @@ from services.withdrawer.withdrawer import Withdrawer
 setup_logger()
 logger = logging.getLogger(__name__)
 SLEEP_TIME = 5
-PROCESS_NO_BALANCE_ORDERS_MINUTES_TIMER = 5
+PROCESS_NO_BALANCE_ORDERS_MINUTES_TIMER = 1
+MAX_ETH_TRANSFER_WEI = 100000000000000000  # TODO move to env variable
 
 
 def using_herodotus():
@@ -106,6 +107,12 @@ async def process_order(order: Order, order_service: OrderService,
     logger.info(f"[+] Processing order: {order}")
     if order.status is OrderStatus.PENDING:
         order_service.set_order_processing(order)
+
+    # 1. Check if order amount is too high
+    if order.amount > MAX_ETH_TRANSFER_WEI:
+        logger.error(f"[-] Order amount is too high: {order.amount}")
+        order_service.set_order_dropped(order)
+        return
 
     # 2. Transfer eth on ethereum
     # (bridging is complete for the user)
