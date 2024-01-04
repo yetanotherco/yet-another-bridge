@@ -9,5 +9,3 @@ class OrderStatus(Enum):
     PROVING = "PROVING"
     PROVED = "PROVED"
     COMPLETED = "COMPLETED"
-    FAILED = "FAILED"
-    NO_BALANCE = "NO_BALANCE"

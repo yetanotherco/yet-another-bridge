@@ -14,6 +14,7 @@ class Order(Base):
     recipient_address: str = Column(String(42), nullable=False)
     amount: decimal = Column(Numeric(78, 0), nullable=False)
     status: OrderStatus = Column(Enum(OrderStatus), nullable=False, default=OrderStatus.PENDING)
+    failed: bool = Column(Integer, nullable=False, default=False)
     tx_hash: HexBytes = Column(LargeBinary, nullable=True)
     herodotus_task_id: str = Column(String, nullable=True)
     herodotus_block: int = Column(Integer, nullable=True)
@@ -22,7 +23,10 @@ class Order(Base):
     created_at: datetime = Column(DateTime, nullable=False, default=datetime.now())
 
     def __str__(self):
-        return f"order_id:{self.order_id}, recipient: {self.recipient_address}, amount: {self.amount}, status: {self.status.value}, herodotus_task_id: {self.herodotus_task_id}"
+        return f"order_id:{self.order_id}, recipient: {self.recipient_address}, amount: {self.amount}, status: {self.status.value}, failed: {self.failed}"
+
+    def __repr__(self):
+        return str(self)
 
     def get_int_amount(self) -> int:
         return int(self.amount)
