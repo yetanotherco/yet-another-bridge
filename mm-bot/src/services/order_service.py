@@ -118,6 +118,13 @@ class OrderService:
         order.status = OrderStatus.COMPLETED.name
         return self.order_dao.update_order(order)
 
+    def set_order_dropped(self, order: Order) -> Order:
+        """
+        Set the order status to "DROPPED"
+        """
+        order.status = OrderStatus.DROPPED.name
+        return self.order_dao.update_order(order)
+
     def set_order_failed(self, order: Order, error_message: str) -> Order:
         """
         Set the order failed to True and create an error in the database.

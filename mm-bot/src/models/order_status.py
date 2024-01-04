@@ -9,3 +9,4 @@ class OrderStatus(Enum):
     PROVING = "PROVING"
     PROVED = "PROVED"
     COMPLETED = "COMPLETED"
+    DROPPED = "DROPPED"

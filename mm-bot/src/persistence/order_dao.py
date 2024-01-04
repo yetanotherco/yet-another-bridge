@@ -30,9 +30,10 @@ class OrderDao:
 
     def get_incomplete_orders(self) -> list[Type[Order]]:
         """
-        An order is incomplete if it's not completed and not failed
+        An order is incomplete if it's not completed or not DROPPED and not failed
         """
         criteria = and_(Order.status != OrderStatus.COMPLETED,
+                        Order.status != OrderStatus.DROPPED,
                         Order.failed == False)
         return self.get_orders(criteria)
 
