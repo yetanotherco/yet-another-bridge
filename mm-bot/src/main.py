@@ -114,6 +114,8 @@ async def process_order(order: Order, order_dao: OrderDao,
                     await transfer(order, order_dao)
                 except Exception as e:
                     logger.error(f"[-] Transfer failed: {e}")
+                    order_dao.set_order_failed(order)
+                    return
 
             # 2.5. Wait for transfer
             if order.status is OrderStatus.TRANSFERRING:
@@ -124,7 +126,12 @@ async def process_order(order: Order, order_dao: OrderDao,
             # 3. Call herodotus to prove
             # extra: validate w3.eth.get_storage_at(addr, pos) before calling herodotus
             if order.status is OrderStatus.FULFILLED:
-                await withdrawer.send_withdraw(order, order_dao)
+                try:
+                    await withdrawer.send_withdraw(order, order_dao)
+                except Exception as e:
+                    logger.error(f"[-] Withdraw failed: {e}")
+                    order_dao.set_order_failed(order)
+                    return
 
             # 4. Poll herodotus to check task status
             if order.status is OrderStatus.PROVING:

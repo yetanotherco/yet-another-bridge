@@ -27,6 +27,9 @@ main_contract_rpc = main_w3.eth.contract(address=constants.ETH_CONTRACT_ADDR, ab
 fallback_contract_rpc = fallback_w3.eth.contract(address=constants.ETH_CONTRACT_ADDR, abi=abi)
 contracts_rpc = [main_contract_rpc, fallback_contract_rpc]
 
+TRANSFER_FEE_PERCENTAGE = 0.1
+WITHDRAW_FEE_PERCENTAGE = 0.05
+
 logger = logging.getLogger(__name__)
 
 
@@ -72,7 +75,10 @@ def transfer(deposit_id, dst_addr, amount):
     deposit_id = Web3.to_int(deposit_id)
     amount = Web3.to_int(amount)
 
-    signed_tx = create_transfer(deposit_id, dst_addr_bytes, amount)
+    unsent_tx, signed_tx = create_transfer(deposit_id, dst_addr_bytes, amount)
+
+    if not is_transaction_viable(unsent_tx, amount, TRANSFER_FEE_PERCENTAGE):
+        raise Exception(f"Transfer gas fee exceeds {TRANSFER_FEE_PERCENTAGE * 100}% of the amount")
 
     tx_hash = send_raw_transaction(signed_tx)
     return tx_hash
@@ -89,7 +95,7 @@ def create_transfer(deposit_id, dst_addr_bytes, amount):
                 "value": amount,
             })
             signed_tx = w3.eth.account.sign_transaction(unsent_tx, private_key=accounts_rpc[index].key)
-            return signed_tx
+            return unsent_tx, signed_tx
         except Exception as exception:
             logger.warning(f"[-] Failed to create transfer eth on node: {exception}")
     logger.error(f"[-] Failed to create transfer eth on all nodes")
@@ -101,7 +107,10 @@ def withdraw(deposit_id, dst_addr, amount):
     dst_addr_bytes = int(dst_addr, 0)
     amount = Web3.to_int(amount)
 
-    signed_tx = create_withdraw(deposit_id, dst_addr_bytes, amount)
+    unsent_tx, signed_tx = create_withdraw(deposit_id, dst_addr_bytes, amount)
+
+    if not is_transaction_viable(unsent_tx, amount, WITHDRAW_FEE_PERCENTAGE):
+        raise Exception(f"Withdraw gas fee exceeds {WITHDRAW_FEE_PERCENTAGE * 100}% of the amount")
 
     tx_hash = send_raw_transaction(signed_tx)
     return tx_hash
@@ -117,7 +126,7 @@ def create_withdraw(deposit_id, dst_addr_bytes, amount):
                 "value": amount,
             })
             signed_tx = w3.eth.account.sign_transaction(unsent_tx, private_key=accounts_rpc[index].key)
-            return signed_tx
+            return unsent_tx, signed_tx
         except Exception as exception:
             logger.warning(f"[-] Failed to create withdraw eth on node: {exception}")
     logger.error(f"[-] Failed to create withdraw eth on all nodes")
@@ -126,6 +135,24 @@ def create_withdraw(deposit_id, dst_addr_bytes, amount):
 
 def get_nonce(w3: Web3, address):
     return w3.eth.get_transaction_count(address)
+
+
+def estimate_gas_fee(transaction):
+    for w3 in w3_clients:
+        try:
+            gas_limit = w3.eth.estimate_gas(transaction)
+            fee = w3.eth.gas_price
+            gas_fee = fee * gas_limit
+            return gas_fee
+        except Exception as exception:
+            logger.warning(f"[-] Failed to estimate fee on node: {exception}")
+    logger.error(f"[-] Failed to estimate fee on all nodes")
+    raise Exception("Failed to estimate fee on all nodes")
+
+
+def is_transaction_viable(transaction, amount: int, percentage: float) -> bool:
+    gas_fee = estimate_gas_fee(transaction)
+    return gas_fee <= amount * percentage
 
 
 def send_raw_transaction(signed_tx):
