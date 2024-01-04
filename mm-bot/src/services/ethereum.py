@@ -77,8 +77,11 @@ def transfer(deposit_id, dst_addr, amount):
 
     unsent_tx, signed_tx = create_transfer(deposit_id, dst_addr_bytes, amount)
 
-    if not is_transaction_viable(unsent_tx, amount, TRANSFER_FEE_PERCENTAGE):
-        raise Exception(f"Transfer gas fee exceeds {TRANSFER_FEE_PERCENTAGE * 100}% of the amount")
+    gas_fee = estimate_gas_fee(unsent_tx)
+    if not is_transaction_viable(amount, TRANSFER_FEE_PERCENTAGE, gas_fee):
+        raise Exception(f"Transfer gas fee ({gas_fee}) exceeds {TRANSFER_FEE_PERCENTAGE * 100}% of the amount ({amount})")
+    if not has_enough_funds(amount, gas_fee):
+        raise Exception("Not enough funds for transfer")
 
     tx_hash = send_raw_transaction(signed_tx)
     return tx_hash
@@ -109,8 +112,11 @@ def withdraw(deposit_id, dst_addr, amount):
 
     unsent_tx, signed_tx = create_withdraw(deposit_id, dst_addr_bytes, amount)
 
-    if not is_transaction_viable(unsent_tx, amount, WITHDRAW_FEE_PERCENTAGE):
-        raise Exception(f"Withdraw gas fee exceeds {WITHDRAW_FEE_PERCENTAGE * 100}% of the amount")
+    gas_fee = estimate_gas_fee(unsent_tx)
+    if not is_transaction_viable(amount, WITHDRAW_FEE_PERCENTAGE, gas_fee):
+        raise Exception(f"Withdraw gas fee ({gas_fee}) exceeds {WITHDRAW_FEE_PERCENTAGE * 100}% of the amount ({amount})")
+    if not has_enough_funds(gas_fee=gas_fee):
+        raise Exception("Not enough funds for withdraw")
 
     tx_hash = send_raw_transaction(signed_tx)
     return tx_hash
@@ -150,9 +156,12 @@ def estimate_gas_fee(transaction):
     raise Exception("Failed to estimate fee on all nodes")
 
 
-def is_transaction_viable(transaction, amount: int, percentage: float) -> bool:
-    gas_fee = estimate_gas_fee(transaction)
+def is_transaction_viable(amount: int, percentage: float, gas_fee: int) -> bool:
     return gas_fee <= amount * percentage
+
+
+def has_enough_funds(amount: int = 0, gas_fee: int = 0) -> bool:
+    return get_balance() >= amount + gas_fee
 
 
 def send_raw_transaction(signed_tx):
