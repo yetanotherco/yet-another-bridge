@@ -2,6 +2,7 @@ import asyncio
 import logging
 from typing import Literal
 
+from starknet_py.common import int_from_bytes
 from starknet_py.hash.selector import get_selector_from_name
 from starknet_py.net.account.account import Account
 from starknet_py.net.client_models import Call
@@ -12,6 +13,7 @@ from config import constants
 from services import ethereum
 from services.mm_full_node_client import MmFullNodeClient
 
+SN_CHAIN_ID = int_from_bytes(constants.SN_CHAIN_ID.encode("utf-8"))
 SET_ORDER_EVENT_KEY = 0x2c75a60b5bdad73ebbf539cc807fccd09875c3cbf3f44041f852cdb96d8acd3
 
 main_full_node_client = MmFullNodeClient(node_url=constants.SN_RPC_URL)
@@ -23,13 +25,13 @@ main_account = Account(
     client=main_full_node_client,
     address=constants.SN_WALLET_ADDR,
     key_pair=key_pair,
-    chain=StarknetChainId.TESTNET,
+    chain=SN_CHAIN_ID,  # ignore this warning TODO change to StarknetChainId when starknet_py adds sepolia
 )
 fallback_account = Account(
     client=fallback_full_node_client,
     address=constants.SN_WALLET_ADDR,
     key_pair=key_pair,
-    chain=StarknetChainId.TESTNET,
+    chain=SN_CHAIN_ID,  # ignore this warning TODO change to StarknetChainId when starknet_py adds sepolia
 )
 accounts = [fallback_account, main_account]
 
