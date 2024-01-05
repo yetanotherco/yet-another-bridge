@@ -37,14 +37,19 @@ trait IEscrow<ContractState> {
 mod Escrow {
     use super::{IEscrow, Order};
 
+    use openzeppelin::upgrades::UpgradeableComponent;
     use starknet::{
-        ContractAddress, EthAddress, get_caller_address, get_contract_address, get_block_timestamp
+        ContractAddress, EthAddress, ClassHash, get_caller_address, get_contract_address,
+        get_block_timestamp
     };
 
     use yab::interfaces::IERC20::{IERC20Dispatcher, IERC20DispatcherTrait};
     use yab::interfaces::IEVMFactsRegistry::{
         IEVMFactsRegistryDispatcher, IEVMFactsRegistryDispatcherTrait
     };
+
+    component!(path: UpgradeableComponent, storage: upgradeable, event: UpgradeableEvent);
+    impl InternalImpl = UpgradeableComponent::InternalImpl<ContractState>;
 
     // https://github.com/starknet-io/starknet-addresses
     // MAINNET = GOERLI = GOERLI2
@@ -56,7 +61,9 @@ mod Escrow {
     #[derive(Drop, starknet::Event)]
     enum Event {
         Withdraw: Withdraw,
-        SetOrder: SetOrder
+        SetOrder: SetOrder,
+        #[flat]
+        UpgradeableEvent: UpgradeableComponent::Event
     }
 
     #[derive(Drop, starknet::Event)]
@@ -86,7 +93,9 @@ mod Escrow {
         eth_transfer_contract: EthAddress, // our transfer contract in L1
         mm_ethereum_wallet: EthAddress,
         mm_starknet_wallet: ContractAddress,
-        native_token_eth_starknet: ContractAddress
+        native_token_eth_starknet: ContractAddress,
+        #[substorage(v0)]
+        upgradeable: UpgradeableComponent::Storage,
     }
 
     #[constructor]
@@ -106,6 +115,12 @@ mod Escrow {
         self.mm_ethereum_wallet.write(mm_ethereum_wallet);
         self.mm_starknet_wallet.write(mm_starknet_wallet);
         self.native_token_eth_starknet.write(native_token_eth_starknet);
+    }
+
+    #[external(v0)]
+    fn upgrade(ref self: ContractState, new_class_hash: ClassHash) {
+        assert(self.owner.read() == get_caller_address(), 'Only owner allowed');
+        self.upgradeable._upgrade(new_class_hash);
     }
 
     #[external(v0)]
