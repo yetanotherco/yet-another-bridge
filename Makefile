@@ -21,10 +21,10 @@ ethereum-build: ethereum-clean
 ethereum-test: ethereum-clean
 	@cd ./contracts/solidity/ && forge test
 
-ethereum-deploy: ethereum-clean
+ethereum-deploy: ethereum-build
 	@./contracts/solidity/deploy.sh
 
-ethereum-upgrade: ethereum-clean
+ethereum-upgrade: ethereum-build
 	@./contracts/solidity/upgrade.sh
 
 starknet-clean:

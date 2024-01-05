@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
-pragma solidity ^0.8.21;
+pragma solidity ^0.8.19;
 
 import {IStarknetMessaging} from "starknet/IStarknetMessaging.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     struct TransferInfo {
@@ -21,13 +21,19 @@ contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     uint256 private _snEscrowAddress;
     uint256 private _snEscrowWithdrawSelector;
 
-    // Due to a requirement of the proxy-based upgradeability system, 
+    constructor() {
+        _disableInitializers();
+    }
+
     // no constructors can be used in upgradeable contracts. 
     function initialize(
         address snMessaging,
         uint256 snEscrowAddress,
         uint256 snEscrowWithdrawSelector) public initializer { 
         _owner = msg.sender;
+        __Ownable_init(_owner); //sets owner to msg.sender
+        __UUPSUpgradeable_init();
+
         _snMessaging = IStarknetMessaging(snMessaging);
         _snEscrowAddress = snEscrowAddress;
         _snEscrowWithdrawSelector = snEscrowWithdrawSelector;

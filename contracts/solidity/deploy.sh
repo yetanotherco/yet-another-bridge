@@ -17,4 +17,4 @@ load_env() {
 load_env
 
 echo -e "${GREEN}\n=> [ETH] Deploy YABTransfer & ERC1967Proxy ${COLOR_RESET}"
-forge script ./script/Deploy.s.sol --fork-url $GOERLI_RPC_URL --broadcast --verify -vvvv
+forge script ./script/Deploy.s.sol --rpc-url $GOERLI_RPC_URL --broadcast --verify --private-key $ETH_PRIVATE_KEY

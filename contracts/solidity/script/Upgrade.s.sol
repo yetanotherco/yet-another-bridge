@@ -1,36 +1,39 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.21;
+pragma solidity ^0.8.19;
 
+import {console} from "../lib/forge-std/src/console.sol";
 import {Script} from "forge-std/Script.sol";
 import {YABTransfer} from "../src/YABTransfer.sol";
 import {YABTransferV2} from "../src/YABTransferV2.sol";
-import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+import {UUPSUpgradeable} from "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 
 contract Upgrade is Script {
     function run() external returns (address) {
-        uint256 YABTrasnferProxyAddress = vm.envUint("ETH_YAB_PROXY_ADDRESS");
-        uint256 deployerPrivateKey = vm.envUint("ETH_PRIVATE_KEY");
-        vm.startBroadcast(deployerPrivateKey);
+        address YABTrasnferProxyAddress = vm.envAddress("ETH_YAB_PROXY_ADDRESS");
+        vm.startBroadcast();
 
-        YABTransferV2 newYabTransfer = new YABTransferV2();
+        YABTransferV2 transferV2 = new YABTransferV2();
+        console.log("YABTrasnferProxyAddress", address(YABTrasnferProxyAddress));
+        console.log("TransferV2 ", address(transferV2));
         vm.stopBroadcast();
-        address proxy = upgradeYABTransfer(address(uint160(uint(keccak256(abi.encodePacked(YABTrasnferProxyAddress))))), address(newYabTransfer));
+
+        address proxy = upgradeAddy(YABTrasnferProxyAddress, address(transferV2)); //upgrades contractA to contractB
         return proxy;
     }
 
-    function upgradeYABTransfer(address proxyAddress, address newYABTrasnfer) public returns (address) {
 
-        YABTransfer proxy = YABTransfer(payable(proxyAddress));
+    function upgradeAddy(
+        address proxyAddress,
+        address newAddy
+    ) public returns (address) {
+        vm.startBroadcast();
 
-        address snMessagingAddress = 0xde29d060D45901Fb19ED6C6e959EB22d8626708e;
-        uint256 snEscrowAddress = 0x0;
-        uint256 snEscrowWithdrawSelector = 0x0;
-
-        proxy.upgradeToAndCall(newYABTrasnfer, 
-            abi.encode()
-);
-        
+        YABTransfer proxy = YABTransfer(payable(proxyAddress)); //we want to make a function call on this address
+        proxy.upgradeToAndCall(address(newAddy), ''); 
+    
+        //proxy address now points to this new address
         vm.stopBroadcast();
         return address(proxy);
     }
+
 }
