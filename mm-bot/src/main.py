@@ -21,7 +21,7 @@ from services.withdrawer.withdrawer import Withdrawer
 setup_logger()
 logger = logging.getLogger(__name__)
 SLEEP_TIME = 5
-PROCESS_NO_BALANCE_ORDERS_MINUTES_TIMER = 1
+PROCESS_NO_BALANCE_ORDERS_MINUTES_TIMER = 5
 MAX_ETH_TRANSFER_WEI = 100000000000000000  # TODO move to env variable
 
 
