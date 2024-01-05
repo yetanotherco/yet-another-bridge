@@ -16,9 +16,3 @@
 [submodule "lib/openzeppelin-contracts"]
 	path = lib/openzeppelin-contracts
 	url = https://github.com/OpenZeppelin/openzeppelin-contracts
-[submodule "lib/foundry-devops"]
-	path = lib/foundry-devops
-	url = https://github.com/chainaccelorg/foundry-devops
-[submodule "contracts/solidity/lib/foundry-devops"]
-	path = contracts/solidity/lib/foundry-devops
-	url = https://github.com/chainaccelorg/foundry-devops
