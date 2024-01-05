@@ -101,6 +101,31 @@ Follow the steps below to set up a testnet smart wallet using `starkli`:
 
 ## Declare and Deploy Contracts in Testnet
 
+### Ethereum smart contract
+First, the Ethereum smart contracts must be deployed. For Ethereum the deployment process you will need to:
+
+1. Create your `.env` file: you need to configure the following variables in your own .env file on the contracts/solidity/ folder. You can use the env.example file as a template for creating your .env file, paying special attention to the formats provided
+
+   ```bash
+   ETH_RPC_URL = Infura or Alchemy RPC URL
+   ETH_PRIVATE_KEY = private key of your ETH wallet
+   ETHERSCAN_API_KEY = API Key to use etherscan to read the Ethereum blockchain
+   ```
+   **NOTE**:
+
+   - You can generate ETHERSCAN_API_KEY [following this steps](https://docs.etherscan.io/getting-started/viewing-api-usage-statistics).
+   - For the deploy, you will need some GoerliETH that you can get from this [faucet](https://goerlifaucet.com/).
+
+
+2. Deploy Solidity contract
+
+   ```bash
+      make ethereum-deploy
+   ```
+
+### Starknet smart contracts
+
+After the Ethereum smart contract is deployed, the Starknet smart contracts must be declared and deployed.
 On Starknet, the deployment process is in two steps:
 
 - Declaring the class of your contract, or sending your contract’s code to the
@@ -108,40 +133,37 @@ On Starknet, the deployment process is in two steps:
 - Deploying a contract or creating an instance of the previously declared code
   with the necessary parameters
 
-1. Updated `.env` file: Please modify the variables with your Testnet account and your RPC provider.
+For this, you will need to:
+
+1. Create your `.env` file: you need to configure the following variables in your own .env file on the contracts/solidity folder. You can use the env.example file as a template for creating your .env file, paying special attention to the formats provided
 
    ```bash
-   // For the deploy, you just need to configure the following variables in the .env file on the mm-bot folder
-   ..
-   SN_RPC_URL=<STARKNET_RPC_HTTPS_URL> // Infura or Alchemy RPC URL 
-   ETH_CONTRACT_ADDR=0xdd69db25f6d620a7bad3023c5d32761d353d3de9 // GoerliETH 
-   SN_CONTRACT_ADDR=<STARKNET_MM_CONTRACT_ADDR>
-   ..
+   STARKNET_ACCOUNT = location of your starknet testnet account, created at the start of this README
+   STARKNET_KEYSTORE = location of your starknet testnet keystore, created at the start of this README
+   SN_RPC_URL = Infura or Alchemy RPC URL
+   ETH_CONTRACT_ADDR = newly created ETH contract address
+   MM_SN_WALLET_ADDR = Starknet wallet of the MarketMaker
+
    ```
+
 2. Declare and Deploy: We sequentially declare and deploy the contracts.
 
    ```bash
       make starknet-deploy
    ```
 
-For Ethereum the deployment process you will need:
+### Finalize connection between both chains
 
-3. Updated `.env` file: Please modify the variables with your Testnet account and your RPC provider.
+After the Starknet smart contracts are declared and deployed, one variable from the Ethereum smart contract must be updated with the newly created Starknet smart contract address.
 
-   ```bash
-   // For the deploy, you just need to configure the following variables in the .env file on the contracts/solidity/ folder
-   ..
-   ETH_RPC_URL=<ETH_RPC_URL> // Infura or Alchemy RPC URL
-   ETH_PRIVATE_KEY=<ETH_PRIVATE_KEY>
-   ETHERSCAN_API_KEY=<ETHERSCAN_API_KEY>
-   ..
-   ```
-   **NOTE**:
+For now, to do this you must go to the ETH explorer and find your ETH smart contract, for example:
+https://goerli.etherscan.io/address/0x8C78111CCDd368345c7d6A7bb6A7c887b1093f7A#writeContract
+Then, under the "contract/Write Contract" section, you must run the function, with your newly created Starknet escrow contract address as the parameter
+```
+snEscrowAddress(uint256)
+```
 
-   - You can generate ETHERSCAN_API_KEY [following this steps](https://docs.etherscan.io/getting-started/viewing-api-usage-statistics).
-   - For the deploy, you will need some GoerliETH that you can get from this [faucet](https://goerlifaucet.com/).
-4. Deploy Solidity contract
+This manual solution is temporary and wil be done automatically in the cairo deploy script.
 
-   ```bash
-      make ethereum-deploy
-   ```
+## Recap
+After following this complete README, we should have an ETH smart contract as well as a Starknet smart contract, both connected to act as a bridge between these two chains.
