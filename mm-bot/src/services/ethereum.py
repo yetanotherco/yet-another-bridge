@@ -5,6 +5,8 @@ from web3 import Web3
 
 from config import constants
 
+ETH_CHAIN_ID = int(constants.ETH_CHAIN_ID)
+
 main_w3 = Web3(Web3.HTTPProvider(constants.ETH_RPC_URL))
 fallback_w3 = Web3(Web3.HTTPProvider(constants.ETH_FALLBACK_RPC_URL))
 w3_clients = [main_w3, fallback_w3]
@@ -92,7 +94,7 @@ def create_transfer(deposit_id, dst_addr_bytes, amount):
     for index, w3 in enumerate(w3_clients):
         try:
             unsent_tx = contracts_rpc[index].functions.transfer(deposit_id, dst_addr_bytes, amount).build_transaction({
-                "chainId": 5,
+                "chainId": ETH_CHAIN_ID,
                 "from": accounts_rpc[index].address,
                 "nonce": get_nonce(w3, accounts_rpc[index].address),
                 "value": amount,
@@ -126,7 +128,7 @@ def create_withdraw(deposit_id, dst_addr_bytes, amount):
     for index, w3 in enumerate(w3_clients):
         try:
             unsent_tx = contracts_rpc[index].functions.withdraw(deposit_id, dst_addr_bytes, amount).build_transaction({
-                "chainId": 5,
+                "chainId": ETH_CHAIN_ID,
                 "from": accounts_rpc[index].address,
                 "nonce": get_nonce(w3, accounts_rpc[index].address),
                 "value": amount,
