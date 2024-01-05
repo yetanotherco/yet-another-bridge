@@ -1,54 +1,36 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.21;
 
 import {Script} from "forge-std/Script.sol";
 import {YABTransfer} from "../src/YABTransfer.sol";
+import {YABTransferV2} from "../src/YABTransferV2.sol";
+import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
-import {Upgrades} from "openzeppelin-foundry-upgrades/Upgrades.sol";
+contract Upgrade is Script {
+    function run() external returns (address) {
+        uint256 YABTrasnferProxyAddress = vm.envUint("ETH_YAB_PROXY_ADDRESS");
+        uint256 deployerPrivateKey = vm.envUint("ETH_PRIVATE_KEY");
+        vm.startBroadcast(deployerPrivateKey);
 
-contract UpgradesScript is Script {
-    function setUp() public {}
-
-    function run() public {
-        vm.startBroadcast();
-
-        // example deployment and upgrade of a UUPS proxy
-        address uupsProxy = Upgrades.deployUUPSProxy(
-            "GreeterProxiable.sol",
-            abi.encodeCall(GreeterProxiable.initialize, ("hello"))
-        );
-        Upgrades.upgradeProxy(
-            uupsProxy,
-            "GreeterV2Proxiable.sol",
-            abi.encodeCall(GreeterV2Proxiable.resetGreeting, ())
-        );
-
-        // example deployment of a beacon proxy and upgrade of the beacon
-        address beacon = Upgrades.deployBeacon("Greeter.sol", msg.sender);
-        Upgrades.deployBeaconProxy(beacon, abi.encodeCall(Greeter.initialize, ("hello")));
-        Upgrades.upgradeBeacon(beacon, "GreeterV2.sol");
-
+        YABTransferV2 newYabTransfer = new YABTransferV2();
         vm.stopBroadcast();
+        address proxy = upgradeYABTransfer(address(uint160(uint(keccak256(abi.encodePacked(YABTrasnferProxyAddress))))), address(newYabTransfer));
+        return proxy;
+    }
+
+    function upgradeYABTransfer(address proxyAddress, address newYABTrasnfer) public returns (address) {
+
+        YABTransfer proxy = YABTransfer(payable(proxyAddress));
+
+        address snMessagingAddress = 0xde29d060D45901Fb19ED6C6e959EB22d8626708e;
+        uint256 snEscrowAddress = 0x0;
+        uint256 snEscrowWithdrawSelector = 0x0;
+
+        proxy.upgradeToAndCall(newYABTrasnfer, 
+            abi.encode()
+);
+        
+        vm.stopBroadcast();
+        return address(proxy);
     }
 }
-
-//      function run() public {
-//         uint256 deployerPrivateKey = vm.envUint("ETH_PRIVATE_KEY");
-//         uint256 proxyAdminAddress = vm.envUint("ETH_PROXY_ADMIN_ADDRESS");
-//         uint256 proxyUpgradeableAddress = vm.envUint("ETH_PROXY_UPGRADEABLE_ADDRESS");
-
-//         vm.startBroadcast(deployerPrivateKey);
-
-//         address snMessagingAddress = 0xde29d060D45901Fb19ED6C6e959EB22d8626708e;
-//         uint256 snEscrowAddress = 0x0;
-//         uint256 snEscrowWithdrawSelector = 0x0;
-
-//         YABTransfer yab = new YABTransfer(
-//             snMessagingAddress,
-//             snEscrowAddress,
-//             snEscrowWithdrawSelector);
-
-//         ITransparentUpgradeableProxy proxyUpgradeable = ITransparentUpgradeableProxy(address(uint160(proxyUpgradeableAddress)));
-//         ProxyAdmin(address(uint160(proxyAdminAddress))).upgradeAndCall(proxyUpgradeable, address(yab), "");
-//         vm.stopBroadcast();
-//     }

@@ -16,5 +16,5 @@ load_env() {
 }
 load_env
 
-echo -e "${GREEN}\n=> [ETH] Deploy ProxyAdmin, TransparentUpgradeableProxy & YABTransfer ${COLOR_RESET}"
+echo -e "${GREEN}\n=> [ETH] Deploy YABTransfer & ERC1967Proxy ${COLOR_RESET}"
 forge script ./script/Deploy.s.sol --fork-url $GOERLI_RPC_URL --broadcast --verify -vvvv

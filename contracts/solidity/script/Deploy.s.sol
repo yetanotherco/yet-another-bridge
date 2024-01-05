@@ -1,14 +1,17 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity ^0.8.21;
 
-import "forge-std/Script.sol";
-import "../src/YABTransfer.sol";
-// import "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
-// import "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
-import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+import {Script} from "forge-std/Script.sol";
+import {YABTransfer} from "../src/YABTransfer.sol";
+import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 contract Deploy is Script {
-    function run() external {
+    function run() external returns (address) {
+        address yabProxy = deployYABTransfer();
+        return yabProxy;
+    }
+
+    function deployYABTransfer() public returns (address) {
         uint256 deployerPrivateKey = vm.envUint("ETH_PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
 
@@ -16,13 +19,10 @@ contract Deploy is Script {
         uint256 snEscrowAddress = 0x0;
         uint256 snEscrowWithdrawSelector = 0x0;
 
-        YABTransfer yab = new YABTransfer(
-            snMessagingAddress,
-            snEscrowAddress,
-            snEscrowWithdrawSelector);
-
-        new ERC1967Proxy(address(yab), "");
-
+        YABTransfer yab = new YABTransfer();
+        ERC1967Proxy proxy = new ERC1967Proxy(address(yab), "");
+        YABTransfer(address(proxy)).initialize(snMessagingAddress, snEscrowAddress, snEscrowWithdrawSelector);
         vm.stopBroadcast();
+        return address(proxy);
     }
 }

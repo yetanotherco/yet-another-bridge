@@ -17,4 +17,4 @@ load_env() {
 load_env
 
 echo -e "${GREEN}\n=> [ETH] Upgrade YABTransfer${COLOR_RESET}"
-forge script ./script/Upgrade.s.sol --fork-url $GOERLI_RPC_URL --broadcast --verify -vvvv
+forge script ./script/Upgrade1.s.sol --fork-url $GOERLI_RPC_URL --broadcast --verify -vvvv
