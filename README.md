@@ -165,5 +165,18 @@ snEscrowAddress(uint256)
 
 This manual solution is temporary and wil be done automatically in the cairo deploy script.
 
+To do this, you can also use Foundry's **cast** function, as follows:
+
+```
+cast send \
+--rpc-url <eth_rpc_url> \
+--private-key <your_private_key> \
+<eth_smart_contract_address> "setEscrowAddress(uint256)" <your_new_SN_contract_address>
+```
+
+This will send a transaction, using the specified rpc, from the specified address, to the specified smart contract, calling the "setEscrowAddress" function, with your new SN contract address. 
+
+
+
 ## Recap
 After following this complete README, we should have an ETH smart contract as well as a Starknet smart contract, both connected to act as a bridge between these two chains.
