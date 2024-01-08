@@ -99,8 +99,9 @@ Follow the steps below to set up a testnet smart wallet using `starkli`:
    export STARKNET_KEYSTORE=~/.starkli-wallets/keystore.json
    ```
 
-## Declare and Deploy Contracts in Testnet
+## Deploy Contracts in Testnet
 
+### Starknet
 On Starknet, the deployment process is in two steps:
 
 - Declaring the class of your contract, or sending your contract’s code to the
@@ -110,38 +111,75 @@ On Starknet, the deployment process is in two steps:
 
 1. Updated `.env` file: Please modify the variables with your Testnet account and your RPC provider.
 
-   ```bash
-   // For the deploy, you just need to configure the following variables in the .env file on the mm-bot folder
-   ..
-   SN_RPC_URL=<STARKNET_RPC_HTTPS_URL> // Infura or Alchemy RPC URL 
-   ETH_CONTRACT_ADDR=0xdd69db25f6d620a7bad3023c5d32761d353d3de9 // GoerliETH 
+```bash
+   # For the deploy, you just need to configure the following variables in the .env file on the mm-bot folder
+
+   ETH_CONTRACT_ADDR=<ETH_TOKEN_CONTRACT_ADDRESS>
+   SN_RPC_URL=<STARKNET_RPC_HTTPS_URL>
    SN_CONTRACT_ADDR=<STARKNET_MM_CONTRACT_ADDR>
-   ..
-   ```
+```
 2. Declare and Deploy: We sequentially declare and deploy the contracts.
 
-   ```bash
-      make starknet-deploy
-   ```
+```bash
+   make starknet-deploy
+```
+
+### Ethereum
 
 For Ethereum the deployment process you will need:
 
-3. Updated `.env` file: Please modify the variables with your Testnet account and your RPC provider.
+1. Updated `.env` file: Please modify the variables with your Testnet account and your RPC provider.
 
-   ```bash
-   // For the deploy, you just need to configure the following variables in the .env file on the contracts/solidity/ folder
-   ..
-   ETH_RPC_URL=<ETH_RPC_URL> // Infura or Alchemy RPC URL
-   ETH_PRIVATE_KEY=<ETH_PRIVATE_KEY>
+```bash
+   # For the deploy, you just need to configure the following variables in the .env file on the contracts/solidity/ folder
+   
+   # To deploy Ethereum contract 
    ETHERSCAN_API_KEY=<ETHERSCAN_API_KEY>
-   ..
-   ```
-   **NOTE**:
+   ETH_PRIVATE_KEY=<ETH_PRIVATE_KEY>
+   GOERLI_RPC_URL=<GOERLI_RPC_URL>
 
-   - You can generate ETHERSCAN_API_KEY [following this steps](https://docs.etherscan.io/getting-started/viewing-api-usage-statistics).
-   - For the deploy, you will need some GoerliETH that you can get from this [faucet](https://goerlifaucet.com/).
-4. Deploy Solidity contract
+   SN_MESSAGING_ADDRESS=0xde29d060D45901Fb19ED6C6e959EB22d8626708e # Dont need change this
+   SN_WITHDRAW_SELECTOR=0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77 # Dont need change this
 
-   ```bash
-      make ethereum-deploy
-   ```
+   # ...
+```
+
+**NOTES**:
+- You can generate ETHERSCAN_API_KEY [following this steps](https://docs.etherscan.io/getting-started/viewing-api-usage-statistics).
+- For the deploy, you will need some GoerliETH that you can get from this [faucet](https://goerlifaucet.com/).
+
+2. Deploy Solidity contract
+
+```bash
+   make ethereum-deploy
+```
+
+## Upgrade Contracts in Testnet
+
+### Ethereum
+1. The contract to be upgraded will be `YABTransfer.sol` located in the source folder, make sure to have the changes ready before proceeding with these steps.
+
+2. Updated `.env` file: Please modify the variables with your Testnet account and your RPC provider.
+
+```bash
+      # For the upgrade, you just need to configure the following variables in the .env file on the contracts/solidity/ folder
+      
+      # To deploy Ethereum contract 
+      ETHERSCAN_API_KEY=<ETHERSCAN_API_KEY>
+      ETH_PRIVATE_KEY=<ETH_PRIVATE_KEY>
+      GOERLI_RPC_URL=<GOERLI_RPC_URL>
+
+      # ..
+
+      # To upgrade Ethereum contract 
+      ETH_YAB_PROXY_ADDRESS=<ETH_YAB_PROXY_ADDRESS> 
+```
+
+**NOTES**:
+- `ETH_YAB_PROXY_ADDRESS` is the proxy for the `YABTransfer` that you want to upgrade.
+
+2. Upgrade Solidity contract
+
+```bash
+   make ethereum-upgrade
+```
