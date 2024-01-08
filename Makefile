@@ -34,4 +34,7 @@ starknet-test: starknet-clean
 	@cd ./contracts/cairo/ && snforge test
 
 starknet-deploy: starknet-build
-	@./contracts/cairo/deploy.sh
+	@./contracts/cairo/deploy.shtest
+
+starknet-upgrade: starknet-build
+	@./contracts/cairo/upgrade.sh
