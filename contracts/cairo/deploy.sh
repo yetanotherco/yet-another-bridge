@@ -1,11 +1,4 @@
 #!/bin/bash
-if [ -f ./contracts/cairo/.env ]; then
-    echo "Sourcing .env file..."
-    source ./contracts/cairo/.env
-else
-    echo "Error: .env file not found!"
-    exit 1
-fi
 
 # ANSI format
 GREEN='\e[32m'
@@ -19,9 +12,17 @@ NATIVE_TOKEN_ETH_STARKNET=0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562
 
 cd "$(dirname "$0")"
 
+load_env() {
+    unamestr=$(uname)
+    if [ "$unamestr" = 'Linux' ]; then
+      export $(grep -v '^#' .env | xargs -d '\n')
+    elif [ "$unamestr" = 'FreeBSD' ] || [ "$unamestr" = 'Darwin' ]; then
+      export $(grep -v '^#' .env | xargs -0)
+    fi
+}
+load_env
+
 echo -e "${GREEN}\n=> [SN] Declare Escrow${COLOR_RESET}"
-echo SN_RPC_URL
-echo $SN_RPC_URL
 ESCROW_CLASS_HASH=$(starkli declare \
   --account $STARKNET_ACCOUNT --keystore $STARKNET_KEYSTORE \
   --watch target/dev/yab_Escrow.contract_class.json)
