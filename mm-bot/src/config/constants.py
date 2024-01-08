@@ -5,6 +5,9 @@ load_dotenv()
 
 ENVIRONMENT = os.getenv('ENVIRONMENT')
 
+ETH_CHAIN_ID = os.getenv('ETH_CHAIN_ID')
+SN_CHAIN_ID = os.getenv('SN_CHAIN_ID')
+
 ETH_RPC_URL = os.getenv('ETH_RPC_URL')
 SN_RPC_URL = os.getenv('SN_RPC_URL')
 
