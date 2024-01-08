@@ -31,7 +31,7 @@ contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         uint256 snEscrowAddress,
         uint256 snEscrowWithdrawSelector) public initializer { 
         _owner = msg.sender;
-        __Ownable_init(_owner); //sets owner to msg.sender
+        __Ownable_init(_owner);
         __UUPSUpgradeable_init();
 
         _snMessaging = IStarknetMessaging(snMessaging);
