@@ -33,5 +33,18 @@ starknet-build: starknet-clean
 starknet-test: starknet-clean
 	@cd ./contracts/cairo/ && snforge test
 
-starknet-deploy: starknet-build
-	@./contracts/cairo/deploy.sh
+Command := $(firstword $(MAKECMDGOALS))
+PARAM := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+starknet-deploy:
+ifneq ($(PARAM),)
+	make starknet-build
+	@./contracts/cairo/deploy.sh $(PARAM)
+else
+	make starknet-build
+	@echo "Warning: No network specified, using Goerli"
+	@echo "Example of usage:"
+	@echo "make starknet-deploy goerli|sepolia|mainnet"
+	@./contracts/cairo/deploy.sh goerli
+endif
+%::
+	@true

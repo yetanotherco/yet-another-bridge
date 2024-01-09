@@ -23,7 +23,8 @@ load_env() {
 load_env
 
 echo -e "${GREEN}\n=> [SN] Declare Escrow${COLOR_RESET}"
-ESCROW_CLASS_HASH=$(starkli declare --watch target/dev/yab_Escrow.contract_class.json)
+echo "On network:" $1
+ESCROW_CLASS_HASH=$(starkli declare --network $1 --watch target/dev/yab_Escrow.contract_class.json)
 
 echo -e "- ${PURPLE}[SN] Escrow ClassHash: $ESCROW_CLASS_HASH${COLOR_RESET}"
 echo -e "- ${PURPLE}[SN] Herodotus Facts Registry: $HERODOTUS_FACTS_REGISTRY${COLOR_RESET}"
@@ -33,7 +34,7 @@ echo -e "- ${PINK}[ETH] Ethereum ContractAddress: $ETH_CONTRACT_ADDR${COLOR_RESE
 echo -e "- ${PINK}[ETH] Market Maker: $MM_ETHEREUM_WALLET${COLOR_RESET}"
 
 echo -e "${GREEN}\n=> [SN] Deploy Escrow${COLOR_RESET}"
-ESCROW_CONTRACT_ADDRESS=$(starkli deploy --watch $ESCROW_CLASS_HASH \
+ESCROW_CONTRACT_ADDRESS=$(starkli deploy --network $1 --watch $ESCROW_CLASS_HASH \
     $HERODOTUS_FACTS_REGISTRY \
     $ETH_CONTRACT_ADDR \
     $MM_ETHEREUM_WALLET \
