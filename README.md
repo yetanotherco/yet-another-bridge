@@ -113,7 +113,7 @@ First, the Ethereum smart contracts must be deployed. For Ethereum the deploymen
    ```
    **NOTE**:
 
-   - You can generate ETHERSCAN_API_KEY [following this steps](https://docs.etherscan.io/getting-started/viewing-api-usage-statistics).
+   - You can generate ETHERSCAN_API_KEY [following this steps](https://docs.etherscan.io/getting-started/creating-an-account).
    - For the deploy, you will need some GoerliETH that you can get from this [faucet](https://goerlifaucet.com/).
 
 
