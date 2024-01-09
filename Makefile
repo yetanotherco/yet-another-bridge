@@ -24,8 +24,34 @@ ethereum-test: ethereum-clean
 ethereum-deploy: ethereum-clean
 	@./contracts/solidity/deploy.sh
 
+
+Command := $(firstword $(MAKECMDGOALS))
+PARAM := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
 ethereum-set-escrow:
-	@./contracts/solidity/set_escrow.sh
+ifneq ($(PARAM),)
+	@./contracts/solidity/set_escrow.sh $(PARAM)
+else
+	@echo "Error: New Escrow address nedded"
+	@echo "Example of usage:"
+	@echo "make ethereum-set-escrow 0x01234..."
+endif
+%::
+	@true
+
+
+Command := $(firstword $(MAKECMDGOALS))
+PARAM := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+ethereum-set-withdraw-selector:
+ifneq ($(PARAM),)
+	@./contracts/solidity/set_withdraw_selector.sh $(PARAM)
+else
+	@echo "Error: New withdraw selector nedded"
+	@echo "Example of usage:"
+	@echo "make ethereum-set-withdraw-selector 0x01234..."
+endif
+%::
+	@true
+
 
 starknet-clean:
 	@cd ./contracts/cairo/ && scarb clean
