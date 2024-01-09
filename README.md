@@ -154,28 +154,17 @@ For this, you will need to:
 
 ### Finalize connection between both chains
 
-After the Starknet smart contracts are declared and deployed, one variable from the Ethereum smart contract must be updated with the newly created Starknet smart contract address.
+After the Starknet smart contracts are declared and deployed, the variable _EscrowAddress_ from the Ethereum smart contract must be updated with the newly created Starknet smart contract address.
 
-For now, to do this you must go to the ETH explorer and find your ETH smart contract, for example:
-https://goerli.etherscan.io/address/0x8C78111CCDd368345c7d6A7bb6A7c887b1093f7A#writeContract
-Then, under the "contract/Write Contract" section, you must run the function, with your newly created Starknet escrow contract address as the parameter
+To do this, you can use
 ```
-snEscrowAddress(uint256)
+make ethereum-set-escrow <new_escrow_address>
 ```
 
-This manual solution is temporary and wil be done automatically in the cairo deploy script.
-
-To do this, you can also use Foundry's **cast** function, as follows:
-
+You can also set and change Ethereum's _EscrowWithdrawSelector_ variable, doing the following:
 ```
-cast send \
---rpc-url <eth_rpc_url> \
---private-key <your_private_key> \
-<eth_smart_contract_address> "setEscrowAddress(uint256)" <your_new_SN_contract_address>
+make ethereum-set-withdraw-selector <new_withdraw_selector>
 ```
-
-This will send a transaction, using the specified rpc, from the specified address, to the specified smart contract, calling the "setEscrowAddress" function, with your new SN contract address. 
-
 
 
 ## Recap
