@@ -192,6 +192,17 @@ async def sign_invoke_transaction(call: Call, max_fee: int):
     raise Exception("Failed to sign invoke transaction from all nodes")
 
 
+async def estimate_message_fee(from_address, to_address, entry_point_selector, payload):
+    for client in full_node_clients:
+        try:
+            fee = await client.estimate_message_fee(from_address, to_address, entry_point_selector, payload)
+            return fee.overall_fee
+        except Exception as e:
+            logger.warning(f"[-] Failed to estimate message fee: {e}")
+    logger.error(f"[-] Failed to estimate message fee from all nodes")
+    raise Exception("Failed to estimate message fee from all nodes")
+
+
 async def send_transaction(transaction):
     for account in accounts:
         try:
