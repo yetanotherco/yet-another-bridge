@@ -6,8 +6,6 @@ COLOR_RESET='\033[0m'
 
 cd "$(dirname "$0")"
 
-pwd
-
 load_env() {
     unamestr=$(uname)
     if [ "$unamestr" = 'Linux' ]; then
