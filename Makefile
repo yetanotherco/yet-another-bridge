@@ -31,7 +31,7 @@ ethereum-set-escrow:
 ifneq ($(PARAM),)
 	@./contracts/solidity/set_escrow.sh $(PARAM)
 else
-	@echo "Error: New Escrow address nedded"
+	@echo "Error: New Escrow address needed"
 	@echo "Example of usage:"
 	@echo "make ethereum-set-escrow 0x01234..."
 endif
@@ -45,7 +45,7 @@ ethereum-set-withdraw-selector:
 ifneq ($(PARAM),)
 	@./contracts/solidity/set_withdraw_selector.sh $(PARAM)
 else
-	@echo "Error: New withdraw selector nedded"
+	@echo "Error: New withdraw selector needed"
 	@echo "Example of usage:"
 	@echo "make ethereum-set-withdraw-selector 0x01234..."
 endif
