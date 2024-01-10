@@ -41,6 +41,4 @@ ESCROW_CONTRACT_ADDRESS=$(starkli deploy \
     $NATIVE_TOKEN_ETH_STARKNET)
 echo -e "- ${PURPLE}[SN] Escrow ContractAddress: $ESCROW_CONTRACT_ADDRESS${COLOR_RESET}"
 
-cd ../..
-contracts/solidity/set_escrow.sh $ESCROW_CONTRACT_ADDRESS
-contracts/solidity/set_withdraw_selector.sh $ESCROW_WITHDRAW_SELECTOR
+sed -i "s/^ESCROW_CONTRACT_ADDRESS=.*/ESCROW_CONTRACT_ADDRESS=$ESCROW_CONTRACT_ADDRESS/" ".env" || echo "ESCROW_CONTRACT_ADDRESS=$ESCROW_CONTRACT_ADDRESS" >> ".env"

@@ -24,34 +24,11 @@ ethereum-test: ethereum-clean
 ethereum-deploy: ethereum-clean
 	@./contracts/solidity/deploy.sh
 
-
-Command := $(firstword $(MAKECMDGOALS))
-PARAM := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
 ethereum-set-escrow:
-ifneq ($(PARAM),)
-	@./contracts/solidity/set_escrow.sh $(PARAM)
-else
-	@echo "Error: New Escrow address needed"
-	@echo "Example of usage:"
-	@echo "make ethereum-set-escrow 0x01234..."
-endif
-%::
-	@true
+	@./contracts/solidity/set_escrow.sh
 
-
-Command := $(firstword $(MAKECMDGOALS))
-PARAM := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
 ethereum-set-withdraw-selector:
-ifneq ($(PARAM),)
-	@./contracts/solidity/set_withdraw_selector.sh $(PARAM)
-else
-	@echo "Error: New withdraw selector needed"
-	@echo "Example of usage:"
-	@echo "make ethereum-set-withdraw-selector 0x01234..."
-endif
-%::
-	@true
-
+	@./contracts/solidity/set_withdraw_selector.sh
 
 starknet-clean:
 	@cd ./contracts/cairo/ && scarb clean
@@ -64,3 +41,11 @@ starknet-test: starknet-clean
 
 starknet-deploy: starknet-build
 	@./contracts/cairo/deploy.sh
+
+starknet-deploy-and-connect: starknet-build
+	@$(MAKE) starknet-deploy
+	@$(MAKE) ethereum-set-escrow
+	@$(MAKE) ethereum-set-withdraw-selector
+
+	
+	

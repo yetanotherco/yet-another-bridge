@@ -23,7 +23,6 @@ else
 fi
 
 echo "Smart contract being modified:" $ETH_CONTRACT_ADDR
-echo "New Escrow address:" $1
+echo "New Escrow address:" $ESCROW_CONTRACT_ADDRESS
 
-cast send --rpc-url $ETH_RPC_URL --private-key $ETH_PRIVATE_KEY $ETH_CONTRACT_ADDR "setEscrowAddress(uint256)" $1
-# example param: 0x067393d445cfd2c1f5285d4624708ea0dd61aaf8c6aa99004a561577e490d36f
+cast send --rpc-url $ETH_RPC_URL --private-key $ETH_PRIVATE_KEY $ETH_CONTRACT_ADDR "setEscrowAddress(uint256)" $ESCROW_CONTRACT_ADDRESS

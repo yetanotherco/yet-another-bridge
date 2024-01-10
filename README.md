@@ -143,35 +143,50 @@ For this, you will need to:
    SN_RPC_URL = Infura or Alchemy RPC URL
    ETH_CONTRACT_ADDR = newly created ETH contract address
    MM_SN_WALLET_ADDR = Starknet wallet of the MarketMaker
-   ESCROW_WITHDRAW_SELECTOR = 'Withdraw' function selector from the Escrow smart contract
+   WITHDRAW_NAME = The exact name of the function that withdraws from the starknet smart contract
    HERODOTUS_FACTS_REGISTRY = Herodotus' Facts Registry Smart Contract in Starknet
    MM_ETHEREUM_WALLET = Ethereum wallet of the MArketMaker
    NATIVE_TOKEN_ETH_STARKNET = Ethereum's erc20 token handler contract in Starkent
+   ESCROW_CONTRACT_ADDRESS = Address of the Starknet smart contract, this value is automatically updated after deploy.sh is run
    ```
 
-2. Declare and Deploy: We sequentially declare and deploy the contracts.
+2. Declare and Deploy: We sequentially declare and deploy the contracts, and connect it to our Ethereum smart contract.
+
+   ```bash
+      make starknet-deploy-and-connect
+   ```
+
+
+
+### ALternative to make starknet-deploy-and-connect
+
+1. Declare and Deploy: We sequentially declare and deploy the contracts.
 
    ```bash
       make starknet-deploy
    ```
 
-### Finalize connection between both chains
+   This script also sets an important .env variable, **ESCROW_CONTRACT_ADDRESS**
+
+2. Setting _EscrowAddress_
 
 After the Starknet smart contracts are declared and deployed, the variable _EscrowAddress_ from the Ethereum smart contract must be updated with the newly created Starknet smart contract address.
 
 To do this, you can use
 ```
-make ethereum-set-escrow <new_escrow_address>
+make ethereum-set-escrow
 ```
 
-Also, Ethereum's smart contract has a variable, _EscrowWithdrawSelector_, which is for specifying the _withdraw_ function's name in the Starknet Escrow smart contract.
+This script uses the previously set .env variable, **ESCROW_CONTRACT_ADDRESS**
+
+3. Setting _EscrowWithdrawSelector_ 
+
+Ethereum's smart contract has another variable that must be configured, _EscrowWithdrawSelector_, which is for specifying the _withdraw_ function's name in the Starknet Escrow smart contract.
 You can set and change Ethereum's _EscrowWithdrawSelector_ variable, doing the following:
 ```
-make ethereum-set-withdraw-selector <new_withdraw_selector>
+make ethereum-set-withdraw-selector
 ```
-   **NOTE**:
-   - In able to get a formated selector name, you can type the function's name (for example, _withdraw_) in https://www.stark-utils.xyz/converter , change the _selector_ row to hex, and copy its value
-
+This script uses the WITHDRAW_NAME .env variable to automatically generate the selector in the necesary format
 
 
 ## Recap
