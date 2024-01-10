@@ -42,9 +42,8 @@ ifneq ($(PARAM),)
 else
 	make starknet-build
 	@echo "Warning: No network specified, using Goerli"
-	@echo "Example of usage:"
-	@echo "make starknet-deploy goerli|sepolia|mainnet"
 	@./contracts/cairo/deploy.sh goerli
 endif
 %::
 	@true
+	

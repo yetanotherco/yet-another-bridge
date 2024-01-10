@@ -118,10 +118,10 @@ On Starknet, the deployment process is in two steps:
    SN_CONTRACT_ADDR=<STARKNET_MM_CONTRACT_ADDR>
    ..
    ```
-2. Declare and Deploy: We sequentially declare and deploy the contracts.
+2. Declare and Deploy: We sequentially declare and deploy the contracts, where _network_ can be in goerli, sepolia, or mainnet.
 
    ```bash
-      make starknet-deploy
+      make starknet-deploy <network>
    ```
 
 For Ethereum the deployment process you will need:
