@@ -4,7 +4,6 @@
 GREEN='\e[32m'
 COLOR_RESET='\033[0m'
 
-cd "$(dirname "$0")"
 
 echo -e "${GREEN}\n=> [ETH] Setting Starknet Escrow Address on ETH Smart Contract${COLOR_RESET}"
 

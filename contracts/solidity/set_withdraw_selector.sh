@@ -18,8 +18,6 @@ fi
 GREEN='\e[32m'
 COLOR_RESET='\033[0m'
 
-cd "$(dirname "$0")"
-
 echo -e "${GREEN}\n=> [ETH] Setting Starknet Withdraw Selector on ETH Smart Contract${COLOR_RESET}"
 echo "Smart contract being modified:" $ETH_CONTRACT_ADDR
 echo "New Withdraw Selector:" $1

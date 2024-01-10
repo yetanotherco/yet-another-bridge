@@ -144,6 +144,9 @@ For this, you will need to:
    ETH_CONTRACT_ADDR = newly created ETH contract address
    MM_SN_WALLET_ADDR = Starknet wallet of the MarketMaker
    ESCROW_WITHDRAW_SELECTOR = 'Withdraw' function selector from the Escrow smart contract
+   HERODOTUS_FACTS_REGISTRY = Herodotus' Facts Registry Smart Contract in Starknet
+   MM_ETHEREUM_WALLET = Ethereum wallet of the MArketMaker
+   NATIVE_TOKEN_ETH_STARKNET = Ethereum's erc20 token handler contract in Starkent
    ```
 
 2. Declare and Deploy: We sequentially declare and deploy the contracts.
