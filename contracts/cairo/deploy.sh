@@ -14,10 +14,16 @@ else
     exit 1
 fi
 
+# Starkli implicitly utilizes these environment variables, so every time we use Starkli,
+# we avoid adding flags such as --account, --keystore, and --rpc.
+export STARKNET_ACCOUNT=$STARKNET_ACCOUNT
+export STARKNET_KEYSTORE=$STARKNET_KEYSTORE
+export STARKNET_RPC=$STARKNET_RPC
+
 cd "$(dirname "$0")"
 
 echo -e "${GREEN}\n=> [SN] Declare Escrow${COLOR_RESET}"
-ESCROW_CLASS_HASH=$(starkli declare --watch --rpc $STARKNET_RPC target/dev/yab_Escrow.contract_class.json)
+ESCROW_CLASS_HASH=$(starkli declare --watch target/dev/yab_Escrow.contract_class.json)
 
 echo -e "- ${PURPLE}[SN] Escrow ClassHash: $ESCROW_CLASS_HASH${COLOR_RESET}"
 echo -e "- ${PURPLE}[SN] Herodotus Facts Registry: $HERODOTUS_FACTS_REGISTRY${COLOR_RESET}"
@@ -27,7 +33,7 @@ echo -e "- ${PINK}[ETH] Ethereum ContractAddress: $ETH_CONTRACT_ADDR${COLOR_RESE
 echo -e "- ${PINK}[ETH] Market Maker: $MM_ETHEREUM_WALLET${COLOR_RESET}"
 
 echo -e "${GREEN}\n=> [SN] Deploy Escrow${COLOR_RESET}"
-ESCROW_CONTRACT_ADDRESS=$(starkli deploy --watch --rpc $STARKNET_RPC $ESCROW_CLASS_HASH \
+ESCROW_CONTRACT_ADDRESS=$(starkli deploy --watch $ESCROW_CLASS_HASH \
     $HERODOTUS_FACTS_REGISTRY \
     $ETH_CONTRACT_ADDR \
     $MM_ETHEREUM_WALLET \

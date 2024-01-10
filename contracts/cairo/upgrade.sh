@@ -14,6 +14,12 @@ else
     exit 1
 fi
 
+# Starkli implicitly utilizes these environment variables, so every time we use Starkli,
+# we avoid adding flags such as --account, --keystore, and --rpc.
+export STARKNET_ACCOUNT=$STARKNET_ACCOUNT
+export STARKNET_KEYSTORE=$STARKNET_KEYSTORE
+export STARKNET_RPC=$STARKNET_RPC
+
 if [ -z "$SN_PROXY_ESCROW_ADDRESS" ]; then
     echo "Error: SN_PROXY_ESCROW_ADDRESS environment variable is not set. Please set it before running this script."
     exit 1
@@ -22,8 +28,9 @@ fi
 cd "$(dirname "$0")"
 
 echo -e "${GREEN}\n=> [SN] Declare Escrow${COLOR_RESET}"
-NEW_ESCROW_CLASS_HASH=$(starkli declare --watch --rpc $STARKNET_RPC target/dev/yab_Escrow.contract_class.json)
+NEW_ESCROW_CLASS_HASH=$(starkli declare --watch target/dev/yab_Escrow.contract_class.json)
 echo -e "- ${PURPLE}[SN] New Escrow ClassHash: $NEW_ESCROW_CLASS_HASH${COLOR_RESET}"
 
 echo -e "${GREEN}\n=> [SN] Upgrade Proxy${COLOR_RESET}"
-$(starkli invoke --rpc $STARKNET_RPC $SN_PROXY_ESCROW_ADDRESS upgrade $NEW_ESCROW_CLASS_HASH)
+echo -e "- ${PURPLE}[SN] Proxy address: $SN_PROXY_ESCROW_ADDRESS${COLOR_RESET}"
+starkli invoke $SN_PROXY_ESCROW_ADDRESS upgrade $NEW_ESCROW_CLASS_HASH
