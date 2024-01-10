@@ -9,9 +9,9 @@ struct Order {
 
 #[starknet::interface]
 trait IEscrow<ContractState> {
-    fn get_orderV2(self: @ContractState, order_id: u256) -> Order;
+    fn get_order(self: @ContractState, order_id: u256) -> Order;
 
-    fn set_orderV2(ref self: ContractState, order: Order) -> u256;
+    fn set_order(ref self: ContractState, order: Order) -> u256;
 
     fn cancel_order(ref self: ContractState, order_id: u256);
 
@@ -146,11 +146,11 @@ mod Escrow {
 
     #[external(v0)]
     impl Escrow of IEscrow<ContractState> {
-        fn get_orderV2(self: @ContractState, order_id: u256) -> Order {
+        fn get_order(self: @ContractState, order_id: u256) -> Order {
             self.orders.read(order_id)
         }
 
-        fn set_orderV2(ref self: ContractState, order: Order) -> u256 {
+        fn set_order(ref self: ContractState, order: Order) -> u256 {
             assert(order.amount > 0, 'Amount must be greater than 0');
 
             let mut order_id = self.current_order_id.read();
