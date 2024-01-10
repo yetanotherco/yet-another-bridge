@@ -39,8 +39,9 @@ logger = logging.getLogger(__name__)
 
 
 class SetOrderEvent:
-    def __init__(self, order_id, recipient_address, amount, fee, block_number, is_used=False):
+    def __init__(self, order_id, starknet_tx_hash, recipient_address, amount, fee, block_number, is_used=False):
         self.order_id = order_id
+        self.starknet_tx_hash = starknet_tx_hash
         self.recipient_address = recipient_address
         self.amount = amount
         self.fee = fee
@@ -116,6 +117,7 @@ async def create_set_order_event(event):
     fee = get_fee(event)
     return SetOrderEvent(
         order_id=order_id,
+        starknet_tx_hash=event.starknet_tx_hash,
         recipient_address=recipient_address,
         amount=amount,
         fee=fee,
