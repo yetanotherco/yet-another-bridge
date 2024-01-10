@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS orders
 (
     order_id             INT PRIMARY KEY,
+    starknet_tx_hash     VARCHAR(66)    NOT NULL, -- 66 chars
     recipient_address    VARCHAR(42)    NOT NULL, -- 0x + 40 bytes
     amount               NUMERIC(78, 0) NOT NULL, -- uint 256
     status               VARCHAR(32)    NOT NULL DEFAULT 'PENDING',

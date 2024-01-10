@@ -71,8 +71,9 @@ def process_order_events(order_events: list, order_service: OrderService,
                          eth_lock: asyncio.Lock, herodotus_semaphore: asyncio.Semaphore):
     for order_event in order_events:
         order_id = order_event.order_id
-        recipient_addr = order_event.recipient_address
+        recipient_address = order_event.recipient_address
         amount = order_event.amount
+        starknet_tx_hash = order_event.starknet_tx_hash
         is_used = order_event.is_used
 
         if order_service.already_exists(order_id):
@@ -80,7 +81,8 @@ def process_order_events(order_events: list, order_service: OrderService,
             continue
 
         try:
-            order = Order(order_id=order_id, recipient_address=recipient_addr, amount=amount,
+            order = Order(order_id=order_id, starknet_tx_hash=starknet_tx_hash,
+                          recipient_address=recipient_address, amount=amount,
                           status=OrderStatus.COMPLETED if is_used else OrderStatus.PENDING)
             order = order_service.create_order(order)
             logger.debug(f"[+] New order: {order}")
