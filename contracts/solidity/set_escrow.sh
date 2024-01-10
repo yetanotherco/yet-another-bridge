@@ -9,17 +9,17 @@ cd "$(dirname "$0")"
 echo -e "${GREEN}\n=> [ETH] Setting Starknet Escrow Address on ETH Smart Contract${COLOR_RESET}"
 
 if [ -f ./contracts/solidity/.env ]; then
-    echo "Sourcing .env file..."
+    echo "Sourcing solidity/.env file..."
     source ./contracts/solidity/.env
 else
-    echo "Error: .env file not found!"
+    echo "Error: solidity/.env file not found!"
     exit 1
 fi
 if [ -f ./contracts/cairo/.env ]; then
-    echo "Sourcing .env file..."
+    echo "Sourcing cairo/.env file..."
     source ./contracts/cairo/.env
 else
-    echo "Error: .env file not found!"
+    echo "Error: cairo/.env file not found!"
     exit 1
 fi
 
