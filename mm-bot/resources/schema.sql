@@ -7,10 +7,12 @@ CREATE TABLE IF NOT EXISTS orders
     status               VARCHAR(32)    NOT NULL DEFAULT 'PENDING',
     failed               BOOLEAN        NOT NULL DEFAULT FALSE,
     tx_hash              BYTEA          NULL,     -- 32 bytes
+    transferred_at        TIMESTAMP      NULL,
     herodotus_task_id    VARCHAR(64)    NULL,
     herodotus_block      BIGINT         NULL,     -- uint 64
     herodotus_slot       BYTEA          NULL,     -- 32 bytes
     eth_withdraw_tx_hash BYTEA          NULL,     -- 32 bytes
+    completed_at        TIMESTAMP      NULL,
     created_at           TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
