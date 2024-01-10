@@ -161,10 +161,14 @@ To do this, you can use
 make ethereum-set-escrow <new_escrow_address>
 ```
 
-You can also set and change Ethereum's _EscrowWithdrawSelector_ variable, doing the following:
+Also, Ethereum's smart contract has a variable, _EscrowWithdrawSelector_, which is for specifying the _withdraw_ function's name in the Starknet Escrow smart contract.
+You can set and change Ethereum's _EscrowWithdrawSelector_ variable, doing the following:
 ```
 make ethereum-set-withdraw-selector <new_withdraw_selector>
 ```
+   **NOTE**:
+   - In able to get a formated selector name, you can type the function's name (for example, _withdraw_) in https://www.stark-utils.xyz/converter , change the _selector_ row to hex, and copy its value
+
 
 
 ## Recap
