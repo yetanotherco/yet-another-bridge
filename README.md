@@ -143,7 +143,7 @@ For this, you will need to:
    SN_RPC_URL = Infura or Alchemy RPC URL
    ETH_CONTRACT_ADDR = newly created ETH contract address
    MM_SN_WALLET_ADDR = Starknet wallet of the MarketMaker
-
+   ESCROW_WITHDRAW_SELECTOR = 'Withdraw' function selector from the Escrow smart contract
    ```
 
 2. Declare and Deploy: We sequentially declare and deploy the contracts.

@@ -47,5 +47,6 @@ echo -e "- ${PURPLE}[SN] Escrow ContractAddress: $ESCROW_CONTRACT_ADDRESS${COLOR
 
 cd ../..
 contracts/solidity/set_escrow.sh $ESCROW_CONTRACT_ADDRESS
+contracts/solidity/set_withdraw_selector.sh $ESCROW_WITHDRAW_SELECTOR
 
 
