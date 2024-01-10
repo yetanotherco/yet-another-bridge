@@ -22,6 +22,7 @@ setup_logger()
 logger = logging.getLogger(__name__)
 SLEEP_TIME = 5
 PROCESS_NO_BALANCE_ORDERS_MINUTES_TIMER = 5
+PROCESS_ACCEPTED_BLOCKS_MINUTES_TIMER = 5
 MAX_ETH_TRANSFER_WEI = 100000000000000000  # TODO move to env variable
 
 
@@ -40,31 +41,25 @@ async def run():
     block_dao = BlockDao(get_db())
     eth_lock = asyncio.Lock()
     herodotus_semaphore = asyncio.Semaphore(100)
+
     (schedule.every(PROCESS_NO_BALANCE_ORDERS_MINUTES_TIMER).minutes
      .do(failed_orders_job, order_service, eth_lock, herodotus_semaphore))
+    (schedule.every(PROCESS_ACCEPTED_BLOCKS_MINUTES_TIMER).minutes
+     .do(set_order_events_from_accepted_blocks_job, order_service, block_dao, eth_lock, herodotus_semaphore))
+    schedule.run_all()
 
     try:
-        # 1 Get all orders that are not completed from the db
+        # Get all orders that are not completed from the db
         orders = order_service.get_incomplete_orders()
         for order in orders:
             create_order_task(order, order_service, eth_lock, herodotus_semaphore)
 
-        # 2. Get orders from missed blocks (if any) after the last time the mm was running
-        latest_block = block_dao.get_latest_block()
-        order_events = await starknet.get_order_events(latest_block, "latest")
-        process_order_events(order_events, order_service, eth_lock, herodotus_semaphore)
-        if len(order_events) > 0:
-            block_dao.update_latest_block(max(map(lambda x: x.block_number, order_events)))
-
         while True:
-            # 3. Listen event on starknet
+            # Listen events on starknet
             set_order_events: list = await starknet.get_order_events("pending", "pending")
 
-            # 4. Process events (create order, transfer eth, prove, withdraw eth)
+            # Process events (create order, transfer eth, prove, withdraw eth)
             process_order_events(set_order_events, order_service, eth_lock, herodotus_semaphore)
-
-            # 5. Update latest block
-            block_dao.update_latest_block(await starknet.get_latest_block())
 
             schedule.run_pending()
             await asyncio.sleep(SLEEP_TIME)
@@ -167,6 +162,21 @@ async def process_failed_orders(order_service: OrderService,
     for order in orders:
         order_service.reset_failed_order(order)
         create_order_task(order, order_service, eth_lock, herodotus_semaphore)
+
+
+def set_order_events_from_accepted_blocks_job(order_service: OrderService, block_dao: BlockDao,
+                                              eth_lock: asyncio.Lock, herodotus_semaphore: asyncio.Semaphore):
+    asyncio.create_task(process_orders_from_accepted_blocks(order_service, block_dao, eth_lock, herodotus_semaphore),
+                        name="Accepted-blocks")
+
+
+async def process_orders_from_accepted_blocks(order_service: OrderService, block_dao: BlockDao,
+                                              eth_lock: asyncio.Lock, herodotus_semaphore: asyncio.Semaphore):
+    latest_block = block_dao.get_latest_block()
+    order_events = await starknet.get_order_events(latest_block, "latest")
+    process_order_events(order_events, order_service, eth_lock, herodotus_semaphore)
+    if len(order_events) > 0:
+        block_dao.update_latest_block(max(map(lambda x: x.block_number, order_events)))
 
 
 async def transfer(order: Order, order_service: OrderService):
