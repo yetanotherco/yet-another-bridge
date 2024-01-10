@@ -5,13 +5,24 @@ mod Escrow {
     use snforge_std::{declare, ContractClassTrait};
     use snforge_std::{CheatTarget, start_prank, stop_prank};
 
+    use yab::EscrowV2::{IEscrowV2Dispatcher, IEscrowV2DispatcherTrait};
     use yab::interfaces::IERC20::{IERC20Dispatcher, IERC20DispatcherTrait};
-    use yab::escrow::{IEscrowDispatcher, IEscrowDispatcherTrait, Order};
+    use yab::Escrow::{IEscrowDispatcher, IEscrowDispatcherTrait, Order};
     use yab::interfaces::IEVMFactsRegistry::{
         IEVMFactsRegistryDispatcher, IEVMFactsRegistryDispatcherTrait
     };
-    use yab::tests::utils::constants::EscrowConstants::{
-        USER, OWNER, MM_STARKNET, MM_ETHEREUM, ETH_TRANSFER_CONTRACT
+
+    use yab::tests::utils::{
+        constants::EscrowConstants::{
+            USER, OWNER, MM_STARKNET, MM_ETHEREUM, ETH_TRANSFER_CONTRACT
+        },
+    };
+
+    use openzeppelin::{
+        upgrades::{
+            UpgradeableComponent,
+            interface::{IUpgradeable, IUpgradeableDispatcher, IUpgradeableDispatcherTrait}
+        },
     };
 
     fn setup() -> (IEscrowDispatcher, IERC20Dispatcher) {
@@ -105,5 +116,21 @@ mod Escrow {
         // check balance
         assert(eth_token.balanceOf(escrow.contract_address) == 0, 'withdraw: wrong balance');
         assert(eth_token.balanceOf(MM_STARKNET()) == 500, 'withdraw: wrong balance');
+    }
+
+    #[test]
+    fn test_upgrade_escrow() {
+        let (escrow, _) = setup();
+        let upgradeable = IUpgradeableDispatcher { contract_address: escrow.contract_address };
+        upgradeable.upgrade(declare('EscrowV2').class_hash);
+    }
+
+    #[test]
+    #[should_panic(expected: ('Caller is not the owner',))]
+    fn test_fail_upgrade_escrow_caller_isnt_the_owner() {
+        let (escrow, _) = setup();
+        let upgradeable = IUpgradeableDispatcher { contract_address: escrow.contract_address };
+        start_prank(CheatTarget::One(escrow.contract_address), MM_STARKNET());
+        upgradeable.upgrade(declare('EscrowV2').class_hash);
     }
 }
