@@ -1,4 +1,13 @@
 #!/bin/bash
+
+# ANSI format
+GREEN='\e[32m'
+COLOR_RESET='\033[0m'
+
+cd "$(dirname "$0")"
+
+echo -e "${GREEN}\n=> [ETH] Setting Starknet Escrow Address on ETH Smart Contract${COLOR_RESET}"
+
 if [ -f ./contracts/solidity/.env ]; then
     echo "Sourcing .env file..."
     source ./contracts/solidity/.env
@@ -14,13 +23,6 @@ else
     exit 1
 fi
 
-# ANSI format
-GREEN='\e[32m'
-COLOR_RESET='\033[0m'
-
-cd "$(dirname "$0")"
-
-echo -e "${GREEN}\n=> [ETH] Setting Starknet Escrow Address on ETH Smart Contract${COLOR_RESET}"
 echo "Smart contract being modified:" $ETH_CONTRACT_ADDR
 echo "New Escrow address:" $1
 
