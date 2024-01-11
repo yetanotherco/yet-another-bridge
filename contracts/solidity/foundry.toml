@@ -5,7 +5,7 @@ libs = ["lib"]
 gas_reports = ["*"]
 
 [rpc_endpoints]
-goerli = "${ETH_RPC_URL}"
+goerli = "${GOERLI_RPC_URL}"
 
 [etherscan]
 goerli = { key = "${ETHERSCAN_API_KEY}" }
