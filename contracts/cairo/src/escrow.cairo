@@ -120,6 +120,7 @@ mod Escrow {
             let payment_amount = order.amount + order.fee;
             let dispatcher = IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() };
             assert(dispatcher.allowance(get_caller_address(), get_contract_address()) >= payment_amount, 'Not enough allowance');
+            assert(dispatcher.balanceOf(get_caller_address()) >= payment_amount, 'Not enough balance');
 
             let mut order_id = self.current_order_id.read();
             self.orders.write(order_id, order);
