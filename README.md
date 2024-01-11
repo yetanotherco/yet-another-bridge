@@ -143,13 +143,13 @@ For this, you will need to:
 
 1. Create your `.env` file: you need to configure the following variables in your own .env file on the contracts/solidity folder. You can use the env.example file as a template for creating your .env file, paying special attention to the formats provided
 
-   ```bash
+   ```
    STARKNET_ACCOUNT = Absolute path of your starknet testnet account, created at the start of this README
    STARKNET_KEYSTORE = Absolute path of your starknet testnet keystore, created at the start of this README
    SN_RPC_URL = Infura or Alchemy RPC URL
    ETH_CONTRACT_ADDR = newly created ETH contract address
    MM_SN_WALLET_ADDR = Starknet wallet of the MarketMaker
-   WITHDRAW_NAME = The exact name of the function that withdraws from the starknet smart contract, case sensitive
+   WITHDRAW_NAME = The exact name of the withdraw function that is called from L1, case sensitive. Example: withdraw_fallback
    HERODOTUS_FACTS_REGISTRY = Herodotus' Facts Registry Smart Contract in Starknet
    MM_ETHEREUM_WALLET = Ethereum wallet of the MArketMaker
    NATIVE_TOKEN_ETH_STARKNET = Ethereum's erc20 token handler contract in Starkent
