@@ -8,11 +8,11 @@ COLOR_RESET='\033[0m'
 
 cd "$(dirname "$0")"
 
-if [ -f ./contracts/cairo/.env ]; then
-    echo "Sourcing .env file..."
-    source ./contracts/cairo/.env
+if [ -f .env ]; then
+    echo "Sourcing cairo/.env file..."
+    source .env
 else
-    echo "Error: .env file not found!"
+    echo "Error: cairo/.env file not found!"
     exit 1
 fi
 

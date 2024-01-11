@@ -6,11 +6,11 @@ COLOR_RESET='\033[0m'
 
 cd "$(dirname "$0")"
 
-if [ -f ./contracts/solidity/.env ]; then
-    echo "Sourcing .env file..."
-    source ./contracts/solidity/.env
+if [ -f .env ]; then
+    echo "Sourcing solidity/.env file..."
+    source .env
 else
-    echo "Error: .env file not found!"
+    echo "Error: solidity/.env file not found!"
     exit 1
 fi
 
