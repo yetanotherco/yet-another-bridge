@@ -149,3 +149,33 @@ For Ethereum the deployment process you will need:
    ```bash
       make ethereum-deploy
    ```
+
+## Upgrade Contracts in Testnet
+
+### Starknet
+
+If you want to upgrade a previously deployed `Escrow` contract, it is possible through a command. We will perform the upgrade using `starkli`, so the same configuration used for deployment is necessary.
+
+Keep in mind that this command will **rebuild** `Escrow.cairo`, perform the **declare**, and call the external **upgrade()** function with the new class hash resulting from the **declare**. 
+
+To be able to upgrade the contract, you must be the **owner** of the contract and set the `SN_ESCROW_ADDRESS` variable in the `.env` file with the address of the `Escrow` contract that you want to be **upgraded**.
+
+1. Update `contracts/cairo/.env` file.
+
+```bash
+   ..
+   ## Starkli
+   STARKNET_ACCOUNT=<STARKNET_ACCOUNT_SRC>
+   STARKNET_KEYSTORE=<STARKNET_KEYSTORE>
+   STARKNET_RPC=<STARKNET_RPC>
+   ..
+   # To upgrade Starknet contract 
+   SN_ESCROW_ADDRESS=<SN_ESCROW_ADDRESS>
+   ..
+```
+
+2. Then using Makefile command upgrade `Escrow` contract
+
+```bash
+   make starknet-upgrade
+```
