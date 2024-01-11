@@ -110,11 +110,16 @@ First, the Ethereum smart contracts must be deployed. For Ethereum the deploymen
    ETH_RPC_URL = Infura or Alchemy RPC URL
    ETH_PRIVATE_KEY = private key of your ETH wallet
    ETHERSCAN_API_KEY = API Key to use etherscan to read the Ethereum blockchain
+   SN_MESSAGING_ADDRESS = Starknet Messaging address
    ```
    **NOTE**:
 
    - You can generate ETHERSCAN_API_KEY [following this steps](https://docs.etherscan.io/getting-started/creating-an-account).
    - For the deploy, you will need some GoerliETH that you can get from this [faucet](https://goerlifaucet.com/).
+   - Current SN_MESSAGING_ADDRESS values:
+      - Mainnet 0xc662c410C0ECf747543f5bA90660f6ABeBD9C8c4
+      - Goerli: 0xde29d060D45901Fb19ED6C6e959EB22d8626708e
+      - Sepolia: 0xE2Bb56ee936fd6433DC0F6e7e3b8365C906AA057 
 
 
 2. Deploy Solidity contract
@@ -164,7 +169,7 @@ For this, you will need to:
 
 
 
-### ALternative to make starknet-deploy-and-connect
+### Alternative to _make starknet-deploy-and-connect_
 
 1. Declare and Deploy: We sequentially declare and deploy the contracts.
 
