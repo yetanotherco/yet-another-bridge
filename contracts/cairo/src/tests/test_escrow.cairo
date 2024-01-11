@@ -36,6 +36,28 @@ mod Escrow {
         (escrow, eth_token)
     }
 
+    fn setup_approved(approved: u256) -> (IEscrowDispatcher, IERC20Dispatcher){
+        let eth_token = deploy_erc20('ETH', '$ETH', BoundedInt::max(), OWNER());
+        let evm_facts_registry = deploy_mock_EVMFactsRegistry();
+        let escrow = deploy_escrow(
+            evm_facts_registry.contract_address,
+            ETH_TRANSFER_CONTRACT(),
+            MM_ETHEREUM(),
+            MM_STARKNET(),
+            eth_token.contract_address
+        );
+
+        start_prank(CheatTarget::One(eth_token.contract_address), OWNER());
+        eth_token.transfer(USER(), BoundedInt::max());
+        stop_prank(CheatTarget::One(eth_token.contract_address));
+
+        start_prank(CheatTarget::One(eth_token.contract_address), USER());
+        eth_token.approve(escrow.contract_address, approved);
+        stop_prank(CheatTarget::One(eth_token.contract_address));
+
+        (escrow, eth_token)
+    }
+
     fn deploy_escrow(
         herodotus_facts_registry_contract: ContractAddress,
         eth_transfer_contract: EthAddress,
@@ -81,6 +103,7 @@ mod Escrow {
         assert(eth_token.balanceOf(MM_STARKNET()) == 0, 'init: wrong balance');
 
         start_prank(CheatTarget::One(escrow.contract_address), USER());
+        // eth_token.approve(escrow.contract_address, 500);
         let order = Order { recipient_address: 12345.try_into().unwrap(), amount: 500, fee: 0 };
         let order_id = escrow.set_order(order);
         stop_prank(CheatTarget::One(escrow.contract_address));
@@ -105,5 +128,39 @@ mod Escrow {
         // check balance
         assert(eth_token.balanceOf(escrow.contract_address) == 0, 'withdraw: wrong balance');
         assert(eth_token.balanceOf(MM_STARKNET()) == 500, 'withdraw: wrong balance');
+    }
+
+
+    #[test]
+    fn test_allowance_happy() {
+        let (escrow, eth_token) = setup_approved(500);
+
+        // check balance
+        assert(eth_token.balanceOf(escrow.contract_address) == 0, 'init: wrong balance');
+        assert(eth_token.balanceOf(MM_STARKNET()) == 0, 'init: wrong balance');
+        
+        start_prank(CheatTarget::One(escrow.contract_address), USER());
+        let order = Order { recipient_address: 12345.try_into().unwrap(), amount: 500, fee: 0 };
+        let order_id = escrow.set_order(order);
+        stop_prank(CheatTarget::One(escrow.contract_address));
+
+        // check balance
+        assert(eth_token.balanceOf(escrow.contract_address) == 500, 'set_order: wrong balance ');
+        assert(eth_token.balanceOf(MM_STARKNET()) == 0, 'set_order: wrong balance');
+    }
+
+    #[test]
+    #[should_panic(expected: ('Not enough allowance',))]
+    fn test_allowance_fail() {
+        let (escrow, eth_token) = setup_approved(499);
+
+        // check balance
+        assert(eth_token.balanceOf(escrow.contract_address) == 0, 'init: wrong balance');
+        assert(eth_token.balanceOf(MM_STARKNET()) == 0, 'init: wrong balance');
+        
+        start_prank(CheatTarget::One(escrow.contract_address), USER());
+        let order = Order { recipient_address: 12345.try_into().unwrap(), amount: 500, fee: 0 };
+        let order_id = escrow.set_order(order);
+        stop_prank(CheatTarget::One(escrow.contract_address));
     }
 }
