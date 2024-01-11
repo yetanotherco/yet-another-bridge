@@ -9,9 +9,10 @@ contract Deploy is Script {
         uint256 deployerPrivateKey = vm.envUint("ETH_PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
 
-        address snMessagingAddress = 0xde29d060D45901Fb19ED6C6e959EB22d8626708e;
-        uint256 snEscrowAddress = 0x0;
-        uint256 snEscrowWithdrawSelector = 0x0;
+        address snMessagingAddress = vm.envAddress("SN_MESSAGING_ADDRESS");
+        uint256 snEscrowAddress = 0x0; //this value is set in a call to the smart contract, once deployed
+        uint256 snEscrowWithdrawSelector = 0x0; //this value is set in a call to the smart contract, once deployed
+
 
         new YABTransfer(
             snMessagingAddress,

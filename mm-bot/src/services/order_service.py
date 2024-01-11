@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from models.error import Error
 from models.order import Order
 from models.order_status import OrderStatus
@@ -74,6 +76,7 @@ class OrderService:
         :param order: the order to update
         """
         order.status = OrderStatus.FULFILLED.name
+        order.transferred_at = datetime.now()
         return self.order_dao.update_order(order)
 
     def set_order_proving_herodotus(self, order: Order, task_id, block, slot) -> Order:
@@ -116,6 +119,7 @@ class OrderService:
         Set the order status to "COMPLETED"
         """
         order.status = OrderStatus.COMPLETED.name
+        order.completed_at = datetime.now()
         return self.order_dao.update_order(order)
 
     def set_order_dropped(self, order: Order) -> Order:

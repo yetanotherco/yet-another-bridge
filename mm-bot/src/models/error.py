@@ -13,4 +13,4 @@ class Error(Base):
     order_id: int = Column(Integer, ForeignKey("orders.order_id"), nullable=False)
     order: Mapped[Order] = relationship("Order")
     message: str = Column(String, nullable=False)
-    created_at: datetime = Column(DateTime, nullable=False, default=datetime.now())
+    created_at: datetime = Column(DateTime, nullable=False, server_default="clock_timestamp()")

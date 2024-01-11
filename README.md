@@ -49,6 +49,7 @@ Follow the steps below to set up a testnet smart wallet using `starkli`:
       ```bash
       export STARKNET_RPC="<ALCHEMY_API_HTTPS_URL>"
       ```
+
 2. **Create a Keystore**: A Keystore is a encrypted `json` file that stores the
    private keys.
 
@@ -57,6 +58,7 @@ Follow the steps below to set up a testnet smart wallet using `starkli`:
       ```bash
       mkdir -p ~/.starkli-wallets
       ```
+
    2. **Generate a new Keystore file**: Run the following command to create a
       new private key stored in the file. It will **ask for a password** to
       encrypt the file:
@@ -72,6 +74,7 @@ Follow the steps below to set up a testnet smart wallet using `starkli`:
       ```bash
       export STARKNET_KEYSTORE="~/.starkli-wallets/keystore.json"
       ```
+
 3. **Account Creation**: In Starknet every account is a smart contract, so to
    create one it will need to be deployed.
 
@@ -80,6 +83,7 @@ Follow the steps below to set up a testnet smart wallet using `starkli`:
       ```bash
       starkli account oz init --keystore ~/.starkli-wallets/keystore.json ~/.starkli-wallets/account.json
       ```
+
    2. **Deploy the account by running**:
 
       ```bash
@@ -101,6 +105,38 @@ Follow the steps below to set up a testnet smart wallet using `starkli`:
 
 ## Declare and Deploy Contracts in Testnet
 
+### Ethereum smart contract
+
+First, the Ethereum smart contracts must be deployed. For Ethereum the deployment process you will need to:
+
+1. Create your `.env` file: you need to configure the following variables in your own .env file on the contracts/solidity/ folder. You can use the env.example file as a template for creating your .env file, paying special attention to the formats provided
+
+   ```bash
+   ETH_RPC_URL = Infura or Alchemy RPC URL
+   ETH_PRIVATE_KEY = private key of your ETH wallet
+   ETHERSCAN_API_KEY = API Key to use etherscan to read the Ethereum blockchain
+   SN_MESSAGING_ADDRESS = Starknet Messaging address
+   ```
+
+   **NOTE**:
+
+   - You can generate ETHERSCAN_API_KEY [following this steps](https://docs.etherscan.io/getting-started/creating-an-account).
+   - For the deploy, you will need some GoerliETH that you can get from this [faucet](https://goerlifaucet.com/).
+   - Current SN_MESSAGING_ADDRESS values:
+   - SN_MESSAGING_ADDRESS is for when a L1 contract initiates a message to a L2 contract on Starknet. It does so by calling the sendMessageToL2 function on the Starknet Core Contract with the message parameters. Starknet Core Contracts are the following:
+      - Goerli: `0xde29d060D45901Fb19ED6C6e959EB22d8626708e`
+      - Sepolia: `0xE2Bb56ee936fd6433DC0F6e7e3b8365C906AA057`
+      - Mainnet: `0xc662c410C0ECf747543f5bA90660f6ABeBD9C8c4`
+
+2. Deploy Solidity contract
+
+   ```bash
+      make ethereum-deploy
+   ```
+
+### Starknet smart contracts
+
+After the Ethereum smart contract is deployed, the Starknet smart contracts must be declared and deployed.
 On Starknet, the deployment process is in two steps:
 
 - Declaring the class of your contract, or sending your contract’s code to the
@@ -108,40 +144,79 @@ On Starknet, the deployment process is in two steps:
 - Deploying a contract or creating an instance of the previously declared code
   with the necessary parameters
 
-1. Updated `.env` file: Please modify the variables with your Testnet account and your RPC provider.
+For this, you will need to:
+
+1. Create your `.env` file: you need to configure the following variables in your own .env file on the contracts/solidity folder. You can use the env.example file as a template for creating your .env file, paying special attention to the formats provided
+
+   ```
+   STARKNET_ACCOUNT = Absolute path of your starknet testnet account, created at the start of this README
+   STARKNET_KEYSTORE = Absolute path of your starknet testnet keystore, created at the start of this README
+   SN_RPC_URL = Infura or Alchemy RPC URL
+   ETH_CONTRACT_ADDR = newly created ETH contract address
+   MM_SN_WALLET_ADDR = Starknet wallet of the MarketMaker
+   WITHDRAW_NAME = The exact name of the withdraw function that is called from L1, case sensitive. Example: withdraw_fallback
+   HERODOTUS_FACTS_REGISTRY = Herodotus' Facts Registry Smart Contract in Starknet
+   MM_ETHEREUM_WALLET = Ethereum wallet of the MArketMaker
+   NATIVE_TOKEN_ETH_STARKNET = Ethereum's erc20 token handler contract in Starkent
+   ESCROW_CONTRACT_ADDRESS = Address of the Starknet smart contract, this value should be empty, and is automatically updated after deploy.sh is run
+   ```
+
+   **Note**
+   - Herodotus Facts Registry:
+      - Starknet Goerli: `0x01b2111317EB693c3EE46633edd45A4876db14A3a53ACDBf4E5166976d8e869d`
+      - Starknet Sepolia: `0x07d3550237ecf2d6ddef9b78e59b38647ee511467fe000ce276f245a006b40bc`
+      - Starknet Mainnet: `0x014bf62fadb41d8f899bb5afeeb2da486fcfd8431852def56c5f10e45ae72765`
+
+2. Declare and Deploy: We sequentially declare and deploy the contracts, and connect it to our Ethereum smart contract.
+
+### First alternative: automatic deploy and connect of Escrow and YABTransfer.
 
    ```bash
-   // For the deploy, you just need to configure the following variables in the .env file on the mm-bot folder
-   ..
-   SN_RPC_URL=<STARKNET_RPC_HTTPS_URL> // Infura or Alchemy RPC URL 
-   ETH_CONTRACT_ADDR=0xdd69db25f6d620a7bad3023c5d32761d353d3de9 // GoerliETH 
-   SN_CONTRACT_ADDR=<STARKNET_MM_CONTRACT_ADDR>
-   ..
+      make starknet-deploy-and-connect
    ```
-2. Declare and Deploy: We sequentially declare and deploy the contracts.
+
+   This make target consists of 4 steps:
+
+   1. make starknet-build; builds the project
+   2. make starknet-deploy; deploys the smart contract on the blockchain
+   3. make ethereum-set-escrow; sets the newly created Starknet contract address on the Ethereum smart contract, so that the L1 contract can communicate with the L2 contract
+   4. make ethereum-set-withdraw-selector; sets the Starknet _withdraw_ function name on the Ethereum smart contract, so that the L1 contract can communicate with the L2 contract
+
+### Second alternative: manual deploy and connect of Escrow and YABTransfer
+
+This may be better suited for you if you plan to change some of the automatically declared .env vars, or if you simply want to make sure you understand the process.
+
+1. Declare and Deploy: We sequentially declare and deploy the contracts.
 
    ```bash
       make starknet-deploy
    ```
 
-For Ethereum the deployment process you will need:
+   This script also sets an important .env variable, **ESCROW_CONTRACT_ADDRESS**
 
-3. Updated `.env` file: Please modify the variables with your Testnet account and your RPC provider.
+2. Setting _EscrowAddress_
 
-   ```bash
-   // For the deploy, you just need to configure the following variables in the .env file on the contracts/solidity/ folder
-   ..
-   ETH_RPC_URL=<ETH_RPC_URL> // Infura or Alchemy RPC URL
-   ETH_PRIVATE_KEY=<ETH_PRIVATE_KEY>
-   ETHERSCAN_API_KEY=<ETHERSCAN_API_KEY>
-   ..
+   After the Starknet smart contracts are declared and deployed, the variable _EscrowAddress_ from the Ethereum smart contract must be updated with the newly created Starknet smart contract address.
+
+   To do this, you can use
+
    ```
-   **NOTE**:
-
-   - You can generate ETHERSCAN_API_KEY [following this steps](https://docs.etherscan.io/getting-started/viewing-api-usage-statistics).
-   - For the deploy, you will need some GoerliETH that you can get from this [faucet](https://goerlifaucet.com/).
-4. Deploy Solidity contract
-
-   ```bash
-      make ethereum-deploy
+   make ethereum-set-escrow
    ```
+
+   This script uses the previously set .env variable, **ESCROW_CONTRACT_ADDRESS**
+
+3. Setting _EscrowWithdrawSelector_
+
+   Ethereum's smart contract has another variable that must be configured, _EscrowWithdrawSelector_, which is for specifying the _withdraw_ function's name in the Starknet Escrow smart contract.
+   You can set and change Ethereum's _EscrowWithdrawSelector_ variable, doing the following:
+
+   ```
+   make ethereum-set-withdraw-selector
+   ```
+
+   This script uses the WITHDRAW_NAME .env variable to automatically generate the selector in the necesary format
+
+## Recap
+
+After following this complete README, we should have an ETH smart contract as well as a Starknet smart contract, both connected to act as a bridge between these two chains.
