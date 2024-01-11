@@ -29,9 +29,6 @@ main_contract_rpc = main_w3.eth.contract(address=constants.ETH_CONTRACT_ADDR, ab
 fallback_contract_rpc = fallback_w3.eth.contract(address=constants.ETH_CONTRACT_ADDR, abi=abi)
 contracts_rpc = [main_contract_rpc, fallback_contract_rpc]
 
-TRANSFER_FEE_PERCENTAGE = 0.1
-WITHDRAW_FEE_PERCENTAGE = 0.05
-
 logger = logging.getLogger(__name__)
 
 
