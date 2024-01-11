@@ -118,9 +118,9 @@ First, the Ethereum smart contracts must be deployed. For Ethereum the deploymen
    - For the deploy, you will need some GoerliETH that you can get from this [faucet](https://goerlifaucet.com/).
    - Current SN_MESSAGING_ADDRESS values:
    - SN_MESSAGING_ADDRESS is for when a L1 contract initiates a message to a L2 contract on Starknet. It does so by calling the sendMessageToL2 function on the Starknet Core Contract with the message parameters. Starknet Core Contracts are the following:
-      - Mainnet: `0xc662c410C0ECf747543f5bA90660f6ABeBD9C8c4`
       - Goerli: `0xde29d060D45901Fb19ED6C6e959EB22d8626708e`
       - Sepolia: `0xE2Bb56ee936fd6433DC0F6e7e3b8365C906AA057` 
+      - Mainnet: `0xc662c410C0ECf747543f5bA90660f6ABeBD9C8c4`
 
 
 2. Deploy Solidity contract
