@@ -158,9 +158,9 @@ For this, you will need to:
 
    **Note**
    - Herodotus Facts Registry:
-      - Starknet Goerli: 0x031653659964bc969905e1b1c18deb69c65efb2e22ff7f4102044d432c91b82d
-      - Starknet Sepolia:
-      - Starknet Mainnet:
+      - Starknet Goerli: 0x01b2111317EB693c3EE46633edd45A4876db14A3a53ACDBf4E5166976d8e869d
+      - Starknet Sepolia: 0x07d3550237ecf2d6ddef9b78e59b38647ee511467fe000ce276f245a006b40bc
+      - Starknet Mainnet: 0x014bf62fadb41d8f899bb5afeeb2da486fcfd8431852def56c5f10e45ae72765
 
 2. Declare and Deploy: We sequentially declare and deploy the contracts, and connect it to our Ethereum smart contract.
 
