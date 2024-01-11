@@ -29,8 +29,8 @@ cd "$(dirname "$0")"
 
 echo -e "${GREEN}\n=> [SN] Declare Escrow${COLOR_RESET}"
 NEW_ESCROW_CLASS_HASH=$(starkli declare --watch target/dev/yab_Escrow.contract_class.json)
-echo -e "- ${PURPLE}[SN] New Escrow ClassHash: $NEW_ESCROW_CLASS_HASH${COLOR_RESET}"
+echo -e "- ${PURPLE}[SN] Escrow Proxy Address: $SN_PROXY_ESCROW_ADDRESS${COLOR_RESET}"
+echo -e "- ${PURPLE}[SN] New Escrow ClassHash Impl: $NEW_ESCROW_CLASS_HASH${COLOR_RESET}"
 
 echo -e "${GREEN}\n=> [SN] Upgrade Proxy${COLOR_RESET}"
-echo -e "- ${PURPLE}[SN] Proxy address: $SN_PROXY_ESCROW_ADDRESS${COLOR_RESET}"
-starkli invoke $SN_PROXY_ESCROW_ADDRESS upgrade $NEW_ESCROW_CLASS_HASH
+starkli invoke --watch $SN_PROXY_ESCROW_ADDRESS upgrade $NEW_ESCROW_CLASS_HASH

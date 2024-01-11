@@ -27,16 +27,17 @@ ESCROW_CLASS_HASH=$(starkli declare --watch target/dev/yab_Escrow.contract_class
 
 echo -e "- ${PURPLE}[SN] Escrow ClassHash: $ESCROW_CLASS_HASH${COLOR_RESET}"
 echo -e "- ${PURPLE}[SN] Herodotus Facts Registry: $HERODOTUS_FACTS_REGISTRY${COLOR_RESET}"
-echo -e "- ${PURPLE}[SN] Market Maker: $SN_WALLET_ADDR${COLOR_RESET}"
+echo -e "- ${PURPLE}[SN] Market Maker: $MM_SN_WALLET_ADDRESS${COLOR_RESET}"
 echo -e "- ${PURPLE}[SN] Ethereum ContractAddress $NATIVE_TOKEN_ETH_STARKNET${COLOR_RESET}"
 echo -e "- ${PINK}[ETH] Ethereum ContractAddress: $ETH_CONTRACT_ADDR${COLOR_RESET}"
 echo -e "- ${PINK}[ETH] Market Maker: $MM_ETHEREUM_WALLET${COLOR_RESET}"
 
 echo -e "${GREEN}\n=> [SN] Deploy Escrow${COLOR_RESET}"
 ESCROW_CONTRACT_ADDRESS=$(starkli deploy --watch $ESCROW_CLASS_HASH \
+    $SN_PROXY_OWNER \
     $HERODOTUS_FACTS_REGISTRY \
     $ETH_CONTRACT_ADDR \
     $MM_ETHEREUM_WALLET \
-    $SN_WALLET_ADDR \
+    $MM_SN_WALLET_ADDRESS \
     $NATIVE_TOKEN_ETH_STARKNET)
 echo -e "- ${PURPLE}[SN] Escrow ContractAddress: $ESCROW_CONTRACT_ADDRESS${COLOR_RESET}"
