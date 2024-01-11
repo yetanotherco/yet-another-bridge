@@ -112,8 +112,6 @@ On Starknet, the deployment process is in two steps:
 1. Updated `.env` file: Please modify the variables with your Testnet account and your RPC provider.
 
 ```bash
-   # For the deploy, you just need to configure the following variables in the .env file on the mm-bot folder
-
    ETH_CONTRACT_ADDR=<ETH_TOKEN_CONTRACT_ADDRESS>
    SN_RPC_URL=<STARKNET_RPC_HTTPS_URL>
    SN_CONTRACT_ADDR=<STARKNET_MM_CONTRACT_ADDR>
@@ -138,8 +136,8 @@ For Ethereum the deployment process you will need:
    ETH_PRIVATE_KEY=<ETH_PRIVATE_KEY>
    GOERLI_RPC_URL=<GOERLI_RPC_URL>
 
-   SN_MESSAGING_ADDRESS=0xde29d060D45901Fb19ED6C6e959EB22d8626708e # Dont need change this
-   SN_WITHDRAW_SELECTOR=0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77 # Dont need change this
+   SN_MESSAGING_ADDRESS=<SN_MESSAGING_ADDRESS>
+   SN_WITHDRAW_SELECTOR=<SN_WITHDRAW_SELECTOR> 
 
    # ...
 ```
