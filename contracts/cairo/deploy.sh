@@ -6,21 +6,23 @@ PURPLE='\033[1;34m'
 PINK='\033[1;35m'
 COLOR_RESET='\033[0m'
 
-if [ -f ./contracts/cairo/.env ]; then
-    echo "Sourcing .env file..."
-    source ./contracts/cairo/.env
-else
-    echo "Error: .env file not found!"
-    exit 1
-fi
+cd "$(dirname "$0")"
+
+load_env() {
+    unamestr=$(uname)
+    if [ "$unamestr" = 'Linux' ]; then
+      export $(grep -v '^#' ./.env | xargs -d '\n')
+    elif [ "$unamestr" = 'FreeBSD' ] || [ "$unamestr" = 'Darwin' ]; then
+      export $(grep -v '^#' ./.env | xargs -0)
+    fi
+}
+load_env
 
 # Starkli implicitly utilizes these environment variables, so every time we use Starkli,
 # we avoid adding flags such as --account, --keystore, and --rpc.
 export STARKNET_ACCOUNT=$STARKNET_ACCOUNT
 export STARKNET_KEYSTORE=$STARKNET_KEYSTORE
 export STARKNET_RPC=$STARKNET_RPC
-
-cd "$(dirname "$0")"
 
 echo -e "${GREEN}\n=> [SN] Declare Escrow${COLOR_RESET}"
 ESCROW_CLASS_HASH=$(starkli declare --watch target/dev/yab_Escrow.contract_class.json)
