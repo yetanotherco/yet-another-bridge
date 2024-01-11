@@ -23,7 +23,7 @@ class Order(Base):
     herodotus_slot: HexBytes = Column(LargeBinary, nullable=True)
     eth_withdraw_tx_hash: HexBytes = Column(LargeBinary, nullable=True)
     completed_at: datetime = Column(DateTime, nullable=True)
-    created_at: datetime = Column(DateTime, nullable=False, default=datetime.now())
+    created_at: datetime = Column(DateTime, nullable=False, server_default="clock_timestamp()")
 
     def __str__(self):
         return f"order_id:{self.order_id}, recipient: {self.recipient_address}, amount: {self.amount}, status: {self.status.value}, failed: {self.failed}"
