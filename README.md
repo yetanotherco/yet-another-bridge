@@ -144,8 +144,8 @@ For this, you will need to:
 1. Create your `.env` file: you need to configure the following variables in your own .env file on the contracts/solidity folder. You can use the env.example file as a template for creating your .env file, paying special attention to the formats provided
 
    ```bash
-   STARKNET_ACCOUNT = location of your starknet testnet account, created at the start of this README
-   STARKNET_KEYSTORE = location of your starknet testnet keystore, created at the start of this README
+   STARKNET_ACCOUNT = Absolute path of your starknet testnet account, created at the start of this README
+   STARKNET_KEYSTORE = Absolute path of your starknet testnet keystore, created at the start of this README
    SN_RPC_URL = Infura or Alchemy RPC URL
    ETH_CONTRACT_ADDR = newly created ETH contract address
    MM_SN_WALLET_ADDR = Starknet wallet of the MarketMaker
