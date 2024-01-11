@@ -29,9 +29,6 @@ main_contract_rpc = main_w3.eth.contract(address=constants.ETH_CONTRACT_ADDR, ab
 fallback_contract_rpc = fallback_w3.eth.contract(address=constants.ETH_CONTRACT_ADDR, abi=abi)
 contracts_rpc = [main_contract_rpc, fallback_contract_rpc]
 
-TRANSFER_FEE_PERCENTAGE = 0.1
-WITHDRAW_FEE_PERCENTAGE = 0.05
-
 logger = logging.getLogger(__name__)
 
 
@@ -80,8 +77,6 @@ def transfer(deposit_id, dst_addr, amount):
     unsent_tx, signed_tx = create_transfer(deposit_id, dst_addr_bytes, amount)
 
     gas_fee = estimate_gas_fee(unsent_tx)
-    if not is_transaction_viable(amount, TRANSFER_FEE_PERCENTAGE, gas_fee):
-        raise Exception(f"Transfer gas fee ({gas_fee}) exceeds {TRANSFER_FEE_PERCENTAGE * 100}% of the amount ({amount})")
     if not has_enough_funds(amount, gas_fee):
         raise Exception("Not enough funds for transfer")
 
@@ -115,8 +110,6 @@ def withdraw(deposit_id, dst_addr, amount, value):
     unsent_tx, signed_tx = create_withdraw(deposit_id, dst_addr_bytes, amount, value)
 
     gas_fee = estimate_gas_fee(unsent_tx)
-    if not is_transaction_viable(amount, WITHDRAW_FEE_PERCENTAGE, gas_fee):
-        raise Exception(f"Withdraw gas fee ({gas_fee}) exceeds {WITHDRAW_FEE_PERCENTAGE * 100}% of the amount ({amount})")
     if not has_enough_funds(gas_fee=gas_fee):
         raise Exception("Not enough funds for withdraw")
 
