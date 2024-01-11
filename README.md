@@ -150,6 +150,12 @@ For this, you will need to:
    ESCROW_CONTRACT_ADDRESS = Address of the Starknet smart contract, this value is automatically updated after deploy.sh is run
    ```
 
+   **Note**
+   - Herodotus Facts Registry:
+      - Starknet Goerli: 0x031653659964bc969905e1b1c18deb69c65efb2e22ff7f4102044d432c91b82d
+      - Starknet Sepolia:
+      - Starknet Mainnet:
+
 2. Declare and Deploy: We sequentially declare and deploy the contracts, and connect it to our Ethereum smart contract.
 
    ```bash
