@@ -11,29 +11,37 @@ from starknet_py.net.signer.stark_curve_signer import KeyPair
 
 from config import constants
 from services import ethereum
+from services.decorators.use_fallback import use_fallback, use_async_fallback
 from services.mm_full_node_client import MmFullNodeClient
 
 SN_CHAIN_ID = int_from_bytes(constants.SN_CHAIN_ID.encode("utf-8"))
 SET_ORDER_EVENT_KEY = 0x2c75a60b5bdad73ebbf539cc807fccd09875c3cbf3f44041f852cdb96d8acd3
 
-main_full_node_client = MmFullNodeClient(node_url=constants.SN_RPC_URL)
-fallback_full_node_client = MmFullNodeClient(node_url=constants.SN_FALLBACK_RPC_URL)
-full_node_clients = [fallback_full_node_client, main_full_node_client]
 
-key_pair = KeyPair.from_private_key(key=constants.SN_PRIVATE_KEY)
-main_account = Account(
-    client=main_full_node_client,
-    address=constants.SN_WALLET_ADDR,
-    key_pair=key_pair,
-    chain=SN_CHAIN_ID,  # ignore this warning TODO change to StarknetChainId when starknet_py adds sepolia
-)
-fallback_account = Account(
-    client=fallback_full_node_client,
-    address=constants.SN_WALLET_ADDR,
-    key_pair=key_pair,
-    chain=SN_CHAIN_ID,  # ignore this warning TODO change to StarknetChainId when starknet_py adds sepolia
-)
-accounts = [fallback_account, main_account]
+class StarknetRpcNode:
+    def __init__(self, rpc_url, private_key, wallet_address, contract_address, chain_id):
+        self.full_node_client = MmFullNodeClient(node_url=rpc_url)
+        key_pair = KeyPair.from_private_key(key=private_key)
+        self.account = Account(
+            client=self.full_node_client,
+            address=wallet_address,
+            key_pair=key_pair,
+            chain=chain_id,  # ignore this warning TODO change to StarknetChainId when starknet_py adds sepolia
+        )
+        self.contract_address = contract_address
+
+
+main_rpc_node = StarknetRpcNode(constants.SN_RPC_URL,
+                                constants.SN_PRIVATE_KEY,
+                                constants.SN_WALLET_ADDR,
+                                constants.SN_CONTRACT_ADDR,
+                                SN_CHAIN_ID)
+fallback_rpc_node = StarknetRpcNode(constants.SN_FALLBACK_RPC_URL,
+                                    constants.SN_PRIVATE_KEY,
+                                    constants.SN_WALLET_ADDR,
+                                    constants.SN_CONTRACT_ADDR,
+                                    SN_CHAIN_ID)
+rpc_nodes = [main_rpc_node, fallback_rpc_node]
 
 logger = logging.getLogger(__name__)
 
@@ -52,40 +60,30 @@ class SetOrderEvent:
         return f"order_id:{self.order_id}, recipient: {self.recipient_address}, amount: {self.amount}, fee: {self.fee}"
 
 
+@use_async_fallback(rpc_nodes, logger, "Failed to get events")
 async def get_starknet_events(from_block_number: Literal["pending", "latest"] | int | None = "pending",
                               to_block_number: Literal["pending", "latest"] | int | None = "pending",
-                              continuation_token=None):
-    for client in full_node_clients:
-        try:
-            events_response = await client.get_events(
-                address=constants.SN_CONTRACT_ADDR,
-                chunk_size=1000,
-                keys=[[SET_ORDER_EVENT_KEY]],
-                from_block_number=from_block_number,
-                to_block_number=to_block_number,
-                continuation_token=continuation_token
-            )
-            return events_response
-        except Exception as exception:
-            logger.warning(f"[-] Failed to get events from node: {exception}")
-    logger.error(f"[-] Failed to get events from all nodes")
-    return None
+                              continuation_token=None, rpc_node=main_rpc_node):
+    events_response = await rpc_node.full_node_client.get_events(
+        address=constants.SN_CONTRACT_ADDR,
+        chunk_size=1000,
+        keys=[[SET_ORDER_EVENT_KEY]],
+        from_block_number=from_block_number,
+        to_block_number=to_block_number,
+        continuation_token=continuation_token
+    )
+    return events_response
 
 
-async def get_is_used_order(order_id) -> bool:
+@use_async_fallback(rpc_nodes, logger, "Failed to set order")
+async def get_is_used_order(order_id, rpc_node=main_rpc_node) -> bool:
     call = Call(
         to_addr=constants.SN_CONTRACT_ADDR,
         selector=get_selector_from_name("get_order_used"),
         calldata=[order_id, 0],
     )
-    for account in accounts:
-        try:
-            status = await account.client.call_contract(call)
-            return status[0]
-        except Exception as exception:
-            logger.warning(f"[-] Failed to get order status from node: {exception}")
-    logger.error(f"[-] Failed to get order status from all nodes")
-    return True
+    status = await rpc_node.account.client.call_contract(call)
+    return status[0]
 
 
 async def get_order_events(from_block_number, to_block_number) -> list[SetOrderEvent]:
@@ -151,15 +149,10 @@ def get_fee(event) -> int:
     return 0
 
 
-async def get_latest_block() -> int:
-    for client in full_node_clients:
-        try:
-            latest_block = await client.get_block("latest")
-            return latest_block.block_number
-        except Exception as exception:
-            logger.warning(f"[-] Failed to get latest block from node: {exception}")
-    logger.error(f"[-] Failed to get latest block from all nodes")
-    return 0
+@use_async_fallback(rpc_nodes, logger, "Failed to get latest block")
+async def get_latest_block(rpc_node=main_rpc_node) -> int:
+    latest_block = await rpc_node.full_node_client.get_block("latest")
+    return latest_block.block_number
 
 
 async def withdraw(order_id, block, slot) -> bool:
@@ -183,26 +176,16 @@ async def withdraw(order_id, block, slot) -> bool:
     return False
 
 
-async def sign_invoke_transaction(call: Call, max_fee: int):
-    for account in accounts:
-        try:
-            transaction = await account.sign_invoke_transaction(call, max_fee=max_fee)
-            return transaction
-        except Exception as e:
-            logger.warning(f"[-] Failed to sign invoke transaction: {e}")
-    logger.error(f"[-] Failed to sign invoke transaction from all nodes")
-    raise Exception("Failed to sign invoke transaction from all nodes")
+@use_async_fallback(rpc_nodes, logger, "Failed to sign invoke transaction")
+async def sign_invoke_transaction(call: Call, max_fee: int, rpc_node=main_rpc_node):
+    return await rpc_node.account.sign_invoke_transaction(call, max_fee=max_fee)
 
 
-async def estimate_message_fee(from_address, to_address, entry_point_selector, payload):
-    for client in full_node_clients:
-        try:
-            fee = await client.estimate_message_fee(from_address, to_address, entry_point_selector, payload)
-            return fee.overall_fee
-        except Exception as e:
-            logger.warning(f"[-] Failed to estimate message fee: {e}")
-    logger.error(f"[-] Failed to estimate message fee from all nodes")
-    raise Exception("Failed to estimate message fee from all nodes")
+@use_async_fallback(rpc_nodes, logger, "Failed to estimate message fee")
+async def estimate_message_fee(from_address, to_address, entry_point_selector, payload, rpc_node=main_rpc_node):
+    fee = await rpc_node.full_node_client.estimate_message_fee(from_address, to_address, entry_point_selector, payload)
+    return fee.overall_fee
+
 
 
 async def send_transaction(transaction):
@@ -215,13 +198,12 @@ async def send_transaction(transaction):
     logger.error(f"[-] Failed to send transaction from all nodes")
     raise Exception("Failed to send transaction from all nodes")
 
+@use_async_fallback(rpc_nodes, logger, "Failed to send transaction")
+async def send_transaction(transaction, rpc_node=main_rpc_node):
+    return await rpc_node.account.client.send_transaction(transaction)
 
-async def wait_for_tx(transaction_hash):
-    for account in accounts:
-        try:
-            await account.client.wait_for_tx(transaction_hash)
-            return
-        except Exception as e:
-            logger.warning(f"[-] Failed to wait for tx: {e}")
-    logger.error(f"[-] Failed to wait for tx from all nodes")
-    raise Exception("Failed to wait for tx from all nodes")
+
+@use_async_fallback(rpc_nodes, logger, "Failed to wait for tx")
+async def wait_for_tx(transaction_hash, rpc_node=main_rpc_node):
+    await rpc_node.account.client.wait_for_tx(transaction_hash)
+
