@@ -18,7 +18,7 @@ fi
 
 echo -e "${GREEN}\n=> [SN] Declare Escrow${COLOR_RESET}"
 ESCROW_CLASS_HASH=$(starkli declare \
-  --account $STARKNET_ACCOUNT --keystore $STARKNET_KEYSTORE --rpc $STARKNET_RPC \
+  --account $STARKNET_ACCOUNT --keystore $STARKNET_KEYSTORE --rpc $SN_RPC_URL \
   --watch target/dev/yab_Escrow.contract_class.json)
 
 echo -e "- ${PURPLE}[SN] Escrow ClassHash: $ESCROW_CLASS_HASH${COLOR_RESET}"
@@ -30,7 +30,7 @@ echo -e "- ${PINK}[ETH] Market Maker: $MM_ETHEREUM_WALLET${COLOR_RESET}"
 
 echo -e "${GREEN}\n=> [SN] Deploy Escrow${COLOR_RESET}"
 ESCROW_CONTRACT_ADDRESS=$(starkli deploy \
-  --account $STARKNET_ACCOUNT --keystore $STARKNET_KEYSTORE --rpc $STARKNET_RPC \
+  --account $STARKNET_ACCOUNT --keystore $STARKNET_KEYSTORE --rpc $SN_RPC_URL \
   --watch $ESCROW_CLASS_HASH \
     $SN_ESCROW_OWNER \
     $HERODOTUS_FACTS_REGISTRY \
