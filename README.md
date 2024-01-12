@@ -131,6 +131,7 @@ Once we have the dependencies installed, we can proceed. For Ethereum the deploy
    ETH_PRIVATE_KEY = private key of your ETH wallet
    ETHERSCAN_API_KEY = API Key to use etherscan to read the Ethereum blockchain
    SN_MESSAGING_ADDRESS = Starknet Messaging address
+   YAB_TRANSFER_PROXY_ADDRESS = This address is for upgrade, is automatically set after running a deployment
    ```
 
    **NOTE**:
@@ -241,10 +242,6 @@ After following this complete README, we should have an ETH smart contract as we
 ### Ethereum
 After deploying the `YABTransfer` contract, you can perform upgrades using the `make ethereum-upgrade` command.
 
-Please note that executing this command will rebuild `YABTransfer.sol`, deploy the new contract to the network, and utilize Foundry to upgrade the proxy contract by changing its implementation to the newly deployed contract.
-
-To execute this action, you must be the **owner** of the contract, and you also need to have set the `YAB_TRANSFER_PROXY_ADDRESS` variable in the `.env` file with the proxy's address.
-
 1. Update the `contracts/solidity/.env` file.
 
    ```
@@ -252,13 +249,12 @@ To execute this action, you must be the **owner** of the contract, and you also 
       ETH_PRIVATE_KEY = private key of your ETH wallet
       ETHERSCAN_API_KEY = API Key to use etherscan to read the Ethereum blockchain
       SN_MESSAGING_ADDRESS = Starknet Messaging address
-
-      # To upgrade Ethereum contract 
-      YAB_TRANSFER_PROXY_ADDRESS=<YAB_TRANSFER_PROXY_ADDRESS> 
+      YAB_TRANSFER_PROXY_ADDRESS = This address is for upgrade, is automatically set after running a deployment
    ```
 
-**NOTES**:
-- `YAB_TRANSFER_PROXY_ADDRESS` is the proxy for the `YABTransfer` that you want to upgrade.
+Please note that executing this command will rebuild `YABTransfer.sol`, deploy the new contract to the network, and utilize Foundry to upgrade the proxy contract by changing its implementation to the newly deployed contract.
+
+To execute this action, you must be the **owner** of the contract, and you also need to have set the `YAB_TRANSFER_PROXY_ADDRESS` variable in the `.env` file with the proxy's address.
 
 2. Then using Makefile command upgrade `YABTransfer` contract
 
