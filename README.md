@@ -131,7 +131,7 @@ Once we have the dependencies installed, we can proceed. For Ethereum the deploy
    ETH_PRIVATE_KEY = private key of your ETH wallet
    ETHERSCAN_API_KEY = API Key to use etherscan to read the Ethereum blockchain
    SN_MESSAGING_ADDRESS = Starknet Messaging address
-   YAB_TRANSFER_PROXY_ADDRESS = This address is for upgrade, is automatically set after running a deployment
+   YAB_TRANSFER_PROXY_ADDRESS = This address is for upgrade, is automatically set after running the deploy script
    ```
 
    **NOTE**:
@@ -249,7 +249,7 @@ After deploying the `YABTransfer` contract, you can perform upgrades using the `
       ETH_PRIVATE_KEY = private key of your ETH wallet
       ETHERSCAN_API_KEY = API Key to use etherscan to read the Ethereum blockchain
       SN_MESSAGING_ADDRESS = Starknet Messaging address
-      YAB_TRANSFER_PROXY_ADDRESS = This address is for upgrade, is automatically set after running a deployment
+      YAB_TRANSFER_PROXY_ADDRESS = This address is for upgrade, is automatically set after running the deploy script
    ```
 
 Please note that executing this command will rebuild `YABTransfer.sol`, deploy the new contract to the network, and utilize Foundry to upgrade the proxy contract by changing its implementation to the newly deployed contract.
