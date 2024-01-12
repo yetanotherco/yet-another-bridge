@@ -1,7 +1,7 @@
+from dataclasses import dataclass
 from typing import Optional, List, Union, cast
 
 from marshmallow import fields, post_load
-from dataclasses import dataclass
 from starknet_py.net.client_models import Hash, Tag, EventsChunk, Event
 from starknet_py.net.full_node_client import FullNodeClient, _get_raw_block_identifier, _to_rpc_felt
 from starknet_py.net.schemas.rpc import EventSchema, EventsChunkSchema
@@ -11,10 +11,12 @@ EXCLUDE = "exclude"
 
 @dataclass
 class MmEvent(Event):
+    starknet_tx_hash: str
     block_number: int
 
 
 class MmEventSchema(EventSchema):
+    starknet_tx_hash = fields.String(data_key="transaction_hash", required=True)
     block_number = fields.Integer(data_key="block_number", load_default=None)
 
     @post_load

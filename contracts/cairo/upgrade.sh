@@ -20,8 +20,8 @@ export STARKNET_ACCOUNT=$STARKNET_ACCOUNT
 export STARKNET_KEYSTORE=$STARKNET_KEYSTORE
 export STARKNET_RPC=$STARKNET_RPC
 
-if [ -z "$SN_ESCROW_ADDRESS" ]; then
-    echo "Error: SN_ESCROW_ADDRESS environment variable is not set. Please set it before running this script."
+if [ -z "$ESCROW_CONTRACT_ADDRESS" ]; then
+    echo "Error: ESCROW_CONTRACT_ADDRESS environment variable is not set. Please set it before running this script."
     exit 1
 fi
 
@@ -29,8 +29,8 @@ cd "$(dirname "$0")"
 
 echo -e "${GREEN}\n=> [SN] Declare Escrow${COLOR_RESET}"
 NEW_ESCROW_CLASS_HASH=$(starkli declare --watch target/dev/yab_Escrow.contract_class.json)
-echo -e "- ${PURPLE}[SN] Escrow address: $SN_ESCROW_ADDRESS${COLOR_RESET}"
+echo -e "- ${PURPLE}[SN] Escrow address: $ESCROW_CONTRACT_ADDRESS${COLOR_RESET}"
 echo -e "- ${PURPLE}[SN] New Escrow ClassHash: $NEW_ESCROW_CLASS_HASH${COLOR_RESET}"
 
 echo -e "${GREEN}\n=> [SN] Upgrade Escrow${COLOR_RESET}"
-starkli invoke --watch $SN_ESCROW_ADDRESS upgrade $NEW_ESCROW_CLASS_HASH
+starkli invoke --watch $ESCROW_CONTRACT_ADDRESS upgrade $NEW_ESCROW_CLASS_HASH

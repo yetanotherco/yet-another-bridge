@@ -24,6 +24,12 @@ ethereum-test: ethereum-clean
 ethereum-deploy: ethereum-clean
 	@./contracts/solidity/deploy.sh
 
+ethereum-set-escrow:
+	@./contracts/solidity/set_escrow.sh
+
+ethereum-set-withdraw-selector:
+	@./contracts/solidity/set_withdraw_selector.sh
+
 starknet-clean:
 	@cd ./contracts/cairo/ && scarb clean
 
@@ -38,3 +44,8 @@ starknet-deploy: starknet-build
 
 starknet-upgrade: starknet-build
 	@./contracts/cairo/upgrade.sh
+
+starknet-deploy-and-connect: starknet-build
+	@$(MAKE) starknet-deploy
+	@$(MAKE) ethereum-set-escrow
+	@$(MAKE) ethereum-set-withdraw-selector

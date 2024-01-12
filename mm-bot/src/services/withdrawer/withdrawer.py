@@ -2,7 +2,7 @@ import logging
 from abc import ABC, abstractmethod
 
 from models.order import Order
-from persistence.order_dao import OrderDao
+from services.order_service import OrderService
 
 
 class Withdrawer(ABC):
@@ -13,17 +13,17 @@ class Withdrawer(ABC):
     """
     """
     @abstractmethod
-    async def send_withdraw(self, order: Order, order_dao: OrderDao):
+    async def send_withdraw(self, order: Order, order_service: OrderService):
         pass
 
     """
     """
     @abstractmethod
-    async def wait_for_withdraw(self, order: Order, order_dao: OrderDao):
+    async def wait_for_withdraw(self, order: Order, order_service: OrderService):
         pass
 
     """
     """
     @abstractmethod
-    async def close_withdraw(self, order: Order, order_dao: OrderDao):
+    async def close_withdraw(self, order: Order, order_service: OrderService):
         pass
