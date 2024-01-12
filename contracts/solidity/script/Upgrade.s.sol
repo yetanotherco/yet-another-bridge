@@ -8,7 +8,7 @@ import {UUPSUpgradeable} from "@openzeppelin/contracts/proxy/utils/UUPSUpgradeab
 
 contract Upgrade is Script {
     function run() external returns (address) {
-        address YABTrasnferProxyAddress = vm.envAddress("ETH_YAB_PROXY_ADDRESS");
+        address YABTrasnferProxyAddress = vm.envAddress("YAB_TRANSFER_PROXY_ADDRESS");
         vm.startBroadcast();
 
         // Deploy new YABTransfer contract to upgrade proxy

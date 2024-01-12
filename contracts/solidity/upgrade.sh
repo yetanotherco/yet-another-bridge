@@ -17,4 +17,4 @@ load_env() {
 load_env
 
 echo -e "${GREEN}\n=> [ETH] Upgrade YABTransfer${COLOR_RESET}"
-forge script ./script/Upgrade.s.sol --rpc-url $GOERLI_RPC_URL --broadcast --verify --private-key $ETH_PRIVATE_KEY
+forge script ./script/Upgrade.s.sol --rpc-url $ETH_RPC_URL --broadcast --verify --private-key $ETH_PRIVATE_KEY
