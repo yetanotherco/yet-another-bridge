@@ -201,8 +201,6 @@ This may be better suited for you if you plan to change some of the automaticall
       make starknet-deploy
    ```
 
-### Ethereum
-
    This script also sets an important .env variable, **ESCROW_CONTRACT_ADDRESS**
 
 2. Setting _EscrowAddress_
