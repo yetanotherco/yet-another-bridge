@@ -2,6 +2,7 @@ import asyncio
 import logging
 from typing import Literal
 
+from starknet_py.common import int_from_bytes
 from starknet_py.hash.selector import get_selector_from_name
 from starknet_py.net.account.account import Account
 from starknet_py.net.client_models import Call
@@ -9,8 +10,10 @@ from starknet_py.net.models.chains import StarknetChainId
 from starknet_py.net.signer.stark_curve_signer import KeyPair
 
 from config import constants
+from services import ethereum
 from services.mm_full_node_client import MmFullNodeClient
 
+SN_CHAIN_ID = int_from_bytes(constants.SN_CHAIN_ID.encode("utf-8"))
 SET_ORDER_EVENT_KEY = 0x2c75a60b5bdad73ebbf539cc807fccd09875c3cbf3f44041f852cdb96d8acd3
 
 main_full_node_client = MmFullNodeClient(node_url=constants.SN_RPC_URL)
@@ -22,13 +25,13 @@ main_account = Account(
     client=main_full_node_client,
     address=constants.SN_WALLET_ADDR,
     key_pair=key_pair,
-    chain=StarknetChainId.TESTNET,
+    chain=SN_CHAIN_ID,  # ignore this warning TODO change to StarknetChainId when starknet_py adds sepolia
 )
 fallback_account = Account(
     client=fallback_full_node_client,
     address=constants.SN_WALLET_ADDR,
     key_pair=key_pair,
-    chain=StarknetChainId.TESTNET,
+    chain=SN_CHAIN_ID,  # ignore this warning TODO change to StarknetChainId when starknet_py adds sepolia
 )
 accounts = [fallback_account, main_account]
 
@@ -36,8 +39,9 @@ logger = logging.getLogger(__name__)
 
 
 class SetOrderEvent:
-    def __init__(self, order_id, recipient_address, amount, fee, block_number, is_used=False):
+    def __init__(self, order_id, starknet_tx_hash, recipient_address, amount, fee, block_number, is_used=False):
         self.order_id = order_id
+        self.starknet_tx_hash = starknet_tx_hash
         self.recipient_address = recipient_address
         self.amount = amount
         self.fee = fee
@@ -106,16 +110,36 @@ async def get_order_events(from_block_number, to_block_number) -> list[SetOrderE
 
 
 async def create_set_order_event(event):
-    is_used = await get_is_used_order(event.data[0])
+    order_id = get_order_id(event)
+    recipient_address = get_recipient_address(event)
+    amount = get_amount(event)
+    is_used = await asyncio.to_thread(ethereum.get_is_used_order, order_id, recipient_address, amount)
     fee = get_fee(event)
     return SetOrderEvent(
-        order_id=event.data[0],
-        recipient_address=hex(event.data[2]),
-        amount=event.data[3],
+        order_id=order_id,
+        starknet_tx_hash=event.starknet_tx_hash,
+        recipient_address=recipient_address,
+        amount=amount,
         fee=fee,
         block_number=event.block_number,
         is_used=is_used
     )
+
+
+def get_order_id(event) -> int:
+    return parse_u256_from_double_u128(event.data[0], event.data[1])
+
+
+def get_recipient_address(event) -> str:
+    return hex(event.data[2])
+
+
+def get_amount(event) -> int:
+    return parse_u256_from_double_u128(event.data[3], event.data[4])
+
+
+def parse_u256_from_double_u128(low, high) -> int:
+    return high << 128 | low
 
 
 def get_fee(event) -> int:
@@ -168,6 +192,17 @@ async def sign_invoke_transaction(call: Call, max_fee: int):
             logger.warning(f"[-] Failed to sign invoke transaction: {e}")
     logger.error(f"[-] Failed to sign invoke transaction from all nodes")
     raise Exception("Failed to sign invoke transaction from all nodes")
+
+
+async def estimate_message_fee(from_address, to_address, entry_point_selector, payload):
+    for client in full_node_clients:
+        try:
+            fee = await client.estimate_message_fee(from_address, to_address, entry_point_selector, payload)
+            return fee.overall_fee
+        except Exception as e:
+            logger.warning(f"[-] Failed to estimate message fee: {e}")
+    logger.error(f"[-] Failed to estimate message fee from all nodes")
+    raise Exception("Failed to estimate message fee from all nodes")
 
 
 async def send_transaction(transaction):

@@ -7,10 +7,11 @@ import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.s
 
 contract Deploy is Script {
     function run() external returns (address) {
-        address snMessagingAddress = vm.envAddress("SN_MESSAGING_ADDRESS");
-        uint256 snWithdrawSelector = vm.envUint("SN_WITHDRAW_SELECTOR");
-        uint256 snEscrowAddress = 0x0;
         vm.startBroadcast();
+
+        address snMessagingAddress = vm.envAddress("SN_MESSAGING_ADDRESS");
+        uint256 snWithdrawSelector = 0x0;
+        uint256 snEscrowAddress = 0x0;
 
         YABTransfer yab = new YABTransfer();
         ERC1967Proxy proxy = new ERC1967Proxy(address(yab), "");

@@ -1,3 +1,5 @@
+from typing import Type
+
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
@@ -21,47 +23,27 @@ class OrderDao:
                 .filter(Order.order_id == order_id)
                 .first())
 
+    def get_orders(self, criteria) -> list[Type[Order]]:
+        return (self.db.query(Order)
+                .filter(criteria)
+                .all())
+
+    def get_incomplete_orders(self) -> list[Type[Order]]:
+        """
+        An order is incomplete if it's not completed or not DROPPED and not failed
+        """
+        criteria = and_(Order.status != OrderStatus.COMPLETED,
+                        Order.status != OrderStatus.DROPPED,
+                        Order.failed == False)
+        return self.get_orders(criteria)
+
+    def get_failed_orders(self) -> list[Type[Order]]:
+        criteria = Order.failed
+        return self.get_orders(criteria)
+
     def already_exists(self, order_id) -> bool:
         return self.get_order(order_id) is not None
 
-    def update_order(self, order: Order, status: OrderStatus) -> Order:
-        order.status = status.name
+    def update_order(self, order: Order) -> Order:
         self.db.commit()
         return order
-
-    def set_order_processing(self, order: Order) -> Order:
-        return self.update_order(order, OrderStatus.PROCESSING)
-
-    def set_order_transferring(self, order: Order, tx_hash) -> Order:
-        order.tx_hash = tx_hash
-        order.status = OrderStatus.TRANSFERRING.name
-        self.db.commit()
-        return order
-
-    def set_order_fulfilled(self, order: Order) -> Order:
-        return self.update_order(order, OrderStatus.FULFILLED)
-
-    def set_order_proving_herodotus(self, order: Order, task_id, block, slot) -> Order:
-        order.herodotus_task_id = task_id
-        order.herodotus_block = block
-        order.herodotus_slot = slot
-        order.status = OrderStatus.PROVING.name
-        self.db.commit()
-        return order
-
-    def set_order_proving_ethereum(self, order: Order, tx_hash) -> Order:
-        order.eth_withdraw_tx_hash = tx_hash
-        order.status = OrderStatus.PROVING.name
-        self.db.commit()
-        return order
-
-    def set_order_proved(self, order: Order) -> Order:
-        return self.update_order(order, OrderStatus.PROVED)
-
-    def set_order_completed(self, order: Order) -> Order:
-        return self.update_order(order, OrderStatus.COMPLETED)
-
-    def get_incomplete_orders(self):
-        return (self.db.query(Order)
-                .filter(and_(Order.status != OrderStatus.COMPLETED, Order.status != OrderStatus.FAILED))
-                .all())
