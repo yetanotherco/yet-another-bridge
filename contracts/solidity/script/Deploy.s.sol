@@ -10,8 +10,8 @@ contract Deploy is Script {
         vm.startBroadcast();
 
         address snMessagingAddress = vm.envAddress("SN_MESSAGING_ADDRESS");
-        uint256 snWithdrawSelector = 0x0;
-        uint256 snEscrowAddress = 0x0;
+        uint256 snEscrowAddress = 0x0; // this value is set in a call to the smart contract, once deployed
+        uint256 snWithdrawSelector = 0x0; // this value is set in a call to the smart contract, once deployed
 
         YABTransfer yab = new YABTransfer();
         ERC1967Proxy proxy = new ERC1967Proxy(address(yab), "");

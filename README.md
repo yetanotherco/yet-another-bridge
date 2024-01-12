@@ -103,7 +103,7 @@ Follow the steps below to set up a testnet smart wallet using `starkli`:
    export STARKNET_KEYSTORE=~/.starkli-wallets/keystore.json
    ```
 
-## Deploy Contracts in Testnet
+## Declare and Deploy Contracts in Testnet
 
 ### Ethereum smart contract
 
@@ -188,9 +188,9 @@ This may be better suited for you if you plan to change some of the automaticall
 
 1. Declare and Deploy: We sequentially declare and deploy the contracts.
 
-```bash
-   make starknet-deploy
-```
+   ```bash
+      make starknet-deploy
+   ```
 
 ### Ethereum
 
@@ -223,7 +223,6 @@ This may be better suited for you if you plan to change some of the automaticall
 
 After following this complete README, we should have an ETH smart contract as well as a Starknet smart contract, both connected to act as a bridge between these two chains.
 
-
 ## Upgrade Contracts in Testnet
 
 ### Ethereum
@@ -235,21 +234,21 @@ To execute this action, you must be the **owner** of the contract, and you also 
 
 1. Update the `contracts/solidity/.env` file.
 
-```
-   ETH_RPC_URL = Infura or Alchemy RPC URL
-   ETH_PRIVATE_KEY = private key of your ETH wallet
-   ETHERSCAN_API_KEY = API Key to use etherscan to read the Ethereum blockchain
-   SN_MESSAGING_ADDRESS = Starknet Messaging address
+   ```
+      ETH_RPC_URL = Infura or Alchemy RPC URL
+      ETH_PRIVATE_KEY = private key of your ETH wallet
+      ETHERSCAN_API_KEY = API Key to use etherscan to read the Ethereum blockchain
+      SN_MESSAGING_ADDRESS = Starknet Messaging address
 
-   # To upgrade Ethereum contract 
-   YAB_TRANSFER_PROXY_ADDRESS=<YAB_TRANSFER_PROXY_ADDRESS> 
-```
+      # To upgrade Ethereum contract 
+      YAB_TRANSFER_PROXY_ADDRESS=<YAB_TRANSFER_PROXY_ADDRESS> 
+   ```
 
 **NOTES**:
 - `YAB_TRANSFER_PROXY_ADDRESS` is the proxy for the `YABTransfer` that you want to upgrade.
 
 2. Then using Makefile command upgrade `YABTransfer` contract
 
-```bash
-   make ethereum-upgrade
-```
+   ```bash
+      make ethereum-upgrade
+   ```
