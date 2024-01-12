@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.21;
 
 import {Script} from "forge-std/Script.sol";
 import {YABTransfer} from "../src/YABTransfer.sol";

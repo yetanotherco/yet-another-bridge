@@ -1,16 +1,16 @@
 deps: install-scarb install-starkli install-starknet-foundry install-ethereum-foundry
 
 install-scarb:
-	curl --proto '=https' --tlsv1.2 -sSf https://docs.swmansion.com/scarb/install.sh | sh -s -- -v  2.3.1
+	curl --proto '=https' --tlsv1.2 -sSf https://docs.swmansion.com/scarb/install.sh | sh -s -- -v  2.4.1
 
 install-starkli: 
-	curl https://get.starkli.sh | sh && exec && starkliup
+	curl https://get.starkli.sh | sh && starkliup
 
 install-starknet-foundry:
 	curl -L https://raw.githubusercontent.com/foundry-rs/starknet-foundry/master/scripts/install.sh | sh -s -- -v 0.12.0
 
 install-ethereum-foundry:
-	curl -L https://foundry.paradigm.xyz | bash && exec && foundryup
+	curl -L https://foundry.paradigm.xyz | bash && foundryup
 
 ethereum-clean:
 	@cd ./contracts/solidity/ && forge clean
@@ -26,7 +26,7 @@ ethereum-deploy: ethereum-build
 
 ethereum-upgrade: ethereum-build
 	@./contracts/solidity/upgrade.sh
-	
+
 ethereum-set-escrow:
 	@./contracts/solidity/set_escrow.sh
 
