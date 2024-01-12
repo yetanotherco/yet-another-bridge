@@ -6,15 +6,13 @@ COLOR_RESET='\033[0m'
 
 cd "$(dirname "$0")"
 
-load_env() {
-    unamestr=$(uname)
-    if [ "$unamestr" = 'Linux' ]; then
-      export $(grep -v '^#' ./.env | xargs -d '\n')
-    elif [ "$unamestr" = 'FreeBSD' ] || [ "$unamestr" = 'Darwin' ]; then
-      export $(grep -v '^#' ./.env | xargs -0)
-    fi
-}
-load_env
+if [ -f .env ]; then
+    echo "Sourcing solidity/.env file..."
+    source .env
+else
+    echo "Error: solidity/.env file not found!"
+    exit 1
+fi
 
-echo -e "${GREEN}\n=> [ETH] Upgrade YABTransfer${COLOR_RESET}"
+echo -e "${GREEN}\n=> [ETH] Upgrade YABTransfer ${COLOR_RESET}"
 forge script ./script/Upgrade.s.sol --rpc-url $ETH_RPC_URL --broadcast --verify
