@@ -17,7 +17,7 @@ load_env() {
 load_env
 
 echo -e "${GREEN}\n=> [ETH] Deploy ERC1967Proxy & YABTransfer ${COLOR_RESET}"
-RESULT_LOG=$(forge script ./script/Deploy.s.sol --rpc-url $ETH_RPC_URL --broadcast --verify --private-key $ETH_PRIVATE_KEY)
+RESULT_LOG=$(forge script ./script/Deploy.s.sol --rpc-url $ETH_RPC_URL --broadcast --verify)
 
 # Setting result address into .env file
 YAB_TRANSFER_PROXY_ADDRESS=$(echo "$RESULT_LOG" | grep -oP '0: address \K[^\n]+' | awk '{print $0}')

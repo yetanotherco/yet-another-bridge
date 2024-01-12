@@ -9,7 +9,8 @@ import {UUPSUpgradeable} from "@openzeppelin/contracts/proxy/utils/UUPSUpgradeab
 contract Upgrade is Script {
     function run() external returns (address) {
         address YABTrasnferProxyAddress = vm.envAddress("YAB_TRANSFER_PROXY_ADDRESS");
-        vm.startBroadcast();
+        uint256 deployerPrivateKey = vm.envUint("ETH_PRIVATE_KEY");
+        vm.startBroadcast(deployerPrivateKey);
 
         // Deploy new YABTransfer contract to upgrade proxy
         YABTransfer yab = new YABTransfer();
@@ -23,8 +24,9 @@ contract Upgrade is Script {
         address proxyAddress,
         address newImplementationAddress
     ) public returns (address) {
-        vm.startBroadcast();
-
+        uint256 deployerPrivateKey = vm.envUint("ETH_PRIVATE_KEY");
+        vm.startBroadcast(deployerPrivateKey);
+        
         YABTransfer proxy = YABTransfer(payable(proxyAddress));
         proxy.upgradeToAndCall(address(newImplementationAddress), ''); 
     
