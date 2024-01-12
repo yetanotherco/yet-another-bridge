@@ -107,7 +107,16 @@ Follow the steps below to set up a testnet smart wallet using `starkli`:
 
 ### Ethereum smart contract
 
-First, the Ethereum smart contracts must be deployed. For Ethereum the deployment process you will need to:
+First, make sure you have the necessary dependencies installed in the `contracts/solidity/lib` folder.
+You can install these commands by executing them within the `/contracts/solidity/` folder.
+
+- **[openzeppelin-contracts-upgradeable]**(https://github.com/OpenZeppelin/openzeppelin-foundry-upgrades)
+`forge install OpenZeppelin/openzeppelin-contracts-upgradeable`
+
+- **[forge-std]**(https://github.com/foundry-rs/forge-std)
+`forge install foundry-rs/forge-std `
+
+Once we have the dependencies installed, we can proceed. For Ethereum the deployment process you will need to:
 
 1. Create your `.env` file: you need to configure the following variables in your own .env file on the contracts/solidity/ folder. You can use the env.example file as a template for creating your .env file, paying special attention to the formats provided
 
