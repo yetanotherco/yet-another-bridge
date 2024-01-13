@@ -156,6 +156,7 @@ For this, you will need to:
    STARKNET_ACCOUNT = Absolute path of your starknet testnet account, created at the start of this README
    STARKNET_KEYSTORE = Absolute path of your starknet testnet keystore, created at the start of this README
    SN_RPC_URL = Infura or Alchemy RPC URL
+   SN_ESCROW_OWNER= Is the owner of the Escrow contract and is the only one who can perform upgrades
    ETH_CONTRACT_ADDR = newly created ETH contract address
    MM_SN_WALLET_ADDR = Starknet wallet of the MarketMaker
    WITHDRAW_NAME = The exact name of the withdraw function that is called from L1, case sensitive. Example: withdraw_fallback
@@ -246,7 +247,7 @@ To be able to upgrade the contract, you must be the **owner** of the contract an
    
    ..
    # To upgrade Starknet contract 
-   ESCROW_CONTRACT_ADDRESS = Address of the Starknet smart contract, this value should be empty, and is automatically 
+   ESCROW_CONTRACT_ADDRESS = You can either set an escrow address manually or run deploy.sh, and it will be set automatically
    ..
 ```
 
