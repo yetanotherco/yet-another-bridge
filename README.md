@@ -234,25 +234,19 @@ If you want to upgrade a previously deployed `Escrow` contract, it is possible t
 
 Keep in mind that this command will **rebuild** `Escrow.cairo`, perform the **declare**, and call the external **upgrade()** function with the new class hash resulting from the **declare**. 
 
-To be able to upgrade the contract, you must be the **owner** of the contract and set the `ESCROW_CONTRACT_ADDRESS` variable in the `.env` file with the address of the `Escrow` contract that you want to be **upgraded**.
+To be able to upgrade the contract, you must be the **owner** of the contract and set the `ESCROW_CONTRACT_ADDRESS` variable in the `.env` file with the address of the `Escrow` contract that you want to be **upgraded**. 
 
 1. Update `contracts/cairo/.env` file.
 
-```bash
-   ..
-   ## Starkli
+```
    STARKNET_ACCOUNT = Absolute path of your starknet testnet account, created at the start of this README
    STARKNET_KEYSTORE = Absolute path of your starknet testnet keystore, created at the start of this README
    SN_RPC_URL = Infura or Alchemy RPC URL
-   
-   ..
-   # To upgrade Starknet contract 
    ESCROW_CONTRACT_ADDRESS = You can either set an escrow address manually or run deploy.sh, and it will be set automatically
-   ..
 ```
 
 2. Then using Makefile command upgrade `Escrow` contract
 
-```bash
+```
    make starknet-upgrade
 ```
