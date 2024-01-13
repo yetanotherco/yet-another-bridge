@@ -45,7 +45,7 @@ starknet-deploy: starknet-build
 starknet-upgrade: starknet-build
 	@./contracts/cairo/upgrade.sh
 
-starknet-deploy-and-connect: starknet-build
+starknet-deploy-and-connect:
 	@$(MAKE) starknet-deploy
 	@$(MAKE) ethereum-set-escrow
 	@$(MAKE) ethereum-set-withdraw-selector

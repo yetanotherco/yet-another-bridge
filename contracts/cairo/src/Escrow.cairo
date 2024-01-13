@@ -28,10 +28,6 @@ trait IEscrow<ContractState> {
     fn set_herodotus_facts_registry_contract(
         ref self: ContractState, new_contract: ContractAddress
     );
-    fn get_mm_starknet_contractv2(self: @ContractState) -> ContractAddress;
-    fn set_herodotus_facts_registry_contractv2(
-        ref self: ContractState, new_contract: ContractAddress
-    );
     fn set_eth_transfer_contract(ref self: ContractState, new_contract: EthAddress);
     fn set_mm_ethereum_contract(ref self: ContractState, new_contract: EthAddress);
     fn set_mm_starknet_contract(ref self: ContractState, new_contract: ContractAddress);
@@ -270,17 +266,6 @@ mod Escrow {
         }
 
         fn set_herodotus_facts_registry_contract(
-            ref self: ContractState, new_contract: ContractAddress
-        ) {
-            self.ownable.assert_only_owner();
-            self.herodotus_facts_registry_contract.write(new_contract);
-        }
-
-        fn get_mm_starknet_contractv2(self: @ContractState) -> ContractAddress {
-            self.mm_starknet_wallet.read()
-        }
-
-        fn set_herodotus_facts_registry_contractv2(
             ref self: ContractState, new_contract: ContractAddress
         ) {
             self.ownable.assert_only_owner();
