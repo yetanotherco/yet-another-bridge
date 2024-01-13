@@ -188,15 +188,6 @@ async def estimate_message_fee(from_address, to_address, entry_point_selector, p
 
 
 
-async def send_transaction(transaction):
-    for account in accounts:
-        try:
-            result = await account.client.send_transaction(transaction)
-            return result
-        except Exception as e:
-            logger.warning(f"[-] Failed to send transaction: {e}")
-    logger.error(f"[-] Failed to send transaction from all nodes")
-    raise Exception("Failed to send transaction from all nodes")
 
 @use_async_fallback(rpc_nodes, logger, "Failed to send transaction")
 async def send_transaction(transaction, rpc_node=main_rpc_node):
