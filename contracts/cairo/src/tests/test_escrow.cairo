@@ -5,7 +5,7 @@ mod Escrow {
     use snforge_std::{declare, ContractClassTrait};
     use snforge_std::{CheatTarget, start_prank, stop_prank};
 
-    use yab::EscrowV2::{IEscrowV2Dispatcher, IEscrowV2DispatcherTrait};
+    use yab::mocks::mock_EscrowV2::{IEscrowV2Dispatcher, IEscrowV2DispatcherTrait};
     use yab::interfaces::IERC20::{IERC20Dispatcher, IERC20DispatcherTrait};
     use yab::Escrow::{IEscrowDispatcher, IEscrowDispatcherTrait, Order};
     use yab::interfaces::IEVMFactsRegistry::{
@@ -29,6 +29,7 @@ mod Escrow {
         let eth_token = deploy_erc20('ETH', '$ETH', BoundedInt::max(), OWNER());
         let evm_facts_registry = deploy_mock_EVMFactsRegistry();
         let escrow = deploy_escrow(
+            OWNER(),
             evm_facts_registry.contract_address,
             ETH_TRANSFER_CONTRACT(),
             MM_ETHEREUM(),
@@ -48,6 +49,7 @@ mod Escrow {
     }
 
     fn deploy_escrow(
+        escrow_owner: ContractAddress,
         herodotus_facts_registry_contract: ContractAddress,
         eth_transfer_contract: EthAddress,
         mm_ethereum_contract: EthAddress,
@@ -56,6 +58,7 @@ mod Escrow {
     ) -> IEscrowDispatcher {
         let escrow = declare('Escrow');
         let mut calldata: Array<felt252> = ArrayTrait::new();
+        calldata.append(escrow_owner.into());
         calldata.append(herodotus_facts_registry_contract.into());
         calldata.append(eth_transfer_contract.into());
         calldata.append(mm_ethereum_contract.into());
@@ -122,6 +125,7 @@ mod Escrow {
     fn test_upgrade_escrow() {
         let (escrow, _) = setup();
         let upgradeable = IUpgradeableDispatcher { contract_address: escrow.contract_address };
+        start_prank(CheatTarget::One(escrow.contract_address), OWNER());
         upgradeable.upgrade(declare('EscrowV2').class_hash);
     }
 

@@ -120,13 +120,14 @@ mod EscrowV2 {
     #[constructor]
     fn constructor(
         ref self: ContractState,
+        owner: ContractAddress,
         herodotus_facts_registry_contract: ContractAddress,
         eth_transfer_contract: EthAddress,
         mm_ethereum_wallet: EthAddress,
         mm_starknet_wallet: ContractAddress,
         native_token_eth_starknet: ContractAddress
     ) {
-        self.ownable.initializer(get_caller_address());
+        self.ownable.initializer(owner);
 
         self.current_order_id.write(0);
         self.herodotus_facts_registry_contract.write(herodotus_facts_registry_contract);
