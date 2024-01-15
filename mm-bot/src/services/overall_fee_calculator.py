@@ -10,7 +10,7 @@ from services.withdrawer.ethereum_withdrawer import EthereumWithdrawer
 async def estimate_overall_fee(order: Order) -> int:
     transfer_fee = await asyncio.to_thread(estimate_transfer_fee, order)
     message_fee = await estimate_message_fee(order)
-    withdraw_fee = estimate_withdraw_fee()
+    withdraw_fee = estimate_yab_withdraw_fee()
     return transfer_fee + message_fee + withdraw_fee
 
 
@@ -24,7 +24,7 @@ def estimate_transfer_fee(order: Order) -> int:
     return estimate_transaction_fee(unsent_tx)
 
 
-def estimate_withdraw_fee() -> int:
+def estimate_yab_withdraw_fee() -> int:
     """
     Due to the deposit does not exist on ethereum at this point,
     we cannot estimate the gas fee of the withdrawal transaction
