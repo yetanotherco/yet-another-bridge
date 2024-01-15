@@ -117,15 +117,18 @@ mod Escrow {
         fn set_order(ref self: ContractState, order: Order) -> u256 {
             assert(order.amount > 0, 'Amount must be greater than 0');
 
+            let payment_amount = order.amount + order.fee;
+            let dispatcher = IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() };
+            assert(dispatcher.allowance(get_caller_address(), get_contract_address()) >= payment_amount, 'Not enough allowance');
+            assert(dispatcher.balanceOf(get_caller_address()) >= payment_amount, 'Not enough balance');
+
             let mut order_id = self.current_order_id.read();
             self.orders.write(order_id, order);
             self.orders_used.write(order_id, false);
             self.orders_senders.write(order_id, get_caller_address());
             self.orders_timestamps.write(order_id, get_block_timestamp());
-            let payment_amount = order.amount + order.fee;
 
-            IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
-                .transferFrom(get_caller_address(), get_contract_address(), payment_amount);
+            dispatcher.transferFrom(get_caller_address(), get_contract_address(), payment_amount);
 
             self
                 .emit(
