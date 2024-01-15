@@ -6,7 +6,7 @@ import {YABTransfer} from "../src/YABTransfer.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 contract Deploy is Script {
-    function run() external returns (address) {
+    function run() external returns (address, address) {
         uint256 deployerPrivateKey = vm.envUint("ETH_PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
 
@@ -20,6 +20,6 @@ contract Deploy is Script {
 
         vm.stopBroadcast();
 
-        return address(proxy);
+        return (address(proxy), address(yab));
     }
 }

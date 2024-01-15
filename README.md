@@ -174,7 +174,7 @@ For this, you will need to:
    HERODOTUS_FACTS_REGISTRY = Herodotus' Facts Registry Smart Contract in Starknet
    MM_ETHEREUM_WALLET = Ethereum wallet of the MarketMaker
    NATIVE_TOKEN_ETH_STARKNET = Ethereum's erc20 token handler contract in Starknet
-   ESCROW_CONTRACT_ADDRESS = Address of the Starknet smart contract, this value should be empty, and is automatically updated after deploy.sh is run
+   ESCROW_CONTRACT_ADDRESS = Address of the Starknet smart contract, this value is automatically created and/or updated after deploy.sh is executed
    ```
 
    **Note**
@@ -185,7 +185,7 @@ For this, you will need to:
 
 2. Declare and Deploy: We sequentially declare and deploy the contracts, and connect it to our Ethereum smart contract.
 
-### First alternative: automatic deploy and connect of Escrow and YABTransfer.
+### First alternative: automatic deploy and connect of Escrow and YABTransfer
 
    ```bash
       make starknet-deploy-and-connect
@@ -240,24 +240,28 @@ After following this complete README, we should have an ETH smart contract as we
 ## Upgrade Contracts in Testnet
 
 ### Ethereum
-After deploying the `YABTransfer` contract, you can perform upgrades using the `make ethereum-upgrade` command.
 
-1. Update the `contracts/solidity/.env` file.
+After deploying the `YABTransfer` contract, you can perform upgrades of it. To do this you must:
+
+1. Configure the `contracts/solidity/.env` file.
 
    ```
       ETH_RPC_URL = Infura or Alchemy RPC URL
       ETH_PRIVATE_KEY = private key of your ETH wallet
       ETHERSCAN_API_KEY = API Key to use etherscan to read the Ethereum blockchain
       SN_MESSAGING_ADDRESS = Starknet Messaging address
-      YAB_TRANSFER_PROXY_ADDRESS = This address is for upgrade, is automatically set after running the deploy script
+      YAB_TRANSFER_PROXY_ADDRESS = Address of the Ethereum Proxy smart contract, this value is automatically created and/or updated after deploy.sh is executed
    ```
 
-Please note that executing this command will rebuild `YABTransfer.sol`, deploy the new contract to the network, and utilize Foundry to upgrade the proxy contract by changing its implementation to the newly deployed contract.
-
-To execute this action, you must be the **owner** of the contract, and you also need to have set the `YAB_TRANSFER_PROXY_ADDRESS` variable in the `.env` file with the proxy's address.
-
-2. Then using Makefile command upgrade `YABTransfer` contract
+2. Use the Makefile command to upgrade `YABTransfer` contract
 
    ```bash
       make ethereum-upgrade
    ```
+
+   **Note**
+   - You must be the **owner** of the contract to upgrade it.
+   - This command will:
+      - Rebuild `YABTransfer.sol`
+      - Deploy the new contract to the network
+      - Utilize Foundry to upgrade the contract by changing the proxy's pointing address to the newly deployed contract
