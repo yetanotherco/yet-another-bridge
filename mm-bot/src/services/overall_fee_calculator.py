@@ -8,6 +8,13 @@ from services.withdrawer.ethereum_withdrawer import EthereumWithdrawer
 
 
 async def estimate_overall_fee(order: Order) -> int:
+    """
+    Operational cost per order done by the market maker.
+    This includes:
+        calling the transfer (from YABTransfer) +
+        withdraw (from YABTransfer) +
+        msg fee paid to Starknet (when calling withdraw)
+    """
     transfer_fee = await asyncio.to_thread(estimate_transfer_fee, order)
     message_fee = await estimate_message_fee(order)
     withdraw_fee = estimate_yab_withdraw_fee()
