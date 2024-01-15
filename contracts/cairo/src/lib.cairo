@@ -1,5 +1,5 @@
 mod ERC20;
-mod escrow;
+mod Escrow;
 
 mod interfaces {
     mod IERC20;
@@ -8,6 +8,8 @@ mod interfaces {
 
 mod mocks {
     mod mock_EVMFactsRegistry;
+    mod mock_EscrowV2;
+
 }
 
 #[cfg(test)]

@@ -18,6 +18,10 @@ This will end up installing:
 - [Starknet Foundry](https://foundry-rs.github.io/starknet-foundry/) - Is a toolchain for developing Starknet smart contracts.
 - [Ethereum Foundry](https://book.getfoundry.sh/) - Is a toolchain for developing Ethereum smart contracts.
 
+### Starknet dependencies
+
+- [OpenZeppelin cairo contracts](https://github.com/OpenZeppelin/cairo-contracts/)
+
 ## Setting up a Starknet Testnet Wallet
 
 **This guide will help you declare and deploy contracts on a testnet. Please
@@ -152,6 +156,7 @@ For this, you will need to:
    STARKNET_ACCOUNT = Absolute path of your starknet testnet account, created at the start of this README
    STARKNET_KEYSTORE = Absolute path of your starknet testnet keystore, created at the start of this README
    SN_RPC_URL = Infura or Alchemy RPC URL
+   SN_ESCROW_OWNER= Is the owner of the Escrow contract and is the only one who can perform upgrades
    ETH_CONTRACT_ADDR = newly created ETH contract address
    MM_SN_WALLET_ADDR = Starknet wallet of the MarketMaker
    WITHDRAW_NAME = The exact name of the withdraw function that is called from L1, case sensitive. Example: withdraw_fallback
@@ -220,3 +225,28 @@ This may be better suited for you if you plan to change some of the automaticall
 ## Recap
 
 After following this complete README, we should have an ETH smart contract as well as a Starknet smart contract, both connected to act as a bridge between these two chains.
+
+## Upgrade Contracts in Testnet
+
+### Starknet
+
+If you want to upgrade a previously deployed `Escrow` contract, it is possible through a command. We will perform the upgrade using `starkli`, so the same configuration used for deployment is necessary.
+
+Keep in mind that this command will **rebuild** `Escrow.cairo`, perform the **declare**, and call the external **upgrade()** function with the new class hash resulting from the **declare**. 
+
+To be able to upgrade the contract, you must be the **owner** of the contract and set the `ESCROW_CONTRACT_ADDRESS` variable in the `.env` file with the address of the `Escrow` contract that you want to be **upgraded**. 
+
+1. Update `contracts/cairo/.env` file.
+
+```
+   STARKNET_ACCOUNT = Absolute path of your starknet testnet account, created at the start of this README
+   STARKNET_KEYSTORE = Absolute path of your starknet testnet keystore, created at the start of this README
+   SN_RPC_URL = Infura or Alchemy RPC URL
+   ESCROW_CONTRACT_ADDRESS = You can either set an escrow address manually or run deploy.sh, and it will be set automatically
+```
+
+2. Then using Makefile command upgrade `Escrow` contract
+
+```
+   make starknet-upgrade
+```
