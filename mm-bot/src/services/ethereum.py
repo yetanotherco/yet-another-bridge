@@ -61,7 +61,7 @@ def transfer(deposit_id, dst_addr, amount):
 
     unsent_tx, signed_tx = create_transfer(deposit_id, dst_addr_bytes, amount)
 
-    gas_fee = estimate_gas_fee(unsent_tx)
+    gas_fee = estimate_transaction_fee(unsent_tx)
     if not has_enough_funds(amount, gas_fee):
         raise Exception("Not enough funds for transfer")
 
@@ -89,7 +89,7 @@ def withdraw(deposit_id, dst_addr, amount, value):
 
     unsent_tx, signed_tx = create_withdraw(deposit_id, dst_addr_bytes, amount, value)
 
-    gas_fee = estimate_gas_fee(unsent_tx)
+    gas_fee = estimate_transaction_fee(unsent_tx)
     if not has_enough_funds(gas_fee=gas_fee):
         raise Exception("Not enough funds for withdraw")
 
@@ -114,7 +114,7 @@ def get_nonce(w3: Web3, address):
 
 
 @use_fallback(rpc_nodes, logger, "Failed to estimate gas fee")
-def estimate_gas_fee(transaction, rpc_node=main_rpc_node):
+def estimate_transaction_fee(transaction, rpc_node=main_rpc_node):
     gas_limit = rpc_node.w3.eth.estimate_gas(transaction)
     fee = rpc_node.w3.eth.gas_price
     gas_fee = fee * gas_limit
