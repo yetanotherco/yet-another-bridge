@@ -2,8 +2,11 @@
 pragma solidity ^0.8.21;
 
 import {IStarknetMessaging} from "starknet/IStarknetMessaging.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-contract YABTransfer {
+contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     struct TransferInfo {
         uint256 destAddress;
         uint256 amount;
@@ -18,11 +21,19 @@ contract YABTransfer {
     uint256 private _snEscrowAddress;
     uint256 private _snEscrowWithdrawSelector;
 
-    constructor(
+    constructor() {
+        _disableInitializers();
+    }
+
+    // no constructors can be used in upgradeable contracts. 
+    function initialize(
         address snMessaging,
         uint256 snEscrowAddress,
-        uint256 snEscrowWithdrawSelector) {
+        uint256 snEscrowWithdrawSelector) public initializer { 
         _owner = msg.sender;
+        __Ownable_init(_owner);
+        __UUPSUpgradeable_init();
+
         _snMessaging = IStarknetMessaging(snMessaging);
         _snEscrowAddress = snEscrowAddress;
         _snEscrowWithdrawSelector = snEscrowWithdrawSelector;
@@ -71,4 +82,6 @@ contract YABTransfer {
         require(msg.sender == _owner, "Only owner can call this function.");
         _snEscrowWithdrawSelector = snEscrowWithdrawSelector;
     }
+
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 }

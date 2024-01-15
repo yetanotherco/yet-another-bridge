@@ -107,7 +107,22 @@ Follow the steps below to set up a testnet smart wallet using `starkli`:
 
 ### Ethereum smart contract
 
-First, the Ethereum smart contracts must be deployed. For Ethereum the deployment process you will need to:
+First, make sure you have the necessary dependencies installed in the `contracts/solidity/lib` folder.
+You can install these commands by executing them within the `/contracts/solidity/` folder.
+
+To install [openzeppelin-contracts-upgradeable](https://github.com/OpenZeppelin/openzeppelin-foundry-upgrades) dependency, execute the following command:
+
+   ```
+   forge install OpenZeppelin/openzeppelin-contracts-upgradeable
+   ```
+
+To install [forge-std](https://github.com/foundry-rs/forge-std) dependency, execute the following command:
+
+   ```
+   forge install foundry-rs/forge-std
+   ```
+
+Once we have the dependencies installed, we can proceed. For Ethereum the deployment process you will need to:
 
 1. Create your `.env` file: you need to configure the following variables in your own .env file on the contracts/solidity/ folder. You can use the env.example file as a template for creating your .env file, paying special attention to the formats provided
 
@@ -116,6 +131,7 @@ First, the Ethereum smart contracts must be deployed. For Ethereum the deploymen
    ETH_PRIVATE_KEY = private key of your ETH wallet
    ETHERSCAN_API_KEY = API Key to use etherscan to read the Ethereum blockchain
    SN_MESSAGING_ADDRESS = Starknet Messaging address
+   YAB_TRANSFER_PROXY_ADDRESS = This address is for upgrade, is automatically set after running the deploy script
    ```
 
    **NOTE**:
@@ -220,3 +236,28 @@ This may be better suited for you if you plan to change some of the automaticall
 ## Recap
 
 After following this complete README, we should have an ETH smart contract as well as a Starknet smart contract, both connected to act as a bridge between these two chains.
+
+## Upgrade Contracts in Testnet
+
+### Ethereum
+After deploying the `YABTransfer` contract, you can perform upgrades using the `make ethereum-upgrade` command.
+
+1. Update the `contracts/solidity/.env` file.
+
+   ```
+      ETH_RPC_URL = Infura or Alchemy RPC URL
+      ETH_PRIVATE_KEY = private key of your ETH wallet
+      ETHERSCAN_API_KEY = API Key to use etherscan to read the Ethereum blockchain
+      SN_MESSAGING_ADDRESS = Starknet Messaging address
+      YAB_TRANSFER_PROXY_ADDRESS = This address is for upgrade, is automatically set after running the deploy script
+   ```
+
+Please note that executing this command will rebuild `YABTransfer.sol`, deploy the new contract to the network, and utilize Foundry to upgrade the proxy contract by changing its implementation to the newly deployed contract.
+
+To execute this action, you must be the **owner** of the contract, and you also need to have set the `YAB_TRANSFER_PROXY_ADDRESS` variable in the `.env` file with the proxy's address.
+
+2. Then using Makefile command upgrade `YABTransfer` contract
+
+   ```bash
+      make ethereum-upgrade
+   ```

@@ -21,8 +21,11 @@ ethereum-build: ethereum-clean
 ethereum-test: ethereum-clean
 	@cd ./contracts/solidity/ && forge test
 
-ethereum-deploy: ethereum-clean
+ethereum-deploy: ethereum-build
 	@./contracts/solidity/deploy.sh
+
+ethereum-upgrade: ethereum-build
+	@./contracts/solidity/upgrade.sh
 
 ethereum-set-escrow:
 	@./contracts/solidity/set_escrow.sh
