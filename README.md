@@ -172,8 +172,8 @@ For this, you will need to:
    MM_SN_WALLET_ADDR = Starknet wallet of the MarketMaker
    WITHDRAW_NAME = The exact name of the withdraw function that is called from L1, case sensitive. Example: withdraw_fallback
    HERODOTUS_FACTS_REGISTRY = Herodotus' Facts Registry Smart Contract in Starknet
-   MM_ETHEREUM_WALLET = Ethereum wallet of the MArketMaker
-   NATIVE_TOKEN_ETH_STARKNET = Ethereum's erc20 token handler contract in Starkent
+   MM_ETHEREUM_WALLET = Ethereum wallet of the MarketMaker
+   NATIVE_TOKEN_ETH_STARKNET = Ethereum's erc20 token handler contract in Starknet
    ESCROW_CONTRACT_ADDRESS = Address of the Starknet smart contract, this value should be empty, and is automatically updated after deploy.sh is run
    ```
 
