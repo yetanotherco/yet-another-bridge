@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS orders
     starknet_tx_hash     VARCHAR(66)    NOT NULL, -- 66 chars
     recipient_address    VARCHAR(42)    NOT NULL, -- 0x + 40 bytes
     amount               NUMERIC(78, 0) NOT NULL, -- uint 256
+    fee                  NUMERIC(78, 0) NOT NULL, -- uint 256
     status               VARCHAR(32)    NOT NULL DEFAULT 'PENDING',
     failed               BOOLEAN        NOT NULL DEFAULT FALSE,
     tx_hash              BYTEA          NULL,     -- 32 bytes
