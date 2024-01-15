@@ -141,12 +141,7 @@ def parse_u256_from_double_u128(low, high) -> int:
 
 
 def get_fee(event) -> int:
-    # fee_threshold = 0.0001 * event.data[3]
-    # if event.data[5] < fee_threshold:
-    #     logger.info(f"[-] Order {event.data[0]} has a fee too low to process ({event.data[5]} < {fee_threshold}). Skipping")
-    #     return -1
-    # return event.data[5]
-    return 0
+    return parse_u256_from_double_u128(event.data[5], event.data[6])
 
 
 @use_async_fallback(rpc_nodes, logger, "Failed to get latest block")

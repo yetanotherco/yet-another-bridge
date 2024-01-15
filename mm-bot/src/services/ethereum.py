@@ -70,6 +70,7 @@ def transfer(deposit_id, dst_addr, amount):
 
 
 # we need amount so the transaction is valid with the transfer that will be transferred
+    # TODO separate create_transfer_unsent_tx and sign_transaction
 @use_fallback(rpc_nodes, logger, "Failed to create ethereum transfer")
 def create_transfer(deposit_id, dst_addr_bytes, amount, rpc_node=main_rpc_node):
     unsent_tx = rpc_node.contract.functions.transfer(deposit_id, dst_addr_bytes, amount).build_transaction({
@@ -119,6 +120,11 @@ def estimate_transaction_fee(transaction, rpc_node=main_rpc_node):
     fee = rpc_node.w3.eth.gas_price
     gas_fee = fee * gas_limit
     return gas_fee
+
+
+@use_fallback(rpc_nodes, logger, "Failed to get gas price")
+def get_gas_price(rpc_node=main_rpc_node):
+    return rpc_node.w3.eth.gas_price
 
 
 def is_transaction_viable(amount: int, percentage: float, gas_fee: int) -> bool:
