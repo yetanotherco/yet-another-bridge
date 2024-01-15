@@ -37,8 +37,8 @@ def estimate_yab_withdraw_fee() -> int:
     we cannot estimate the gas fee of the withdrawal transaction
     So we will use fixed values for the gas
     """
-    eth_withdrawal = 86139
-    return eth_withdrawal * get_gas_price()
+    eth_withdrawal_gas = 86139  # TODO this is a fixed value, if the contract changes, this should be updated
+    return eth_withdrawal_gas * get_gas_price()
 
 
 async def estimate_message_fee(order: Order) -> int:
