@@ -23,7 +23,6 @@ PROXY_ADDRESS=$(echo "$RESULT_LOG" | grep -oP '0: address \K[^\n]+' | awk '{prin
 YAB_TRANSFER_ADDRESS=$(echo "$RESULT_LOG" | grep -oP '1: address \K[^\n]+' | awk '{print $0}')
 
 echo -e "${GREEN}\n=> [ETH] Deployed Proxy address: $PROXY_ADDRESS ${COLOR_RESET}"
-
 echo -e "${GREEN}\n=> [ETH] Deployed YABTransfer address: $YAB_TRANSFER_ADDRESS ${COLOR_RESET}"
 
 # Setting proxy_address into .env file
