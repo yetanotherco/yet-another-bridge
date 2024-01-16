@@ -127,6 +127,8 @@ mod Escrow {
         let upgradeable = IUpgradeableDispatcher { contract_address: escrow.contract_address };
         start_prank(CheatTarget::One(escrow.contract_address), OWNER());
         upgradeable.upgrade(declare('EscrowV2').class_hash);
+        let upgraded = IEscrowV2Dispatcher { contract_address: escrow.contract_address };
+        assert(upgraded.new_mock_function() == true, 'error reading new function');
     }
 
     #[test]
