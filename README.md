@@ -221,7 +221,7 @@ This may be better suited for you if you plan to change some of the automaticall
 
 ### Note on Starknet Smart Contract
 
-_Note: this is a temporary solution, there is WIP on better solutions_
+_Note: this is a temporary solution, there is WIP on a better solution_
 
 If you want to use the Herodotus version of the smart contract, rename the `escrow_herodotus.cairo` into `escrow.cairo`. Then you must also set the following .env variable before using any deployment script:
 ```env
