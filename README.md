@@ -152,18 +152,18 @@ For this, you will need to:
 
 1. Create your `.env` file: you need to configure the following variables in your own .env file on the contracts/solidity folder. You can use the env.example file as a template for creating your .env file, paying special attention to the formats provided
 
-   ```
-   STARKNET_ACCOUNT = Absolute path of your starknet testnet account, created at the start of this README
-   STARKNET_KEYSTORE = Absolute path of your starknet testnet keystore, created at the start of this README
+   ```env
+   STARKNET_ACCOUNT = Path of your starknet testnet account, created at the start of this README
+   STARKNET_KEYSTORE = Path of your starknet testnet keystore, created at the start of this README
    SN_RPC_URL = Infura or Alchemy RPC URL
-   SN_ESCROW_OWNER= Is the owner of the Escrow contract and is the only one who can perform upgrades
-   ETH_CONTRACT_ADDR = newly created ETH contract address
+   SN_ESCROW_OWNER = Public address of the owner of the Escrow contract
+   ETH_CONTRACT_ADDR = Newly created ETH contract address
    MM_SN_WALLET_ADDR = Starknet wallet of the MarketMaker
-   WITHDRAW_NAME = The exact name of the withdraw function that is called from L1, case sensitive. Example: withdraw_fallback
+   WITHDRAW_NAME = Exact name of the withdraw function that is called from L1, case sensitive. Example: withdraw_fallback
    HERODOTUS_FACTS_REGISTRY = Herodotus' Facts Registry Smart Contract in Starknet
    MM_ETHEREUM_WALLET = Ethereum wallet of the MarketMaker
    NATIVE_TOKEN_ETH_STARKNET = Ethereum's erc20 token handler contract in Starknet
-   ESCROW_CONTRACT_ADDRESS = Address of the Starknet smart contract, this value should be empty, and is automatically updated after deploy.sh is run
+   ESCROW_CONTRACT_ADDRESS = Address of the Starknet smart contract, this value is automatically updated after deploy.sh is run
    ```
 
    **Note**
@@ -171,10 +171,11 @@ For this, you will need to:
       - Starknet Goerli: `0x01b2111317EB693c3EE46633edd45A4876db14A3a53ACDBf4E5166976d8e869d`
       - Starknet Sepolia: `0x07d3550237ecf2d6ddef9b78e59b38647ee511467fe000ce276f245a006b40bc`
       - Starknet Mainnet: `0x014bf62fadb41d8f899bb5afeeb2da486fcfd8431852def56c5f10e45ae72765`
+   - SN_ESCROW_OWNER is the only one who can perform upgrades of the smart contract. If not defined, this value will be set (in deploy.sh) to the deployer of the smart contract.
 
 2. Declare and Deploy: We sequentially declare and deploy the contracts, and connect it to our Ethereum smart contract.
 
-### First alternative: automatic deploy and connect of Escrow and YABTransfer.
+### First alternative: automatic deploy and connect of Escrow and YABTransfer
 
    ```bash
       make starknet-deploy-and-connect
@@ -205,7 +206,7 @@ This may be better suited for you if you plan to change some of the automaticall
 
    To do this, you can use
 
-   ```
+   ```bash
    make ethereum-set-escrow
    ```
 
@@ -216,7 +217,7 @@ This may be better suited for you if you plan to change some of the automaticall
    Ethereum's smart contract has another variable that must be configured, _EscrowWithdrawSelector_, which is for specifying the _withdraw_ function's name in the Starknet Escrow smart contract.
    You can set and change Ethereum's _EscrowWithdrawSelector_ variable, doing the following:
 
-   ```
+   ```bash
    make ethereum-set-withdraw-selector
    ```
 
@@ -230,23 +231,26 @@ After following this complete README, we should have an ETH smart contract as we
 
 ### Starknet
 
-If you want to upgrade a previously deployed `Escrow` contract, it is possible through a command. We will perform the upgrade using `starkli`, so the same configuration used for deployment is necessary.
+If you want to upgrade a previously deployed `Escrow` contract, it is possible through a command. We will perform the upgrade using the `starkli` tool, so the same configuration used for deployment is necessary.
 
-Keep in mind that this command will **rebuild** `Escrow.cairo`, perform the **declare**, and call the external **upgrade()** function with the new class hash resulting from the **declare**. 
+1. Configure `contracts/cairo/.env` file.
 
-To be able to upgrade the contract, you must be the **owner** of the contract and set the `ESCROW_CONTRACT_ADDRESS` variable in the `.env` file with the address of the `Escrow` contract that you want to be **upgraded**. 
+   ```env
+      STARKNET_ACCOUNT = Path of your starknet testnet account, created at the start of this README
+      STARKNET_KEYSTORE = Path of your starknet testnet keystore, created at the start of this README
+      ESCROW_CONTRACT_ADDRESS = You can either set an escrow address manually, or use the value automatically set by deploying the Escrow, as mentioned previously
+   ```
 
-1. Update `contracts/cairo/.env` file.
+2. Use the Makefile command to upgrade `Escrow` contract
 
-```
-   STARKNET_ACCOUNT = Absolute path of your starknet testnet account, created at the start of this README
-   STARKNET_KEYSTORE = Absolute path of your starknet testnet keystore, created at the start of this README
-   SN_RPC_URL = Infura or Alchemy RPC URL
-   ESCROW_CONTRACT_ADDRESS = You can either set an escrow address manually or run deploy.sh, and it will be set automatically
-```
+   ```bash
+      make starknet-upgrade
+   ```
 
-2. Then using Makefile command upgrade `Escrow` contract
+   **Note**
 
-```
-   make starknet-upgrade
-```
+- You must be the **owner** of the contract to upgrade it.
+- This command will:
+  - **rebuild** `Escrow.cairo`
+  - **declare** it on Starknet
+  - Call the external **upgrade()** function with the new class hash
