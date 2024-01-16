@@ -13,8 +13,7 @@ install-ethereum-foundry:
 	curl -L https://foundry.paradigm.xyz | bash && foundryup
 
 update-submodules:
-	@cd ./contracts/solidity/
-	@forge install
+	@cd ./contracts/solidity/ && forge update
 
 ethereum-clean:
 	@cd ./contracts/solidity/ && forge clean
