@@ -17,6 +17,8 @@ contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
     mapping(bytes32 => TransferInfo) public transfers;
     address private _owner;
+    address private _MarketMaker;
+
     IStarknetMessaging private _snMessaging;
     uint256 private _snEscrowAddress;
     uint256 private _snEscrowWithdrawSelector;
@@ -29,7 +31,8 @@ contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     function initialize(
         address snMessaging,
         uint256 snEscrowAddress,
-        uint256 snEscrowWithdrawSelector) public initializer { 
+        uint256 snEscrowWithdrawSelector,
+        address MarketMaker) public initializer { 
         _owner = msg.sender;
         __Ownable_init(_owner);
         __UUPSUpgradeable_init();
@@ -37,9 +40,11 @@ contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         _snMessaging = IStarknetMessaging(snMessaging);
         _snEscrowAddress = snEscrowAddress;
         _snEscrowWithdrawSelector = snEscrowWithdrawSelector;
+        _MarketMaker = MarketMaker;
     }
 
     function transfer(uint256 orderId, uint256 destAddress, uint256 amount) external payable {
+        require(msg.sender == _MarketMaker || msg.sender == _owner, "Access denied");
         require(destAddress != 0, "Invalid destination address.");
         require(amount > 0, "Invalid amount, should be higher than 0.");
         require(msg.value == amount, "Invalid amount, should match msg.value.");
@@ -56,6 +61,7 @@ contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     }
 
     function withdraw(uint256 orderId, uint256 destAddress, uint256 amount) external payable {
+        require(msg.sender == _MarketMaker || msg.sender == _owner, "Access denied");
         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount));
         TransferInfo storage transferInfo = transfers[index];
         require(transferInfo.isUsed == true, "Transfer not found.");
@@ -81,6 +87,11 @@ contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     function setEscrowWithdrawSelector(uint256 snEscrowWithdrawSelector) external {
         require(msg.sender == _owner, "Only owner can call this function.");
         _snEscrowWithdrawSelector = snEscrowWithdrawSelector;
+    }
+
+    function setMMAddress(address newMMAddress) external {
+        require(msg.sender == _owner, "Only owner can call this function.");
+        _MarketMaker = newMMAddress;
     }
 
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
