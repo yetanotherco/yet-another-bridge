@@ -108,17 +108,16 @@ Follow the steps below to set up a testnet smart wallet using `starkli`:
 ### Ethereum smart contract
 
 First, make sure you have the necessary dependencies installed in the `contracts/solidity/lib` folder.
-You can install these commands by executing them within the `/contracts/solidity/` folder.
 
 To install [openzeppelin-contracts-upgradeable](https://github.com/OpenZeppelin/openzeppelin-foundry-upgrades) dependency, execute the following command:
 
-   ```
+   ```bash
    forge install OpenZeppelin/openzeppelin-contracts-upgradeable
    ```
 
 To install [forge-std](https://github.com/foundry-rs/forge-std) dependency, execute the following command:
 
-   ```
+   ```bash
    forge install foundry-rs/forge-std
    ```
 
@@ -131,7 +130,7 @@ Once we have the dependencies installed, we can proceed. For Ethereum the deploy
    ETH_PRIVATE_KEY = private key of your ETH wallet
    ETHERSCAN_API_KEY = API Key to use etherscan to read the Ethereum blockchain
    SN_MESSAGING_ADDRESS = Starknet Messaging address
-   YAB_TRANSFER_PROXY_ADDRESS = This address is for upgrade, is automatically set after running the deploy script
+   YAB_TRANSFER_PROXY_ADDRESS = Address of the Ethereum Proxy smart contract, this value is automatically created and/or updated after deploy.sh is executed
    ```
 
    **NOTE**:
