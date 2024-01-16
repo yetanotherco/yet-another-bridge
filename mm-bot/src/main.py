@@ -13,6 +13,7 @@ from persistence.error_dao import ErrorDao
 from persistence.order_dao import OrderDao
 from services import ethereum
 from services import starknet
+from services.overall_fee_calculator import estimate_overall_fee
 from services.order_service import OrderService
 from services.withdrawer.ethereum_withdrawer import EthereumWithdrawer
 from services.withdrawer.herodotus_withdrawer import HerodotusWithdrawer
@@ -77,6 +78,7 @@ def process_order_events(order_events: list, order_service: OrderService,
         order_id = order_event.order_id
         recipient_address = order_event.recipient_address
         amount = order_event.amount
+        fee = order_event.fee
         starknet_tx_hash = order_event.starknet_tx_hash
         is_used = order_event.is_used
 
@@ -86,7 +88,7 @@ def process_order_events(order_events: list, order_service: OrderService,
 
         try:
             order = Order(order_id=order_id, starknet_tx_hash=starknet_tx_hash,
-                          recipient_address=recipient_address, amount=amount,
+                          recipient_address=recipient_address, amount=amount, fee=fee,
                           status=OrderStatus.COMPLETED if is_used else OrderStatus.PENDING)
             order = order_service.create_order(order)
             logger.debug(f"[+] New order: {order}")
@@ -107,10 +109,16 @@ async def process_order(order: Order, order_service: OrderService,
                         eth_lock: asyncio.Lock, herodotus_semaphore: asyncio.Semaphore):
     try:
         logger.info(f"[+] Processing order: {order}")
+        # 1. Check if the order fee is enough
         if order.status is OrderStatus.PENDING:
+            estimated_fee = await estimate_overall_fee(order)
+            if order.get_int_fee() < estimated_fee:
+                logger.error(f"[-] Order fee is too low: {order.get_int_fee()} < {estimated_fee}")
+                order_service.set_order_dropped(order)
+                return
             order_service.set_order_processing(order)
 
-        # 1. Check if order amount is too high
+        # 1.5. Check if order amount is too high
         if order.amount > MAX_ETH_TRANSFER_WEI:
             logger.error(f"[-] Order amount is too high: {order.amount}")
             order_service.set_order_dropped(order)
