@@ -35,6 +35,8 @@ trait IEscrowV2<ContractState> {
     fn set_eth_transfer_contract(ref self: ContractState, new_contract: EthAddress);
     fn set_mm_ethereum_contract(ref self: ContractState, new_contract: EthAddress);
     fn set_mm_starknet_contract(ref self: ContractState, new_contract: ContractAddress);
+
+    fn new_mock_function(self: @ContractState) -> bool;
 }
 
 #[starknet::contract]
@@ -301,6 +303,11 @@ mod EscrowV2 {
             self.ownable.assert_only_owner();   
             self.mm_starknet_wallet.write(new_contract);
         }
+
+        fn new_mock_function(self: @ContractState) -> bool{
+            true
+        }
+
     }
 
     #[l1_handler]
