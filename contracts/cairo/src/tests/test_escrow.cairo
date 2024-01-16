@@ -10,7 +10,7 @@ mod Escrow {
 
     use yab::mocks::mock_EscrowV2::{IEscrowV2Dispatcher, IEscrowV2DispatcherTrait};
     use yab::interfaces::IERC20::{IERC20Dispatcher, IERC20DispatcherTrait};
-    use yab::Escrow::{IEscrowDispatcher, IEscrowDispatcherTrait, Order};
+    use yab::escrow::{IEscrowDispatcher, IEscrowDispatcherTrait, Order};
     use yab::interfaces::IEVMFactsRegistry::{
         IEVMFactsRegistryDispatcher, IEVMFactsRegistryDispatcherTrait
     };
