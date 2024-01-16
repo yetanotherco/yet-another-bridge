@@ -14,6 +14,7 @@ class Order(Base):
     starknet_tx_hash: str = Column(String(66), nullable=False)
     recipient_address: str = Column(String(42), nullable=False)
     amount: decimal = Column(Numeric(78, 0), nullable=False)
+    fee: decimal = Column(Numeric(78, 0), nullable=False)
     status: OrderStatus = Column(Enum(OrderStatus), nullable=False, default=OrderStatus.PENDING)
     failed: bool = Column(Integer, nullable=False, default=False)
     tx_hash: HexBytes = Column(LargeBinary, nullable=True)
@@ -33,3 +34,6 @@ class Order(Base):
 
     def get_int_amount(self) -> int:
         return int(self.amount)
+
+    def get_int_fee(self) -> int:
+        return int(self.fee)
