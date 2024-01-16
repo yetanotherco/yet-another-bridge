@@ -1,4 +1,4 @@
-deps: install-scarb install-starkli install-starknet-foundry install-ethereum-foundry update-submodules
+deps: install-scarb install-starkli install-starknet-foundry install-ethereum-foundry
 
 install-scarb:
 	curl --proto '=https' --tlsv1.2 -sSf https://docs.swmansion.com/scarb/install.sh | sh -s -- -v  2.4.1
@@ -11,9 +11,6 @@ install-starknet-foundry:
 
 install-ethereum-foundry:
 	curl -L https://foundry.paradigm.xyz | bash && foundryup
-
-update-submodules:
-	@cd ./contracts/solidity/ && forge update
 
 ethereum-clean:
 	@cd ./contracts/solidity/ && forge clean
