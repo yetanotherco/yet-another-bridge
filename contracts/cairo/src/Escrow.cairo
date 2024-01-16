@@ -1,4 +1,4 @@
-use starknet::{ContractAddress, EthAddress};
+use starknet::{ContractAddress, ClassHash, EthAddress};
 
 #[derive(Copy, Drop, Serde, starknet::Store)]
 struct Order {
@@ -34,14 +34,31 @@ trait IEscrow<ContractState> {
 mod Escrow {
     use super::{IEscrow, Order};
 
+    use openzeppelin::{
+        access::ownable::OwnableComponent,
+        upgrades::{UpgradeableComponent, interface::IUpgradeable}
+    };
     use starknet::{
-        ContractAddress, EthAddress, get_caller_address, get_contract_address, get_block_timestamp
+        ContractAddress, EthAddress, ClassHash, get_caller_address, get_contract_address,
+        get_block_timestamp
     };
 
     use yab::interfaces::IERC20::{IERC20Dispatcher, IERC20DispatcherTrait};
     use yab::interfaces::IEVMFactsRegistry::{
         IEVMFactsRegistryDispatcher, IEVMFactsRegistryDispatcherTrait
     };
+
+    /// Components
+    component!(path: UpgradeableComponent, storage: upgradeable, event: UpgradeableEvent);
+    component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
+
+    /// (Ownable)
+    #[abi(embed_v0)]
+    impl OwnableImpl = OwnableComponent::OwnableImpl<ContractState>;
+    impl OwnableInternalImpl = OwnableComponent::InternalImpl<ContractState>;
+
+    /// (Upgradeable)
+    impl InternalImpl = UpgradeableComponent::InternalImpl<ContractState>;
 
     // https://github.com/starknet-io/starknet-addresses
     // MAINNET = GOERLI = GOERLI2
@@ -53,7 +70,11 @@ mod Escrow {
     #[derive(Drop, starknet::Event)]
     enum Event {
         Withdraw: Withdraw,
-        SetOrder: SetOrder
+        SetOrder: SetOrder,
+        #[flat]
+        OwnableEvent: OwnableComponent::Event,
+        #[flat]
+        UpgradeableEvent: UpgradeableComponent::Event
     }
 
     #[derive(Drop, starknet::Event)]
@@ -73,7 +94,6 @@ mod Escrow {
 
     #[storage]
     struct Storage {
-        owner: ContractAddress,
         current_order_id: u256,
         orders: LegacyMap::<u256, Order>,
         orders_used: LegacyMap::<u256, bool>,
@@ -82,24 +102,37 @@ mod Escrow {
         eth_transfer_contract: EthAddress, // our transfer contract in L1
         mm_ethereum_wallet: EthAddress,
         mm_starknet_wallet: ContractAddress,
-        native_token_eth_starknet: ContractAddress
+        native_token_eth_starknet: ContractAddress,
+        #[substorage(v0)]
+        ownable: OwnableComponent::Storage,
+        #[substorage(v0)]
+        upgradeable: UpgradeableComponent::Storage,
     }
 
     #[constructor]
     fn constructor(
         ref self: ContractState,
+        owner: ContractAddress,
         eth_transfer_contract: EthAddress,
         mm_ethereum_wallet: EthAddress,
         mm_starknet_wallet: ContractAddress,
         native_token_eth_starknet: ContractAddress
     ) {
-        self.owner.write(get_caller_address());
+        self.ownable.initializer(owner);
 
         self.current_order_id.write(0);
         self.eth_transfer_contract.write(eth_transfer_contract);
         self.mm_ethereum_wallet.write(mm_ethereum_wallet);
         self.mm_starknet_wallet.write(mm_starknet_wallet);
         self.native_token_eth_starknet.write(native_token_eth_starknet);
+    }
+
+    #[external(v0)]
+    impl UpgradeableImpl of IUpgradeable<ContractState> {
+        fn upgrade(ref self: ContractState, new_class_hash: ClassHash) {
+            self.ownable.assert_only_owner();
+            self.upgradeable._upgrade(new_class_hash);
+        }
     }
 
     #[external(v0)]
@@ -176,17 +209,17 @@ mod Escrow {
         }
 
         fn set_eth_transfer_contract(ref self: ContractState, new_contract: EthAddress) {
-            assert(self.owner.read() == get_caller_address(), 'Only owner allowed');
+            self.ownable.assert_only_owner();
             self.eth_transfer_contract.write(new_contract);
         }
 
         fn set_mm_ethereum_contract(ref self: ContractState, new_contract: EthAddress) {
-            assert(self.owner.read() == get_caller_address(), 'Only owner allowed');
+            self.ownable.assert_only_owner();
             self.mm_ethereum_wallet.write(new_contract);
         }
 
         fn set_mm_starknet_contract(ref self: ContractState, new_contract: ContractAddress) {
-            assert(self.owner.read() == get_caller_address(), 'Only owner allowed');
+            self.ownable.assert_only_owner();   
             self.mm_starknet_wallet.write(new_contract);
         }
     }

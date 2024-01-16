@@ -1,20 +1,31 @@
 mod Escrow {
     use core::to_byte_array::FormatAsByteArray;
-use core::serde::Serde;
-use core::traits::Into;
+    use core::serde::Serde;
+    use core::traits::Into;
     use starknet::{EthAddress, ContractAddress};
     use integer::BoundedInt;
 
     use snforge_std::{declare, ContractClassTrait, L1Handler, L1HandlerTrait};
     use snforge_std::{CheatTarget, start_prank, stop_prank};
 
+    use yab::mocks::mock_EscrowV2::{IEscrowV2Dispatcher, IEscrowV2DispatcherTrait};
     use yab::interfaces::IERC20::{IERC20Dispatcher, IERC20DispatcherTrait};
-    use yab::escrow::{IEscrowDispatcher, IEscrowDispatcherTrait, Order};
+    use yab::Escrow::{IEscrowDispatcher, IEscrowDispatcherTrait, Order};
     use yab::interfaces::IEVMFactsRegistry::{
         IEVMFactsRegistryDispatcher, IEVMFactsRegistryDispatcherTrait
     };
-    use yab::tests::utils::constants::EscrowConstants::{
-        USER, OWNER, MM_STARKNET, MM_ETHEREUM, ETH_TRANSFER_CONTRACT
+
+    use yab::tests::utils::{
+        constants::EscrowConstants::{
+            USER, OWNER, MM_STARKNET, MM_ETHEREUM, ETH_TRANSFER_CONTRACT
+        },
+    };
+
+    use openzeppelin::{
+        upgrades::{
+            UpgradeableComponent,
+            interface::{IUpgradeable, IUpgradeableDispatcher, IUpgradeableDispatcherTrait}
+        },
     };
 
     fn setup() -> (IEscrowDispatcher, IERC20Dispatcher) {
@@ -32,6 +43,7 @@ use core::traits::Into;
     fn setup_general(balance: u256, approved: u256) -> (IEscrowDispatcher, IERC20Dispatcher){
         let eth_token = deploy_erc20('ETH', '$ETH', BoundedInt::max(), OWNER());
         let escrow = deploy_escrow(
+            OWNER(),
             ETH_TRANSFER_CONTRACT(),
             MM_ETHEREUM(),
             MM_STARKNET(),
@@ -50,6 +62,7 @@ use core::traits::Into;
     }
 
     fn deploy_escrow(
+        escrow_owner: ContractAddress,
         eth_transfer_contract: EthAddress,
         mm_ethereum_contract: EthAddress,
         mm_starknet_contract: ContractAddress,
@@ -57,6 +70,7 @@ use core::traits::Into;
     ) -> IEscrowDispatcher {
         let escrow = declare('Escrow');
         let mut calldata: Array<felt252> = ArrayTrait::new();
+        calldata.append(escrow_owner.into());
         calldata.append(eth_transfer_contract.into());
         calldata.append(mm_ethereum_contract.into());
         calldata.append(mm_starknet_contract.into());
@@ -120,6 +134,23 @@ use core::traits::Into;
         // check balance
         assert(eth_token.balanceOf(escrow.contract_address) == 0, 'withdraw: wrong balance');
         assert(eth_token.balanceOf(MM_STARKNET()) == 500, 'withdraw: wrong balance');
+    }
+
+    #[test]
+    fn test_upgrade_escrow() {
+        let (escrow, _) = setup();
+        let upgradeable = IUpgradeableDispatcher { contract_address: escrow.contract_address };
+        start_prank(CheatTarget::One(escrow.contract_address), OWNER());
+        upgradeable.upgrade(declare('EscrowV2').class_hash);
+    }
+
+    #[test]
+    #[should_panic(expected: ('Caller is not the owner',))]
+    fn test_fail_upgrade_escrow_caller_isnt_the_owner() {
+        let (escrow, _) = setup();
+        let upgradeable = IUpgradeableDispatcher { contract_address: escrow.contract_address };
+        start_prank(CheatTarget::One(escrow.contract_address), MM_STARKNET());
+        upgradeable.upgrade(declare('EscrowV2').class_hash);
     }
 
 
