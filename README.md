@@ -160,17 +160,12 @@ For this, you will need to:
    ETH_CONTRACT_ADDR = Newly created ETH contract address
    MM_SN_WALLET_ADDR = Starknet wallet of the MarketMaker
    WITHDRAW_NAME = Exact name of the withdraw function that is called from L1, case sensitive. Example: withdraw_fallback
-   HERODOTUS_FACTS_REGISTRY = Herodotus' Facts Registry Smart Contract in Starknet
    MM_ETHEREUM_WALLET = Ethereum wallet of the MarketMaker
    NATIVE_TOKEN_ETH_STARKNET = Ethereum's erc20 token handler contract in Starknet
    ESCROW_CONTRACT_ADDRESS = Address of the Starknet smart contract, this value is automatically updated after deploy.sh is run
    ```
 
    **Note**
-   - Herodotus Facts Registry:
-      - Starknet Goerli: `0x01b2111317EB693c3EE46633edd45A4876db14A3a53ACDBf4E5166976d8e869d`
-      - Starknet Sepolia: `0x07d3550237ecf2d6ddef9b78e59b38647ee511467fe000ce276f245a006b40bc`
-      - Starknet Mainnet: `0x014bf62fadb41d8f899bb5afeeb2da486fcfd8431852def56c5f10e45ae72765`
    - SN_ESCROW_OWNER is the only one who can perform upgrades of the smart contract. If not defined, this value will be set (in deploy.sh) to the deployer of the smart contract.
 
 2. Declare and Deploy: We sequentially declare and deploy the contracts, and connect it to our Ethereum smart contract.
@@ -222,6 +217,22 @@ This may be better suited for you if you plan to change some of the automaticall
    ```
 
    This script uses the WITHDRAW_NAME .env variable to automatically generate the selector in the necesary format
+
+
+### Note on Starknet Smart Contract
+
+_Note: this is a temporary solution, there is WIP on a better solution_
+
+If you want to use the Herodotus version of the smart contract, rename the `escrow_herodotus.cairo` into `escrow.cairo`. Then you must also set the following .env variable before using any deployment script:
+```env
+   HERODOTUS_FACTS_REGISTRY = Herodotus' Facts Registry Smart Contract in Starknet
+```
+
+**Note**
+   - Herodotus Facts Registry:
+      - Starknet Goerli: `0x01b2111317EB693c3EE46633edd45A4876db14A3a53ACDBf4E5166976d8e869d`
+      - Starknet Sepolia: `0x07d3550237ecf2d6ddef9b78e59b38647ee511467fe000ce276f245a006b40bc`
+      - Starknet Mainnet: `0x014bf62fadb41d8f899bb5afeeb2da486fcfd8431852def56c5f10e45ae72765`
 
 ## Recap
 

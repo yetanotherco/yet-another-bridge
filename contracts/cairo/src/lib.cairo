@@ -1,5 +1,5 @@
 mod ERC20;
-mod Escrow;
+mod escrow;
 
 mod interfaces {
     mod IERC20;
