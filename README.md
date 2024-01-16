@@ -107,21 +107,7 @@ Follow the steps below to set up a testnet smart wallet using `starkli`:
 
 ### Ethereum smart contract
 
-First, make sure you have the necessary dependencies installed in the `contracts/solidity/lib` folder.
-
-To install [openzeppelin-contracts-upgradeable](https://github.com/OpenZeppelin/openzeppelin-foundry-upgrades) dependency, execute the following command:
-
-   ```bash
-   forge install OpenZeppelin/openzeppelin-contracts-upgradeable
-   ```
-
-To install [forge-std](https://github.com/foundry-rs/forge-std) dependency, execute the following command:
-
-   ```bash
-   forge install foundry-rs/forge-std
-   ```
-
-Once we have the dependencies installed, we can proceed. For Ethereum the deployment process you will need to:
+Once we have the dependencies installed, we can proceed. For the Ethereum the deployment process you will need to:
 
 1. Create your `.env` file: you need to configure the following variables in your own .env file on the contracts/solidity/ folder. You can use the env.example file as a template for creating your .env file, paying special attention to the formats provided
 
@@ -148,6 +134,8 @@ Once we have the dependencies installed, we can proceed. For Ethereum the deploy
    ```bash
       make ethereum-deploy
    ```
+
+   This will deploy a Proxy smart contract, a YABTransfer smart contract, and it will link them both. The purpose of having a proxy in front of our smart contract is so that it is upgradeable, by simply deploying another smart contract and changing the Proxy's stored address.
 
 ### Starknet smart contracts
 
@@ -240,7 +228,7 @@ After following this complete README, we should have an ETH smart contract as we
 
 ### Ethereum
 
-After deploying the `YABTransfer` contract, you can perform upgrades of it. To do this you must:
+After deploying the `YABTransfer` contract, you can perform upgrades to it. To do this you must:
 
 1. Configure the `contracts/solidity/.env` file.
 
