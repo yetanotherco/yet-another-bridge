@@ -63,12 +63,6 @@ mod Escrow {
     /// (Upgradeable)
     impl InternalImpl = UpgradeableComponent::InternalImpl<ContractState>;
 
-    // https://github.com/starknet-io/starknet-addresses
-    // MAINNET = GOERLI = GOERLI2
-    // 0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7
-    // const NATIVE_TOKEN: felt252 =
-    //     0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7;
-
     #[event]
     #[derive(Drop, starknet::Event)]
     enum Event {
