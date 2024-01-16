@@ -221,10 +221,18 @@ This may be better suited for you if you plan to change some of the automaticall
 
 ### Note on Starknet Smart Contract
 
-If you want to use the Herodotus version of the smart contract, rename the `Escrow_herodotus.cairo` into `Escrow.cairo`. Then you must also set the following .env variable before using any deployment script:
+_Note: this is a temporary solution, there is WIP on better solutions_
+
+If you want to use the Herodotus version of the smart contract, rename the `escrow_herodotus.cairo` into `escrow.cairo`. Then you must also set the following .env variable before using any deployment script:
 ```env
    HERODOTUS_FACTS_REGISTRY = Herodotus' Facts Registry Smart Contract in Starknet
 ```
+
+**Note**
+   - Herodotus Facts Registry:
+      - Starknet Goerli: `0x01b2111317EB693c3EE46633edd45A4876db14A3a53ACDBf4E5166976d8e869d`
+      - Starknet Sepolia: `0x07d3550237ecf2d6ddef9b78e59b38647ee511467fe000ce276f245a006b40bc`
+      - Starknet Mainnet: `0x014bf62fadb41d8f899bb5afeeb2da486fcfd8431852def56c5f10e45ae72765`
 
 ## Recap
 
