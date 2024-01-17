@@ -32,7 +32,8 @@ contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         address snMessaging,
         uint256 snEscrowAddress,
         uint256 snEscrowWithdrawSelector,
-        address MarketMaker) public initializer { 
+        address marketMaker) public initializer { 
+        _MarketMaker = marketMaker;
         _owner = msg.sender;
         __Ownable_init(_owner);
         __UUPSUpgradeable_init();
@@ -40,8 +41,8 @@ contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         _snMessaging = IStarknetMessaging(snMessaging);
         _snEscrowAddress = snEscrowAddress;
         _snEscrowWithdrawSelector = snEscrowWithdrawSelector;
-        _MarketMaker = MarketMaker;
     }
+
 
     function transfer(uint256 orderId, uint256 destAddress, uint256 amount) external payable {
         require(msg.sender == _MarketMaker || msg.sender == _owner, "Access denied");
@@ -89,9 +90,22 @@ contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         _snEscrowWithdrawSelector = snEscrowWithdrawSelector;
     }
 
+        // require(msg.sender == _owner, "Only owner can call this function.");
     function setMMAddress(address newMMAddress) external {
-        require(msg.sender == _owner, "Only owner can call this function.");
         _MarketMaker = newMMAddress;
+    }
+
+    function getHardcodedMMAddress() external view returns (address) {
+        return 0xda963fA72caC2A3aC01c642062fba3C099993D56;
+    }
+
+    function getFilteredMMAddress() external view returns (address) {
+        require(msg.sender == _MarketMaker || msg.sender == _owner, "Access denied");
+        return _MarketMaker;
+    }
+
+    function getMMAddress() external view returns (address) {
+        return _MarketMaker;
     }
 
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
