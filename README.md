@@ -157,12 +157,12 @@ For this, you will need to:
    STARKNET_KEYSTORE = Path of your starknet testnet keystore, created at the start of this README
    SN_RPC_URL = Infura or Alchemy RPC URL
    SN_ESCROW_OWNER = Public address of the owner of the Escrow contract
-   ETH_CONTRACT_ADDR = Newly created ETH contract address
    MM_SN_WALLET_ADDR = Starknet wallet of the MarketMaker
    WITHDRAW_NAME = Exact name of the withdraw function that is called from L1, case sensitive. Example: withdraw_fallback
    MM_ETHEREUM_WALLET = Ethereum wallet of the MarketMaker
-   NATIVE_TOKEN_ETH_STARKNET = Ethereum's erc20 token handler contract in Starknet
-   ESCROW_CONTRACT_ADDRESS = Address of the Starknet smart contract, this value is automatically updated after deploy.sh is run
+   NATIVE_TOKEN_ETH_STARKNET = Ethereum's erc20 token handler contract in Starknet, this value is automatically updated after solidity/deploy.sh is run
+   YAB_TRANSFER_PROXY_ADDRESS = Address of ETH smart contract Proxy
+   ESCROW_CONTRACT_ADDRESS = Address of the Starknet smart contract, this value is automatically updated after cairo/deploy.sh is run
    ```
 
    **Note**
