@@ -19,7 +19,7 @@ ethereum-build: ethereum-clean
 	@cd ./contracts/solidity/ && forge build
 
 ethereum-test: ethereum-clean
-	@cd ./contracts/solidity/ && forge test
+	@cd ./contracts/solidity/ && forge test -vvvvv
 
 ethereum-deploy: ethereum-build
 	@./contracts/solidity/deploy.sh

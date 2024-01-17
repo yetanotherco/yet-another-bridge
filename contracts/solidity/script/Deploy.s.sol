@@ -13,7 +13,7 @@ contract Deploy is Script {
         address snMessagingAddress = vm.envAddress("SN_MESSAGING_ADDRESS");
         uint256 snEscrowAddress = 0x0; // this value is set in a call to the smart contract, once deployed
         uint256 snWithdrawSelector = 0x0; // this value is set in a call to the smart contract, once deployed
-        address MarketMaker = 0xda963fA72caC2A3aC01c642062fba3C099993D56;//vm.envAddress("MM_ETHEREUM_WALLET");
+        address MarketMaker = vm.envAddress("MM_ETHEREUM_WALLET");
 
         YABTransfer yab = new YABTransfer();
         ERC1967Proxy proxy = new ERC1967Proxy(address(yab), "");
