@@ -27,7 +27,9 @@ echo -e "${GREEN}\n=> [ETH] Deployed YABTransfer address: $YAB_TRANSFER_ADDRESS 
 
 # Setting proxy_address into .env file
 if grep -q "^YAB_TRANSFER_PROXY_ADDRESS=" ".env"; then
-  sed -i "s/^YAB_TRANSFER_PROXY_ADDRESS=.*/YAB_TRANSFER_PROXY_ADDRESS=$PROXY_ADDRESS/" ".env"
+  # sed -i "" "s/^YAB_TRANSFER_PROXY_ADDRESS=.*/YAB_TRANSFER_PROXY_ADDRESS=$PROXY_ADDRESS/" ".env"
+  sed "s/^YAB_TRANSFER_PROXY_ADDRESS=.*/YAB_TRANSFER_PROXY_ADDRESS=$PROXY_ADDRESS/" .env >> temp.file
+  mv temp.file .env
 else
   echo "YAB_TRANSFER_PROXY_ADDRESS=$PROXY_ADDRESS" >> ".env"
 fi
