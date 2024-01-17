@@ -51,4 +51,9 @@ echo -e "${GREEN}\n=> [SN] Escrow Deployed${COLOR_RESET}"
 
 echo -e "- ${PURPLE}[SN] Escrow ContractAddress: $ESCROW_CONTRACT_ADDRESS${COLOR_RESET}"
 
-sed -i "s/^ESCROW_CONTRACT_ADDRESS=.*/ESCROW_CONTRACT_ADDRESS=$ESCROW_CONTRACT_ADDRESS/" ".env" || echo "ESCROW_CONTRACT_ADDRESS=$ESCROW_CONTRACT_ADDRESS" >> ".env"
+if grep -q "^ESCROW_CONTRACT_ADDRESS=" ".env"; then
+  sed "s/^ESCROW_CONTRACT_ADDRESS=.*/ESCROW_CONTRACT_ADDRESS=$ESCROW_CONTRACT_ADDRESS/" .env >> env.temp.file
+  mv env.temp.file .env
+else
+  echo "ESCROW_CONTRACT_ADDRESS=$ESCROW_CONTRACT_ADDRESS" >> ".env"
+fi
