@@ -42,7 +42,7 @@ contract TransferTest is Test {
     }
 
     function test_getMMAddress_mm_fail() public { //OK
-        vm.expectRevert(); //getMMAddress is only callable by owner or MM
+        vm.expectRevert("Only Owner or MM can call this function");
         address MMaddress = yab_caller.getMMAddress();
     }
 

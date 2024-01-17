@@ -100,7 +100,7 @@ contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     }
 
     modifier onlyOwnerOrMM {
-        require(msg.sender == owner() || msg.sender == _marketMaker);
+        require(msg.sender == owner() || msg.sender == _marketMaker, "Only Owner or MM can call this function");
         _;
     }
 
