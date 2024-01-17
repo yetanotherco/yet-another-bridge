@@ -40,12 +40,13 @@ starknet-test: starknet-clean
 	@cd ./contracts/cairo/ && snforge test
 
 starknet-deploy: starknet-build
-	@./contracts/cairo/deploy.sh
+	@source ./contracts/cairo/.env && . ./contracts/cairo/deploy.sh
 
 starknet-upgrade: starknet-build
 	@./contracts/cairo/upgrade.sh
 
+.ONESHELL:
 starknet-deploy-and-connect:
-	@$(MAKE) starknet-deploy
-	@$(MAKE) ethereum-set-escrow
-	@$(MAKE) ethereum-set-withdraw-selector
+	@source ./contracts/cairo/.env && . ./contracts/cairo/deploy.sh
+	@source ./contracts/solidity/.env && . ./contracts/solidity/set_escrow.sh
+	@source ./contracts/solidity/.env && . ./contracts/solidity/set_withdraw_selector.sh
