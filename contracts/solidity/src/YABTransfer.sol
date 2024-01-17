@@ -17,7 +17,7 @@ contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
     mapping(bytes32 => TransferInfo) public transfers;
     address private _owner;
-    address private _MarketMaker;
+    address private _marketMaker;
 
     IStarknetMessaging private _snMessaging;
     uint256 private _snEscrowAddress;
@@ -33,7 +33,6 @@ contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         uint256 snEscrowAddress,
         uint256 snEscrowWithdrawSelector,
         address marketMaker) public initializer { 
-        _MarketMaker = marketMaker;
         _owner = msg.sender;
         __Ownable_init(_owner);
         __UUPSUpgradeable_init();
@@ -41,11 +40,12 @@ contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         _snMessaging = IStarknetMessaging(snMessaging);
         _snEscrowAddress = snEscrowAddress;
         _snEscrowWithdrawSelector = snEscrowWithdrawSelector;
+        _marketMaker = marketMaker;
     }
 
 
     function transfer(uint256 orderId, uint256 destAddress, uint256 amount) external payable {
-        require(msg.sender == _MarketMaker || msg.sender == _owner, "Access denied");
+        require(msg.sender == _marketMaker || msg.sender == _owner, "Access denied");
         require(destAddress != 0, "Invalid destination address.");
         require(amount > 0, "Invalid amount, should be higher than 0.");
         require(msg.value == amount, "Invalid amount, should match msg.value.");
@@ -62,7 +62,7 @@ contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     }
 
     function withdraw(uint256 orderId, uint256 destAddress, uint256 amount) external payable {
-        require(msg.sender == _MarketMaker || msg.sender == _owner, "Access denied");
+        require(msg.sender == _marketMaker || msg.sender == _owner, "Access denied");
         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount));
         TransferInfo storage transferInfo = transfers[index];
         require(transferInfo.isUsed == true, "Transfer not found.");
@@ -92,7 +92,7 @@ contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
         // require(msg.sender == _owner, "Only owner can call this function.");
     function setMMAddress(address newMMAddress) external {
-        _MarketMaker = newMMAddress;
+        _marketMaker = newMMAddress;
     }
 
     function getHardcodedMMAddress() external view returns (address) {
@@ -100,12 +100,12 @@ contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     }
 
     function getFilteredMMAddress() external view returns (address) {
-        require(msg.sender == _MarketMaker || msg.sender == _owner, "Access denied");
-        return _MarketMaker;
+        require(msg.sender == _marketMaker || msg.sender == _owner, "Access denied");
+        return _marketMaker;
     }
 
     function getMMAddress() external view returns (address) {
-        return _MarketMaker;
+        return _marketMaker;
     }
 
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
