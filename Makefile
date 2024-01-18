@@ -52,3 +52,9 @@ starknet-deploy-and-connect:
 	@$(MAKE) starknet-deploy
 	@$(MAKE) ethereum-set-escrow
 	@$(MAKE) ethereum-set-withdraw-selector
+
+deploy-all:
+	@$(MAKE) ethereum-deploy
+	@$(MAKE) starknet-deploy
+	@$(MAKE) ethereum-set-escrow
+	@$(MAKE) ethereum-set-withdraw-selector
