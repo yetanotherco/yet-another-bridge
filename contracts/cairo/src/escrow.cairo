@@ -36,7 +36,8 @@ mod Escrow {
 
     use openzeppelin::{
         access::ownable::OwnableComponent,
-        upgrades::{UpgradeableComponent, interface::IUpgradeable}
+        upgrades::{UpgradeableComponent, interface::IUpgradeable},
+        security::PausableComponent
     };
     use starknet::{
         ContractAddress, EthAddress, ClassHash, get_caller_address, get_contract_address,
@@ -51,6 +52,7 @@ mod Escrow {
     /// Components
     component!(path: UpgradeableComponent, storage: upgradeable, event: UpgradeableEvent);
     component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
+    component!(path: PausableComponent, storage: pausable, event: PausableEvent);
 
     /// (Ownable)
     #[abi(embed_v0)]
@@ -59,6 +61,11 @@ mod Escrow {
 
     /// (Upgradeable)
     impl InternalImpl = UpgradeableComponent::InternalImpl<ContractState>;
+
+    // Pausable
+    #[abi(embed_v0)]
+    impl PausableImpl = PausableComponent::PausableImpl<ContractState>;
+    impl PausableInternalImpl = PausableComponent::InternalImpl<ContractState>;
 
     // https://github.com/starknet-io/starknet-addresses
     // MAINNET = GOERLI = GOERLI2
@@ -75,6 +82,8 @@ mod Escrow {
         OwnableEvent: OwnableComponent::Event,
         #[flat]
         UpgradeableEvent: UpgradeableComponent::Event
+        #[flat]
+        PausableEvent: PausableComponent::Event
     }
 
     #[derive(Drop, starknet::Event)]
@@ -107,6 +116,8 @@ mod Escrow {
         ownable: OwnableComponent::Storage,
         #[substorage(v0)]
         upgradeable: UpgradeableComponent::Storage, 
+        #[substorage(v0)]
+        pausable: PausableComponent::Storage
     }
 
     #[constructor]
@@ -142,6 +153,7 @@ mod Escrow {
         }
 
         fn set_order(ref self: ContractState, order: Order) -> u256 {
+            self.pausable.assert_not_paused();
             assert(order.amount > 0, 'Amount must be greater than 0');
 
             let payment_amount = order.amount + order.fee;
@@ -172,6 +184,7 @@ mod Escrow {
         }
 
         fn cancel_order(ref self: ContractState, order_id: u256) {
+            self.pausable.assert_not_paused();
             assert(!self.orders_used.read(order_id), 'Order already withdrawed');
             assert(
                 get_block_timestamp() - self.orders_timestamps.read(order_id) < 43200,
@@ -222,6 +235,16 @@ mod Escrow {
             self.ownable.assert_only_owner();   
             self.mm_starknet_wallet.write(new_contract);
         }
+
+        fn pause(ref self: ContractState) {
+            self.ownable.assert_only_owner();
+            self.pausable._pause();
+        }
+
+        fn unpause(ref self: ContractState) {
+            self.ownable.assert_only_owner();
+            self.pausable._unpause();
+        }
     }
 
     #[l1_handler]
@@ -232,6 +255,7 @@ mod Escrow {
         recipient_address: EthAddress,
         amount: u256
     ) {
+        self.pausable.assert_not_paused();
         let eth_transfer_contract_felt: felt252 = self.eth_transfer_contract.read().into();
         assert(eth_transfer_contract_felt == from_address, 'Only ETH_TRANSFER_CONTRACT');
         assert(!self.orders_used.read(order_id), 'Order already withdrawed');
