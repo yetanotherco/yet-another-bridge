@@ -28,7 +28,7 @@ class EthereumWithdrawer(Withdrawer):
     async def estimate_withdraw_fallback_message_fee(order_id, recipient_address, amount):
         from_address = constants.ETH_CONTRACT_ADDR
         to_address = constants.SN_CONTRACT_ADDR
-        entry_point_selector = hex(get_selector_from_name("withdraw_fallback"))
+        entry_point_selector = hex(get_selector_from_name("withdraw"))
         payload = [
             hex(order_id),
             "0x0",

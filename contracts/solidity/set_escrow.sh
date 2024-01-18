@@ -22,7 +22,7 @@ else
     exit 1
 fi
 
-echo "Smart contract being modified:" $ETH_CONTRACT_ADDR
+echo "Smart contract being modified:" $YAB_TRANSFER_PROXY_ADDRESS
 echo "New Escrow address:" $ESCROW_CONTRACT_ADDRESS
 
-cast send --rpc-url $ETH_RPC_URL --private-key $ETH_PRIVATE_KEY $ETH_CONTRACT_ADDR "setEscrowAddress(uint256)" $ESCROW_CONTRACT_ADDRESS
+cast send --rpc-url $ETH_RPC_URL --private-key $ETH_PRIVATE_KEY $YAB_TRANSFER_PROXY_ADDRESS "setEscrowAddress(uint256)" $ESCROW_CONTRACT_ADDRESS
