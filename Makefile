@@ -50,6 +50,6 @@ starknet-upgrade: starknet-build
 
 .ONESHELL:
 starknet-deploy-and-connect:
-	@source ./contracts/cairo/.env && . ./contracts/cairo/deploy.sh
-	@source ./contracts/solidity/.env && . ./contracts/solidity/set_escrow.sh
-	@source ./contracts/solidity/.env && . ./contracts/solidity/set_withdraw_selector.sh
+	@. ./contracts/cairo/.env && . ./contracts/cairo/deploy.sh
+	@. ./contracts/solidity/.env && . ./contracts/solidity/set_escrow.sh
+	@. ./contracts/solidity/.env && . ./contracts/solidity/set_withdraw_selector.sh
