@@ -107,7 +107,7 @@ Follow the steps below to set up a testnet smart wallet using `starkli`:
 
 ### Ethereum smart contract
 
-First, the Ethereum smart contracts must be deployed. For Ethereum the deployment process you will need to:
+Once we have the dependencies installed, we can proceed. For the Ethereum the deployment process you will need to:
 
 1. Create your `.env` file: you need to configure the following variables in your own .env file on the contracts/solidity/ folder. You can use the env.example file as a template for creating your .env file, paying special attention to the formats provided
 
@@ -116,6 +116,7 @@ First, the Ethereum smart contracts must be deployed. For Ethereum the deploymen
    ETH_PRIVATE_KEY = private key of your ETH wallet
    ETHERSCAN_API_KEY = API Key to use etherscan to read the Ethereum blockchain
    SN_MESSAGING_ADDRESS = Starknet Messaging address
+   YAB_TRANSFER_PROXY_ADDRESS = Address of the Ethereum Proxy smart contract, this value is automatically created and/or updated after deploy.sh is executed
    ```
 
    **NOTE**:
@@ -134,6 +135,8 @@ First, the Ethereum smart contracts must be deployed. For Ethereum the deploymen
       make ethereum-deploy
    ```
 
+   This will deploy a Proxy smart contract, a YABTransfer smart contract, and it will link them both. The purpose of having a proxy in front of our smart contract is so that it is upgradeable, by simply deploying another smart contract and changing the Proxy's stored address.
+
 ### Starknet smart contracts
 
 After the Ethereum smart contract is deployed, the Starknet smart contracts must be declared and deployed.
@@ -148,7 +151,7 @@ For this, you will need to:
 
 1. Create your `.env` file: you need to configure the following variables in your own .env file on the contracts/solidity folder. You can use the env.example file as a template for creating your .env file, paying special attention to the formats provided
 
-   ```
+   ```env
    STARKNET_ACCOUNT = Absolute path of your starknet testnet account, created at the start of this README
    STARKNET_KEYSTORE = Absolute path of your starknet testnet keystore, created at the start of this README
    SN_RPC_URL = Infura or Alchemy RPC URL
@@ -158,7 +161,7 @@ For this, you will need to:
    HERODOTUS_FACTS_REGISTRY = Herodotus' Facts Registry Smart Contract in Starknet
    MM_ETHEREUM_WALLET = Ethereum wallet of the MarketMaker
    NATIVE_TOKEN_ETH_STARKNET = Ethereum's erc20 token handler contract in Starknet
-   ESCROW_CONTRACT_ADDRESS = Address of the Starknet smart contract, this value should be empty, and is automatically updated after deploy.sh is run
+   ESCROW_CONTRACT_ADDRESS = Address of the Starknet smart contract, this value is automatically created and/or updated after deploy.sh is executed
    ```
 
    **Note**
@@ -169,7 +172,7 @@ For this, you will need to:
 
 2. Declare and Deploy: We sequentially declare and deploy the contracts, and connect it to our Ethereum smart contract.
 
-### First alternative: automatic deploy and connect of Escrow and YABTransfer.
+### First alternative: automatic deploy and connect of Escrow and YABTransfer
 
    ```bash
       make starknet-deploy-and-connect
@@ -220,3 +223,32 @@ This may be better suited for you if you plan to change some of the automaticall
 ## Recap
 
 After following this complete README, we should have an ETH smart contract as well as a Starknet smart contract, both connected to act as a bridge between these two chains.
+
+## Upgrade Contracts in Testnet
+
+### Ethereum
+
+After deploying the `YABTransfer` contract, you can perform upgrades to it. To do this you must:
+
+1. Configure the `contracts/solidity/.env` file.
+
+   ```
+      ETH_RPC_URL = Infura or Alchemy RPC URL
+      ETH_PRIVATE_KEY = private key of your ETH wallet
+      ETHERSCAN_API_KEY = API Key to use etherscan to read the Ethereum blockchain
+      SN_MESSAGING_ADDRESS = Starknet Messaging address
+      YAB_TRANSFER_PROXY_ADDRESS = Address of the Ethereum Proxy smart contract, this value is automatically created and/or updated after deploy.sh is executed
+   ```
+
+2. Use the Makefile command to upgrade `YABTransfer` contract
+
+   ```bash
+      make ethereum-upgrade
+   ```
+
+   **Note**
+   - You must be the **owner** of the contract to upgrade it.
+   - This command will:
+      - Rebuild `YABTransfer.sol`
+      - Deploy the new contract to the network
+      - Utilize Foundry to upgrade the contract by changing the proxy's pointing address to the newly deployed contract
