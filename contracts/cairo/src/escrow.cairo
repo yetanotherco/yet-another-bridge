@@ -28,6 +28,10 @@ trait IEscrow<ContractState> {
     fn set_eth_transfer_contract(ref self: ContractState, new_contract: EthAddress);
     fn set_mm_ethereum_contract(ref self: ContractState, new_contract: EthAddress);
     fn set_mm_starknet_contract(ref self: ContractState, new_contract: ContractAddress);
+
+    fn pause(ref self: ContractState);
+    fn unpause(ref self: ContractState);
+    fn pause_state(ref self: ContractState) -> bool;
 }
 
 #[starknet::contract]
@@ -81,7 +85,7 @@ mod Escrow {
         #[flat]
         OwnableEvent: OwnableComponent::Event,
         #[flat]
-        UpgradeableEvent: UpgradeableComponent::Event
+        UpgradeableEvent: UpgradeableComponent::Event,
         #[flat]
         PausableEvent: PausableComponent::Event
     }
@@ -244,6 +248,10 @@ mod Escrow {
         fn unpause(ref self: ContractState) {
             self.ownable.assert_only_owner();
             self.pausable._unpause();
+        }
+
+        fn pause_state(ref self: ContractState) -> bool {
+            self.pausable.is_paused()
         }
     }
 
