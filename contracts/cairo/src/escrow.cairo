@@ -106,7 +106,7 @@ mod Escrow {
         #[substorage(v0)]
         ownable: OwnableComponent::Storage,
         #[substorage(v0)]
-        upgradeable: UpgradeableComponent::Storage,
+        upgradeable: UpgradeableComponent::Storage, 
     }
 
     #[constructor]
