@@ -24,11 +24,14 @@ ethereum-test: ethereum-clean
 ethereum-deploy: ethereum-clean
 	@./contracts/solidity/deploy.sh
 
+ESCROW_CONTRACT_ADDRESS=
 ethereum-set-escrow:
-	@./contracts/solidity/set_escrow.sh
+	@(source ./contracts/solidity/.env; export ESCROW_CONTRACT_ADDRESS=$(ESCROW_CONTRACT_ADDRESS) ; . ./contracts/solidity/set_escrow.sh)
 
+WITHDRAW_NAME?="withdraw"
+ETH_CONTRACT_ADDR=
 ethereum-set-withdraw-selector:
-	@./contracts/solidity/set_withdraw_selector.sh
+	@(source ./contracts/solidity/.env; export WITHDRAW_NAME=$(WITHDRAW_NAME); export ETH_CONTRACT_ADDRESS=$(ETH_CONTRACT_ADDR) ; . ./contracts/solidity/set_withdraw_selector.sh)
 
 starknet-clean:
 	@cd ./contracts/cairo/ && scarb clean
