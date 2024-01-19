@@ -19,7 +19,7 @@ contract TransferTest is Test {
         address snMessagingAddress = 0xde29d060D45901Fb19ED6C6e959EB22d8626708e;
         uint256 snEscrowAddress = 0x0;
         uint256 snEscrowWithdrawSelector = 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77;
-        marketMaker = vm.envAddress("MM_ETHEREUM_WALLET");
+        marketMaker = 0xda963fA72caC2A3aC01c642062fba3C099993D56;
         
         yab = new YABTransfer();
         proxy = new ERC1967Proxy(address(yab), "");
@@ -29,12 +29,12 @@ contract TransferTest is Test {
         vm.stopPrank();
     }
 
-    function testTransfer_mm() public { //ok
+    function testTransfer_mm() public {
         hoax(marketMaker, 100 wei);
         yab_caller.transfer{value: 100}(1, 0x1, 100);
     }
 
-    function testTransfer_fail() public { //ok
+    function testTransfer_fail() public {
         hoax(address(0x0000000000000000000000000000000000000001), 100 wei);
         vm.expectRevert("Only Owner or MM can call this function");
         yab_caller.transfer{value: 100}(1, 0x1, 100);
@@ -51,13 +51,13 @@ contract TransferTest is Test {
     //     yab_caller.withdraw{value: 100}(1, 0x1, 100);
     // }
 
-    function testWithdraw_mm_fail() public { //ok
+    function testWithdraw_mm_fail() public {
         hoax(marketMaker, 100 wei);
         vm.expectRevert("Transfer not found."); //Won't match to a random transfer number
         yab_caller.withdraw{value: 100}(1, 0x1, 100);
     }
 
-    function testWithdraw_fail() public { //ok
+    function testWithdraw_fail() public {
         hoax(0x0000000000000000000000000000000000000001, 100 wei);
         vm.expectRevert("Only Owner or MM can call this function");
         yab_caller.withdraw{value: 100}(1, 0x1, 100);

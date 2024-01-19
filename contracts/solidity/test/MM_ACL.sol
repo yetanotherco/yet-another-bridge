@@ -19,7 +19,7 @@ contract TransferTest is Test {
         address snMessagingAddress = 0xde29d060D45901Fb19ED6C6e959EB22d8626708e;
         uint256 snEscrowAddress = 0x0;
         uint256 snEscrowWithdrawSelector = 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77;
-        marketMaker = vm.envAddress("MM_ETHEREUM_WALLET");
+        marketMaker = 0xda963fA72caC2A3aC01c642062fba3C099993D56;
         
         yab = new YABTransfer();
         proxy = new ERC1967Proxy(address(yab), "");
@@ -29,24 +29,24 @@ contract TransferTest is Test {
         vm.stopPrank();
     }
 
-    function test_getMMAddress_deployer() public { //OK
+    function test_getMMAddress_deployer() public {
         vm.prank(deployer);
         address MMaddress = yab_caller.getMMAddress();
-        assertEq(MMaddress, vm.envAddress("MM_ETHEREUM_WALLET"));
+        assertEq(MMaddress, 0xda963fA72caC2A3aC01c642062fba3C099993D56);
     }
 
-    function test_getMMAddress_mm() public { //OK
+    function test_getMMAddress_mm() public {
         vm.prank(marketMaker);
         address MMaddress = yab_caller.getMMAddress();
-        assertEq(MMaddress, vm.envAddress("MM_ETHEREUM_WALLET"));
+        assertEq(MMaddress, 0xda963fA72caC2A3aC01c642062fba3C099993D56);
     }
 
-    function test_getMMAddress_mm_fail() public { //OK
+    function test_getMMAddress_mm_fail() public {
         vm.expectRevert("Only Owner or MM can call this function");
-        address MMaddress = yab_caller.getMMAddress();
+        yab_caller.getMMAddress();
     }
 
-    function test_set_and_get_MMAddress_deployer() public { //OK
+    function test_set_and_get_MMAddress_deployer() public {
         vm.startPrank(deployer);
         address newAddress = 0x0000000000000000000000000000000000000001;
         yab_caller.setMMAddress(newAddress);
@@ -54,13 +54,13 @@ contract TransferTest is Test {
         vm.stopPrank();
     }
 
-    function test_set_MMAddress_fail() public { //OK
+    function test_set_MMAddress_fail() public {
         address newAddress = 0xda963fA72caC2A3aC01c642062fba3C099993D56;
         vm.expectRevert(); //setMMAddress is only callable by the owner
         yab_caller.setMMAddress(newAddress);
     }
 
-    function test_get_owner() public { //OK
+    function test_get_owner() public {
         address ownerAddress = yab_caller.getOwner();
         assertEq(ownerAddress, deployer);
     }
