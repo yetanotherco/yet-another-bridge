@@ -140,6 +140,10 @@ mod Escrow {
         self.mm_ethereum_wallet.write(mm_ethereum_wallet);
         self.mm_starknet_wallet.write(mm_starknet_wallet);
         self.native_token_eth_starknet.write(native_token_eth_starknet);
+
+        if (self.pausable.is_paused()) {
+            self.pausable._unpause();
+        }
     }
 
     #[external(v0)]

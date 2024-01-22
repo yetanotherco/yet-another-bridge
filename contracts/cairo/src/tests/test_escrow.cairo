@@ -221,6 +221,55 @@ mod Escrow {
     }
 
     #[test]
+    #[should_panic(expected: ('Caller is not the owner',))]
+    fn test_fail_pause_not_owner() {
+        let (escrow, _) = setup();
+        start_prank(CheatTarget::One(escrow.contract_address), USER());
+        assert(escrow.pause_state() == false, 'Should start unpaused');
+        escrow.pause();
+        stop_prank(CheatTarget::One(escrow.contract_address));
+    }
+
+    #[test]
+    #[should_panic(expected: ('Caller is not the owner',))]
+    fn test_fail_unpause_not_owner() {
+        let (escrow, _) = setup();
+        start_prank(CheatTarget::One(escrow.contract_address), OWNER());
+        assert(escrow.pause_state() == false, 'Should start unpaused');
+        escrow.pause();
+        assert(escrow.pause_state() == true, 'Should be paused');
+        stop_prank(CheatTarget::One(escrow.contract_address));
+        
+        start_prank(CheatTarget::One(escrow.contract_address), USER());
+        escrow.unpause();
+        stop_prank(CheatTarget::One(escrow.contract_address));
+    }
+
+    #[test]
+    #[should_panic(expected: ('Pausable: paused',))]
+    fn test_fail_pause_while_paused() {
+        let (escrow, _) = setup();
+        start_prank(CheatTarget::One(escrow.contract_address), OWNER());
+        assert(escrow.pause_state() == false, 'Should start unpaused');
+        escrow.pause();
+        assert(escrow.pause_state() == true, 'Should be paused');
+        escrow.pause();
+        stop_prank(CheatTarget::One(escrow.contract_address));
+    }
+
+    #[test]
+    #[should_panic(expected: ('Pausable: not paused',))]
+    fn test_fail_unpause_while_unpaused() {
+        let (escrow, _) = setup();
+        start_prank(CheatTarget::One(escrow.contract_address), OWNER());
+        assert(escrow.pause_state() == false, 'Should start unpaused');
+        escrow.unpause();
+        assert(escrow.pause_state() == false, 'Should be unpaused');
+        escrow.unpause();
+        stop_prank(CheatTarget::One(escrow.contract_address));
+    }
+
+    #[test]
     #[should_panic(expected: ('Pausable: paused',))]
     fn test_fail_interact_when_paused() {
         let (escrow, _) = setup();
