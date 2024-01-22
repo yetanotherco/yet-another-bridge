@@ -6,10 +6,9 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-
-// This contract is the same as YABTransfer.sol but it does not have:
-// _snEscrowAddress and _snEscrowWithdrawSelector storage, and their related functions
-contract YABTransfer_lessVars is Initializable, OwnableUpgradeable, UUPSUpgradeable {
+// This contract is the same as YABTransfer.sol but it has reordered variables in its storage:
+// _snEscrowAddress and _snEscrowWithdrawSelector
+contract YABTransfer_replaceVars is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     struct TransferInfo {
         uint256 destAddress;
         uint256 amount;
@@ -22,8 +21,8 @@ contract YABTransfer_lessVars is Initializable, OwnableUpgradeable, UUPSUpgradea
     address private _marketMaker;
 
     IStarknetMessaging private _snMessaging;
-    // uint256 private _snEscrowAddress;
-    // uint256 private _snEscrowWithdrawSelector;
+    uint256 private _snEscrowAddressV2;
+    uint256 private _snEscrowWithdrawSelectorV2;
 
     constructor() {
         _disableInitializers();
@@ -32,15 +31,15 @@ contract YABTransfer_lessVars is Initializable, OwnableUpgradeable, UUPSUpgradea
     // no constructors can be used in upgradeable contracts. 
     function initialize(
         address snMessaging,
-        // uint256 snEscrowAddress,
-        // uint256 snEscrowWithdrawSelector,
+        uint256 snEscrowAddress,
+        uint256 snEscrowWithdrawSelector,
         address marketMaker) public initializer { 
         __Ownable_init(msg.sender);
         __UUPSUpgradeable_init();
 
         _snMessaging = IStarknetMessaging(snMessaging);
-        // _snEscrowAddress = snEscrowAddress;
-        // _snEscrowWithdrawSelector = snEscrowWithdrawSelector;
+        _snEscrowAddressV2 = snEscrowAddress;
+        _snEscrowWithdrawSelectorV2 = snEscrowWithdrawSelector;
         _marketMaker = marketMaker;
     }
 
@@ -73,28 +72,27 @@ contract YABTransfer_lessVars is Initializable, OwnableUpgradeable, UUPSUpgradea
         payload[3] = transferInfo.amount;
         payload[4] = 0;
         
-        // commented out because those variables are not defined:
-        // _snMessaging.sendMessageToL2{value: msg.value}(
-        //     _snEscrowAddress,
-        //     _snEscrowWithdrawSelector,
-        //     payload);
+        _snMessaging.sendMessageToL2{value: msg.value}(
+            _snEscrowAddressV2,
+            _snEscrowWithdrawSelectorV2,
+            payload);
     }
 
-    // function setEscrowAddress(uint256 snEscrowAddress) external onlyOwner {
-    //     _snEscrowAddress = snEscrowAddress;
-    // }
+    function setEscrowAddressV2(uint256 snEscrowAddress) external onlyOwner {
+        _snEscrowAddressV2 = snEscrowAddress;
+    }
 
-    // function setEscrowWithdrawSelector(uint256 snEscrowWithdrawSelector) external onlyOwner {
-    //     _snEscrowWithdrawSelector = snEscrowWithdrawSelector;
-    // }
+    function setEscrowWithdrawSelectorV2(uint256 snEscrowWithdrawSelector) external onlyOwner {
+        _snEscrowWithdrawSelectorV2 = snEscrowWithdrawSelector;
+    }
 
-    // function getEscrowAddress() external view returns (uint256) {
-    //     return _snEscrowAddress;
-    // }
+    function getEscrowAddressV2() external view returns (uint256) {
+        return _snEscrowAddressV2;
+    }
 
-    // function getEscrowWithdrawSelector() external view returns (uint256) {
-    //     return _snEscrowWithdrawSelector;
-    // }
+    function getEscrowWithdrawSelectorV2() external view returns (uint256) {
+        return _snEscrowWithdrawSelectorV2;
+    }
 
     
     //// MM ACL:
