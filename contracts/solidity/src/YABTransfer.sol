@@ -83,13 +83,5 @@ contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         _snEscrowWithdrawSelector = snEscrowWithdrawSelector;
     }
 
-    function getEscrowAddress() external view returns (uint256) {
-        return _snEscrowAddress;
-    }
-
-    function getEscrowWithdrawSelector() external view returns (uint256) {
-        return _snEscrowWithdrawSelector;
-    }
-
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 }
