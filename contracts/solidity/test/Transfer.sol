@@ -35,7 +35,7 @@ contract TransferTest is Test {
     }
 
     function testTransfer_fail() public {
-        hoax(address(0x0000000000000000000000000000000000000001), 100 wei);
+        hoax(makeAddr("bob"), 100 wei);
         vm.expectRevert("Only Owner or MM can call this function");
         yab_caller.transfer{value: 100}(1, 0x1, 100);
     }
@@ -58,7 +58,7 @@ contract TransferTest is Test {
     }
 
     function testWithdraw_fail() public {
-        hoax(0x0000000000000000000000000000000000000001, 100 wei);
+        hoax(makeAddr("bob"), 100 wei);
         vm.expectRevert("Only Owner or MM can call this function");
         yab_caller.withdraw{value: 100}(1, 0x1, 100);
     }

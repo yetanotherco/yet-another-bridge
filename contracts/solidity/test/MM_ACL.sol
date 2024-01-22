@@ -32,13 +32,13 @@ contract TransferTest is Test {
     function test_getMMAddress_deployer() public {
         vm.prank(deployer);
         address MMaddress = yab_caller.getMMAddress();
-        assertEq(MMaddress, 0xda963fA72caC2A3aC01c642062fba3C099993D56);
+        assertEq(MMaddress, marketMaker);
     }
 
     function test_getMMAddress_mm() public {
         vm.prank(marketMaker);
         address MMaddress = yab_caller.getMMAddress();
-        assertEq(MMaddress, 0xda963fA72caC2A3aC01c642062fba3C099993D56);
+        assertEq(MMaddress, marketMaker);
     }
 
     function test_getMMAddress_mm_fail() public {
@@ -48,16 +48,16 @@ contract TransferTest is Test {
 
     function test_set_and_get_MMAddress_deployer() public {
         vm.startPrank(deployer);
-        address newAddress = 0x0000000000000000000000000000000000000001;
-        yab_caller.setMMAddress(newAddress);
-        assertEq(yab_caller.getMMAddress(), newAddress);
+        address alice = makeAddr("alice");
+        yab_caller.setMMAddress(alice);
+        assertEq(yab_caller.getMMAddress(), alice);
         vm.stopPrank();
     }
 
     function test_set_MMAddress_fail() public {
-        address newAddress = 0xda963fA72caC2A3aC01c642062fba3C099993D56;
+        address bob = makeAddr("bob");
         vm.expectRevert(); //setMMAddress is only callable by the owner
-        yab_caller.setMMAddress(newAddress);
+        yab_caller.setMMAddress(bob);
     }
 
     function test_get_owner() public {
