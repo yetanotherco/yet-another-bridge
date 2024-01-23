@@ -88,4 +88,5 @@ jobs:
 
       - name: Deploy Starknet contract
         run: |
-          sudo .github/workflows/scripts/setup_katana_account.sh
+          ls -l .github/workflows/scripts
+          .github/workflows/scripts/setup_katana_account.sh
