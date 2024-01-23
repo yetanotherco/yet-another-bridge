@@ -14,6 +14,8 @@ mod mocks {
     mod mock_Escrow_moreVars_before;
     mod mock_Escrow_replaceVars;
     mod mock_Escrow_reorgVars;
+    mod mock_Escrow_oldVars;
+    mod mock_Escrow_replacePlusOldVars;
 }
 
 #[cfg(test)]

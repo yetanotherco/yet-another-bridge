@@ -8,7 +8,7 @@ mod Escrow {
     use snforge_std::{declare, ContractClassTrait, L1Handler, L1HandlerTrait};
     use snforge_std::{CheatTarget, start_prank, stop_prank};
 
-    use yab::mocks::mock_Escrow_changed_functions::{IEscrowV2Dispatcher, IEscrowV2DispatcherTrait};
+    use yab::mocks::mock_Escrow_changed_functions::{IEscrow_changed_functionsDispatcher, IEscrow_changed_functionsDispatcherTrait};
     use yab::interfaces::IERC20::{IERC20Dispatcher, IERC20DispatcherTrait};
     use yab::escrow::{IEscrowDispatcher, IEscrowDispatcherTrait, Order};
     use yab::interfaces::IEVMFactsRegistry::{
@@ -141,7 +141,7 @@ mod Escrow {
         let (escrow, _) = setup();
         let upgradeable = IUpgradeableDispatcher { contract_address: escrow.contract_address };
         start_prank(CheatTarget::One(escrow.contract_address), OWNER());
-        upgradeable.upgrade(declare('EscrowV2').class_hash);
+        upgradeable.upgrade(declare('Escrow_changed_functions').class_hash);
     }
 
     #[test]
@@ -150,7 +150,7 @@ mod Escrow {
         let (escrow, _) = setup();
         let upgradeable = IUpgradeableDispatcher { contract_address: escrow.contract_address };
         start_prank(CheatTarget::One(escrow.contract_address), MM_STARKNET());
-        upgradeable.upgrade(declare('EscrowV2').class_hash);
+        upgradeable.upgrade(declare('Escrow_changed_functions').class_hash);
     }
 
 
