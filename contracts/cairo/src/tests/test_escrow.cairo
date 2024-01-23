@@ -8,7 +8,7 @@ mod Escrow {
     use snforge_std::{declare, ContractClassTrait, L1Handler, L1HandlerTrait};
     use snforge_std::{CheatTarget, start_prank, stop_prank};
 
-    use yab::mocks::mock_EscrowV2::{IEscrowV2Dispatcher, IEscrowV2DispatcherTrait};
+    use yab::mocks::mock_Escrow_changed_functions::{IEscrowV2Dispatcher, IEscrowV2DispatcherTrait};
     use yab::interfaces::IERC20::{IERC20Dispatcher, IERC20DispatcherTrait};
     use yab::escrow::{IEscrowDispatcher, IEscrowDispatcherTrait, Order};
     use yab::interfaces::IEVMFactsRegistry::{

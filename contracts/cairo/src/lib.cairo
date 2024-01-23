@@ -8,13 +8,18 @@ mod interfaces {
 
 mod mocks {
     mod mock_EVMFactsRegistry;
-    mod mock_EscrowV2;
-
+    mod mock_Escrow_changed_functions;
+    mod mock_Escrow_lessVars;
+    mod mock_Escrow_moreVars_after;
+    mod mock_Escrow_moreVars_before;
+    mod mock_Escrow_replaceVars;
+    mod mock_Escrow_reorgVars;
 }
 
 #[cfg(test)]
 mod tests {
     mod test_escrow;
+    mod test_escrow_storage;
 
     mod utils {
         mod constants;
