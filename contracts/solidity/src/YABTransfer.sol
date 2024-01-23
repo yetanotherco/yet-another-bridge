@@ -87,7 +87,7 @@ contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     
     //// MM ACL:
 
-    function getMMAddress() external view onlyOwnerOrMM returns (address) {
+    function getMMAddress() external view returns (address) {
         return _marketMaker;
     }
 
