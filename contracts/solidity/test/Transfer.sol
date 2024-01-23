@@ -36,10 +36,10 @@ contract TransferTest is Test {
 
     function testWithdrawOver() public {
         address alice = makeAddr("alice");
-        uint256 maxInt = uint256(type(uint128).max) + 1;
+        uint256 maxInt = type(uint256).max;
+        
         vm.deal(alice, maxInt);
-
-        startHoax(alice);
+        vm.prank(alice);
 
         yab.transfer{value: maxInt}(1, 0x1, maxInt);
         yab.withdraw(1, 0x1, maxInt);
