@@ -9,6 +9,6 @@ contract mock_IStarknetMessaging {
         require(msg.value > 0, "L1_MSG_FEE_MUST_BE_GREATER_THAN_0");
         require(msg.value <= 1 ether, "MAX_L1_MSG_FEE_EXCEEDED");
         //content of contract
-        return (0x626c756500000000000000000000000000000000000000000000000000000000, 0x0); //mock values, unused.
+        return (0x0, 0x0); //mock values, unused.
     }
 }
