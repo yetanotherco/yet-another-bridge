@@ -9,6 +9,7 @@ mod Escrow {
     use snforge_std::{CheatTarget, start_prank, stop_prank};
 
     use yab::mocks::mock_EscrowV2::{IEscrowV2Dispatcher, IEscrowV2DispatcherTrait};
+    use yab::mocks::mock_pausableEscrow::{IEscrow_mockPausableDispatcher, IEscrow_mockPausableDispatcherTrait};
     use yab::interfaces::IERC20::{IERC20Dispatcher, IERC20DispatcherTrait};
     use yab::escrow::{IEscrowDispatcher, IEscrowDispatcherTrait, Order};
     use yab::interfaces::IEVMFactsRegistry::{
@@ -300,6 +301,21 @@ mod Escrow {
         start_prank(CheatTarget::One(escrow.contract_address), USER());
         let order = Order { recipient_address: 12345.try_into().unwrap(), amount: 500, fee: 0 };
         let order_id = escrow.set_order(order);
+        stop_prank(CheatTarget::One(escrow.contract_address));
+    }
+
+    #[test]
+    fn test_upgrade_when_paused() {
+        let (escrow, _) = setup();
+        let upgradeable = IUpgradeableDispatcher { contract_address: escrow.contract_address };
+
+        start_prank(CheatTarget::One(escrow.contract_address), OWNER());
+        escrow.pause();
+        upgradeable.upgrade(declare('Escrow_mockPausable').class_hash);
+
+        let escrow_2 = IEscrow_mockPausableDispatcher { contract_address: escrow.contract_address };
+        assert(escrow_2.pause_state() == true, 'Contract should be paused');
+
         stop_prank(CheatTarget::One(escrow.contract_address));
     }
 }

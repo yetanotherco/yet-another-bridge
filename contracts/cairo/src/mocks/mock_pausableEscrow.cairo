@@ -8,7 +8,7 @@ struct Order {
 }
 
 #[starknet::interface]
-trait IEscrow<ContractState> {
+trait IEscrow_mockPausable<ContractState> {
     fn get_order(self: @ContractState, order_id: u256) -> Order;
 
     fn set_order(ref self: ContractState, order: Order) -> u256;
@@ -35,8 +35,9 @@ trait IEscrow<ContractState> {
 }
 
 #[starknet::contract]
-mod Escrow {
-    use super::{IEscrow, Order};
+mod Escrow_mockPausable {
+
+    use super::{IEscrow_mockPausable, Order};
 
     use openzeppelin::{
         access::ownable::OwnableComponent,
@@ -155,7 +156,7 @@ mod Escrow {
     }
 
     #[external(v0)]
-    impl Escrow of IEscrow<ContractState> {
+    impl Escrow_mockPausable of IEscrow_mockPausable<ContractState> {
         fn get_order(self: @ContractState, order_id: u256) -> Order {
             self.orders.read(order_id)
         }
