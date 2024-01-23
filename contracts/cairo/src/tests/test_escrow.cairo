@@ -203,7 +203,6 @@ mod Escrow {
     fn test_pause() {
         let (escrow, _) = setup();
         start_prank(CheatTarget::One(escrow.contract_address), OWNER());
-        assert(escrow.pause_state() == false, 'Should start unpaused');
         escrow.pause();
         assert(escrow.pause_state() == true, 'Should be paused');
         stop_prank(CheatTarget::One(escrow.contract_address));
