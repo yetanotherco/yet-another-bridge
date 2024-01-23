@@ -145,10 +145,10 @@ mod Escrow {
         }
 
         fn cancel_order(ref self: ContractState, order_id: u256) {
-            assert(!self.orders_used.read(order_id), 'Order already withdrawed');
+            assert(!self.orders_used.read(order_id), 'Order already withdrew');
             assert(
-                get_block_timestamp() - self.orders_timestamps.read(order_id) < 43200,
-                'Didnt passed enough time'
+                get_block_timestamp() - self.orders_timestamps.read(order_id) > 43200,
+                'Not enough time has passed'
             );
 
             let sender = self.orders_senders.read(order_id);
