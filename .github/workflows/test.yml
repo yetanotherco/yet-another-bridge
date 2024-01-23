@@ -13,7 +13,7 @@ defaults:
     shell: bash
 
 jobs:
-  test:
+  Test:
     runs-on: ubuntu-latest
 
     services:
@@ -49,13 +49,13 @@ jobs:
 
       - name: Install PSQL
         run: |
-          apt-get update
-          apt-get install --yes postgresql-client
+          sudo apt-get update
+          sudo apt-get install --yes postgresql-client
 
       - name: Create tables
         run: |
           psql -h localhost -d postgres_db -U postgres_user -f mm-bot/resources/schema.sql
-            psql -h localhost -d postgres_db -U postgres_user -c "SELECT * FROM block;"
+          psql -h localhost -d postgres_db -U postgres_user -c "SELECT * FROM block;"
         env:
           PGPASSWORD: postgres_password
 
