@@ -38,13 +38,13 @@ contract TransferTest is Test {
         yab_caller.transfer{value: 100}(1, 0x1, 100);
     }
 
-    function testTransfer_fail() public {
+    function testTransfer_fail_notOwnerOrMM() public {
         hoax(makeAddr("bob"), 100 wei);
         vm.expectRevert("Only Owner or MM can call this function");
         yab_caller.transfer{value: 100}(1, 0x1, 100);
     }
 
-    function testWithdraw_mm() public { //not working
+    function testWithdraw_mm() public {
         // escrow: 0x00d3d7c86ba3931b120dfb08a41f6b8e78e37128bf09eca76b6a639965e014d6
         vm.prank(deployer);
         yab_caller.setEscrowAddress(0x00d3d7c86ba3931b120dfb08a41f6b8e78e37128bf09eca76b6a639965e014d6);
@@ -55,13 +55,13 @@ contract TransferTest is Test {
         yab_caller.withdraw{value: 100}(1, 0x1, 100);
     }
 
-    function testWithdraw_mm_fail() public {
+    function testWithdraw_fail_noOrderId() public {
         hoax(marketMaker, 100 wei);
         vm.expectRevert("Transfer not found."); //Won't match to a random transfer number
         yab_caller.withdraw{value: 100}(1, 0x1, 100);
     }
 
-    function testWithdraw_fail() public {
+    function testWithdraw_fail_notOwnerOrMM() public {
         hoax(makeAddr("bob"), 100 wei);
         vm.expectRevert("Only Owner or MM can call this function");
         yab_caller.withdraw{value: 100}(1, 0x1, 100);
