@@ -6,7 +6,7 @@ import "../src/YABTransfer.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 contract TransferTest is Test {
-    address public deployer = address('deployer');
+    address public deployer = makeAddr('deployer');
     address public marketMaker;
 
     YABTransfer public yab;
@@ -19,7 +19,7 @@ contract TransferTest is Test {
         address snMessagingAddress = 0xde29d060D45901Fb19ED6C6e959EB22d8626708e;
         uint256 snEscrowAddress = 0x0;
         uint256 snEscrowWithdrawSelector = 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77;
-        marketMaker = address('marketMaker');
+        marketMaker = makeAddr('marketMaker');
         
         yab = new YABTransfer();
         proxy = new ERC1967Proxy(address(yab), "");
@@ -29,21 +29,9 @@ contract TransferTest is Test {
         vm.stopPrank();
     }
 
-    function test_getMMAddress_deployer() public {
-        vm.prank(deployer);
-        address MMaddress = yab_caller.getMMAddress();
-        assertEq(MMaddress, marketMaker);
-    }
-
-    function test_getMMAddress_mm() public {
-        vm.prank(marketMaker);
-        address MMaddress = yab_caller.getMMAddress();
-        assertEq(MMaddress, marketMaker);
-    }
-
-    function test_getMMAddress_mm_fail() public {
-        vm.expectRevert("Only Owner or MM can call this function");
-        yab_caller.getMMAddress();
+    function test_getMMAddress() public {
+        address mmAddress = yab_caller.getMMAddress();
+        assertEq(mmAddress, marketMaker);
     }
 
     function test_set_and_get_MMAddress_deployer() public {
@@ -54,7 +42,7 @@ contract TransferTest is Test {
         vm.stopPrank();
     }
 
-    function test_set_MMAddress_fail() public {
+    function test_set_MMAddress_not_owner() public {
         address bob = makeAddr("bob");
         vm.expectRevert(); //setMMAddress is only callable by the owner
         yab_caller.setMMAddress(bob);
