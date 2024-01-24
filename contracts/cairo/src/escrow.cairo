@@ -19,8 +19,6 @@ trait IEscrow<ContractState> {
 
     fn get_order_fee(self: @ContractState, order_id: u256) -> u256;
 
-    // fn withdraw(ref self: ContractState, from_address: felt252, order_id: u256, recipient_address: EthAddress, amount: u256);
-
     fn get_eth_transfer_contract(self: @ContractState) -> EthAddress;
     fn get_mm_ethereum_contract(self: @ContractState) -> EthAddress;
     fn get_mm_starknet_contract(self: @ContractState) -> ContractAddress;
