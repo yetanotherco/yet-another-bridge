@@ -282,4 +282,43 @@ mod Escrow {
 
         self.emit(Withdraw { order_id, address: self.mm_starknet_wallet.read(), amount });
     }
+
+    #[l1_handler]
+    fn withdraw_batch(
+        ref self: ContractState,
+        from_address: felt252,
+        order_ids: Array<u256>,
+        recipient_addresses: Array<EthAddress>,
+        amounts: Array<u256>
+    ) {
+        let eth_transfer_contract_felt: felt252 = self.eth_transfer_contract.read().into();
+        assert(eth_transfer_contract_felt == from_address, 'Only ETH_TRANSFER_CONTRACT');
+        assert(order_ids.len() == recipient_addresses.len(), 'Different lengths');
+        assert(order_ids.len() == amounts.len(), 'Different lengths');
+        let mut idx = 0;
+
+        loop {
+            if idx >= order_ids.len() {
+                break;
+            }
+
+            let order_id = *order_ids.at(idx);
+            let recipient_address = *recipient_addresses.at(idx);
+            let amount = *amounts.at(idx);
+            assert(!self.orders_used.read(order_id), 'Order withdrew or nonexistent');
+            let order = self.orders.read(order_id);
+            assert(order.recipient_address == recipient_address, 'recipient_address not match L1');
+            assert(order.amount == amount, 'amount not match L1');
+
+            self.orders_used.write(order_id, true);
+            let payment_amount = order.amount + order.fee;
+
+            IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
+                .transfer(self.mm_starknet_wallet.read(), payment_amount);
+
+            self.emit(Withdraw { order_id, address: self.mm_starknet_wallet.read(), amount });
+
+            idx += 1;
+        };
+    }
 }

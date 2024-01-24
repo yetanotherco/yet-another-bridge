@@ -62,6 +62,35 @@ contract YABTransfer {
             payload);
     }
 
+    function withdraw_batch(uint256[] calldata orderIds, uint256[] calldata destAddresses, uint256[] calldata amounts) external payable {
+        require(orderIds.length == destAddresses.length, "Invalid lengths.");
+        require(orderIds.length == amounts.length, "Invalid lengths.");
+
+        uint256[] memory payload = new uint256[](5 * orderIds.length);
+        
+        for (uint32 idx = 0; idx < orderIds.length; idx++) {
+            uint256 orderId = orderIds[idx];
+            uint256 destAddress = destAddresses[idx];
+            uint256 amount = amounts[idx];
+
+            bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount));
+            TransferInfo storage transferInfo = transfers[index];
+            require(transferInfo.isUsed == true, "Transfer not found.");
+
+            uint32 base_idx = 5 * idx;
+            payload[base_idx] = uint128(orderId); // low
+            payload[base_idx + 1] = uint128(orderId >> 128); // high
+            payload[base_idx + 2] = destAddress;
+            payload[base_idx + 3] = uint128(amount); // low
+            payload[base_idx + 4] = uint128(amount >> 128); // high
+        }
+        
+        _snMessaging.sendMessageToL2{value: msg.value}(
+            _snEscrowAddress,
+            _snEscrowWithdrawSelector,
+            payload);
+    }
+
     function setEscrowAddress(uint256 snEscrowAddress) external {
         require(msg.sender == _owner, "Only owner can call this function.");
         _snEscrowAddress = snEscrowAddress;

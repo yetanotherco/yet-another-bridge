@@ -1,9 +1,13 @@
 mod Escrow {
-    use starknet::{EthAddress, ContractAddress};
+    use core::clone::Clone;
+use core::option::OptionTrait;
+use core::traits::TryInto;
+use core::array::ArrayTrait;
+use starknet::{EthAddress, ContractAddress};
     use integer::BoundedInt;
 
     use snforge_std::{declare, ContractClassTrait};
-    use snforge_std::{CheatTarget, start_prank, stop_prank};
+    use snforge_std::{CheatTarget, start_prank, stop_prank, L1Handler, L1HandlerTrait};
 
     use yab::interfaces::IERC20::{IERC20Dispatcher, IERC20DispatcherTrait};
     use yab::escrow::{IEscrowDispatcher, IEscrowDispatcherTrait, Order};
@@ -154,5 +158,61 @@ mod Escrow {
         let order = Order { recipient_address: 12345.try_into().unwrap(), amount: 500, fee: 0 };
         let order_id = escrow.set_order(order);
         stop_prank(CheatTarget::One(escrow.contract_address));
+    }
+
+    #[test]
+    fn test_withdraw_batch() {
+        let (escrow, eth_token) = setup();
+
+        let recipient_addresses = array![12345.try_into().unwrap(), 12346.try_into().unwrap(), 12347.try_into().unwrap()];
+        let amounts = array![500, 501, 502];
+        let fees = array![3, 2, 1];
+
+        let recipient_adresses_clone = recipient_addresses.clone();
+        let amounts_clone = amounts.clone();
+
+        let mut order_ids = array![];
+
+        start_prank(CheatTarget::One(escrow.contract_address), USER());
+
+        let mut idx = 0;
+        loop {
+            if idx >= 3 {
+                break;
+            }
+
+            let recipient_address = recipient_addresses.at(idx).clone();
+            let amount = amounts.at(idx).clone();
+            let fee = fees.at(idx).clone();
+
+            let order = Order { recipient_address, amount, fee };
+            let order_id = escrow.set_order(order);
+
+            order_ids.append(order_id);
+            
+            idx += 1;
+        };
+
+        stop_prank(CheatTarget::One(escrow.contract_address));
+
+        // check balance
+        assert(eth_token.balanceOf(escrow.contract_address) == 1509, 'set_order: wrong balance ');
+        assert(eth_token.balanceOf(MM_STARKNET()) == 0, 'set_order: wrong balance');
+
+        // Call withdraw_batch l1_handler
+        let mut l1_handler = L1HandlerTrait::new(
+            contract_address: escrow.contract_address,
+            function_name: 'withdraw_batch'
+        );
+
+        let mut payload_buffer: Array<felt252> = ArrayTrait::new();
+        Serde::serialize(@order_ids, ref payload_buffer);
+        Serde::serialize(@recipient_adresses_clone, ref payload_buffer);
+        Serde::serialize(@amounts_clone, ref payload_buffer);
+
+        l1_handler.from_address = ETH_TRANSFER_CONTRACT().into();
+        l1_handler.payload = payload_buffer.span();
+
+        l1_handler.execute().expect('Failed to execute l1_handler');        
     }
 }
