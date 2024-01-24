@@ -219,7 +219,7 @@ mod Escrow {
         let order = Order { recipient_address: 12345.try_into().unwrap(), amount: 500, fee: 0 };
         let order_id = escrow.set_order(order);
 
-        start_warp(CheatTarget::One(escrow.contract_address), 43201); // set time to 43201
+        start_warp(CheatTarget::One(escrow.contract_address), 43201);
         start_prank(CheatTarget::One(escrow.contract_address), MM_STARKNET());
         escrow.cancel_order(order_id);
     }
