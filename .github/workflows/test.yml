@@ -134,6 +134,7 @@ jobs:
           export ETHERSCAN_API_KEY=${{vars.ETHERSCAN_API_KEY}}
           export ETH_PRIVATE_KEY=${{vars.ETH_PRIVATE_KEY}}
           export SN_MESSAGING_ADDRESS=${{vars.SN_MESSAGING_ADDRESS}}
+          export SKIP_VERIFY=true
           make ethereum-deploy
 
       # Deploy Starknet Contract
