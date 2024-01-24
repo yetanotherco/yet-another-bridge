@@ -195,7 +195,7 @@ mod Escrow {
     }
 
     #[test]
-    #[should_panic(expected: ('Order already withdrew',))]
+    #[should_panic(expected: ('Order withdrew or nonexistent',))]
     fn tets_cancel_order_fail_withdrew() {
         let (escrow, eth_token) = setup_balance(500);
 
