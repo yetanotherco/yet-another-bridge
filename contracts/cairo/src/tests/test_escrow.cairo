@@ -319,7 +319,7 @@ mod Escrow {
     }
 
     #[test]
-    fn test_fail_l1_while_paused() {
+    fn test_fail_call_l1_handler_while_paused() {
         let (escrow, _) = setup();
         start_prank(CheatTarget::One(escrow.contract_address), OWNER());
         escrow.pause();
@@ -345,7 +345,7 @@ mod Escrow {
     }
 
     #[test]
-    fn test_fail_l1_from_user() {
+    fn test_fail_random_eth_user_calls_l1_handler() {
         let (escrow, _) = setup();
         let data: Array<felt252> = array![1, MM_ETHEREUM().into(), 3, 4];
         let mut payload_buffer: Array<felt252> = ArrayTrait::new();
