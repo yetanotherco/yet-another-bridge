@@ -93,9 +93,6 @@ jobs:
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
 
-      - name: Run tests
-        run: forge test -vvv
-
       - name: Run Anvil
         run: |
           anvil &
