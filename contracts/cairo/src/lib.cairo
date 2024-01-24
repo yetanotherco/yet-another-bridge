@@ -16,7 +16,6 @@ mod mocks {
 #[cfg(test)]
 mod tests {
     mod test_escrow;
-
     mod utils {
         mod constants;
     }
