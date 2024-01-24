@@ -141,7 +141,7 @@ jobs:
       - name: Deploy Starknet Contract
         run: |
           export STARKNET_ACCOUNT=${{vars.STARKNET_ACCOUNT}}
-          export STARKNET_KEYSTORE=${{vars.STARKNET_KEYSTORE}}
+          export STARKNET_PRIVATE_KEY=${{vars.STARKNET_PRIVATE_KEY}}
           export SN_RPC_URL=${{vars.SN_RPC_URL}}
           export SN_ESCROW_OWNER=${{vars.SN_ESCROW_OWNER}}
           export ETH_CONTRACT_ADDR=${{vars.ETH_CONTRACT_ADDR}}
