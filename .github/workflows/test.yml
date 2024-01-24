@@ -138,6 +138,18 @@ jobs:
           make ethereum-deploy
 
       # Deploy Starknet Contract
-
+      - name: Deploy Starknet Contract
+        run: |
+          export STARKNET_ACCOUNT=${{vars.STARKNET_ACCOUNT}}
+          export STARKNET_KEYSTORE=${{vars.STARKNET_KEYSTORE}}
+          export SN_RPC_URL=${{vars.SN_RPC_URL}}
+          export SN_ESCROW_OWNER=${{vars.SN_ESCROW_OWNER}}
+          export ETH_CONTRACT_ADDR=${{vars.ETH_CONTRACT_ADDR}}
+          export MM_SN_WALLET_ADDR=${{vars.MM_SN_WALLET_ADDR}}
+          export WITHDRAW_NAME=${{vars.WITHDRAW_NAME}}
+          export MM_ETHEREUM_WALLET=${{vars.MM_ETHEREUM_WALLET}}
+          export NATIVE_TOKEN_ETH_STARKNET=${{vars.NATIVE_TOKEN_ETH_STARKNET}}
+          export ESCROW_CONTRACT_ADDRESS=${{vars.ESCROW_CONTRACT_ADDRESS}}
+          ./contracts/cairo/deploy.sh
 
       # Run mm-bot (it should run a single process order listening to the contract once)
