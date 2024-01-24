@@ -17,7 +17,6 @@ contract TransferTest is Test {
     function setUp() public {
         vm.startPrank(deployer);
 
-        // address snMessagingAddress = 0xde29d060D45901Fb19ED6C6e959EB22d8626708e; //deprecated value
         uint256 snEscrowAddress = 0x0;
         uint256 snEscrowWithdrawSelector = 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77;
         marketMaker = 0xda963fA72caC2A3aC01c642062fba3C099993D56;
