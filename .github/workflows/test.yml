@@ -15,6 +15,7 @@ defaults:
 jobs:
   Test:
     runs-on: ubuntu-latest
+    environment: Test
 
     services:
       postgres:
@@ -108,6 +109,7 @@ jobs:
           branch: 'main'
           owner: 'glihm'
           repository: 'starknet-messaging-dev'
+
       - name: Install Forge
         run: |
           cd starknet-messaging-dev/solidity
@@ -121,7 +123,9 @@ jobs:
           forge script script/LocalTesting.s.sol:LocalSetup --broadcast --rpc-url ${ETH_RPC_URL}
 
       # Deploy Ethereum Contract
-
+      - name: Deploy Ethereum Contract
+        run: |
+          make ethereum-deploy
 
       # Deploy Starknet Contract
 
