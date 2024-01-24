@@ -176,7 +176,7 @@ For this, you will need to:
 ### First alternative: automatic deploy and connect of Escrow and YABTransfer
 
    ```bash
-      make starknet-deploy-and-connect
+      make starknet-deploy-and-connect 
    ```
 
    This make target consists of 4 steps:
