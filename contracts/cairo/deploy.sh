@@ -22,7 +22,9 @@ echo -e "- ${PINK}[ETH] Market Maker: $MM_ETHEREUM_WALLET${COLOR_RESET}"
 
 echo -e "${GREEN}\n=> [SN] Deploying Escrow${COLOR_RESET}"
 ESCROW_CONTRACT_ADDRESS=$(starkli deploy \
-  --account $STARKNET_ACCOUNT --keystore $STARKNET_KEYSTORE \
+  --account $STARKNET_ACCOUNT \
+  ${STARKNET_KEYSTORE: +--keystore $STARKNET_KEYSTORE} \
+  ${STARKNET_PRIVATE_KEY: +--private-key $STARKNET_PRIVATE_KEY} \
   --watch $ESCROW_CLASS_HASH \
     $SN_ESCROW_OWNER \
     $ETH_CONTRACT_ADDR \
