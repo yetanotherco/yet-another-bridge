@@ -125,6 +125,10 @@ jobs:
       # Deploy Ethereum Contract
       - name: Deploy Ethereum Contract
         run: |
+          export ETH_RPC_URL=${{vars.ETH_RPC_URL}}
+          export ETHERSCAN_API_KEY=${{vars.ETHERSCAN_API_KEY}}
+          export ETH_PRIVATE_KEY=${{vars.ETH_PRIVATE_KEY}}
+          export SN_MESSAGING_ADDRESS=${{vars.SN_MESSAGING_ADDRESS}}
           make ethereum-deploy
 
       # Deploy Starknet Contract
