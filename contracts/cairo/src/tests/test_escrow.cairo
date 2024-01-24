@@ -284,7 +284,7 @@ mod Escrow {
     }
 
     #[test]
-    fn test_interact_when_unpaused() {
+    fn test_set_order_when_unpaused_after_prev_pause() {
         let (escrow, _) = setup();
 
         start_prank(CheatTarget::One(escrow.contract_address), USER());
