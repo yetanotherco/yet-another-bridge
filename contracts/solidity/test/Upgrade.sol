@@ -9,6 +9,7 @@ import {YABTransfer_reorgVars} from "./mock_contracts/YABTransfer_reorgVars.sol"
 import {YABTransfer_replaceVars} from "./mock_contracts/YABTransfer_replaceVars.sol";
 import {YABTransfer_moreVars_before} from "./mock_contracts/YABTransfer_moreVars_before.sol";
 import {YABTransfer_moreVars_after} from "./mock_contracts/YABTransfer_moreVars_after.sol";
+import {YABTransfer_moreVars_middle} from "./mock_contracts/YABTransfer_moreVars_middle.sol";
 
 
 contract TransferTest is Test {
@@ -83,6 +84,14 @@ contract TransferTest is Test {
         yab_moreVars_after_caller.upgradeToAndCall(address(yab_moreVars_after), '');
         return yab_moreVars_after_caller;
     }
+
+    // Same as original but with more variables in the middle of the storage
+    function deploy_and_upgrade_moreVars_middle() public returns (YABTransfer_moreVars_middle){
+        YABTransfer_moreVars_middle yab_moreVars_middle = new YABTransfer_moreVars_middle();
+        YABTransfer_moreVars_middle yab_moreVars_middle_caller = YABTransfer_moreVars_middle(address(proxy));
+        yab_moreVars_middle_caller.upgradeToAndCall(address(yab_moreVars_middle), '');
+        return yab_moreVars_middle_caller;
+    }
     
     //// ^^ Functions to upgrade the smart contract ^^
 
@@ -95,11 +104,14 @@ contract TransferTest is Test {
     function test_delete_undelete_values() public {
         vm.startPrank(deployer);
 
+        assertEq(yab_caller.getEscrowAddress(), 0x0 );
+        assertEq(yab_caller.getEscrowWithdrawSelector(), 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77);
+
         deploy_and_upgrade_lessVars();
         YABTransfer yab_oldVars_caller = deploy_and_upgrade_oldVars();
 
-        assertEq(yab_oldVars_caller.getEscrowWithdrawSelector(), 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77);
         assertEq(yab_oldVars_caller.getEscrowAddress(), 0x0 );
+        assertEq(yab_oldVars_caller.getEscrowWithdrawSelector(), 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77);
         
         vm.stopPrank();
     }
@@ -107,13 +119,13 @@ contract TransferTest is Test {
     // WARNING
     function test_replace_values() public { //this test proves new vars take the memory slot of replaced vars
         vm.startPrank(deployer);
-        assertEq(yab_caller.getEscrowWithdrawSelector(), 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77);
         assertEq(yab_caller.getEscrowAddress(), 0x0);
+        assertEq(yab_caller.getEscrowWithdrawSelector(), 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77);
 
         YABTransfer_replaceVars yab_replaceVars_caller = deploy_and_upgrade_replaceVars();
 
-        assertEq(yab_replaceVars_caller.getEscrowWithdrawSelectorV2(), 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77);
         assertEq(yab_replaceVars_caller.getEscrowAddressV2(), 0x0);
+        assertEq(yab_replaceVars_caller.getEscrowWithdrawSelectorV2(), 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77);
         
         vm.stopPrank();
     }
@@ -121,14 +133,14 @@ contract TransferTest is Test {
     // WARNING
     function test_delete_replace_values() public { //this test proves new vars take the memory slot of old deleted vars
         vm.startPrank(deployer);
-        assertEq(yab_caller.getEscrowWithdrawSelector(), 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77);
         assertEq(yab_caller.getEscrowAddress(), 0x0);
+        assertEq(yab_caller.getEscrowWithdrawSelector(), 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77);
 
         deploy_and_upgrade_lessVars();
         YABTransfer_replaceVars yab_replaceVars_caller = deploy_and_upgrade_replaceVars();
 
-        assertEq(yab_replaceVars_caller.getEscrowWithdrawSelectorV2(), 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77);
         assertEq(yab_replaceVars_caller.getEscrowAddressV2(), 0x0);
+        assertEq(yab_replaceVars_caller.getEscrowWithdrawSelectorV2(), 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77);
         
         vm.stopPrank();
     }
@@ -136,8 +148,8 @@ contract TransferTest is Test {
     //WARNING
     function test_read_reorg_values() public { //this test proves reorganizing values in storage IS HIGHLY DANGEROUS
         vm.startPrank(deployer);
-        assertEq(yab_caller.getEscrowWithdrawSelector(), 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77);
         assertEq(yab_caller.getEscrowAddress(), 0x0);
+        assertEq(yab_caller.getEscrowWithdrawSelector(), 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77);
 
         YABTransfer_reorgVars yab_reorgVars_caller = deploy_and_upgrade_reorgVars();
 
@@ -149,8 +161,8 @@ contract TransferTest is Test {
     //WARNING
     function test_read_delAndReorg_values() public {//this test proves reorganizing values in storage IS HIGHLY DANGEROUS
         vm.startPrank(deployer);
-        assertEq(yab_caller.getEscrowWithdrawSelector(), 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77);
         assertEq(yab_caller.getEscrowAddress(), 0x0);
+        assertEq(yab_caller.getEscrowWithdrawSelector(), 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77);
 
         deploy_and_upgrade_lessVars();
         YABTransfer_reorgVars yab_reorgVars_caller = deploy_and_upgrade_reorgVars();
@@ -164,28 +176,42 @@ contract TransferTest is Test {
     function test_add_var_before() public { //This test proves adding new variables at the beggining of the storage is highly dangerous
         vm.startPrank(deployer);
 
-        assertEq(yab_caller.getEscrowWithdrawSelector(), 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77);
         assertEq(yab_caller.getEscrowAddress(), 0x0);
+        assertEq(yab_caller.getEscrowWithdrawSelector(), 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77);
 
         YABTransfer_moreVars_before yab_moreVars_before_caller =  deploy_and_upgrade_moreVars_before();
 
         assertEq(yab_moreVars_before_caller.getNewVarBefore(), 0x0);
-        assertEq(yab_moreVars_before_caller.getEscrowWithdrawSelector(), 0x0); //this value has been swapped
         assertEq(yab_moreVars_before_caller.getEscrowAddress(), 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77); //this value has been swapped
+        assertEq(yab_moreVars_before_caller.getEscrowWithdrawSelector(), 0x0); //this value has been swapped
         vm.stopPrank();
     }
 
     function test_add_var_after() public { //This test shows how adding vars at the end of the storage is the best way to go
         vm.startPrank(deployer);
 
-        assertEq(yab_caller.getEscrowWithdrawSelector(), 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77);
         assertEq(yab_caller.getEscrowAddress(), 0x0);
+        assertEq(yab_caller.getEscrowWithdrawSelector(), 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77);
 
         YABTransfer_moreVars_after yab_moreVars_after_caller =  deploy_and_upgrade_moreVars_after();
 
-        assertEq(yab_moreVars_after_caller.getEscrowWithdrawSelector(), 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77);
         assertEq(yab_moreVars_after_caller.getEscrowAddress(), 0x0);
+        assertEq(yab_moreVars_after_caller.getEscrowWithdrawSelector(), 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77);
         assertEq(yab_moreVars_after_caller.getNewVarAfter(), 0x0);
+        vm.stopPrank();
+    }
+
+    function test_add_var_middle() public { //This test shows adding vars displace down the vars that follow it
+        vm.startPrank(deployer);
+
+        assertEq(yab_caller.getEscrowWithdrawSelector(), 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77);
+        assertEq(yab_caller.getEscrowAddress(), 0x0);
+
+        YABTransfer_moreVars_middle yab_moreVars_middle_caller =  deploy_and_upgrade_moreVars_middle();
+
+        assertEq(yab_moreVars_middle_caller.getEscrowAddress(), 0x0);
+        assertEq(yab_moreVars_middle_caller.getNewVarMiddle(), 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77);
+        assertEq(yab_moreVars_middle_caller.getEscrowWithdrawSelector(), 0x0);
         vm.stopPrank();
     }
 }
