@@ -17,7 +17,6 @@ contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
     mapping(bytes32 => TransferInfo) public transfers;
     address private _marketMaker;
-
     IStarknetMessaging private _snMessaging;
     uint256 private _snEscrowAddress;
     uint256 private _snEscrowWithdrawSelector;
