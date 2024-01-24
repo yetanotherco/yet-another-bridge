@@ -36,6 +36,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Python setup
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -47,6 +48,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r mm-bot/requirements.txt
 
+      # Postgres setup
       - name: Install PSQL
         run: |
           sudo apt-get update
@@ -59,6 +61,15 @@ jobs:
         env:
           PGPASSWORD: postgres_password
 
+      # Ethereum Setup
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Run Anvil
+        run: |
+          anvil &
+
+      # Starknet Setup
       - name: Install scarb
         uses: software-mansion/setup-scarb@v1
         with:
@@ -90,10 +101,10 @@ jobs:
         run: |
           .github/workflows/scripts/setup_katana_account.sh
 
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
+      # Deploy Ethereum Contract
 
-      - name: Run Anvil
-        run: |
-          anvil &
 
+      # Deploy Starknet Contract
+
+
+      # Run mm-bot (it should run a single process order listening to the contract once)
