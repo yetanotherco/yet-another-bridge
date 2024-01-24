@@ -123,6 +123,11 @@ jobs:
           forge script script/LocalTesting.s.sol:LocalSetup --broadcast --rpc-url ${ETH_RPC_URL}
 
       # Deploy Ethereum Contract
+      - name: Install Forge
+        run: |
+          cd contracts/solidity
+          forge install
+
       - name: Deploy Ethereum Contract
         run: |
           export ETH_RPC_URL=${{vars.ETH_RPC_URL}}
