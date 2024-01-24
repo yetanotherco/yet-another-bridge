@@ -137,12 +137,18 @@ jobs:
           export SKIP_VERIFY=true
           make ethereum-deploy
 
+      # Build Starknet Contract
+      - name: Build Starknet Contract
+        run: |
+          make starknet-build
+
       # Deploy Starknet Contract
       - name: Deploy Starknet Contract
         run: |
           export STARKNET_ACCOUNT=${{vars.STARKNET_ACCOUNT}}
           export STARKNET_PRIVATE_KEY=${{vars.STARKNET_PRIVATE_KEY}}
           export SN_RPC_URL=${{vars.SN_RPC_URL}}
+          export STARKNET_RPC=${{vars.SN_RPC_URL}}
           export SN_ESCROW_OWNER=${{vars.SN_ESCROW_OWNER}}
           export ETH_CONTRACT_ADDR=${{vars.ETH_CONTRACT_ADDR}}
           export MM_SN_WALLET_ADDR=${{vars.MM_SN_WALLET_ADDR}}
