@@ -9,6 +9,7 @@ mod interfaces {
 mod mocks {
     mod mock_EVMFactsRegistry;
     mod mock_EscrowV2;
+    mod mock_pausableEscrow;
 
 }
 
