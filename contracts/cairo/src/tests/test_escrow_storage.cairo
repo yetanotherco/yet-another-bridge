@@ -138,22 +138,18 @@ mod Escrow {
     // //but as it is an exception it says "failed" when run
     // #[test]
     // #[should_panic(expected: ('Entry point selector 0x009033a93ae22bbe3345b5bc992840aa932bf44027c3e662056eed95d7f0a4e4 not found in contract 0x046265009a15985a37f39b3998e2744c33c43ed269789871cf5b66c38e01e4ec',))]
-    // fn test_upgrade_escrow_nigger() {
+    // fn test_upgrade_escrow_nonExistentFunction() {
     //     let (escrow, _) = setup();
     //     let upgradeable = IUpgradeableDispatcher { contract_address: escrow.contract_address };
     //     start_prank(CheatTarget::One(escrow.contract_address), OWNER());
     //     let a = escrow.get_mm_starknet_contract();
     //     let b = escrow.get_mm_ethereum_contract();
-    //     a.print();
-    //     b.print();
-    //     'asdasdasd'.print();
+ 
 
     //     upgradeable.upgrade(declare('Escrow_lessVars').class_hash);
-
+    //     // Here it throws an exception as there is no such functions
     //     let c = escrow.get_mm_starknet_contract();
     //     let d = escrow.get_mm_ethereum_contract();
-    //     c.print();
-    //     d.print();
     //     stop_prank(CheatTarget::One(escrow.contract_address));
     // }
 
