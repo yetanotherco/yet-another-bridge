@@ -93,7 +93,8 @@ jobs:
       - name: Install Foundry
         run: |
           curl -L https://foundry.paradigm.xyz | bash &&
-          sudo . /root/.bashrc &&
+          sudo -s &&
+          source /root/.bashrc &&
           foundryup
 
       - name: Run Anvil
