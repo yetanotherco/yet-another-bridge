@@ -86,6 +86,15 @@ jobs:
         run: |
           ./katana &
 
-      - name: Deploy Starknet contract
+      - name: Setup Katana Account
         run: |
           .github/workflows/scripts/setup_katana_account.sh
+
+      - name: Install Foundry
+        run: |
+          curl -L https://foundry.paradigm.xyz | bash && foundryup
+
+      - name: Run Anvil
+        run: |
+          anvil &
+
