@@ -101,6 +101,18 @@ jobs:
         run: |
           .github/workflows/scripts/setup_katana_account.sh
 
+      # Deploy Starknet Messaging Contract in L1
+      - name: Clone https://github.com/glihm/starknet-messaging-dev
+        uses: GuillaumeFalourd/clone-github-repo-action@v2.3
+        with:
+          branch: 'main'
+          owner: 'glihm'
+          repository: 'starknet-messaging-dev'
+
+      - name: Check if repo is cloned
+        run: |
+          ls starknet-messaging-dev
+
       # Deploy Ethereum Contract
 
 
