@@ -45,7 +45,6 @@ contract TransferTest is Test {
     }
 
     function testWithdraw_mm() public {
-        // escrow: 0x00d3d7c86ba3931b120dfb08a41f6b8e78e37128bf09eca76b6a639965e014d6
         vm.prank(deployer);
         yab_caller.setEscrowAddress(0x00d3d7c86ba3931b120dfb08a41f6b8e78e37128bf09eca76b6a639965e014d6);
         hoax(marketMaker, 100 wei);
