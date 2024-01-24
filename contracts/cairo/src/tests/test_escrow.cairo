@@ -271,7 +271,7 @@ mod Escrow {
 
     #[test]
     #[should_panic(expected: ('Pausable: paused',))]
-    fn test_fail_interact_when_paused() {
+    fn test_fail_set_order_when_paused() {
         let (escrow, _) = setup();
         start_prank(CheatTarget::One(escrow.contract_address), OWNER());
         escrow.pause();
