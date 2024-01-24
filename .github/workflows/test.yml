@@ -109,9 +109,12 @@ jobs:
           owner: 'glihm'
           repository: 'starknet-messaging-dev'
 
-      - name: Check if repo is cloned
+      - name: Deploy Starknet Messaging Contract
         run: |
-          ls starknet-messaging-dev
+          cd starknet-messaging-dev/solidity
+          cp anvil.env .env
+          source .env
+          forge script script/LocalTesting.s.sol:LocalSetup --broadcast --rpc-url ${ETH_RPC_URL}
 
       # Deploy Ethereum Contract
 
