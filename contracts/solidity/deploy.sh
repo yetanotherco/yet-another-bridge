@@ -15,4 +15,4 @@ cd "$(dirname "$0")"
 #fi
 
 echo -e "${GREEN}\n=> [ETH] Deploy Escrow${COLOR_RESET}"
-forge script ./script/Deploy.s.sol --fork-url $ETH_RPC_URL --broadcast ${SKIP_VERIFY:+--verify} -vvvv
+forge script ./script/Deploy.s.sol --fork-url $ETH_RPC_URL --broadcast ${SKIP_VERIFY:---verify} -vvvv
