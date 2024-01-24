@@ -18,7 +18,7 @@ mod Escrow {
 
     use yab::tests::utils::{
         constants::EscrowConstants::{
-            USER, OWNER, MM_STARKNET, MM_ETHEREUM, ETH_TRANSFER_CONTRACT
+            USER, OWNER, MM_STARKNET, MM_ETHEREUM, ETH_TRANSFER_CONTRACT, ETH_USER
         },
     };
 
@@ -354,7 +354,8 @@ mod Escrow {
             contract_address: escrow.contract_address,
             function_name: 'withdraw',
         );
-        l1_handler.from_address = MM_ETHEREUM().into();
+        l1_handler.from_address = ETH_USER().into();
+
         l1_handler.payload = payload_buffer.span();
 
         // same as "Should Panic" but for the L1 handler function
