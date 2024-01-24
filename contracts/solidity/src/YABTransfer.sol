@@ -16,7 +16,8 @@ contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     event Transfer(uint256 indexed orderId, address srcAddress, TransferInfo transferInfo);
 
     mapping(bytes32 => TransferInfo) public transfers;
-    address private _owner;
+    address private _marketMaker;
+
     IStarknetMessaging private _snMessaging;
     uint256 private _snEscrowAddress;
     uint256 private _snEscrowWithdrawSelector;
@@ -29,17 +30,19 @@ contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     function initialize(
         address snMessaging,
         uint256 snEscrowAddress,
-        uint256 snEscrowWithdrawSelector) public initializer { 
-        _owner = msg.sender;
-        __Ownable_init(_owner);
+        uint256 snEscrowWithdrawSelector,
+        address marketMaker) public initializer { 
+        __Ownable_init(msg.sender);
         __UUPSUpgradeable_init();
 
         _snMessaging = IStarknetMessaging(snMessaging);
         _snEscrowAddress = snEscrowAddress;
         _snEscrowWithdrawSelector = snEscrowWithdrawSelector;
+        _marketMaker = marketMaker;
     }
 
-    function transfer(uint256 orderId, uint256 destAddress, uint256 amount) external payable {
+
+    function transfer(uint256 orderId, uint256 destAddress, uint256 amount) external payable onlyOwnerOrMM {
         require(destAddress != 0, "Invalid destination address.");
         require(amount > 0, "Invalid amount, should be higher than 0.");
         require(msg.value == amount, "Invalid amount, should match msg.value.");
@@ -55,7 +58,7 @@ contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         emit Transfer(orderId, msg.sender, transfers[index]);
     }
 
-    function withdraw(uint256 orderId, uint256 destAddress, uint256 amount) external payable {
+    function withdraw(uint256 orderId, uint256 destAddress, uint256 amount) external payable onlyOwnerOrMM {
         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount));
         TransferInfo storage transferInfo = transfers[index];
         require(transferInfo.isUsed == true, "Transfer not found.");
@@ -73,14 +76,32 @@ contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             payload);
     }
 
-    function setEscrowAddress(uint256 snEscrowAddress) external {
-        require(msg.sender == _owner, "Only owner can call this function.");
+    function setEscrowAddress(uint256 snEscrowAddress) external onlyOwner {
         _snEscrowAddress = snEscrowAddress;
     }
 
-    function setEscrowWithdrawSelector(uint256 snEscrowWithdrawSelector) external {
-        require(msg.sender == _owner, "Only owner can call this function.");
+    function setEscrowWithdrawSelector(uint256 snEscrowWithdrawSelector) external onlyOwner {
         _snEscrowWithdrawSelector = snEscrowWithdrawSelector;
+    }
+
+    
+    //// MM ACL:
+
+    function getMMAddress() external view returns (address) {
+        return _marketMaker;
+    }
+
+    function setMMAddress(address newMMAddress) external onlyOwner {
+        _marketMaker = newMMAddress;
+    }
+
+    function getOwner() external view returns (address) {
+        return owner();
+    }
+
+    modifier onlyOwnerOrMM {
+        require(msg.sender == owner() || msg.sender == _marketMaker, "Only Owner or MM can call this function");
+        _;
     }
 
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
