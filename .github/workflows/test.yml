@@ -91,11 +91,10 @@ jobs:
           .github/workflows/scripts/setup_katana_account.sh
 
       - name: Install Foundry
-        run: |
-          curl -L https://foundry.paradigm.xyz | bash &&
-          sudo -s &&
-          source /root/.bashrc &&
-          foundryup
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Run tests
+        run: forge test -vvv
 
       - name: Run Anvil
         run: |
