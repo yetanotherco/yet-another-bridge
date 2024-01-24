@@ -17,7 +17,6 @@ mod Escrow {
     use yab::mocks::mock_Escrow_oldVars::{IEscrow_oldVarsDispatcher, IEscrow_oldVarsDispatcherTrait};
     use yab::mocks::mock_Escrow_replacePlusOldVars::{IEscrow_replacePlusOldVarsDispatcher, IEscrow_replacePlusOldVarsDispatcherTrait};
 
-
     use yab::interfaces::IERC20::{IERC20Dispatcher, IERC20DispatcherTrait};
     use yab::escrow::{IEscrowDispatcher, IEscrowDispatcherTrait, Order};
     use yab::interfaces::IEVMFactsRegistry::{
