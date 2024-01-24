@@ -9,7 +9,9 @@ COLOR_RESET='\033[0m'
 
 echo -e "${GREEN}\n=> [SN] Declaring Escrow${COLOR_RESET}"
 ESCROW_CLASS_HASH=$(starkli declare \
-  --account $STARKNET_ACCOUNT --keystore $STARKNET_KEYSTORE \
+  --account $STARKNET_ACCOUNT \
+  ${STARKNET_KEYSTORE:+--keystore $STARKNET_KEYSTORE} \
+  ${STARKNET_PRIVATE_KEY:+--private-key $STARKNET_PRIVATE_KEY} \
   --watch contracts/cairo/target/dev/yab_Escrow.contract_class.json)
 
 echo -e "${GREEN}\n=> [SN] Escrow Declared${COLOR_RESET}"
