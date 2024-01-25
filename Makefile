@@ -8,6 +8,7 @@ install-starkli:
 
 install-starknet-foundry:
 	curl -L https://raw.githubusercontent.com/foundry-rs/starknet-foundry/master/scripts/install.sh | sh -s -- -v 0.12.0
+	snfoundryup
 
 install-ethereum-foundry:
 	curl -L https://foundry.paradigm.xyz | bash && foundryup
