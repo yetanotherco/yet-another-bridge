@@ -11,13 +11,13 @@ jobs:
   test-SN:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      # # Starknet Setup #working
-      # - name: Install scarb
-      #   uses: software-mansion/setup-scarb@v1
-      #   with:
-      #     scarb-version: "2.3.1"
+      # Starknet Setup
+      - name: Install scarb
+        uses: software-mansion/setup-scarb@v1
+        with:
+          scarb-version: "2.3.1"
 
       - name: Install starkliup
         run: |
@@ -25,16 +25,9 @@ jobs:
 
       - name: Install Starkli
         run: |
-          echo 0
-          pwd
-          ls
-          echo a
           /home/runner/.config/.starkli/bin/starkliup --version 0.1.20
-          echo b
           sudo mv /home/runner/.config/.starkli/bin/starkli /usr/local/bin/
-          echo c
 
-        
-      # - name: Run make starknet-test
-      #   run: |
-      #     make starknet-test
+      - name: Run make starknet-test
+        run: |
+          make starknet-test
