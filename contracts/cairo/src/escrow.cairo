@@ -35,7 +35,8 @@ trait IEscrow<ContractState> {
 
 #[starknet::contract]
 mod Escrow {
-    use super::{IEscrow, Order};
+    use core::traits::Into;
+use super::{IEscrow, Order};
 
     use starknet::{
         ContractAddress, EthAddress, get_caller_address, get_contract_address, get_block_timestamp
@@ -268,19 +269,7 @@ mod Escrow {
     ) {
         let eth_transfer_contract_felt: felt252 = self.eth_transfer_contract.read().into();
         assert(eth_transfer_contract_felt == from_address, 'Only ETH_TRANSFER_CONTRACT');
-        assert(!self.orders_used.read(order_id), 'Order already withdrawed');
-
-        let order = self.orders.read(order_id);
-        assert(order.recipient_address == recipient_address, 'recipient_address not match L1');
-        assert(order.amount == amount, 'amount not match L1');
-
-        self.orders_used.write(order_id, true);
-        let payment_amount = order.amount + order.fee;
-
-        IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
-            .transfer(self.mm_starknet_wallet.read(), payment_amount);
-
-        self.emit(Withdraw { order_id, address: self.mm_starknet_wallet.read(), amount });
+        _withdraw(ref self, from_address, order_id, recipient_address, amount);
     }
 
     #[l1_handler]
@@ -293,8 +282,10 @@ mod Escrow {
     ) {
         let eth_transfer_contract_felt: felt252 = self.eth_transfer_contract.read().into();
         assert(from_address == eth_transfer_contract_felt, 'Only YAB_TRANSFER_CONTRACT');
+
         assert(order_ids.len() == recipient_addresses.len(), 'Different lengths');
         assert(order_ids.len() == amounts.len(), 'Different lengths');
+        
         let mut idx = 0;
 
         loop {
@@ -302,23 +293,30 @@ mod Escrow {
                 break;
             }
 
-            let order_id = *order_ids.at(idx);
-            let recipient_address = *recipient_addresses.at(idx);
-            let amount = *amounts.at(idx);
-            assert(!self.orders_used.read(order_id), 'Order withdrew or nonexistent');
-            let order = self.orders.read(order_id);
-            assert(order.recipient_address == recipient_address, 'recipient_address not match L1');
-            assert(order.amount == amount, 'amount not match L1');
-
-            self.orders_used.write(order_id, true);
-            let payment_amount = order.amount + order.fee;
-
-            IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
-                .transfer(self.mm_starknet_wallet.read(), payment_amount);
-
-            self.emit(Withdraw { order_id, address: self.mm_starknet_wallet.read(), amount });
+            _withdraw(ref self, from_address, *order_ids.at(idx), *recipient_addresses.at(idx), *amounts.at(idx));
 
             idx += 1;
         };
+    }
+
+    fn _withdraw(
+        ref self: ContractState,
+        from_address: felt252,
+        order_id: u256,
+        recipient_address: EthAddress,
+        amount: u256
+    ) {
+        assert(!self.orders_used.read(order_id), 'Order withdrew or nonexistent');
+        let order = self.orders.read(order_id);
+        assert(order.recipient_address == recipient_address, order.recipient_address.into());
+        assert(order.amount == amount, 'amount not match L1');
+
+        self.orders_used.write(order_id, true);
+        let payment_amount = order.amount + order.fee;
+
+        IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
+            .transfer(self.mm_starknet_wallet.read(), payment_amount);
+
+        self.emit(Withdraw { order_id, address: self.mm_starknet_wallet.read(), amount });
     }
 }
