@@ -106,14 +106,14 @@ mod Escrow {
         let order_save = escrow.get_order(order_id);
         assert(order.recipient_address == order_save.recipient_address, 'wrong recipient_address');
         assert(order.amount == order_save.amount, 'wrong amount');
-        assert(!escrow.get_order_used(order_id), 'wrong order used');
+        assert(escrow.get_order_pending(order_id), 'wrong order used');
 
         start_prank(CheatTarget::One(escrow.contract_address), MM_STARKNET());
         escrow.withdraw(order_id, 0, 0);
         stop_prank(CheatTarget::One(escrow.contract_address));
 
         // check Order
-        assert(escrow.get_order_used(order_id), 'wrong order used');
+        assert(!escrow.get_order_pending(order_id), 'wrong order used');
         // check balance
         assert(eth_token.balanceOf(escrow.contract_address) == 0, 'withdraw: wrong balance');
         assert(eth_token.balanceOf(MM_STARKNET()) == 500, 'withdraw: wrong balance');

@@ -15,7 +15,7 @@ trait IEscrow<ContractState> {
 
     fn cancel_order(ref self: ContractState, order_id: u256);
 
-    fn get_order_used(self: @ContractState, order_id: u256) -> bool;
+    fn get_order_pending(self: @ContractState, order_id: u256) -> bool;
 
     fn get_order_fee(self: @ContractState, order_id: u256) -> u256;
 
@@ -79,7 +79,7 @@ mod Escrow {
         owner: ContractAddress,
         current_order_id: u256,
         orders: LegacyMap::<u256, Order>,
-        orders_used: LegacyMap::<u256, bool>,
+        orders_pending: LegacyMap::<u256, bool>,
         orders_senders: LegacyMap::<u256, ContractAddress>,
         orders_timestamps: LegacyMap::<u256, u64>,
         herodotus_facts_registry_contract: ContractAddress,
@@ -124,7 +124,7 @@ mod Escrow {
 
             let mut order_id = self.current_order_id.read();
             self.orders.write(order_id, order);
-            self.orders_used.write(order_id, false);
+            self.orders_pending.write(order_id, true);
             self.orders_senders.write(order_id, get_caller_address());
             self.orders_timestamps.write(order_id, get_block_timestamp());
 
@@ -145,7 +145,7 @@ mod Escrow {
         }
 
         fn cancel_order(ref self: ContractState, order_id: u256) {
-            assert(!self.orders_used.read(order_id), 'Order withdrew or nonexistent');
+            assert(self.orders_pending.read(order_id), 'Order withdrew or nonexistent');
             assert(
                 get_block_timestamp() - self.orders_timestamps.read(order_id) > 43200,
                 'Not enough time has passed'
@@ -160,8 +160,8 @@ mod Escrow {
                 .transfer(sender, payment_amount);
         }
 
-        fn get_order_used(self: @ContractState, order_id: u256) -> bool {
-            self.orders_used.read(order_id)
+        fn get_order_pending(self: @ContractState, order_id: u256) -> bool {
+            self.orders_pending.read(order_id)
         }
 
         fn get_order_fee(self: @ContractState, order_id: u256) -> u256 {
@@ -170,7 +170,7 @@ mod Escrow {
         }
 
         fn withdraw(ref self: ContractState, order_id: u256, block: u256, slot: u256) {
-            assert(!self.orders_used.read(order_id), 'Order already withdrawed');
+            assert(self.orders_pending.read(order_id), 'Order withdrew or nonexistent');
 
             // Read transfer info from the facts registry
             // struct TransferInfo {
@@ -210,7 +210,7 @@ mod Escrow {
 
             assert(order.amount == amount, 'amount not match L1');
 
-            self.orders_used.write(order_id, true);
+            self.orders_pending.write(order_id, false);
             let payment_amount = order.amount + order.fee;
 
             IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
@@ -268,13 +268,13 @@ mod Escrow {
     ) {
         let eth_transfer_contract_felt: felt252 = self.eth_transfer_contract.read().into();
         assert(eth_transfer_contract_felt == from_address, 'Only ETH_TRANSFER_CONTRACT');
-        assert(!self.orders_used.read(order_id), 'Order already withdrawed');
+        assert(self.orders_pending.read(order_id), 'Order withdrew or nonexistent');
 
         let order = self.orders.read(order_id);
         assert(order.recipient_address == recipient_address, 'recipient_address not match L1');
         assert(order.amount == amount, 'amount not match L1');
 
-        self.orders_used.write(order_id, true);
+        self.orders_pending.write(order_id, false);
         let payment_amount = order.amount + order.fee;
 
         IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
