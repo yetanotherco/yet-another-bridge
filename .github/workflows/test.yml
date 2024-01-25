@@ -143,9 +143,9 @@ jobs:
           make starknet-build
 
       # Deploy Starknet ERC20 Contract
-      - name: Deploy ERC20 Contract
-        run: |
-          source ./contracts/cairo/.env.test && . ./contracts/cairo/deploy_erc20.sh
+#      - name: Deploy ERC20 Contract
+#        run: |
+#          source ./contracts/cairo/.env.test && . ./contracts/cairo/deploy_erc20.sh
 
 
       # Deploy Starknet Contract
