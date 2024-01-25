@@ -1,6 +1,6 @@
 name: Tests-ETH
 
-on:
+on: 
   pull_request:
     types: [opened, synchronize, reopened]
 
