@@ -153,6 +153,9 @@ mod Escrow {
 
             let sender = self.orders_senders.read(order_id);
             assert(sender == get_caller_address(), 'Only sender allowed');
+
+            self.orders_pending.write(order_id, false);
+
             let order = self.orders.read(order_id);
             let payment_amount = order.amount + order.fee;
 

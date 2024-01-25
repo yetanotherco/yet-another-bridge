@@ -175,6 +175,9 @@ mod Escrow {
 
         stop_prank(CheatTarget::One(escrow.contract_address));
 
+        // check order not pending
+        assert(!escrow.get_order_pending(order_id), 'wrong order used');
+
         // check balance
         assert(eth_token.balanceOf(escrow.contract_address) == 0, 'cancel_order: wrong balance ');
         assert(eth_token.balanceOf(MM_STARKNET()) == 0, 'cancel_order: wrong balance');
