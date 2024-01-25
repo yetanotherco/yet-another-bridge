@@ -1,5 +1,6 @@
 mod Escrow {
-    use core::clone::Clone;
+    use core::result::ResultTrait;
+use core::clone::Clone;
 use core::option::OptionTrait;
 use core::traits::TryInto;
 use core::array::ArrayTrait;
@@ -214,6 +215,99 @@ use starknet::{EthAddress, ContractAddress};
         l1_handler.payload = payload_buffer.span();
 
         l1_handler.execute().expect('Failed to execute l1_handler');        
+    }
+
+    #[test]
+    fn test_withdraw_batch_fail_order_used() {
+        let (escrow, eth_token) = setup();
+
+        let recipient_addresses: Array<EthAddress> = array![12345.try_into().unwrap(), 12346.try_into().unwrap(), 12347.try_into().unwrap()];
+        let amounts: Array<u256> = array![500, 501, 502];
+        let fees = array![3, 2, 1];
+
+        let recipient_adresses_clone = recipient_addresses.clone();
+        let amounts_clone = amounts.clone();
+
+        let mut order_ids = array![];
+
+        start_prank(CheatTarget::One(escrow.contract_address), USER());
+
+        let mut idx = 0;
+        loop {
+            if idx >= 3 {
+                break;
+            }
+
+            let recipient_address = recipient_addresses.at(idx).clone();
+            let amount = amounts.at(idx).clone();
+            let fee = fees.at(idx).clone();
+
+            let order = Order { recipient_address, amount, fee };
+            let order_id = escrow.set_order(order);
+
+            order_ids.append(order_id);
+            
+            idx += 1;
+        };
+
+        stop_prank(CheatTarget::One(escrow.contract_address));
+
+        // Withdraw second order
+        _withdraw(
+            contract_address: escrow.contract_address,
+            function_name: 'withdraw_fallback',
+            from_address: ETH_TRANSFER_CONTRACT().into(),
+            order_id: *order_ids.at(1),
+            recipient_address: recipient_adresses_clone.at(1).clone(),
+            amount: *amounts_clone.at(1)
+        );
+
+        // Call withdraw_batch l1_handler
+        let mut l1_handler = L1HandlerTrait::new(
+            contract_address: escrow.contract_address,
+            function_name: 'withdraw_batch'
+        );
+
+        let mut payload_buffer: Array<felt252> = ArrayTrait::new();
+        Serde::serialize(@order_ids, ref payload_buffer);
+        Serde::serialize(@recipient_adresses_clone, ref payload_buffer);
+        Serde::serialize(@amounts_clone, ref payload_buffer);
+
+        l1_handler.from_address = ETH_TRANSFER_CONTRACT().into();
+        l1_handler.payload = payload_buffer.span();
+
+        // same as "Should Panic" but for the L1 handler function
+        match l1_handler.execute() {
+            Result::Ok(_) => panic_with_felt252('shouldve panicked'),
+            Result::Err(RevertedTransaction) => {
+                println!("{}", *RevertedTransaction.panic_data.at(0));
+                assert(*RevertedTransaction.panic_data.at(0) == 'Order withdrew or nonexistent', *RevertedTransaction.panic_data.at(0));
+            }
+        }
+    }
+
+    fn _withdraw(
+        contract_address: ContractAddress,
+        function_name: felt252,
+        from_address: felt252,
+        order_id: u256,
+        recipient_address: EthAddress,
+        amount: u256
+    ) {
+        let mut l1_handler = L1HandlerTrait::new(
+            contract_address,
+            function_name
+        );
+
+        let mut payload_buffer: Array<felt252> = ArrayTrait::new();
+        Serde::serialize(@order_id, ref payload_buffer);
+        Serde::serialize(@recipient_address, ref payload_buffer);
+        Serde::serialize(@amount, ref payload_buffer);
+
+        l1_handler.from_address = from_address;
+        l1_handler.payload = payload_buffer.span();
+
+        l1_handler.execute().expect('Failed to execute l1_handler');
     }
 
     #[test]
