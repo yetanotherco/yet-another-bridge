@@ -11,6 +11,8 @@ contract YABTransfer {
     }
 
     event Transfer(uint256 indexed orderId, address srcAddress, TransferInfo transferInfo);
+    event ModifiedEscrowAddress();
+    event ModifiedEscrowWithdrawSelector();
 
     mapping(bytes32 => TransferInfo) public transfers;
     address private _owner;
