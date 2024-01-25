@@ -1,11 +1,11 @@
-name: Tests-ETH
+name: ETH YABTransfer Tests
 
 on: 
   pull_request:
     types: [opened, synchronize, reopened]
 
 jobs:
-  check:
+  test-ETH:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
