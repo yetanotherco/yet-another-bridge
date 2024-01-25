@@ -9,8 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      # - uses: software-mansion/setup-scarb@v1
-      #   with:
-      #     scarb-version: "0.7.0"
-      # - run: scarb fmt --check
-      # - run: scarb test
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Run tests
+        run: make ethereum-test
