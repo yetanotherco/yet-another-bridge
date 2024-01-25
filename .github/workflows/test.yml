@@ -137,13 +137,13 @@ jobs:
           export SKIP_VERIFY=true
           make ethereum-deploy
 
-      # Build Starknet Contract
+      # Build Starknet Contract. It builds escrow and ERC20 contracts
       - name: Build Starknet Contract
         run: |
           make starknet-build
 
-      # Deploy Starknet Contract
-      - name: Deploy Starknet Contract
+      # Setup environment variables for deploy starknet contracts
+      - name: Setup environment variables
         run: |
           export STARKNET_ACCOUNT=${{vars.STARKNET_ACCOUNT}}
           export STARKNET_PRIVATE_KEY=${{vars.STARKNET_PRIVATE_KEY}}
@@ -156,6 +156,16 @@ jobs:
           export MM_ETHEREUM_WALLET=${{vars.MM_ETHEREUM_WALLET}}
           export NATIVE_TOKEN_ETH_STARKNET=${{vars.NATIVE_TOKEN_ETH_STARKNET}}
           export ESCROW_CONTRACT_ADDRESS=${{vars.ESCROW_CONTRACT_ADDRESS}}
+
+      # Deploy Starknet ERC20 Contract
+      - name: Deploy ERC20 Contract
+        run: |
+          ./contracts/cairo/deploy_erc20.sh
+
+
+      # Deploy Starknet Contract
+      - name: Deploy Escrow Contract
+        run: |
           ./contracts/cairo/deploy.sh
 
       # Run mm-bot (it should run a single process order listening to the contract once)
