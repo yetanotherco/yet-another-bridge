@@ -4,9 +4,9 @@ Yet Another Bridge is the cheapest, fastest and most secure bridge solution from
 
 ## Ok, but how does it work?
 
-YAB is conformed primarily by 2 Smart Contracts, one Smart Contract on L1 ETH blockchain (called YABTransfer), and one Smart Contract on L2 Starknet blockchain (called Escrow).
+YAB is conformed primarily by 2 Smart Contracts, one Smart Contract on L1 ETH blockchain (called YABTransfer), and one Smart Contract on L2 Starknet blockchain (called Escrow). Another vital entity for YAB's functionality is the Market Maker (MM for short).
 
-Another vital entity for YAB's functionality is the Market Maker (MM for short) 
+And, of course, the users.
 
 - To the user, the process is as follows:
 
@@ -30,3 +30,9 @@ Another vital entity for YAB's functionality is the Market Maker (MM for short)
 The whole process is shown in the following diagram:
 
 ![YAB-diagram](YAB-diagram.png)
+
+## This repo
+
+In this repo you will find both Smart Contracts, L1 YABTransfer contract (written in Solidity) and L2 Escrow contract (written in Cairo), and a MM-bot (written in Python).
+
+Each folder has it's corresponding README to deploy and use them correctly, and also some extra information to be able to understand them better.
