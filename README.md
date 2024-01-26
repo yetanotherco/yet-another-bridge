@@ -39,11 +39,35 @@ The whole process is shown in the following diagram:
 
 ![YAB-diagram](YAB-diagram.png)
 
+## Risks
+
+### User
+
+For the user, the only risk is the existance of a bug in the code of the smart contracts. This risk is mitigated by having very simple, and thoroughly tested, smart contracts.
+
+### Market Makers
+
+The risk taken by market makers is the same than by the users, plus the fact that in the end, MM will end up with its value in a L2; which are less battle-tested and have less guarantees.
+
+Additionally, since the capital is locked for a short period of time, the associated risks are mitigated. By minimizing the value held within the smart contracts, these becomes less appealing as a target to potential attackers, thereby significantly reducing its attractiveness as a potential exploit.
+
 # This Project
 
 In this repo you will find both Smart Contracts, L1 [YABTransfer contract](contracts/solidity/src/YABTransfer.sol) (written in Solidity) and L2 [Escrow contract](contracts/cairo/src/escrow.cairo) (written in Cairo), and a MM-bot (written in Python).
 
 Both the [contracts](contracts/README_contracts.md) and the [MM-bot](mm-bot/README.md) have their own README, to deploy and use them correctly.
+
+## Prerequisites
+
+To make this project work, you must have installed the following:
+
+- Python: to execute MM-bot
+- Scarb: Cairo and Starknet toolchain
+- Starkli: CLI tool for interating with Starknet blockchain
+- Starknet Foundry: for building, testing and developing Starknet contracts
+- Ethereum Foundry: for building, testing and developing Ethereum contracts
+
+All these are installed with `make deps`.
 
 ## Escrow
 
@@ -75,4 +99,4 @@ When run, MM-bot constantly reads Escrow's events and stores them in its own dat
 
 It reads every new order's information, analyzes if it capable of completing such order, and, if so, it makes the transfer to YABTransfer using the funds available on its L1 address. After this transfer is complete, MM-bot will execute the appropriate withdraw so that it can regain its tokens on L2.
 
-MM-bot uses a L1 address to transfer funds to YABTransfer (as stated above), and a L2 address to recieve the L2 tokens after succesfully completing the bridge. Also, if MM-bot is shut down, and Escrow recieves new orders, MM-bot will identify these orders when turned back on, and will identify which of them are still open, so he can complete them.
+MM-bot has a L1 address to transfer funds to YABTransfer (as stated above), and a L2 address to recieve the L2 tokens after succesfully completing the bridge. Also, if MM-bot is shut down, and Escrow recieves new orders, MM-bot will identify these orders when turned back on, and will identify which of them are still open, so he can complete them.
