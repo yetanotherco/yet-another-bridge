@@ -1,10 +1,18 @@
-# Yet-Another-Bridge
+# Yet Another Bridge 🍭
 
-Yet Another Bridge is the cheapest, fastest and most secure bridge solution from Starknet to Ethereum
+
+<div align="center">
+  <br />
+  <br />
+  <a href="https://yetanotherswap.com/bridge"><img alt="YAB" src="YAB-header.jpg" width=600></a></a>
+  <br />
+  <h3><a href="https://yetanotherswap.com/bridge">Yet Another Bridge</a> is the cheapest, fastest and most secure bridge solution from Starknet to Ethereum</h3>
+  <br />
+</div>
 
 ## Ok, but how does it work?
 
-YAB is conformed primarily by 2 Smart Contracts, one Smart Contract on L1 ETH blockchain (called YABTransfer), and one Smart Contract on L2 Starknet blockchain (called Escrow). Another vital entity for YAB's functionality is the Market Maker (MM for short).
+YAB is conformed primarily by 2 Smart Contracts, one Smart Contract on L1 ETH blockchain (called [YABTransfer](contracts/solidity/src/YABTransfer.sol)), and one Smart Contract on L2 Starknet blockchain (called [Escrow](contracts/cairo/src/escrow.cairo)). Another vital entity for YAB's functionality is the Market Maker (MM for short).
 
 And, of course, the users.
 
@@ -33,13 +41,13 @@ The whole process is shown in the following diagram:
 
 # This Project
 
-In this repo you will find both Smart Contracts, L1 YABTransfer contract (written in Solidity) and L2 Escrow contract (written in Cairo), and a MM-bot (written in Python).
+In this repo you will find both Smart Contracts, L1 [YABTransfer contract](contracts/solidity/src/YABTransfer.sol) (written in Solidity) and L2 [Escrow contract](contracts/cairo/src/escrow.cairo) (written in Cairo), and a MM-bot (written in Python).
 
-Each folder has it's corresponding README to deploy and use them correctly, and also some extra information to be able to understand them better.
+Both the [contracts](contracts/README_contracts.md) and the [MM-bot](mm-bot/README.md) have their own README, to deploy and use them correctly.
 
 ## Escrow
 
-Escrow is a Smart Contract written in Cairo that resides in Ethereum's L2 Starknet.
+[Escrow](contracts/cairo/src/escrow.cairo) is a Smart Contract written in Cairo that resides in Ethereum's L2 Starknet.
 
 This contract is responsable for recieving Users' payments in L2, and liberating them to the MM when, and only when, appropriate.
 
@@ -53,9 +61,18 @@ After a MM consolidates an order, Escrow will recieve a `withdraw` call from YAB
 
 ## YABTransfer
 
-YABTransfer is a Smart Contract written in Solidity that resides in Ethereum's L1, responsable for receiving MM's transaction on L1, forwarding it to the User's address, and sending the information of this transaction to Escrow.
+[YABTransfer](contracts/solidity/src/YABTransfer.sol) (written in Solidity) is a Smart Contract written in Solidity that resides in Ethereum's L1, responsable for receiving MM's transaction on L1, forwarding it to the User's address, and sending the information of this transaction to Escrow.
 
 So, when MM wants to complete an order it has read on Escrow, it will call the `transfer` function from YABTransfer, containing the relevant information (orderID, User's address on L1, and amount). YABTransfer will verify the information is acceptable (the amount is enough, the orderID has not already been closed, etc), store it, and send the desired amount to User's L1 address.
 
 After this transfer is completed, MM must call `withdraw` function on YABTransfer to withdraw its funds, so that YABTransfer can verify MM has previously sent the order's amount to the User. If it has, this same function will call Escrow's `withdraw` function, informing Escrow that MM has indeed bridged funds for User, and that he wants to withdraw his amount on L2. Then, as mentioned before, Escrow will release MM's funds to his desired L2 address.
 
+## MM-bot
+
+[MM-bot](mm-bot/src/main.py) (written in Python) is a complex script responsable of being the Market Maker of YAB.
+
+When run, MM-bot constantly reads Escrow's events and stores them in its own database; With this, the bot can detect almost instantaneously when a user creates a new order, allowing it to be the one who bridges the tokens for the user.
+
+It reads every new order's information, analyzes if it capable of completing such order, and, if so, it makes the transfer to YABTransfer using the funds available on its L1 address. After this transfer is complete, MM-bot will execute the appropriate withdraw so that it can regain its tokens on L2.
+
+MM-bot uses a L1 address to transfer funds to YABTransfer (as stated above), and a L2 address to recieve the L2 tokens after succesfully completing the bridge. Also, if MM-bot is shut down, and Escrow recieves new orders, MM-bot will identify these orders when turned back on, and will identify which of them are still open, so he can complete them.
