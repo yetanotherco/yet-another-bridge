@@ -11,8 +11,8 @@ contract YABTransfer {
     }
 
     event Transfer(uint256 indexed orderId, address srcAddress, TransferInfo transferInfo);
-    event ModifiedEscrowAddress();
-    event ModifiedEscrowWithdrawSelector();
+    event ModifiedEscrowAddress(uint256 newEscrowAddress);
+    event ModifiedEscrowWithdrawSelector(uint256 newEscrowWithdrawSelector);
 
     mapping(bytes32 => TransferInfo) public transfers;
     address private _owner;
@@ -67,10 +67,13 @@ contract YABTransfer {
     function setEscrowAddress(uint256 snEscrowAddress) external {
         require(msg.sender == _owner, "Only owner can call this function.");
         _snEscrowAddress = snEscrowAddress;
+        emit ModifiedEscrowAddress(snEscrowAddress);
+        
     }
 
     function setEscrowWithdrawSelector(uint256 snEscrowWithdrawSelector) external {
         require(msg.sender == _owner, "Only owner can call this function.");
         _snEscrowWithdrawSelector = snEscrowWithdrawSelector;
+        emit ModifiedEscrowWithdrawSelector(snEscrowWithdrawSelector);
     }
 }
