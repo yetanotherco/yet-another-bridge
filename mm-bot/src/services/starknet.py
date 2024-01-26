@@ -173,15 +173,13 @@ async def withdraw(order_id, block, slot) -> bool:
 
 @use_async_fallback(rpc_nodes, logger, "Failed to sign invoke transaction")
 async def sign_invoke_transaction(call: Call, max_fee: int, rpc_node=main_rpc_node):
-    return await rpc_node.account.sign_invoke_transaction(call, max_fee=max_fee)
+    return await rpc_node.account.sign_invoke_v1_transaction(call, max_fee=max_fee)  # TODO migrate to V3
 
 
 @use_async_fallback(rpc_nodes, logger, "Failed to estimate message fee")
 async def estimate_message_fee(from_address, to_address, entry_point_selector, payload, rpc_node=main_rpc_node):
     fee = await rpc_node.full_node_client.estimate_message_fee(from_address, to_address, entry_point_selector, payload)
     return fee.overall_fee
-
-
 
 
 @use_async_fallback(rpc_nodes, logger, "Failed to send transaction")
