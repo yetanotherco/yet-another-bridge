@@ -37,12 +37,6 @@ In this repo you will find both Smart Contracts, L1 YABTransfer contract (writte
 
 Each folder has it's corresponding README to deploy and use them correctly, and also some extra information to be able to understand them better.
 
-## YABTransfer
-
-YABTransfer is a Smart Contract written in Solidity that resides in Ethereum's L1.
-
-This contract is 
-
 ## Escrow
 
 Escrow is a Smart Contract written in Cairo that resides in Ethereum's L2 Starknet.
@@ -54,3 +48,14 @@ This contract has a storage of all open (and closed!) orders. When a new order i
 Once Escrow has accepted the new order, it will emit a `SetOrder` event, containing this information so that MMs can decide if they want to accept this offer.
 
 Once the new order is placed, the user must wait until a MM picks it's order, which should be almost instantaneous if the transfer fee is the suggested one! If the order is not chosen by any MM for the minimum wait time (which is currently 12 hours), the user may call the `cancel_order` function from the same address who requested the bridge. While doing this, if the correct information is provided to Escrow, it will cancel the order and return the funds to the user.
+
+After a MM consolidates an order, Escrow will recieve a `withdraw` call from YABTransfer, containing the information about how MM has indeed bridged the funds to the User's L1 address, and where does MM want to recieve it's L2 tokens. Escrow will then cross check this information to its own records, and if everything is in check, Escrow will transfer the bridged amount of tokens, plus the fee, to MM's L2 address.
+
+## YABTransfer
+
+YABTransfer is a Smart Contract written in Solidity that resides in Ethereum's L1, responsable for receiving MM's transaction on L1, forwarding it to the User's address, and sending the information of this transaction to Escrow.
+
+So, when MM wants to complete an order it has read on Escrow, it will call the `transfer` function from YABTransfer, containing the relevant information (orderID, User's address on L1, and amount). YABTransfer will verify the information is acceptable (the amount is enough, the orderID has not already been closed, etc), store it, and send the desired amount to User's L1 address.
+
+After this transfer is completed, MM must call `withdraw` function on YABTransfer to withdraw its funds, so that YABTransfer can verify MM has previously sent the order's amount to the User. If it has, this same function will call Escrow's `withdraw` function, informing Escrow that MM has indeed bridged funds for User, and that he wants to withdraw his amount on L2. Then, as mentioned before, Escrow will release MM's funds to his desired L2 address.
+
