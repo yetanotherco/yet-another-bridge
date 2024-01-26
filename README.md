@@ -31,8 +31,26 @@ The whole process is shown in the following diagram:
 
 ![YAB-diagram](YAB-diagram.png)
 
-## This repo
+# This Project
 
 In this repo you will find both Smart Contracts, L1 YABTransfer contract (written in Solidity) and L2 Escrow contract (written in Cairo), and a MM-bot (written in Python).
 
 Each folder has it's corresponding README to deploy and use them correctly, and also some extra information to be able to understand them better.
+
+## YABTransfer
+
+YABTransfer is a Smart Contract written in Solidity that resides in Ethereum's L1.
+
+This contract is 
+
+## Escrow
+
+Escrow is a Smart Contract written in Cairo that resides in Ethereum's L2 Starknet.
+
+This contract is responsable for recieving Users' payments in L2, and liberating them to the MM when, and only when, appropriate.
+
+This contract has a storage of all open (and closed!) orders. When a new order is made, by calling the `set_order` function, this contract reads the new order's details, verifies the Order is acceptable, and if so, it stores this data and accepts from the sendes the appropriate amount of tokens. An Order's details are: the address where the User wants to recieve the transaction on L1, the amount he wants to recieve, and the amount he is willing to give the MM to concrete the bridge process.
+
+Once Escrow has accepted the new order, it will emit a `SetOrder` event, containing this information so that MMs can decide if they want to accept this offer.
+
+Once the new order is placed, the user must wait until a MM picks it's order, which should be almost instantaneous if the transfer fee is the suggested one! If the order is not chosen by any MM for the minimum wait time (which is currently 12 hours), the user may call the `cancel_order` function from the same address who requested the bridge. While doing this, if the correct information is provided to Escrow, it will cancel the order and return the funds to the user.
