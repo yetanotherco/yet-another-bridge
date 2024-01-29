@@ -49,7 +49,7 @@ starknet-deploy: starknet-build
 	@. ./contracts/cairo/.env && . ./contracts/cairo/deploy.sh
 
 starknet-upgrade: starknet-build
-	@./contracts/cairo/upgrade.sh
+	@. ./contracts/cairo/.env && . ./contracts/cairo/upgrade.sh
 
 .ONESHELL:
 starknet-deploy-and-connect: starknet-build

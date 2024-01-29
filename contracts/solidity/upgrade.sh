@@ -20,10 +20,8 @@ fi
 
 echo "${GREEN}\n=> [ETH] Upgrading YABTransfer ${COLOR_RESET}"
 
-echo "fuck"
 RESULT_LOG=$(forge script ./script/Upgrade.s.sol --rpc-url $ETH_RPC_URL --broadcast --verify)
-echo "$RESULT_LOG" #uncomment this line for debugging in detail
-echo "king bithc"
+# echo "$RESULT_LOG" #uncomment this line for debugging in detail
 
 # Getting result addresses
 PROXY_ADDRESS=$(echo "$RESULT_LOG" | grep -oP '0: address \K[^\n]+' | awk '{print $0}')
