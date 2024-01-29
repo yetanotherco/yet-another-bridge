@@ -40,7 +40,7 @@ NATIVE_TOKEN_ETH_STARKNET=$(starkli deploy \
 
 echo -e "${GREEN}\n=> [SN] ERC20 Deployed${COLOR_RESET}"
 
-echo -e "- ${PURPLE}[SN] ERC20 ContractAddress: $ERC20_CONTRACT_ADDRESS${COLOR_RESET}"
+echo -e "- ${PURPLE}[SN] ERC20 ContractAddress: $NATIVE_TOKEN_ETH_STARKNET${COLOR_RESET}"
 
 # if grep -q "^ERC20_CONTRACT_ADDRESS=" ".env"; then
 #   sed "s/^ERC20_CONTRACT_ADDRESS=.*/ERC20_CONTRACT_ADDRESS=$ERC20_CONTRACT_ADDRESS/" .env >> env.temp.file
