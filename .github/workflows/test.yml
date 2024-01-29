@@ -149,7 +149,7 @@ jobs:
           source ./contracts/cairo/.env.test
           . ./contracts/cairo/deploy_erc20.sh
           . ./contracts/cairo/deploy.sh
-          . ./.github/workflows/scripts/transfer.sh
+          . ./.github/workflows/scripts/set_order.sh
           
 
       # Run mm-bot (it should run a single process order listening to the contract once)
