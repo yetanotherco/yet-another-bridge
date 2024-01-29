@@ -10,8 +10,8 @@ COLOR_RESET='\033[0m'
 echo -e "${GREEN}\n=> [SN] Declaring Escrow${COLOR_RESET}"
 ESCROW_CLASS_HASH=$(starkli declare \
   --account $STARKNET_ACCOUNT \
-  ${STARKNET_KEYSTORE:+--keystore $STARKNET_KEYSTORE} \
-  ${STARKNET_PRIVATE_KEY:+--private-key $STARKNET_PRIVATE_KEY} \
+  $(if [ -n "$STARKNET_KEYSTORE" ]; then echo "--keystore $STARKNET_KEYSTORE"; fi) \
+  $(if [ -n "$STARKNET_PRIVATE_KEY" ]; then echo "--private-key $STARKNET_PRIVATE_KEY"; fi) \
   --watch contracts/cairo/target/dev/yab_Escrow.contract_class.json)
 
 echo -e "${GREEN}\n=> [SN] Escrow Declared${COLOR_RESET}"
@@ -25,8 +25,8 @@ echo -e "- ${PINK}[ETH] Market Maker: $MM_ETHEREUM_WALLET${COLOR_RESET}"
 echo -e "${GREEN}\n=> [SN] Deploying Escrow${COLOR_RESET}"
 ESCROW_CONTRACT_ADDRESS=$(starkli deploy \
   --account $STARKNET_ACCOUNT \
-  ${STARKNET_KEYSTORE:+--keystore $STARKNET_KEYSTORE} \
-  ${STARKNET_PRIVATE_KEY:+--private-key $STARKNET_PRIVATE_KEY} \
+  $(if [ -n "$STARKNET_KEYSTORE" ]; then echo "--keystore $STARKNET_KEYSTORE"; fi) \
+  $(if [ -n "$STARKNET_PRIVATE_KEY" ]; then echo "--private-key $STARKNET_PRIVATE_KEY"; fi) \
   --watch $ESCROW_CLASS_HASH \
     $SN_ESCROW_OWNER \
     $ETH_CONTRACT_ADDR \
