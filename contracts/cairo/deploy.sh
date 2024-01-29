@@ -53,6 +53,12 @@ if [ -z "$ESCROW_CLASS_HASH" ]; then
     exit 1
 fi
 
+if [ -z "$SN_ESCROW_OWNER" ]; then
+  echo "" #\n
+  echo -e "${ORANGE}WARNING:${COLOR_RESET} no SN_ESCROW_OWNER defined in .env, declaring deployer as the owner of the contract"
+  SN_ESCROW_OWNER=$(cat "$STARKNET_ACCOUNT" | grep '"address"' | sed -E 's/.*"address": "([^"]+)".*/\1/')
+fi
+
 
 echo "${GREEN}\n=> [SN] Escrow Declared${COLOR_RESET}"
 
