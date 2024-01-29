@@ -157,5 +157,7 @@ jobs:
           
           . ./.github/workflows/scripts/set_order.sh
           
+          . ./.github/workflows/scripts/transfer.sh
+          
 
       # Run mm-bot (it should run a single process order listening to the contract once)
