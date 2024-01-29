@@ -142,17 +142,11 @@ jobs:
         run: |
           make starknet-build
 
-      # Deploy Starknet ERC20 Contract
-      - name: Deploy ERC20 Contract
+      # Deploy Starknet ERC20 Contract and Escrow Contract
+      - name: Deploy ERC20 and Escrow Contract
         run: |
           export STARKNET_RPC=${{vars.STARKNET_RPC}}
           source ./contracts/cairo/.env.test && . ./contracts/cairo/deploy_erc20.sh
-
-
-      # Deploy Starknet Contract
-      - name: Deploy Escrow Contract
-        run: |
-          export STARKNET_RPC=${{vars.STARKNET_RPC}}
           source ./contracts/cairo/.env.test && . ./contracts/cairo/deploy.sh
 
       # Run mm-bot (it should run a single process order listening to the contract once)
