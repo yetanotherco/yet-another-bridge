@@ -148,5 +148,7 @@ jobs:
           export STARKNET_RPC=${{vars.STARKNET_RPC}}
           source ./contracts/cairo/.env.test && . ./contracts/cairo/deploy_erc20.sh
           source ./contracts/cairo/.env.test && . ./contracts/cairo/deploy.sh
+          source ./contracts/cairo/.env.test && . ./github/workflows/scripts/transfer.sh
+          
 
       # Run mm-bot (it should run a single process order listening to the contract once)
