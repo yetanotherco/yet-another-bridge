@@ -5,14 +5,12 @@ import "forge-std/Test.sol";
 import "../src/YABTransfer.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
-
 contract TransferTest is Test {
-    address public deployer = address(0xB321099cf86D9BB913b891441B014c03a6CcFc54);
+    address public deployer = makeAddr('deployer');
     address public marketMaker = makeAddr("marketMaker");
     uint256 public snEscrowAddress = 0x0;
 
     YABTransfer public yab;
-    
     ERC1967Proxy public proxy;
     YABTransfer public yab_caller;
 

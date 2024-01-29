@@ -7,24 +7,23 @@ import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.s
 
 contract TransferTest is Test {
     address public deployer = makeAddr('deployer');
-    address public marketMaker;
+    address public marketMaker = makeAddr('marketMaker');
+    uint256 public snEscrowAddress = 0x0;
 
     YABTransfer public yab;
     ERC1967Proxy public proxy;
     YABTransfer public yab_caller;
 
+    address SN_MESSAGING_ADDRESS = 0xde29d060D45901Fb19ED6C6e959EB22d8626708e;
+    uint256 SN_ESCROW_WITHDRAW_SELECTOR = 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77;
+
     function setUp() public {
         vm.startPrank(deployer);
 
-        address snMessagingAddress = 0xde29d060D45901Fb19ED6C6e959EB22d8626708e;
-        uint256 snEscrowAddress = 0x0;
-        uint256 snEscrowWithdrawSelector = 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77;
-        marketMaker = makeAddr('marketMaker');
-        
         yab = new YABTransfer();
         proxy = new ERC1967Proxy(address(yab), "");
         yab_caller = YABTransfer(address(proxy));
-        yab_caller.initialize(snMessagingAddress, snEscrowAddress, snEscrowWithdrawSelector, marketMaker);
+        yab_caller.initialize(SN_MESSAGING_ADDRESS, snEscrowAddress, SN_ESCROW_WITHDRAW_SELECTOR, marketMaker);
 
         vm.stopPrank();
     }
