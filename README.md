@@ -55,7 +55,7 @@ Additionally, since the capital is locked for a short period of time, the associ
 
 In this repo you will find both Smart Contracts, L1 [YABTransfer contract](contracts/solidity/src/YABTransfer.sol) (written in Solidity) and L2 [Escrow contract](contracts/cairo/src/escrow.cairo) (written in Cairo), and a MM-bot (written in Python).
 
-Both the [contracts](contracts/README_contracts.md) and the [MM-bot](mm-bot/README.md) have their own README, to deploy and use them correctly.
+Both the [contracts](contracts/README.md) and the [MM-bot](mm-bot/README.md) have their own README, to deploy and use them correctly.
 
 ## Prerequisites
 
