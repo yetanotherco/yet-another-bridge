@@ -21,8 +21,8 @@ ethereum-build: ethereum-clean
 ethereum-test: ethereum-clean
 	@cd ./contracts/solidity/ && forge test
 
-ethereum-deploy: ethereum-build
-	@./contracts/solidity/deploy.sh
+ethereum-deploy: #ethereum-build
+	. ./contracts/solidity/.env && . ./contracts/solidity/deploy.sh
 
 ethereum-upgrade: ethereum-build
 	@./contracts/solidity/upgrade.sh
@@ -46,6 +46,7 @@ starknet-test: starknet-clean
 	@cd ./contracts/cairo/ && snforge test
 
 starknet-deploy: starknet-build
+	cat ./contracts/cairo/.env
 	@source ./contracts/cairo/.env && . ./contracts/cairo/deploy.sh
 
 starknet-upgrade: starknet-build
@@ -53,12 +54,13 @@ starknet-upgrade: starknet-build
 
 .ONESHELL:
 starknet-deploy-and-connect: starknet-build
-	@. ./contracts/cairo/.env && . ./contracts/cairo/deploy.sh
-	@. ./contracts/solidity/.env && . ./contracts/solidity/set_escrow.sh
-	@. ./contracts/solidity/.env && . ./contracts/solidity/set_withdraw_selector.sh
+	. ./contracts/cairo/.env && . ./contracts/cairo/deploy.sh
+	. ./contracts/solidity/.env && . ./contracts/solidity/set_escrow.sh
+	. ./contracts/solidity/.env && . ./contracts/solidity/set_withdraw_selector.sh
 
+.ONESHELL:
 deploy-all:
-	@$(MAKE) ethereum-deploy
-	@$(MAKE) starknet-deploy
-	@$(MAKE) ethereum-set-escrow
-	@$(MAKE) ethereum-set-withdraw-selector
+	make ethereum-build
+	. ./contracts/solidity/.env && . ./contracts/solidity/deploy.sh
+	make starknet-build
+	. ./contracts/cairo/.env && . ./contracts/cairo/deploy.sh
