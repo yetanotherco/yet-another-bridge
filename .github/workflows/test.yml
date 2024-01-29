@@ -149,6 +149,10 @@ jobs:
           source ./contracts/cairo/.env.test
           . ./contracts/cairo/deploy_erc20.sh
           . ./contracts/cairo/deploy.sh
+          
+          export ETH_PRIVATE_KEY=${{vars.ETH_PRIVATE_KEY}}
+          . ./contracts/solidity/set_escrow.sh
+          
           . ./.github/workflows/scripts/set_order.sh
           
 
