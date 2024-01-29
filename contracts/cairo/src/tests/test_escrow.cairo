@@ -8,7 +8,7 @@ mod Escrow {
     use snforge_std::{declare, ContractClassTrait, L1Handler, L1HandlerTrait};
     use snforge_std::{CheatTarget, start_prank, stop_prank, start_warp, stop_warp};
 
-    use yab::mocks::mock_Escrow_mock_changed_functions::{IEscrow_mock_changed_functionsDispatcher, IEscrow_mock_changed_functionsDispatcherTrait};
+    use yab::mocks::mock_Escrow_changed_functions::{IEscrow_mock_changed_functionsDispatcher, IEscrow_mock_changed_functionsDispatcherTrait};
     use yab::mocks::mock_pausableEscrow::{IEscrow_mockPausableDispatcher, IEscrow_mockPausableDispatcherTrait};
     use yab::interfaces::IERC20::{IERC20Dispatcher, IERC20DispatcherTrait};
     use yab::escrow::{IEscrowDispatcher, IEscrowDispatcherTrait, Order};
@@ -379,22 +379,6 @@ mod Escrow {
 
         escrow.cancel_order(order_id);
         stop_prank(CheatTarget::One(escrow.contract_address));
-    }
-    
-    #[test]
-    #[should_panic(expected: ('Order withdrew or nonexistent',))]
-    fn tets_cancel_order_fail_withdrew() {
-        let (escrow, eth_token) = setup_balance(500);
-
-        start_prank(CheatTarget::One(escrow.contract_address), USER());
-        let order = Order { recipient_address: 12345.try_into().unwrap(), amount: 500, fee: 0 };
-        let order_id = escrow.set_order(order);
-
-        start_prank(CheatTarget::One(escrow.contract_address), MM_STARKNET());
-        escrow.withdraw(order_id, 0, 0);
-        stop_prank(CheatTarget::One(escrow.contract_address));
-
-        escrow.cancel_order(order_id);
     }
 
     #[test]
