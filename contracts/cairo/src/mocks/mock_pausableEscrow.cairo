@@ -8,7 +8,7 @@ struct Order {
 }
 
 #[starknet::interface]
-trait IEscrow<ContractState> {
+trait IEscrow_mockPausable<ContractState> {
     fn get_order(self: @ContractState, order_id: u256) -> Order;
 
     fn set_order(ref self: ContractState, order: Order) -> u256;
@@ -18,6 +18,8 @@ trait IEscrow<ContractState> {
     fn get_order_used(self: @ContractState, order_id: u256) -> bool;
 
     fn get_order_fee(self: @ContractState, order_id: u256) -> u256;
+
+    // fn withdraw(ref self: ContractState, from_address: felt252, order_id: u256, recipient_address: EthAddress, amount: u256);
 
     fn get_eth_transfer_contract(self: @ContractState) -> EthAddress;
     fn get_mm_ethereum_contract(self: @ContractState) -> EthAddress;
@@ -33,8 +35,9 @@ trait IEscrow<ContractState> {
 }
 
 #[starknet::contract]
-mod Escrow {
-    use super::{IEscrow, Order};
+mod Escrow_mockPausable {
+
+    use super::{IEscrow_mockPausable, Order};
 
     use openzeppelin::{
         access::ownable::OwnableComponent,
@@ -138,6 +141,10 @@ mod Escrow {
         self.mm_ethereum_wallet.write(mm_ethereum_wallet);
         self.mm_starknet_wallet.write(mm_starknet_wallet);
         self.native_token_eth_starknet.write(native_token_eth_starknet);
+
+        if (self.pausable.is_paused()) {
+            self.pausable._unpause();
+        }
     }
 
     #[external(v0)]
@@ -149,7 +156,7 @@ mod Escrow {
     }
 
     #[external(v0)]
-    impl Escrow of IEscrow<ContractState> {
+    impl Escrow_mockPausable of IEscrow_mockPausable<ContractState> {
         fn get_order(self: @ContractState, order_id: u256) -> Order {
             self.orders.read(order_id)
         }
@@ -266,7 +273,7 @@ mod Escrow {
     ) {
         self.pausable.assert_not_paused();
         let eth_transfer_contract_felt: felt252 = self.eth_transfer_contract.read().into();
-        assert(from_address == eth_transfer_contract_felt, 'Only YAB_TRANSFER_CONTRACT');
+        assert(eth_transfer_contract_felt == from_address, 'Only ETH_TRANSFER_CONTRACT');
         assert(!self.orders_used.read(order_id), 'Order already withdrawed');
 
         let order = self.orders.read(order_id);

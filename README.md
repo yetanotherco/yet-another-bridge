@@ -111,7 +111,7 @@ Follow the steps below to set up a testnet smart wallet using `starkli`:
 
 ### Ethereum smart contract
 
-First, the Ethereum smart contracts must be deployed. For Ethereum the deployment process you will need to:
+Once we have the dependencies installed, we can proceed. For the Ethereum the deployment process you will need to:
 
 1. Create your `.env` file: you need to configure the following variables in your own .env file on the contracts/solidity/ folder. You can use the env.example file as a template for creating your .env file, paying special attention to the formats provided
 
@@ -120,6 +120,7 @@ First, the Ethereum smart contracts must be deployed. For Ethereum the deploymen
    ETH_PRIVATE_KEY = private key of your ETH wallet
    ETHERSCAN_API_KEY = API Key to use etherscan to read the Ethereum blockchain
    SN_MESSAGING_ADDRESS = Starknet Messaging address
+   YAB_TRANSFER_PROXY_ADDRESS = Address of the Ethereum Proxy smart contract, this value is automatically created and/or updated after deploy.sh is executed
    ```
 
    **NOTE**:
@@ -137,6 +138,8 @@ First, the Ethereum smart contracts must be deployed. For Ethereum the deploymen
    ```bash
       make ethereum-deploy
    ```
+
+   This will deploy a Proxy smart contract, a YABTransfer smart contract, and it will link them both. The purpose of having a proxy in front of our smart contract is so that it is upgradeable, by simply deploying another smart contract and changing the Proxy's stored address.
 
 ### Starknet smart contracts
 
@@ -157,12 +160,12 @@ For this, you will need to:
    STARKNET_KEYSTORE = Path of your starknet testnet keystore, created at the start of this README
    SN_RPC_URL = Infura or Alchemy RPC URL
    SN_ESCROW_OWNER = Public address of the owner of the Escrow contract
-   ETH_CONTRACT_ADDR = Newly created ETH contract address
    MM_SN_WALLET_ADDR = Starknet wallet of the MarketMaker
    WITHDRAW_NAME = Exact name of the withdraw function that is called from L1, case sensitive. Example: withdraw_fallback
    MM_ETHEREUM_WALLET = Ethereum wallet of the MarketMaker
-   NATIVE_TOKEN_ETH_STARKNET = Ethereum's erc20 token handler contract in Starknet
-   ESCROW_CONTRACT_ADDRESS = Address of the Starknet smart contract, this value is automatically updated after deploy.sh is run
+   NATIVE_TOKEN_ETH_STARKNET = Ethereum's erc20 token handler contract in Starknet, this value is automatically updated after solidity/deploy.sh is run
+   YAB_TRANSFER_PROXY_ADDRESS = Address of ETH smart contract Proxy
+   ESCROW_CONTRACT_ADDRESS = Address of the Starknet smart contract, this value is automatically updated after cairo/deploy.sh is run
    ```
 
    **Note**
@@ -173,7 +176,7 @@ For this, you will need to:
 ### First alternative: automatic deploy and connect of Escrow and YABTransfer
 
    ```bash
-      make starknet-deploy-and-connect
+      make starknet-deploy-and-connect 
    ```
 
    This make target consists of 4 steps:
@@ -239,6 +242,34 @@ If you want to use the Herodotus version of the smart contract, rename the `escr
 After following this complete README, we should have an ETH smart contract as well as a Starknet smart contract, both connected to act as a bridge between these two chains.
 
 ## Upgrade Contracts in Testnet
+
+### Ethereum
+
+After deploying the `YABTransfer` contract, you can perform upgrades to it. To do this you must:
+
+1. Configure the `contracts/solidity/.env` file.
+
+   ```
+      ETH_RPC_URL = Infura or Alchemy RPC URL
+      ETH_PRIVATE_KEY = private key of your ETH wallet
+      ETHERSCAN_API_KEY = API Key to use etherscan to read the Ethereum blockchain
+      SN_MESSAGING_ADDRESS = Starknet Messaging address
+      YAB_TRANSFER_PROXY_ADDRESS = Address of the Ethereum Proxy smart contract, this value is automatically created and/or updated after deploy.sh is executed
+   ```
+
+2. Use the Makefile command to upgrade `YABTransfer` contract
+
+   ```bash
+      make ethereum-upgrade
+   ```
+
+   **Note**
+   - You must be the **owner** of the contract to upgrade it.
+   - This command will:
+      - Rebuild `YABTransfer.sol`
+      - Deploy the new contract to the network
+      - Utilize Foundry to upgrade the contract by changing the proxy's pointing address to the newly deployed contract
+
 
 ### Starknet
 

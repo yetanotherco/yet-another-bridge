@@ -21,8 +21,11 @@ ethereum-build: ethereum-clean
 ethereum-test: ethereum-clean
 	@cd ./contracts/solidity/ && forge test
 
-ethereum-deploy: ethereum-clean
+ethereum-deploy: ethereum-build
 	@./contracts/solidity/deploy.sh
+
+ethereum-upgrade: ethereum-build
+	@./contracts/solidity/upgrade.sh
 
 ESCROW_CONTRACT_ADDRESS=
 ethereum-set-escrow:
@@ -53,3 +56,9 @@ starknet-deploy-and-connect: starknet-build
 	@. ./contracts/cairo/.env && . ./contracts/cairo/deploy.sh
 	@. ./contracts/solidity/.env && . ./contracts/solidity/set_escrow.sh
 	@. ./contracts/solidity/.env && . ./contracts/solidity/set_withdraw_selector.sh
+
+deploy-all:
+	@$(MAKE) ethereum-deploy
+	@$(MAKE) starknet-deploy
+	@$(MAKE) ethereum-set-escrow
+	@$(MAKE) ethereum-set-withdraw-selector
