@@ -8,7 +8,7 @@ struct Order {
 }
 
 #[starknet::interface]
-trait IEscrowV2<ContractState> {
+trait IEscrow_mock_changed_functions<ContractState> {
     fn get_orderV2(self: @ContractState, order_id: u256) -> Order;
 
     fn set_orderV2(ref self: ContractState, order: Order) -> u256;
@@ -40,8 +40,8 @@ trait IEscrowV2<ContractState> {
 }
 
 #[starknet::contract]
-mod EscrowV2 {
-    use super::{IEscrowV2, Order};
+mod Escrow_mock_changed_functions {
+    use super::{IEscrow_mock_changed_functions, Order};
 
     use openzeppelin::{
         access::ownable::OwnableComponent,
@@ -148,7 +148,7 @@ mod EscrowV2 {
     }
 
     #[external(v0)]
-    impl Escrow of IEscrowV2<ContractState> {
+    impl Escrow_mock_changed_functions of IEscrow_mock_changed_functions<ContractState> {
         fn get_orderV2(self: @ContractState, order_id: u256) -> Order {
             self.orders.read(order_id)
         }
