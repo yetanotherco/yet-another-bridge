@@ -28,7 +28,7 @@ echo -e "- ${PURPLE}[SN] ERC20 ClassHash: $ERC20_CLASS_HASH${COLOR_RESET}"
 # recipent: Katana account
 # https://www.stark-utils.xyz/converter
 echo -e "${GREEN}\n=> [SN] Deploying ERC20${COLOR_RESET}"
-ERC20_CONTRACT_ADDRESS=$(starkli deploy \
+NATIVE_TOKEN_ETH_STARKNET=$(starkli deploy \
   --account $STARKNET_ACCOUNT \
   $(if [ -n "$STARKNET_KEYSTORE" ]; then echo "--keystore $STARKNET_KEYSTORE"; fi) \
   $(if [ -n "$STARKNET_PRIVATE_KEY" ]; then echo "--private-key $STARKNET_PRIVATE_KEY"; fi) \
