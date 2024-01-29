@@ -145,7 +145,6 @@ jobs:
       # Deploy Starknet ERC20 Contract
       - name: Deploy ERC20 Contract
         run: |
-          export STARKNET_RPC=${{vars.SN_RPC_URL}}
           source ./contracts/cairo/.env.test && . ./contracts/cairo/deploy_erc20.sh
 
 
