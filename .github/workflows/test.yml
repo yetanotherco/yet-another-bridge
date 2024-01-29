@@ -150,6 +150,7 @@ jobs:
           . ./contracts/cairo/deploy_erc20.sh
           . ./contracts/cairo/deploy.sh
           
+          export ETH_RPC_URL=${{vars.ETH_RPC_URL}}
           export ETH_PRIVATE_KEY=${{vars.ETH_PRIVATE_KEY}}
           . ./contracts/solidity/set_escrow.sh
           
