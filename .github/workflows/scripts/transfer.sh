@@ -5,10 +5,7 @@ fee=25000000000000
 approve=$((124000000000000+${fee}))
 amount=124000000000000
 
-echo $NATIVE_TOKEN_ETH_STARKNET
-echo $ESCROW_CONTRACT_ADDRESS
-echo $STARKNET_PRIVATE_KEY
-echo $STARKNET_ACCOUNT
+echo -e "${GREEN}\n=> [SN] Making transfer to Escrow${COLOR_RESET}"
 
 starkli invoke \
   $NATIVE_TOKEN_ETH_STARKNET approve $ESCROW_CONTRACT_ADDRESS u256:$approve \
