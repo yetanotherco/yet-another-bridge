@@ -149,6 +149,9 @@ jobs:
           source ./contracts/cairo/.env.test
           . ./contracts/cairo/deploy_erc20.sh
           . ./contracts/cairo/deploy.sh
+
+      - name: Set Order
+        run: |
           . ./.github/workflows/scripts/set_order.sh
           
 
