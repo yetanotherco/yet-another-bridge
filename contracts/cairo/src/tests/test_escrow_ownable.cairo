@@ -92,14 +92,53 @@ mod Escrow {
     }
 
     #[test]
-    fn test_upgrade_escrow() {
+    #[should_panic(expected: ('Caller is not the owner',))]
+    fn test_fail_upgrade_escrow_caller_isnt_the_owner() {
         let (escrow, _) = setup();
         let upgradeable = IUpgradeableDispatcher { contract_address: escrow.contract_address };
-        let value = escrow.get_mm_starknet_contract();
-        start_prank(CheatTarget::One(escrow.contract_address), OWNER());
+        start_prank(CheatTarget::One(escrow.contract_address), MM_STARKNET());
         upgradeable.upgrade(declare('Escrow_mock_changed_functions').class_hash);
-        let escrow_v2 = IEscrow_mock_changed_functionsDispatcher { contract_address: escrow.contract_address };
-        let value_v2 = escrow_v2.get_mm_starknet_contractv2(); //would fail if new function name didn't exist
-        assert(value == value_v2, 'value should be the same');
+    }
+
+    #[test]
+    #[should_panic(expected: ('Caller is not the owner',))]
+    fn test_fail_set_eth_transfer_contract() {
+        let (escrow, _) = setup();
+        escrow.set_eth_transfer_contract(MM_ETHEREUM());
+    }
+
+    #[test]
+    fn test_set_eth_transfer_contract() {
+        let (escrow, _) = setup();
+        start_prank(CheatTarget::One(escrow.contract_address), OWNER());
+        escrow.set_eth_transfer_contract(MM_ETHEREUM());
+    }
+
+    #[test]
+    #[should_panic(expected: ('Caller is not the owner',))]
+    fn test_fail_set_mm_ethereum_contract() {
+        let (escrow, _) = setup();
+        escrow.set_mm_ethereum_contract(MM_ETHEREUM());
+    }
+
+    #[test]
+    fn test_set_mm_ethereum_contract() {
+        let (escrow, _) = setup();
+        start_prank(CheatTarget::One(escrow.contract_address), OWNER());
+        escrow.set_mm_ethereum_contract(MM_ETHEREUM());
+    }
+
+    #[test]
+    #[should_panic(expected: ('Caller is not the owner',))]
+    fn test_fail_set_mm_starknet_contract() {
+        let (escrow, _) = setup();
+        escrow.set_mm_starknet_contract(USER());
+    }
+
+    #[test]
+    fn test_set_mm_starknet_contract() {
+        let (escrow, _) = setup();
+        start_prank(CheatTarget::One(escrow.contract_address), OWNER());
+        escrow.set_mm_starknet_contract(USER());
     }
 }
