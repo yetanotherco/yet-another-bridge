@@ -9,7 +9,6 @@ if [ -z "$YAB_TRANSFER_PROXY_ADDRESS" ]; then
     echo "YAB_TRANSFER_PROXY_ADDRESS Variable is empty. Aborting execution.\n"
     exit 1
 fi
-
 if [ -z "$WITHDRAW_NAME" ]; then
     printf "\n${RED}ERROR:${COLOR_RESET}\n"
     echo "WITHDRAW_NAME Variable is empty. Aborting execution.\n"

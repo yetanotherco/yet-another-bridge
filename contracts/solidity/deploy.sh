@@ -18,7 +18,7 @@ YAB_TRANSFER_ADDRESS=$(echo "$RESULT_LOG" | grep -Eo '1: address ([^\n]+)' | awk
 printf "${GREEN}\n=> [ETH] Deployed Proxy address: $YAB_TRANSFER_PROXY_ADDRESS ${COLOR_RESET}\n"
 printf "${GREEN}\n=> [ETH] Deployed YABTransfer address: $YAB_TRANSFER_ADDRESS ${COLOR_RESET}\n"
 
-echo "If you now wish to deploy SN Escrow, you will need to run the following command:"
+echo "If you now wish to deploy SN Escrow, you will need to run the following commands:"
 echo "export YAB_TRANSFER_PROXY_ADDRESS=$YAB_TRANSFER_PROXY_ADDRESS"
 echo "make starknet-deploy"
 

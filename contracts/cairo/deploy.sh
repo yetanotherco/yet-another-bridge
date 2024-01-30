@@ -81,3 +81,9 @@ ESCROW_CONTRACT_ADDRESS=$(starkli deploy \
 printf "${GREEN}\n=> [SN] Escrow Deployed${COLOR_RESET}\n"
 
 printf "${CYAN}[SN] Escrow Address: $ESCROW_CONTRACT_ADDRESS${COLOR_RESET}\n"
+
+echo "If you now wish to finish the configuration of this deploy, you will need to run the following commands:"
+echo "export YAB_TRANSFER_PROXY_ADDRESS=$YAB_TRANSFER_PROXY_ADDRESS"
+echo "export ESCROW_CONTRACT_ADDRESS=$ESCROW_CONTRACT_ADDRESS"
+echo "make ethereum-set-escrow"
+echo "make ethereum-set-withdraw-selector"
