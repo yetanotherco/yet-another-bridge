@@ -77,6 +77,7 @@ ESCROW_CONTRACT_ADDRESS=$(starkli deploy \
     $MM_ETHEREUM_WALLET \
     $MM_SN_WALLET_ADDR \
     $NATIVE_TOKEN_ETH_STARKNET)
+echo $ESCROW_CONTRACT_ADDRESS
 
 printf "${GREEN}\n=> [SN] Escrow Deployed${COLOR_RESET}\n"
 

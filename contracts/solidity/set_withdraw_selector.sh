@@ -22,3 +22,4 @@ WITHDRAW_SELECTOR=$(starkli selector $WITHDRAW_NAME)
 echo "New Withdraw Selector: ${WITHDRAW_SELECTOR}"
 
 cast send --rpc-url $ETH_RPC_URL --private-key $ETH_PRIVATE_KEY $YAB_TRANSFER_PROXY_ADDRESS "setEscrowWithdrawSelector(uint256)" "${WITHDRAW_SELECTOR}" | grep "transactionHash"
+echo "Done setting withdraw selector"

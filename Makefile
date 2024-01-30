@@ -50,18 +50,20 @@ starknet-upgrade: starknet-build
 
 .ONESHELL:
 starknet-deploy-and-connect: starknet-build
-	@. ./contracts/cairo/.env && . ./contracts/cairo/deploy.sh
-	@. ./contracts/solidity/.env && . ./contracts/solidity/set_escrow.sh
-	@. ./contracts/solidity/.env && . ./contracts/solidity/set_withdraw_selector.sh
+	@. ./contracts/solidity/.env && . ./contracts/cairo/.env
+	@. ./contracts/cairo/deploy.sh
+	@. ./contracts/solidity/set_escrow.sh
+	@. ./contracts/solidity/set_withdraw_selector.sh
 
 .ONESHELL:
 deploy-all:
+	@. ./contracts/solidity/.env && . ./contracts/cairo/.env
 	@make ethereum-build
-	@. ./contracts/solidity/.env && . ./contracts/solidity/deploy.sh
+	@. ./contracts/solidity/deploy.sh
 	@make starknet-build
-	@. ./contracts/cairo/.env && . ./contracts/cairo/deploy.sh
-	@. ./contracts/solidity/.env && . ./contracts/solidity/set_escrow.sh
-	@. ./contracts/solidity/.env && . ./contracts/solidity/set_withdraw_selector.sh
-	@. ./contracts/solidity/.env && . ./contracts/cairo/.env && . ./contracts/display_info.sh
+	@. ./contracts/cairo/deploy.sh
+	@. ./contracts/solidity/set_escrow.sh
+	@. ./contracts/solidity/set_withdraw_selector.sh
+	@. ./contracts/display_info.sh
 
 
