@@ -158,7 +158,7 @@ jobs:
           . ./.github/workflows/scripts/set_order.sh
           
           . ./.github/workflows/scripts/transfer.sh
-          
+          sleep 15
           . ./.github/workflows/scripts/withdraw.sh
           
 
