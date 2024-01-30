@@ -2,7 +2,7 @@
 
 # ANSI format
 GREEN='\e[32m'
-PURPLE='\033[1;34m'
+CYAN='\033[36m'
 PINK='\033[1;35m'
 ORANGE='\033[1;33m'
 RED='\033[0;31m'
@@ -48,27 +48,27 @@ ESCROW_CLASS_HASH=$(starkli declare \
 
 
 if [ -z "$ESCROW_CLASS_HASH" ]; then
-    echo -e "\n${RED}ERROR:${COLOR_RESET}"
+    printf "\n${RED}ERROR:${COLOR_RESET}"
     echo "ESCROW_CLASS_HASH Variable is empty. Aborting execution.\n"
     exit 1
 fi
 
 if [ -z "$SN_ESCROW_OWNER" ]; then
   echo "" #\n
-  echo -e "${ORANGE}WARNING:${COLOR_RESET} no SN_ESCROW_OWNER defined in .env, declaring deployer as the owner of the contract"
+  printf "${ORANGE}WARNING:${COLOR_RESET} no SN_ESCROW_OWNER defined in .env, declaring deployer as the owner of the contract"
   SN_ESCROW_OWNER=$(cat "$STARKNET_ACCOUNT" | grep '"address"' | sed -E 's/.*"address": "([^"]+)".*/\1/')
 fi
 
 
-echo -e "${GREEN}\n=> [SN] Escrow Declared${COLOR_RESET}"
+printf "${GREEN}\n=> [SN] Escrow Declared${COLOR_RESET}"
 
-echo -e "- ${PURPLE}[SN] Escrow ClassHash: $ESCROW_CLASS_HASH${COLOR_RESET}"
-echo -e "- ${PURPLE}[SN] Market Maker SN Wallet: $MM_SN_WALLET_ADDR${COLOR_RESET}"
-echo -e "- ${PURPLE}[SN] Ethereum ERC20 ContractAddress $NATIVE_TOKEN_ETH_STARKNET${COLOR_RESET}"
-echo -e "- ${PINK}[ETH] YABTransfer Proxy Address: $YAB_TRANSFER_PROXY_ADDRESS${COLOR_RESET}"
-echo -e "- ${PINK}[ETH] Market Maker ETH Wallet: $MM_ETHEREUM_WALLET${COLOR_RESET}"
+printf "- ${CYAN}[SN] Escrow ClassHash: $ESCROW_CLASS_HASH${COLOR_RESET}"
+printf "- ${CYAN}[SN] Market Maker SN Wallet: $MM_SN_WALLET_ADDR${COLOR_RESET}"
+printf "- ${CYAN}[SN] Ethereum ERC20 ContractAddress $NATIVE_TOKEN_ETH_STARKNET${COLOR_RESET}"
+printf "- ${PINK}[ETH] YABTransfer Proxy Address: $YAB_TRANSFER_PROXY_ADDRESS${COLOR_RESET}"
+printf "- ${PINK}[ETH] Market Maker ETH Wallet: $MM_ETHEREUM_WALLET${COLOR_RESET}"
 
-echo -e "${GREEN}\n=> [SN] Deploying Escrow${COLOR_RESET}"
+printf "${GREEN}\n=> [SN] Deploying Escrow${COLOR_RESET}"
 ESCROW_CONTRACT_ADDRESS=$(starkli deploy \
   --account $STARKNET_ACCOUNT --keystore $STARKNET_KEYSTORE \
   --watch $ESCROW_CLASS_HASH \
@@ -78,6 +78,6 @@ ESCROW_CONTRACT_ADDRESS=$(starkli deploy \
     $MM_SN_WALLET_ADDR \
     $NATIVE_TOKEN_ETH_STARKNET)
 
-echo -e "${GREEN}\n=> [SN] Escrow Deployed${COLOR_RESET}"
+printf "${GREEN}\n=> [SN] Escrow Deployed${COLOR_RESET}"
 
-echo -e "- ${PURPLE}[SN] Escrow Address: $ESCROW_CONTRACT_ADDRESS${COLOR_RESET}"
+printf "- ${CYAN}[SN] Escrow Address: $ESCROW_CONTRACT_ADDRESS${COLOR_RESET}"
