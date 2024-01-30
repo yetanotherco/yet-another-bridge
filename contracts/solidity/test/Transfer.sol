@@ -6,9 +6,9 @@ import "../src/YABTransfer.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 contract TransferTest is Test {
-    address public deployer = address(0xB321099cf86D9BB913b891441B014c03a6CcFc54);
-    address public marketMaker;
-    uint256 public snEscrowAddress;
+    address public deployer = makeAddr('deployer');
+    address public marketMaker = makeAddr("marketMaker");
+    uint256 public snEscrowAddress = 0x0;
 
     YABTransfer public yab;
     ERC1967Proxy public proxy;
@@ -16,15 +16,10 @@ contract TransferTest is Test {
 
     address SN_MESSAGING_ADDRESS = 0xde29d060D45901Fb19ED6C6e959EB22d8626708e;
     uint256 SN_ESCROW_WITHDRAW_SELECTOR = 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77;
-    
 
     function setUp() public {
         vm.startPrank(deployer);
-
-        snEscrowAddress = 0x0;
-        marketMaker = 0xda963fA72caC2A3aC01c642062fba3C099993D56;
-
-        
+                
         yab = new YABTransfer();
         proxy = new ERC1967Proxy(address(yab), "");
         yab_caller = YABTransfer(address(proxy));
@@ -36,7 +31,6 @@ contract TransferTest is Test {
             abi.encodeWithSelector(IStarknetMessaging(SN_MESSAGING_ADDRESS).sendMessageToL2.selector),
             abi.encode(0x0, 0x1)
         );
-        
         vm.stopPrank();
     }
 
@@ -52,8 +46,6 @@ contract TransferTest is Test {
     }
 
     function testWithdraw_mm() public {
-        vm.prank(deployer);
-        yab_caller.setEscrowAddress(0x00d3d7c86ba3931b120dfb08a41f6b8e78e37128bf09eca76b6a639965e014d6);
         hoax(marketMaker, 100 wei);
         yab_caller.transfer{value: 100}(1, 0x1, 100);
 
@@ -71,5 +63,30 @@ contract TransferTest is Test {
         hoax(makeAddr("bob"), 100 wei);
         vm.expectRevert("Only Owner or MM can call this function");
         yab_caller.withdraw{value: 100}(1, 0x1, 100);
+    }
+
+    function testWithdraw() public {
+        hoax(marketMaker, 100 wei);
+        yab_caller.transfer{value: 100}(1, 0x1, 100);  
+        hoax(marketMaker, 100 wei);
+        yab_caller.withdraw(1, 0x1, 100);
+    }
+
+    function testWithdrawOver() public {
+        uint256 maxInt = type(uint256).max;
+        
+        vm.deal(marketMaker, maxInt);
+        vm.startPrank(marketMaker);
+
+        yab_caller.transfer{value: maxInt}(1, 0x1, maxInt);
+        yab_caller.withdraw(1, 0x1, maxInt);
+        vm.stopPrank();
+    }
+
+    function testWithdrawLow() public {
+        hoax(marketMaker, 1 wei);
+        yab_caller.transfer{value: 1}(1, 0x1, 1);
+        hoax(marketMaker, 1 wei);
+        yab_caller.withdraw(1, 0x1, 1);
     }
 }

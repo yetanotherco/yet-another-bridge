@@ -187,10 +187,10 @@ mod Escrow {
 
         fn cancel_order(ref self: ContractState, order_id: u256) {
             self.pausable.assert_not_paused();
-            assert(!self.orders_used.read(order_id), 'Order already withdrawed');
+            assert(!self.orders_used.read(order_id), 'Order withdrawn or nonexistent');
             assert(
-                get_block_timestamp() - self.orders_timestamps.read(order_id) < 43200,
-                'Didnt passed enough time'
+                get_block_timestamp() - self.orders_timestamps.read(order_id) > 43200,
+                'Not enough time has passed'
             );
 
             let sender = self.orders_senders.read(order_id);
@@ -267,7 +267,7 @@ mod Escrow {
         self.pausable.assert_not_paused();
         let eth_transfer_contract_felt: felt252 = self.eth_transfer_contract.read().into();
         assert(from_address == eth_transfer_contract_felt, 'Only YAB_TRANSFER_CONTRACT');
-        assert(!self.orders_used.read(order_id), 'Order already withdrawed');
+        assert(!self.orders_used.read(order_id), 'Order already withdrawn');
 
         let order = self.orders.read(order_id);
         assert(order.recipient_address == recipient_address, 'recipient_address not match L1');

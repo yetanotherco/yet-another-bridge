@@ -63,11 +63,11 @@ contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         require(transferInfo.isUsed == true, "Transfer not found.");
 
         uint256[] memory payload = new uint256[](5);
-        payload[0] = orderId;
-        payload[1] = 0;
+        payload[0] = uint128(orderId); // low
+        payload[1] = uint128(orderId >> 128); // high
         payload[2] = transferInfo.destAddress;
-        payload[3] = transferInfo.amount;
-        payload[4] = 0;
+        payload[3] = uint128(amount); // low
+        payload[4] = uint128(amount >> 128); // high
         
         _snMessaging.sendMessageToL2{value: msg.value}(
             _snEscrowAddress,
