@@ -68,7 +68,7 @@ jobs:
 
       - name: Run Anvil
         run: |
-          anvil &
+          anvil --gas-price=0 &
 
       # Starknet Setup
       - name: Install scarb
