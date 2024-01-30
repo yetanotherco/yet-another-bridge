@@ -214,4 +214,11 @@ If you wish to upgrade any previously deployed `Escrow` contract, it is possible
   - **rebuild** `Escrow.cairo`
   - **declare** it on Starknet
   - Call the external **upgrade()** function with the new class hash
-  
+
+### Pausable
+
+Escrow also implements the interesting `Pauseable` module. This means the smart contract can be paused and unpaused by the smart contract Owner. When paused, all modifying functions are unavailable for everyone, including the Owner.
+
+For this, the Owner must execute the `pause` or `unpause` function from the smart contract.
+
+todo: add a make target for this
