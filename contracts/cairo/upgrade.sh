@@ -10,7 +10,7 @@ COLOR_RESET='\033[0m'
 # we avoid adding flags such as --account, --keystore, and --rpc.
 export STARKNET_ACCOUNT=$STARKNET_ACCOUNT
 export STARKNET_KEYSTORE=$STARKNET_KEYSTORE
-# export STARKNET_RPC=$STARKNET_RPC #this must remain commented until we find a reliable and compatible rpc
+# export STARKNET_RPC=$STARKNET_RPC #todo: this must remain commented until we find a reliable and compatible rpc
 
 if [ -z "$ESCROW_CONTRACT_ADDRESS" ]; then
     printf "\n${RED}ERROR:${COLOR_RESET}\n"
