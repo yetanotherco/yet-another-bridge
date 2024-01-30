@@ -65,5 +65,3 @@ deploy-all:
 	@. ./contracts/solidity/set_escrow.sh
 	@. ./contracts/solidity/set_withdraw_selector.sh
 	@. ./contracts/display_info.sh
-
-
