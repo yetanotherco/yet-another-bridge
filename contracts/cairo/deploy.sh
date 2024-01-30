@@ -48,27 +48,27 @@ ESCROW_CLASS_HASH=$(starkli declare \
 
 
 if [ -z "$ESCROW_CLASS_HASH" ]; then
-    printf "\n${RED}ERROR:${COLOR_RESET}"
+    printf "\n${RED}ERROR:${COLOR_RESET}\n"
     echo "ESCROW_CLASS_HASH Variable is empty. Aborting execution.\n"
     exit 1
 fi
 
 if [ -z "$SN_ESCROW_OWNER" ]; then
   echo "" #\n
-  printf "${ORANGE}WARNING:${COLOR_RESET} no SN_ESCROW_OWNER defined in .env, declaring deployer as the owner of the contract"
+  printf "${ORANGE}WARNING:${COLOR_RESET} no SN_ESCROW_OWNER defined in .env, declaring deployer as the owner of the contract\n"
   SN_ESCROW_OWNER=$(cat "$STARKNET_ACCOUNT" | grep '"address"' | sed -E 's/.*"address": "([^"]+)".*/\1/')
 fi
 
 
-printf "${GREEN}\n=> [SN] Escrow Declared${COLOR_RESET}"
+printf "${GREEN}\n=> [SN] Escrow Declared${COLOR_RESET}\n"
 
-printf "- ${CYAN}[SN] Escrow ClassHash: $ESCROW_CLASS_HASH${COLOR_RESET}"
-printf "- ${CYAN}[SN] Market Maker SN Wallet: $MM_SN_WALLET_ADDR${COLOR_RESET}"
-printf "- ${CYAN}[SN] Ethereum ERC20 ContractAddress $NATIVE_TOKEN_ETH_STARKNET${COLOR_RESET}"
-printf "- ${PINK}[ETH] YABTransfer Proxy Address: $YAB_TRANSFER_PROXY_ADDRESS${COLOR_RESET}"
-printf "- ${PINK}[ETH] Market Maker ETH Wallet: $MM_ETHEREUM_WALLET${COLOR_RESET}"
+printf "${CYAN}[SN] Escrow ClassHash: $ESCROW_CLASS_HASH${COLOR_RESET}\n"
+printf "${CYAN}[SN] Market Maker SN Wallet: $MM_SN_WALLET_ADDR${COLOR_RESET}\n"
+printf "${CYAN}[SN] Ethereum ERC20 ContractAddress $NATIVE_TOKEN_ETH_STARKNET${COLOR_RESET}\n"
+printf "${PINK}[ETH] YABTransfer Proxy Address: $YAB_TRANSFER_PROXY_ADDRESS${COLOR_RESET}\n"
+printf "${PINK}[ETH] Market Maker ETH Wallet: $MM_ETHEREUM_WALLET${COLOR_RESET}\n"
 
-printf "${GREEN}\n=> [SN] Deploying Escrow${COLOR_RESET}"
+printf "${GREEN}\n=> [SN] Deploying Escrow${COLOR_RESET}\n"
 ESCROW_CONTRACT_ADDRESS=$(starkli deploy \
   --account $STARKNET_ACCOUNT --keystore $STARKNET_KEYSTORE \
   --watch $ESCROW_CLASS_HASH \
@@ -78,6 +78,6 @@ ESCROW_CONTRACT_ADDRESS=$(starkli deploy \
     $MM_SN_WALLET_ADDR \
     $NATIVE_TOKEN_ETH_STARKNET)
 
-printf "${GREEN}\n=> [SN] Escrow Deployed${COLOR_RESET}"
+printf "${GREEN}\n=> [SN] Escrow Deployed${COLOR_RESET}\n"
 
-printf "- ${CYAN}[SN] Escrow Address: $ESCROW_CONTRACT_ADDRESS${COLOR_RESET}"
+printf "${CYAN}[SN] Escrow Address: $ESCROW_CONTRACT_ADDRESS${COLOR_RESET}\n"

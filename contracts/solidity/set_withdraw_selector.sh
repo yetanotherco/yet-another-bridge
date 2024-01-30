@@ -5,18 +5,18 @@ GREEN='\e[32m'
 COLOR_RESET='\033[0m'
 
 if [ -z "$YAB_TRANSFER_PROXY_ADDRESS" ]; then
-    printf "\n${RED}ERROR:${COLOR_RESET}"
+    printf "\n${RED}ERROR:${COLOR_RESET}\n"
     echo "YAB_TRANSFER_PROXY_ADDRESS Variable is empty. Aborting execution.\n"
     exit 1
 fi
 
 if [ -z "$WITHDRAW_NAME" ]; then
-    printf "\n${RED}ERROR:${COLOR_RESET}"
+    printf "\n${RED}ERROR:${COLOR_RESET}\n"
     echo "WITHDRAW_NAME Variable is empty. Aborting execution.\n"
     exit 1
 fi
 
-printf "${GREEN}\n=> [ETH] Setting Starknet Withdraw Selector on ETH Smart Contract${COLOR_RESET}"
+printf "${GREEN}\n=> [ETH] Setting Starknet Withdraw Selector on ETH Smart Contract${COLOR_RESET}\n"
 echo "Smart contract being modified:" $YAB_TRANSFER_PROXY_ADDRESS
 
 WITHDRAW_SELECTOR=$(starkli selector $WITHDRAW_NAME)
