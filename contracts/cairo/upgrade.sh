@@ -14,25 +14,25 @@ export STARKNET_KEYSTORE=$STARKNET_KEYSTORE
 
 if [ -z "$ESCROW_CONTRACT_ADDRESS" ]; then
     echo -e "\n${RED}ERROR:${COLOR_RESET}"
-    echo -e "ESCROW_CONTRACT_ADDRESS Variable is empty. Aborting execution.\n"
+    echo "ESCROW_CONTRACT_ADDRESS Variable is empty. Aborting execution.\n"
     exit 1
 fi
 
 cd contracts/cairo
 
-echo "${GREEN}\n=> [SN] Declare Escrow${COLOR_RESET}"
+echo -e "${GREEN}\n=> [SN] Declare Escrow${COLOR_RESET}"
 NEW_ESCROW_CLASS_HASH=$(starkli declare --watch target/dev/yab_Escrow.contract_class.json)
 
 if [ -z "$NEW_ESCROW_CLASS_HASH" ]; then
-    echo "\n${RED}ERROR:${COLOR_RESET}"
-    echo "NEW_ESCROW_CLASS_HASH Variable is empty. Aborting execution.\n"
+    echo -e "\n${RED}ERROR:${COLOR_RESET}"
+    echo "Failed to generate New Escrow Class Hash. Aborting execution.\n"
     exit 1
 fi
 
-echo "- ${PURPLE}[SN] Escrow address: $ESCROW_CONTRACT_ADDRESS${COLOR_RESET}"
-echo "- ${PURPLE}[SN] New Escrow ClassHash: $NEW_ESCROW_CLASS_HASH${COLOR_RESET}"
+echo -e "- ${PURPLE}[SN] Escrow address: $ESCROW_CONTRACT_ADDRESS${COLOR_RESET}"
+echo -e "- ${PURPLE}[SN] New Escrow ClassHash: $NEW_ESCROW_CLASS_HASH${COLOR_RESET}"
 
-echo "${GREEN}\n=> [SN] Upgrade Escrow${COLOR_RESET}"
+echo -e "${GREEN}\n=> [SN] Upgrade Escrow${COLOR_RESET}"
 starkli invoke --watch $ESCROW_CONTRACT_ADDRESS upgrade $NEW_ESCROW_CLASS_HASH
 
 cd ../..
