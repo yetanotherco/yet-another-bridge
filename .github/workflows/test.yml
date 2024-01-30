@@ -142,8 +142,8 @@ jobs:
         run: |
           make starknet-build
 
-      # Deploy Starknet ERC20 Contract and Escrow Contract
-      - name: Deploy ERC20 and Escrow Contract
+      # Deploy ERC20, Escrow, set escrow, set withdraw selector and test complete flow
+      - name: Deploy ERC20, Escrow, set escrow, set withdraw selector and test complete flow
         run: |
           export STARKNET_RPC=${{vars.STARKNET_RPC}}
           source ./contracts/cairo/.env.test
@@ -158,6 +158,8 @@ jobs:
           . ./.github/workflows/scripts/set_order.sh
           
           . ./.github/workflows/scripts/transfer.sh
+          
+          . ./.github/workflows/scripts/withdraw.sh
           
 
       # Run mm-bot (it should run a single process order listening to the contract once)
