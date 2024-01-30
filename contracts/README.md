@@ -16,7 +16,11 @@ This will end up installing:
 - [Starknet Foundry](https://foundry-rs.github.io/starknet-foundry/) - Is a toolchain for developing Starknet smart contracts.
 - [Ethereum Foundry](https://book.getfoundry.sh/) - Is a toolchain for developing Ethereum smart contracts.
 
-## Ethereum smart contract (YABTransfer)
+Another starknet dependency used in this project:
+
+- [OpenZeppelin cairo contracts](https://github.com/OpenZeppelin/cairo-contracts/)
+
+## Deploy YABTransfer (on Ethereum)
 
 First, the Ethereum smart contract must be deployed. For Ethereum the deployment process you will need to:
 
@@ -24,8 +28,11 @@ First, the Ethereum smart contract must be deployed. For Ethereum the deployment
 
    ```bash
    ETH_RPC_URL = Infura or Alchemy RPC URL
+
    ETH_PRIVATE_KEY = private key of your ETH wallet
+
    ETHERSCAN_API_KEY = API Key to use etherscan to read the Ethereum blockchain
+
    SN_MESSAGING_ADDRESS = Starknet Messaging address
    ```
 
@@ -45,7 +52,9 @@ First, the Ethereum smart contract must be deployed. For Ethereum the deployment
       make ethereum-deploy
    ```
 
-## Starknet smart contract (Escrow)
+This will deploy a [ERC1967 Proxy](https://docs.openzeppelin.com/contracts/4.x/api/proxy#ERC1967Proxy) smart contract, a [YABTransfer](solidity/src/YABTransfer.sol) smart contract, and it will link them both. The purpose of having a proxy in front of our smart contract is so that it is [upgradeable](https://docs.openzeppelin.com/contracts/4.x/api/proxy#UUPSUpgradeable), by simply deploying another smart contract and changing the address pointed by the Proxy.
+
+## Deploy Escrow (on Starknet)
 
 After the Ethereum smart contract is deployed, the Starknet smart contracts must be declared and deployed.
 On Starknet, the deployment process is in two steps:
@@ -60,23 +69,26 @@ For this, you will need to:
 1. Create your `.env` file: you need to configure the following variables in your own .env file on the contracts/solidity folder. You can use the env.example file as a template for creating your .env file, paying special attention to the formats provided
 
    ```env
-   STARKNET_ACCOUNT = Absolute path of your starknet testnet account, created at the start of this README
-   STARKNET_KEYSTORE = Absolute path of your starknet testnet keystore, created at the start of this README
+   STARKNET_ACCOUNT = Absolute path of your starknet testnet account
+
+   STARKNET_KEYSTORE = Absolute path of your starknet testnet keystore
+
    SN_RPC_URL = Infura or Alchemy RPC URL
-   ETH_CONTRACT_ADDR = newly created ETH contract address
+
+   SN_ESCROW_OWNER = Public address of the owner of the Escrow contract
+
    MM_SN_WALLET_ADDR = Starknet wallet of the MarketMaker
-   WITHDRAW_NAME = The exact name of the withdraw function that is called from L1, case sensitive. Example: withdraw_fallback
-   HERODOTUS_FACTS_REGISTRY = Herodotus' Facts Registry Smart Contract in Starknet
+
+   WITHDRAW_NAME = The exact plain name of the withdraw function that is called from L1, case sensitive
+
    MM_ETHEREUM_WALLET = Ethereum wallet of the MarketMaker
+
    NATIVE_TOKEN_ETH_STARKNET = Ethereum's erc20 token handler contract in Starknet
-   ESCROW_CONTRACT_ADDRESS = Address of the Starknet smart contract, this value should be empty, and is automatically updated after deploy.sh is run
    ```
 
    **Note**
-   - Herodotus Facts Registry:
-      - Starknet Goerli: `0x01b2111317EB693c3EE46633edd45A4876db14A3a53ACDBf4E5166976d8e869d`
-      - Starknet Sepolia: `0x07d3550237ecf2d6ddef9b78e59b38647ee511467fe000ce276f245a006b40bc`
-      - Starknet Mainnet: `0x014bf62fadb41d8f899bb5afeeb2da486fcfd8431852def56c5f10e45ae72765`
+   - For how to create Starknet ACCOUNT and KEYSTORE, you can follow [this tutorial](starknet_wallet_setup.md)
+   - SN_ESCROW_OWNER is the only one who can perform upgrades, pause and unpause the smart contract. If not defined, this value will be set (by deploy.sh) to the current deployer of the smart contract.
 
 2. Declare and Deploy: We sequentially declare and deploy the contracts, and connect it to our Ethereum smart contract.
 
@@ -95,7 +107,7 @@ For this, you will need to:
 
 ### Second alternative: manual deploy and connect of Escrow and YABTransfer
 
-This may be better suited for you if you plan to change some of the automatically declared .env vars, or if you simply want to make sure you understand the process.
+This may be better suited for you if you plan to change some of the automatically declared variables, or if you simply want to make sure you understand the process.
 
 1. Declare and Deploy: We sequentially declare and deploy the contracts.
 
@@ -103,7 +115,7 @@ This may be better suited for you if you plan to change some of the automaticall
       make starknet-deploy
    ```
 
-   This script also sets an important .env variable, **ESCROW_CONTRACT_ADDRESS**
+   This script also defines an important variable, **ESCROW_CONTRACT_ADDRESS**
 
 2. Setting _EscrowAddress_
 
@@ -115,7 +127,7 @@ This may be better suited for you if you plan to change some of the automaticall
    make ethereum-set-escrow
    ```
 
-   This script uses the previously set .env variable, **ESCROW_CONTRACT_ADDRESS**
+   This script uses the previously set variable, **ESCROW_CONTRACT_ADDRESS**
 
 3. Setting _EscrowWithdrawSelector_
 
@@ -130,4 +142,76 @@ This may be better suited for you if you plan to change some of the automaticall
 
 ## Recap
 
-After following this README, we should have deployed an ETH smart contract as well as declared and deployed a Starknet smart contract, both connected to act as a bridge between these two chains.
+At this point, we should have deployed an ETH smart contract as well as declared and deployed a Starknet smart contract, both connected to act as a bridge between these two chains.
+
+## Upgrade Contracts in Testnet
+
+### Upgrading YABTransfer (on Ethereum)
+
+After deploying the `YABTransfer` contract, you can perform upgrades to it. To do this you must:
+
+1. Configure the `contracts/solidity/.env` file.
+
+   ```env
+      ETH_RPC_URL = Infura or Alchemy RPC URL
+
+      ETH_PRIVATE_KEY = private key of your ETH wallet
+
+      ETHERSCAN_API_KEY = API Key to use etherscan to read the Ethereum blockchain
+
+      SN_MESSAGING_ADDRESS = Starknet Messaging address
+   ```
+
+   **NOTE:** This is a very similar configuration than the mentioned before, but MM_ETHEREUM_WALLET is not necessary
+
+2. Configure the address of the proxy to be upgraded:
+
+   ```b
+      export YAB_TRANSFER_PROXY_ADDRESS = Address of your YABTransfer's Proxy
+   ```
+
+3. Use the Makefile command to upgrade `YABTransfer` contract
+
+   ```bash
+      make ethereum-upgrade
+   ```
+
+   **Note**
+   - You must be the **owner** of the contract to upgrade it.
+   - This command will:
+      - Rebuild `YABTransfer.sol`
+      - Deploy the new contract to the network
+      - Utilize Foundry to upgrade the previous contract, changing the proxy's pointing address to the newly deployed contract
+
+### Upgrade Escrow (on Starknet)
+
+If you wish to upgrade any previously deployed `Escrow` contract, it is possible through a command. We will perform the upgrade using the `starkli` tool, so the same configuration used for deployment is necessary:
+
+1. Configure `contracts/cairo/.env` file.
+
+   ```env
+      STARKNET_ACCOUNT = Path of your starknet testnet account
+
+      STARKNET_KEYSTORE = Path of your starknet testnet keystore
+   ```
+
+2. Configure the address of the contract to be upgraded:
+
+   ```bash
+      export ESCROW_CONTRACT_ADDRESS = Address of your Escrow smart contract
+   ```
+
+3. Use the Makefile command to upgrade `Escrow` contract
+
+   ```bash
+      make starknet-upgrade
+   ```
+
+   **Note**
+
+- You must be the **owner** of the contract to upgrade it.
+- This command will:
+  - **rebuild** `Escrow.cairo`
+  - **declare** it on Starknet
+  - Call the external **upgrade()** function with the new class hash
+  
