@@ -4,7 +4,6 @@
 GREEN='\e[32m'
 COLOR_RESET='\033[0m'
 
-# cd "$(dirname "$0")"
 cd contracts/solidity
 
 if [ -z "$YAB_TRANSFER_PROXY_ADDRESS" ]; then

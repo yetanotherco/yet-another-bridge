@@ -8,7 +8,6 @@ ORANGE='\033[1;33m'
 RED='\033[0;31m'
 COLOR_RESET='\033[0m'
 
-#todo: make this prettier
 if [ -z "$STARKNET_ACCOUNT" ]; then
     echo "\n${RED}ERROR:${COLOR_RESET}"
     echo "STARKNET_ACCOUNT Variable is empty. Aborting execution.\n"
