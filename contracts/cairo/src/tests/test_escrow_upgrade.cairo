@@ -95,8 +95,12 @@ mod Escrow {
     fn test_upgrade_escrow() {
         let (escrow, _) = setup();
         let upgradeable = IUpgradeableDispatcher { contract_address: escrow.contract_address };
+        let value = escrow.get_mm_starknet_contract();
         start_prank(CheatTarget::One(escrow.contract_address), OWNER());
         upgradeable.upgrade(declare('Escrow_mock_changed_functions').class_hash);
+        let escrow_v2 = IEscrow_mock_changed_functionsDispatcher { contract_address: escrow.contract_address };
+        let value_v2 = escrow_v2.get_mm_starknet_contractv2(); //would fail if new function name didn't exist
+        assert(value == value_v2, 'value should be the same');
     }
 
     #[test]
