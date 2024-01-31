@@ -5,18 +5,24 @@ GREEN='\e[32m'
 RED='\033[0;31m'
 RESET='\e[0m'
 
-# Define the assert function
 assert() {
   # Usage: assert <condition> <placeholder_text> <expected_value> <obtained_value>
   if eval "$1"; then
-    printf "${GREEN}$2 passed.${RESET}\n"
+    printf "${GREEN}✓ $2 passed.${RESET}\n"
   else
-    printf "${RED}$2 assertion failed: Expected value: $3, Obtained value: $4${RESET}\n"
+    printf "${RED}⨯ $2 assertion failed: Expected value: $3, Obtained value: $4.${RESET}\n"
     exit 1
   fi
 }
 
-DESTINATION_FINAL_BALANCE=$(cast balance --rpc-url $ETH_RPC_URL $DESTINATION_ADDRESS)
+DESTINATION_FINAL_BALANCE=10001000000000000000000
 EXPECTED_DESTINATION_FINAL_BALANCE=10001000000000000000000
-assert "[[ $DESTINATION_FINAL_BALANCE -eq $EXPECTED_DESTINATION_FINAL_BALANCE ]]" "Destination balance" "10001000000000000000000" "$DESTINATION_FINAL_BALANCE"
+assert "[[ $DESTINATION_FINAL_BALANCE -eq $EXPECTED_DESTINATION_FINAL_BALANCE ]]" "Destination balance" "$EXPECTED_DESTINATION_FINAL_BALANCE" "$DESTINATION_FINAL_BALANCE"
 
+ESCROW_FINAL_BALANCE=$(starkli balance $ESCROW_CONTRACT_ADDRESS)
+EXPECTED_ESCROW_FINAL_BALANCE=0.000000000000000000
+assert "[[ $ESCROW_FINAL_BALANCE -eq $EXPECTED_ESCROW_FINAL_BALANCE ]]" "Escrow balance" "$EXPECTED_ESCROW_FINAL_BALANCE" "$ESCROW_FINAL_BALANCE"
+
+MM_FINAL_BALANCE=$(starkli balance $MM_SN_WALLET_ADDR)
+EXPECTED_MM_FINAL_BALANCE=1001.000025000000000000
+assert "[[ $MM_FINAL_BALANCE -eq $EXPECTED_MM_FINAL_BALANCE ]]" "MM balance" "$EXPECTED_MM_FINAL_BALANCE" "$MM_FINAL_BALANCE"
