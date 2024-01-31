@@ -13,9 +13,9 @@ if [ -z "$STARKNET_ACCOUNT" ]; then
     echo "STARKNET_ACCOUNT Variable is empty. Aborting execution.\n"
     exit 1
 fi
-if [ -z "$STARKNET_KEYSTORE" ]; then
+if [ -z "$STARKNET_KEYSTORE" && -z "$STARKNET_PRIVATE_KEY" ]; then
     echo "\n${RED}ERROR:${COLOR_RESET}"
-    echo "STARKNET_KEYSTORE Variable is empty. Aborting execution.\n"
+    echo "STARKNET_KEYSTORE and STARKNET_PRIVATE_KEY Variable is empty. Aborting execution.\n"
     exit 1
 fi
 if [ -z "$MM_SN_WALLET_ADDR" ]; then
