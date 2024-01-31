@@ -13,7 +13,7 @@ if [ -z "$STARKNET_ACCOUNT" ]; then
     echo "STARKNET_ACCOUNT Variable is empty. Aborting execution.\n"
     exit 1
 fi
-if [ -z "$STARKNET_KEYSTORE" && -z "$STARKNET_PRIVATE_KEY" ]; then
+if [ -z "$STARKNET_KEYSTORE" ] && [ -z "$STARKNET_PRIVATE_KEY" ]; then
     echo "\n${RED}ERROR:${COLOR_RESET}"
     echo "STARKNET_KEYSTORE and STARKNET_PRIVATE_KEY Variable is empty. Aborting execution.\n"
     exit 1
