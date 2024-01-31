@@ -173,8 +173,6 @@ jobs:
           
           export STARKNET_RPC=${{vars.STARKNET_RPC}}
           source ./contracts/cairo/.env.test
-          . ./contracts/cairo/deploy_erc20.sh
-          export NATIVE_TOKEN_ETH_STARKNET=0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7
           . ./contracts/cairo/deploy.sh
           
           . ./contracts/solidity/set_escrow.sh
