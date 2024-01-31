@@ -37,30 +37,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Python setup
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.10.12
-          architecture: x64
+      # Python setup TODO activate when mm-bot is ready
+#      - name: Setup Python
+#        uses: actions/setup-python@v5
+#        with:
+#          python-version: 3.10.12
+#          architecture: x64
+#
+#      - name: Install dependencies
+#        run: |
+#          python -m pip install --upgrade pip
+#          pip install -r mm-bot/requirements.txt
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r mm-bot/requirements.txt
-
-      # Postgres setup
-      - name: Install PSQL
-        run: |
-          sudo apt-get update
-          sudo apt-get install --yes postgresql-client
-
-      - name: Create tables
-        run: |
-          psql -h localhost -d postgres_db -U postgres_user -f mm-bot/resources/schema.sql
-          psql -h localhost -d postgres_db -U postgres_user -c "SELECT * FROM block;"
-        env:
-          PGPASSWORD: postgres_password
+      # Postgres setup TODO activate when mm-bot is ready
+#      - name: Install PSQL
+#        run: |
+#          sudo apt-get update
+#          sudo apt-get install --yes postgresql-client
+#
+#      - name: Create tables
+#        run: |
+#          psql -h localhost -d postgres_db -U postgres_user -f mm-bot/resources/schema.sql
+#          psql -h localhost -d postgres_db -U postgres_user -c "SELECT * FROM block;"
+#        env:
+#          PGPASSWORD: postgres_password
 
       # Ethereum Setup
       - name: Install Foundry
