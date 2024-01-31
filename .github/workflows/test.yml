@@ -90,8 +90,8 @@ jobs:
 
       - name: Download Katana
         run: |
-          wget https://github.com/dojoengine/dojo/releases/download/v0.3.1/dojo_v0.3.1_linux_amd64.tar.gz
-          tar -xzvf dojo_v0.3.1_linux_amd64.tar.gz
+          wget https://github.com/dojoengine/dojo/releases/download/v0.4.4/dojo_v0.4.4_linux_amd64.tar.gz
+          tar -xzvf dojo_v0.4.4_linux_amd64.tar.gz
           rm sozo torii dojo-language-server
 
       # Deploy Starknet Messaging Contract in L1
