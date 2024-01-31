@@ -1,10 +1,5 @@
 #!/bin/bash
-
-# ANSI format
-GREEN='\e[32m'
-CYAN='\033[36m'
-PINK='\033[1;35m'
-COLOR_RESET='\033[0m'
+. contracts/general/colors.sh #for ANSI colors
 
 # Starkli implicitly utilizes these environment variables, so every time we use Starkli,
 # we avoid adding flags such as --account, --keystore, and --rpc.
