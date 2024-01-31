@@ -238,3 +238,9 @@ starkli invoke $ESCROW_CONTRACT_ADDRESS pause
 ```bash
 starkli invoke $ESCROW_CONTRACT_ADDRESS unpause 
 ```
+
+You can also see if the contract is paused or unpaused by executing the following:
+
+```bash
+starkli call $ESCROW_CONTRACT_ADDRESS is_paused 
+```
