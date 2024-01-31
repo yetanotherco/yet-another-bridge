@@ -8,7 +8,7 @@ RESET='\e[0m'
 # Define the assert function
 assert() {
   # Usage: assert <condition> <placeholder_text> <expected_value> <obtained_value>
-  if eval "$1"; then
+  if "$1"; then
     echo "${GREEN}$2 passed.${RESET}"
   else
     echo "${RED}$2 assertion failed: Expected value: $3, Obtained value: $4${RESET}"
