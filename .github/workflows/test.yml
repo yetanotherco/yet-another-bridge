@@ -167,6 +167,7 @@ jobs:
           . ./contracts/solidity/set_escrow.sh
           . ./contracts/solidity/set_withdraw_selector.sh
           
+          export AMOUNT=1000000000000000000
           . ./.github/workflows/scripts/set_order.sh
           
           . ./.github/workflows/scripts/transfer.sh
