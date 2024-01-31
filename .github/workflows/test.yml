@@ -94,14 +94,6 @@ jobs:
           tar -xzvf dojo_v0.3.1_linux_amd64.tar.gz
           rm sozo torii dojo-language-server
 
-      - name: Run Katana
-        run: |
-          ./katana &
-
-      - name: Setup Katana Account
-        run: |
-          .github/workflows/scripts/setup_katana_account.sh
-
       # Deploy Starknet Messaging Contract in L1
       - name: Clone https://github.com/glihm/starknet-messaging-dev
         uses: GuillaumeFalourd/clone-github-repo-action@v2.3
@@ -121,6 +113,25 @@ jobs:
           cp anvil.env .env
           source .env
           forge script script/LocalTesting.s.sol:LocalSetup --broadcast --rpc-url ${ETH_RPC_URL}
+
+      - name: Run Katana
+        run: |
+          ./katana --messaging starknet-messaging-dev/anvil.messaging.json &
+
+      - name: Setup Katana Account
+        run: |
+          .github/workflows/scripts/setup_katana_account.sh
+
+#      # Setup Starknet messaging
+#      - name: Setup Starknet messaging
+#        run: |
+#          cd starknet-messaging-dev/cairo
+#          source katana.env
+#          scarb build
+#          starkli declare ./target/dev/messaging_tuto_contract_msg.contract_class.json --keystore-password ""
+#          starkli deploy 0x02d6b666ade3a9ee98430d565830604b90954499c590fa05a9844bdf4d3a574b \
+#              --salt 0x1234 \
+#              --keystore-password ""
 
       # Deploy Ethereum Contract
       - name: Install Forge
