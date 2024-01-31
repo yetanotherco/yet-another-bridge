@@ -17,7 +17,7 @@ cast send --rpc-url $ETH_RPC_URL --private-key $ETH_PRIVATE_KEY \
 
 sleep 15
 
-starkli invoke $ESCROW_CONTRACT_ADDRESS get_order_used uint256:0  --account $STARKNET_ACCOUNT
+starkli invoke $ESCROW_CONTRACT_ADDRESS get_order_used uint256:0 --account $STARKNET_ACCOUNT
 
 MM_FINAL_BALANCE=$(starkli balance $MM_SN_WALLET_ADDR)
 echo "Final MM balance: $MM_FINAL_BALANCE"
