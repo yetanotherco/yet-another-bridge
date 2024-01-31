@@ -29,7 +29,6 @@ trait IEscrow<ContractState> {
 
     fn pause(ref self: ContractState);
     fn unpause(ref self: ContractState);
-    fn pause_state(ref self: ContractState) -> bool;
 }
 
 #[starknet::contract]
@@ -249,10 +248,6 @@ mod Escrow {
         fn unpause(ref self: ContractState) {
             self.ownable.assert_only_owner();
             self.pausable._unpause();
-        }
-
-        fn pause_state(ref self: ContractState) -> bool {
-            self.pausable.is_paused()
         }
     }
 
