@@ -15,5 +15,9 @@ cast send --rpc-url $ETH_RPC_URL --private-key $ETH_PRIVATE_KEY \
   "0" "642829559307850963015472508762062935916233390536" "$AMOUNT" \
   --value $AMOUNT >> /dev/null
 
+sleep 15
+
+starkli invoke $ESCROW_CONTRACT_ADDRESS get_order_used uint256:0
+
 MM_FINAL_BALANCE=$(starkli balance $MM_SN_WALLET_ADDR)
 echo "Final MM balance: $MM_FINAL_BALANCE"
