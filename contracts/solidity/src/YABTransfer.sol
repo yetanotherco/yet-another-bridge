@@ -67,8 +67,7 @@ contract YABTransfer {
     function setEscrowAddress(uint256 snEscrowAddress) external {
         require(msg.sender == _owner, "Only owner can call this function.");
         _snEscrowAddress = snEscrowAddress;
-        emit ModifiedEscrowAddress(snEscrowAddress);
-        
+        emit ModifiedEscrowAddress(snEscrowAddress);        
     }
 
     function setEscrowWithdrawSelector(uint256 snEscrowWithdrawSelector) external {
