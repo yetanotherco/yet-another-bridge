@@ -148,7 +148,9 @@ At this point, we should have deployed an ETH smart contract as well as declared
 
 ### Upgrading YABTransfer (on Ethereum)
 
-After deploying the `YABTransfer` contract, you can perform upgrades to it. To do this you must:
+After deploying the `YABTransfer` contract, you can perform [upgrades](https://docs.openzeppelin.com/contracts/4.x/api/proxy#UUPSUpgradeable) to it. As mentioned previously, this is done via a [ERC1967 Proxy](https://docs.openzeppelin.com/contracts/4.x/api/proxy#ERC1967Proxy). So, to upgrade YABTransfer, another smart contract must be deployed, and the address stored inside the Proxy must be changed.
+
+To do this you must:
 
 1. Configure the `contracts/solidity/.env` file.
 
@@ -185,7 +187,9 @@ After deploying the `YABTransfer` contract, you can perform upgrades to it. To d
 
 ### Upgrade Escrow (on Starknet)
 
-If you wish to upgrade any previously deployed `Escrow` contract, it is possible through a command. We will perform the upgrade using the `starkli` tool, so the same configuration used for deployment is necessary:
+Our Escrow contract is also upgradeable, but it's method and process of upgrading is different than YABTransfer's upgrade. Starknet implemented the `replace_class` syscall, allowing a contract to update its source code by replacing its class hash once deployed. So, to upgrade Escrow, a new class hash must be declared, and the contract's class hash must be replaced.
+
+We will perform the upgrade using the `starkli` tool, so the same configuration used for deployment is necessary:
 
 1. Configure `contracts/cairo/.env` file.
 
@@ -213,7 +217,7 @@ If you wish to upgrade any previously deployed `Escrow` contract, it is possible
 - This command will:
   - **rebuild** `Escrow.cairo`
   - **declare** it on Starknet
-  - Call the external **upgrade()** function with the new class hash
+  - Call the external **upgrade()** function, from [OpenZeppellin's Upgradeable implementation](https://github.com/OpenZeppelin/cairo-contracts/blob/release-v0.8.0/src/upgrades/upgradeable.cairo), with the new class hash
 
 ### Pausable
 
