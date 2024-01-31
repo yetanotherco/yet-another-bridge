@@ -21,17 +21,17 @@ ethereum-build: ethereum-clean
 ethereum-test: ethereum-clean
 	@cd ./contracts/solidity/ && forge test
 
-ethereum-deploy: ethereum-clean
-	@./contracts/solidity/deploy.sh
+ethereum-deploy: ethereum-build
+	@. ./contracts/solidity/.env && . ./contracts/solidity/deploy.sh
 
-ESCROW_CONTRACT_ADDRESS=
+ethereum-upgrade: ethereum-build
+	@. ./contracts/solidity/.env && . ./contracts/solidity/upgrade.sh
+
 ethereum-set-escrow:
-	@(source ./contracts/solidity/.env; export ESCROW_CONTRACT_ADDRESS=$(ESCROW_CONTRACT_ADDRESS) ; . ./contracts/solidity/set_escrow.sh)
+	@. ./contracts/solidity/.env && . ./contracts/solidity/set_escrow.sh
 
-WITHDRAW_NAME?="withdraw"
-ETH_CONTRACT_ADDR=
 ethereum-set-withdraw-selector:
-	@(source ./contracts/solidity/.env; export WITHDRAW_NAME=$(WITHDRAW_NAME); export ETH_CONTRACT_ADDRESS=$(ETH_CONTRACT_ADDR) ; . ./contracts/solidity/set_withdraw_selector.sh)
+	@. ./contracts/solidity/.env && . ./contracts/cairo/.env && . ./contracts/solidity/set_withdraw_selector.sh
 
 starknet-clean:
 	@cd ./contracts/cairo/ && scarb clean
@@ -43,13 +43,25 @@ starknet-test: starknet-clean
 	@cd ./contracts/cairo/ && snforge test
 
 starknet-deploy: starknet-build
-	@source ./contracts/cairo/.env && . ./contracts/cairo/deploy.sh
+	@. ./contracts/cairo/.env && . ./contracts/cairo/deploy.sh
 
 starknet-upgrade: starknet-build
-	@./contracts/cairo/upgrade.sh
+	@. ./contracts/cairo/.env && . ./contracts/cairo/upgrade.sh
 
 .ONESHELL:
 starknet-deploy-and-connect: starknet-build
-	@. ./contracts/cairo/.env && . ./contracts/cairo/deploy.sh
-	@. ./contracts/solidity/.env && . ./contracts/solidity/set_escrow.sh
-	@. ./contracts/solidity/.env && . ./contracts/solidity/set_withdraw_selector.sh
+	@. ./contracts/solidity/.env && . ./contracts/cairo/.env
+	@. ./contracts/cairo/deploy.sh
+	@. ./contracts/solidity/set_escrow.sh
+	@. ./contracts/solidity/set_withdraw_selector.sh
+
+.ONESHELL:
+deploy-all:
+	@. ./contracts/solidity/.env && . ./contracts/cairo/.env
+	@make ethereum-build
+	@. ./contracts/solidity/deploy.sh
+	@make starknet-build
+	@. ./contracts/cairo/deploy.sh
+	@. ./contracts/solidity/set_escrow.sh
+	@. ./contracts/solidity/set_withdraw_selector.sh
+	@. ./contracts/display_info.sh

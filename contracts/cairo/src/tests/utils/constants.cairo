@@ -20,4 +20,8 @@ mod EscrowConstants {
     fn ETH_TRANSFER_CONTRACT() -> EthAddress {
         69.try_into().unwrap()
     }
+
+    fn ETH_USER() -> EthAddress {
+        99.try_into().unwrap()
+    }
 }
