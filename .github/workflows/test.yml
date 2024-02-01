@@ -108,6 +108,11 @@ jobs:
           owner: 'glihm'
           repository: 'starknet-messaging-dev'
 
+      - name: Install Forge
+        run: |
+          cd starknet-messaging-dev/solidity
+          forge install
+
       - name: Deploy Starknet Messaging Contract
         run: |
           cd starknet-messaging-dev/solidity
