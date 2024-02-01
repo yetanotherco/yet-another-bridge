@@ -48,6 +48,13 @@ starknet-deploy: starknet-build
 starknet-upgrade: starknet-build
 	@. ./contracts/cairo/.env && . ./contracts/cairo/upgrade.sh
 
+starknet-pause:
+	@. ./contracts/cairo/.env && ./contracts/cairo/change_pause_state.sh pause
+
+starknet-unpause:
+	@. ./contracts/cairo/.env && ./contracts/cairo/change_pause_state.sh unpause
+
+
 .ONESHELL:
 starknet-deploy-and-connect: starknet-build
 	@. ./contracts/solidity/.env && . ./contracts/cairo/.env
