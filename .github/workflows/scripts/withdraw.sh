@@ -11,7 +11,7 @@ MM_INITIAL_BALANCE=$(starkli balance $MM_SN_WALLET_ADDR)
 echo "Initial Escrow balance: $ESCROW_INITIAL_BALANCE"
 echo "Initial MM balance: $MM_INITIAL_BALANCE"
 
-echo "Withdrawing $amount"
+echo "Withdrawing $AMOUNT"
 cast send --rpc-url $ETH_RPC_URL --private-key $ETH_PRIVATE_KEY \
   $YAB_TRANSFER_PROXY_ADDRESS "withdraw(uint256, uint256, uint256)" \
   "0" "642829559307850963015472508762062935916233390536" "$AMOUNT" \

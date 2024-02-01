@@ -66,9 +66,10 @@ jobs:
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
 
-      - name: Run Anvil
+      - name: Install Forge
         run: |
-          anvil --gas-price=0 &
+          cd contracts/solidity
+          forge install
 
       # Starknet Setup
       - name: Install scarb
@@ -94,6 +95,11 @@ jobs:
           tar -xzvf dojo_v0.4.4_linux_amd64.tar.gz
           rm sozo torii dojo-language-server
 
+      # Run Anvil
+      - name: Run Anvil
+        run: |
+          anvil &
+
       # Deploy Starknet Messaging Contract in L1
       - name: Clone https://github.com/glihm/starknet-messaging-dev
         uses: GuillaumeFalourd/clone-github-repo-action@v2.3
@@ -101,11 +107,6 @@ jobs:
           branch: 'main'
           owner: 'glihm'
           repository: 'starknet-messaging-dev'
-
-      - name: Install Forge
-        run: |
-          cd starknet-messaging-dev/solidity
-          forge install
 
       - name: Deploy Starknet Messaging Contract
         run: |
@@ -134,33 +135,17 @@ jobs:
               --salt 0x1234 \
               --keystore-password ""
 
-      # Deploy Ethereum Contract
-      - name: Install Forge
-        run: |
-          cd contracts/solidity
-          forge install
-
-#      - name: Deploy Ethereum Contract
-#        run: |
-#          export ETH_RPC_URL=${{vars.ETH_RPC_URL}}
-#          export ETHERSCAN_API_KEY=${{vars.ETHERSCAN_API_KEY}}
-#          export ETH_PRIVATE_KEY=${{vars.ETH_PRIVATE_KEY}}
-#          export SN_MESSAGING_ADDRESS=${{vars.SN_MESSAGING_ADDRESS}}
-#          export MM_ETHEREUM_WALLET=${{vars.MM_ETHEREUM_WALLET}}
-#          export SKIP_VERIFY=true
-#          make ethereum-deploy
-
       # Build Ethereum Contract
       - name: Build Ethereum Contract
         run: |
           make ethereum-build
 
-      # Build Starknet Contract. It builds escrow and ERC20 contracts
+      # Build Starknet Contract
       - name: Build Starknet Contract
         run: |
           make starknet-build
 
-      # Deploy YABTransfer, ERC20, Escrow, set escrow, set withdraw selector and test complete flow
+      # Deploy PaymentRegistry, Escrow, set escrow, set withdraw selector and test complete flow
       - name: Deploy and test complete flow
         run: |
           export ETH_RPC_URL=${{vars.ETH_RPC_URL}}
@@ -186,5 +171,4 @@ jobs:
           
           . ./.github/workflows/scripts/assert.sh
           
-
       # Run mm-bot (it should run a single process order listening to the contract once)
