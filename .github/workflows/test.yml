@@ -153,6 +153,7 @@ jobs:
       # Deploy PaymentRegistry, Escrow, set escrow, set withdraw selector and test complete flow
       - name: Deploy and test complete flow
         run: |
+          export ETHERSCAN_API_KEY=${{vars.ETHERSCAN_API_KEY}}
           source ./contracts/solidity/.env.test
           . ./contracts/solidity/deploy.sh
           
