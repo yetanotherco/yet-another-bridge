@@ -73,7 +73,7 @@ All these are installed with `make deps`.
 
 [Escrow](contracts/cairo/src/escrow.cairo) is a Smart Contract written in Cairo that resides in Ethereum's L2 Starknet.
 
-This contract is responsable for recieving Users' payments in L2, and liberating them to the MM when, and only when, appropriate.
+This contract is responsable for recieving Users' payments in L2, and liberating them to the MM when, and only when, the MM has proved the L1 payment.
 
 This contract has a storage of all open (and closed!) orders. When a new order is made, by calling the `set_order` function, this contract reads the new order's details, verifies the Order is acceptable, and if so, it stores this data and accepts from the sendes the appropriate amount of tokens. An Order's details are: the address where the User wants to recieve the transaction on L1, the amount he wants to recieve, and the amount he is willing to give the MM to concrete the bridge process.
 
