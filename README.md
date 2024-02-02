@@ -99,4 +99,4 @@ When run, MM-bot constantly reads Escrow's events and stores them in its own dat
 
 It reads every new order's information, analyzes if it capable of completing such order, and, if so, it makes the transfer to YABTransfer using the funds available on its L1 address. After this transfer is complete, MM-bot will execute the appropriate withdrawal so that it can regain its tokens on L2.
 
-MM-bot has a L1 address to transfer funds to user through YABTransfer (as stated above), and a L2 address to receive the L2 tokens after successfully completing the bridge. Also, if MM-bot is shut down, and Escrow receives new orders, MM-bot will identify these orders when turned back on, and will identify which of them are still open, so he can complete them.
+MM-bot has a L1 address to transfer funds to user through YABTransfer (as stated above), and a L2 address to receive the L2 tokens after successfully completing the bridge.
