@@ -29,7 +29,7 @@ And, of course, the users.
     1. The MM holds his ETH tokens on his own private L1 wallet
     2. The MM monitors Escrow's activity logs and events, to detect any Users wanting to bridge tokens
     3. MM detects a User that has transferred ETH tokens to L2 Escrow, and decides the amount to bridge with the transfer fee is acceptable
-    4. When the transaction has been accepted by the blockchain, MM sends the ETH tokens on L1 to YABTransfer, specifying the User's orderID, L1 wallet address, etc.
+    4. MM sends the ETH tokens on L1 to YABTransfer, specifying the User's orderID, L1 recipient address and amount.
     5. Then, YABTransfer sends the ETH tokens to the User, and generates a storage proof, proving the User has recieved the appropriate funds, and sends this proof to L2 Escrow
     6. Escrow validates this storage proof, and sends the ETH Tokens (plus fees) to MM's L2 wallet.
 
