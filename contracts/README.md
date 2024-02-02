@@ -196,7 +196,7 @@ We will perform the upgrade using the `starkli` tool, so the same configuration 
    ```env
       STARKNET_ACCOUNT = Path of your starknet testnet account
 
-      STARKNET_KEYSTORE = Path of your starknet testnet keystore
+      STARKNET_KEYSTORE = Path of your starknet keystore
    ```
 
 2. Configure the address of the contract to be upgraded:
