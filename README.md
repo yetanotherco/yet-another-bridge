@@ -85,7 +85,7 @@ After a MM consolidates an order, Escrow will recieve a `withdraw` call from YAB
 
 ## YABTransfer
 
-[YABTransfer](contracts/solidity/src/YABTransfer.sol) (written in Solidity) is a Smart Contract written in Solidity that resides in Ethereum's L1, responsable for receiving MM's transaction on L1, forwarding it to the User's address, and sending the information of this transaction to Escrow.
+[YABTransfer](contracts/solidity/src/YABTransfer.sol) is a Smart Contract that resides in Ethereum's L1, responsable for receiving MM's transaction on L1, forwarding it to the User's address, and sending the information of this transaction to Escrow.
 
 So, when MM wants to complete an order it has read on Escrow, it will call the `transfer` function from YABTransfer, containing the relevant information (orderID, User's address on L1, and amount). YABTransfer will verify the information is acceptable (the amount is enough, the orderID has not already been closed, etc), store it, and send the desired amount to User's L1 address.
 
