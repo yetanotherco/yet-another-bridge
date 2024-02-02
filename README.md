@@ -30,8 +30,8 @@ And, of course, the users.
     2. The MM monitors Escrow's activity logs and events, to detect any Users wanting to bridge tokens
     3. MM detects a User that has transferred ETH tokens to L2 Escrow, and decides the amount to bridge with the transfer fee is acceptable
     4. MM sends the ETH tokens on L1 to YABTransfer, specifying the User's orderID, L1 recipient address and amount.
-    5. Then, YABTransfer sends the ETH tokens to the User, and generates a storage proof, proving the User has received the appropriate funds, and sends this proof to L2 Escrow
-    6. Escrow validates this storage proof, and sends the ETH Tokens (plus fees) to MM's L2 wallet.
+    5. Then, YABTransfer sends the ETH tokens to the User, and proves to the Escrow contract, either using the messaging system or storage proofs, that the User has received the appropriate funds.
+    6. Escrow validates the proof, and sends the ETH Tokens (plus fees) to MM's L2 wallet.
 
     Done, MM has sent ETH to a L1 address, and received same ETH plus fees on L2.
 
@@ -79,9 +79,9 @@ This contract has a storage of all orders. When a new order is made, by calling 
 
 Once Escrow has accepted the new order, it will emit a `SetOrder` event, containing this information so that MMs can decide if they want to accept this offer.
 
-The user must wait until a MM picks its order, which should be almost instantaneous if the transfer fee is the suggested one! If the order is not chosen by any MM for the minimum wait time (which is currently 12 hours), the user may call the `cancel_order` function from the same address who requested the bridge. While doing this, if the correct information is provided to Escrow, it will cancel the order and return the funds to the user.
+The user must wait until an MM picks its order, which should be almost instantaneous if the transfer fee is the suggested one.
 
-After a MM consolidates an order, Escrow will receive a `withdraw` call from YABTransfer, containing the information about how MM has indeed bridged the funds to the User's L1 address, and where does MM want to receive it's L2 tokens. Escrow will then cross-check this information to its own records, and if everything is in check, Escrow will transfer the bridged amount of tokens, plus the fee, to MM's L2 address.
+After an MM consolidates an order, Escrow will receive a `withdraw` call from YABTransfer, containing the information about how MM has indeed bridged the funds to the User's L1 address, and where does MM want to receive it's L2 tokens. Escrow will then cross-check this information to its own records, and if everything is in check, Escrow will transfer the bridged amount of tokens, plus the fee, to MM's L2 address.
 
 ## YABTransfer
 
