@@ -93,7 +93,7 @@ After this transfer is completed, MM must call `withdraw` function on YABTransfe
 
 ## MM-bot
 
-[MM-bot](mm-bot/src/main.py) (written in Python) is a complex script responsable of being the Market Maker of YAB.
+[MM-bot](mm-bot/src/main.py) is a bot responsible of being a YAB's market maker.
 
 When run, MM-bot constantly reads Escrow's events and stores them in its own database; With this, the bot can detect almost instantaneously when a user creates a new order, allowing it to be the one who bridges the tokens for the user.
 
