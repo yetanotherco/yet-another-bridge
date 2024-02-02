@@ -30,7 +30,7 @@ Follow the steps below to set up a testnet smart wallet using `starkli`:
       export STARKNET_RPC="<ALCHEMY_API_HTTPS_URL>"
       ```
 
-2. **Create a Keystore**: A Keystore is a encrypted `json` file that stores the
+2. **Create a Keystore**: A Keystore is an encrypted `json` file that stores the
    private keys.
 
    1. **Create a hidden folder**: Use the following command:
