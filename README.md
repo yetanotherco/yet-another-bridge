@@ -79,7 +79,7 @@ This contract has a storage of all orders. When a new order is made, by calling 
 
 Once Escrow has accepted the new order, it will emit a `SetOrder` event, containing this information so that MMs can decide if they want to accept this offer.
 
-Once the new order is placed, the user must wait until a MM picks it's order, which should be almost instantaneous if the transfer fee is the suggested one! If the order is not chosen by any MM for the minimum wait time (which is currently 12 hours), the user may call the `cancel_order` function from the same address who requested the bridge. While doing this, if the correct information is provided to Escrow, it will cancel the order and return the funds to the user.
+The user must wait until a MM picks it's order, which should be almost instantaneous if the transfer fee is the suggested one! If the order is not chosen by any MM for the minimum wait time (which is currently 12 hours), the user may call the `cancel_order` function from the same address who requested the bridge. While doing this, if the correct information is provided to Escrow, it will cancel the order and return the funds to the user.
 
 After a MM consolidates an order, Escrow will recieve a `withdraw` call from YABTransfer, containing the information about how MM has indeed bridged the funds to the User's L1 address, and where does MM want to recieve it's L2 tokens. Escrow will then cross check this information to its own records, and if everything is in check, Escrow will transfer the bridged amount of tokens, plus the fee, to MM's L2 address.
 
