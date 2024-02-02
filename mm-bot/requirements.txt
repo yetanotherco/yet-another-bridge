@@ -1,6 +1,6 @@
 python-dotenv==1.0.0
 Requests==2.31.0
-starknet_py==0.18.3
+starknet_py==0.19.0-alpha
 web3==6.5.0
 SQLAlchemy==2.0.23
 psycopg2-binary==2.9.9

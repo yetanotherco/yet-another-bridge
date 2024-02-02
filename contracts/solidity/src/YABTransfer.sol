@@ -2,8 +2,11 @@
 pragma solidity ^0.8.21;
 
 import {IStarknetMessaging} from "starknet/IStarknetMessaging.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-contract YABTransfer {
+contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     struct TransferInfo {
         uint256 destAddress;
         uint256 amount;
@@ -11,24 +14,36 @@ contract YABTransfer {
     }
 
     event Transfer(uint256 indexed orderId, address srcAddress, TransferInfo transferInfo);
+    event ModifiedEscrowAddress(uint256 newEscrowAddress);
+    event ModifiedEscrowWithdrawSelector(uint256 newEscrowWithdrawSelector);
 
     mapping(bytes32 => TransferInfo) public transfers;
-    address private _owner;
+    address private _marketMaker;
     IStarknetMessaging private _snMessaging;
     uint256 private _snEscrowAddress;
     uint256 private _snEscrowWithdrawSelector;
 
-    constructor(
+    constructor() {
+        _disableInitializers();
+    }
+
+    // no constructors can be used in upgradeable contracts. 
+    function initialize(
         address snMessaging,
         uint256 snEscrowAddress,
-        uint256 snEscrowWithdrawSelector) {
-        _owner = msg.sender;
+        uint256 snEscrowWithdrawSelector,
+        address marketMaker) public initializer { 
+        __Ownable_init(msg.sender);
+        __UUPSUpgradeable_init();
+
         _snMessaging = IStarknetMessaging(snMessaging);
         _snEscrowAddress = snEscrowAddress;
         _snEscrowWithdrawSelector = snEscrowWithdrawSelector;
+        _marketMaker = marketMaker;
     }
 
-    function transfer(uint256 orderId, uint256 destAddress, uint256 amount) external payable {
+
+    function transfer(uint256 orderId, uint256 destAddress, uint256 amount) external payable onlyOwnerOrMM {
         require(destAddress != 0, "Invalid destination address.");
         require(amount > 0, "Invalid amount, should be higher than 0.");
         require(msg.value == amount, "Invalid amount, should match msg.value.");
@@ -44,7 +59,7 @@ contract YABTransfer {
         emit Transfer(orderId, msg.sender, transfers[index]);
     }
 
-    function withdraw(uint256 orderId, uint256 destAddress, uint256 amount) external payable {
+    function withdraw(uint256 orderId, uint256 destAddress, uint256 amount) external payable onlyOwnerOrMM {
         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount));
         TransferInfo storage transferInfo = transfers[index];
         require(transferInfo.isUsed == true, "Transfer not found.");
@@ -62,13 +77,35 @@ contract YABTransfer {
             payload);
     }
 
-    function setEscrowAddress(uint256 snEscrowAddress) external {
-        require(msg.sender == _owner, "Only owner can call this function.");
+    function setEscrowAddress(uint256 snEscrowAddress) external onlyOwner {
         _snEscrowAddress = snEscrowAddress;
+        emit ModifiedEscrowAddress(snEscrowAddress);        
     }
 
-    function setEscrowWithdrawSelector(uint256 snEscrowWithdrawSelector) external {
-        require(msg.sender == _owner, "Only owner can call this function.");
+    function setEscrowWithdrawSelector(uint256 snEscrowWithdrawSelector) external onlyOwner {
         _snEscrowWithdrawSelector = snEscrowWithdrawSelector;
+        emit ModifiedEscrowWithdrawSelector(snEscrowWithdrawSelector);
     }
+
+    
+    //// MM ACL:
+
+    function getMMAddress() external view returns (address) {
+        return _marketMaker;
+    }
+
+    function setMMAddress(address newMMAddress) external onlyOwner {
+        _marketMaker = newMMAddress;
+    }
+
+    function getOwner() external view returns (address) {
+        return owner();
+    }
+
+    modifier onlyOwnerOrMM {
+        require(msg.sender == owner() || msg.sender == _marketMaker, "Only Owner or MM can call this function");
+        _;
+    }
+
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 }
