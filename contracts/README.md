@@ -38,8 +38,8 @@ First, the Ethereum smart contract must be deployed. For Ethereum the deployment
 
    **NOTE**:
 
-   - You can generate ETHERSCAN_API_KEY [following this steps](https://docs.etherscan.io/getting-started/creating-an-account).
-   - For the deploy, you will need some GoerliETH that you can get from this [faucet](https://goerlifaucet.com/).
+   - You can generate ETHERSCAN_API_KEY [following these steps](https://docs.etherscan.io/getting-started/creating-an-account).
+   - For the deployment, you will need some GoerliETH that you can get from this [faucet](https://goerlifaucet.com/).
    - SN_MESSAGING_ADDRESS is for when a L1 contract initiates a message to a L2 contract on Starknet. It does so by calling the sendMessageToL2 function on the Starknet Core Contract with the message parameters. Starknet Core Contracts are the following:
       - Goerli: `0xde29d060D45901Fb19ED6C6e959EB22d8626708e`
       - Sepolia: `0xE2Bb56ee936fd6433DC0F6e7e3b8365C906AA057`
@@ -137,7 +137,7 @@ This may be better suited for you if you plan to change some of the automaticall
    make ethereum-set-withdraw-selector
    ```
 
-   This script uses the WITHDRAW_NAME .env variable to automatically generate the selector in the necesary format
+   This script uses the WITHDRAW_NAME .env variable to automatically generate the selector in the necessary format
 
 ## Recap
 
@@ -186,7 +186,7 @@ To do this you must:
 
 ### Upgrade Escrow (on Starknet)
 
-Our Escrow contract is also upgradeable, but it's method and process of upgrading is different than YABTransfer's upgrade. Starknet implemented the `replace_class` syscall, allowing a contract to update its source code by replacing its class hash once deployed. So, to upgrade Escrow, a new class hash must be declared, and the contract's class hash must be replaced.
+Our Escrow contract is also upgradeable, but it's method and process of upgrading is different from YABTransfer's upgrade. Starknet implemented the `replace_class` syscall, allowing a contract to update its source code by replacing its class hash once deployed. So, to upgrade Escrow, a new class hash must be declared, and the contract's class hash must be replaced.
 
 We will perform the upgrade using the `starkli` tool, so the same configuration used for deployment is necessary:
 
