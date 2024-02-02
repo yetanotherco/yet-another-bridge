@@ -49,7 +49,7 @@ Follow the steps below to set up a testnet smart wallet using `starkli`:
 
       The command will return the Public Key of your account, copy it to your
       clipboard to fund the account.
-   3. **Set STARKNET_ACCOUNT**: To set the environment variable just run:
+   3. **Set STARKNET_KEYSTORE**: To set the environment variable just run:
 
       ```bash
       export STARKNET_KEYSTORE="~/.starkli-wallets/keystore.json"
