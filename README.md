@@ -19,7 +19,7 @@ And, of course, the users.
 - To the user, the process is as follows:
 
     1. The user want to bridge L2 ETH tokens from Starknet to L1 Ethereum
-    2. The user deposits ETH tokens on L2 Escrow, while also sending some extra information; such as where does the user want to recieve the money on L1, how much fee does he want to give to the Market Maker, etc.
+    2. The user deposits ETH tokens on L2 Escrow, while also sending some extra information; such as where does the user want to recieve the money on L1, how much fee does he want to give to the Market Maker, etc. So the user sends to the Escrow the amount plus a fee
     3. The user recieves in his L1 wallet a transaction of the amount sent to Escrow (minus fees) from a YABTransfer's address
 
     Done, the User has bridged tokens from L2 to L1, in the time it takes to complete 2 simple transactions.
