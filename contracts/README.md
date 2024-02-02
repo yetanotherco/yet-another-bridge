@@ -34,6 +34,8 @@ First, the Ethereum smart contract must be deployed. For Ethereum the deployment
    ETHERSCAN_API_KEY = API Key to use etherscan to read the Ethereum blockchain
 
    SN_MESSAGING_ADDRESS = Starknet Messaging address
+   
+   MM_ETHEREUM_WALLET = Ethereum wallet address of the MarketMaker
    ```
 
    **NOTE**:
