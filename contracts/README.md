@@ -40,7 +40,6 @@ First, the Ethereum smart contract must be deployed. For Ethereum the deployment
 
    - You can generate ETHERSCAN_API_KEY [following this steps](https://docs.etherscan.io/getting-started/creating-an-account).
    - For the deploy, you will need some GoerliETH that you can get from this [faucet](https://goerlifaucet.com/).
-   - Current SN_MESSAGING_ADDRESS values:
    - SN_MESSAGING_ADDRESS is for when a L1 contract initiates a message to a L2 contract on Starknet. It does so by calling the sendMessageToL2 function on the Starknet Core Contract with the message parameters. Starknet Core Contracts are the following:
       - Goerli: `0xde29d060D45901Fb19ED6C6e959EB22d8626708e`
       - Sepolia: `0xE2Bb56ee936fd6433DC0F6e7e3b8365C906AA057`
