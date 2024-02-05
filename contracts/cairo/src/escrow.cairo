@@ -13,9 +13,7 @@ trait IEscrow<ContractState> {
 
     fn set_order(ref self: ContractState, order: Order) -> u256;
 
-    fn cancel_order(ref self: ContractState, order_id: u256);
-
-    fn get_order_pending(self: @ContractState, order_id: u256) -> bool;
+    fn get_order_used(self: @ContractState, order_id: u256) -> bool;
 
     fn get_order_fee(self: @ContractState, order_id: u256) -> u256;
 
@@ -29,7 +27,6 @@ trait IEscrow<ContractState> {
 
     fn pause(ref self: ContractState);
     fn unpause(ref self: ContractState);
-    fn pause_state(ref self: ContractState) -> bool;
 }
 
 #[starknet::contract]
@@ -107,7 +104,7 @@ mod Escrow {
     struct Storage {
         current_order_id: u256,
         orders: LegacyMap::<u256, Order>,
-        orders_pending: LegacyMap::<u256, bool>,
+        orders_used: LegacyMap::<u256, bool>,
         orders_senders: LegacyMap::<u256, ContractAddress>,
         orders_timestamps: LegacyMap::<u256, u64>,
         eth_transfer_contract: EthAddress, // our transfer contract in L1
@@ -165,7 +162,7 @@ mod Escrow {
 
             let mut order_id = self.current_order_id.read();
             self.orders.write(order_id, order);
-            self.orders_pending.write(order_id, true);
+            self.orders_used.write(order_id, false);
             self.orders_senders.write(order_id, get_caller_address());
             self.orders_timestamps.write(order_id, get_block_timestamp());
 
@@ -185,28 +182,8 @@ mod Escrow {
             order_id
         }
 
-        fn cancel_order(ref self: ContractState, order_id: u256) {
-            self.pausable.assert_not_paused();
-            assert(self.orders_pending.read(order_id), 'Order withdrawn or nonexistent');
-            assert(
-                get_block_timestamp() - self.orders_timestamps.read(order_id) > 43200,
-                'Not enough time has passed'
-            );
-
-            let sender = self.orders_senders.read(order_id);
-            assert(sender == get_caller_address(), 'Only sender allowed');
-
-            self.orders_pending.write(order_id, false);
-
-            let order = self.orders.read(order_id);
-            let payment_amount = order.amount + order.fee;
-
-            IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
-                .transfer(sender, payment_amount);
-        }
-
-        fn get_order_pending(self: @ContractState, order_id: u256) -> bool {
-            self.orders_pending.read(order_id)
+        fn get_order_used(self: @ContractState, order_id: u256) -> bool {
+            self.orders_used.read(order_id)
         }
 
         fn get_order_fee(self: @ContractState, order_id: u256) -> u256 {
@@ -253,10 +230,6 @@ mod Escrow {
             self.ownable.assert_only_owner();
             self.pausable._unpause();
         }
-
-        fn pause_state(ref self: ContractState) -> bool {
-            self.pausable.is_paused()
-        }
     }
 
     #[l1_handler]
@@ -270,13 +243,13 @@ mod Escrow {
         self.pausable.assert_not_paused();
         let eth_transfer_contract_felt: felt252 = self.eth_transfer_contract.read().into();
         assert(from_address == eth_transfer_contract_felt, 'Only YAB_TRANSFER_CONTRACT');
-        assert(self.orders_pending.read(order_id), 'Order withdrawn or nonexistent');
+        assert(!self.orders_used.read(order_id), 'Order already withdrawn');
 
         let order = self.orders.read(order_id);
         assert(order.recipient_address == recipient_address, 'recipient_address not match L1');
         assert(order.amount == amount, 'amount not match L1');
 
-        self.orders_pending.write(order_id, false);
+        self.orders_used.write(order_id, true);
         let payment_amount = order.amount + order.fee;
 
         IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
