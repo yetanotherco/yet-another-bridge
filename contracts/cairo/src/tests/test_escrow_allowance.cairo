@@ -113,7 +113,7 @@ mod Escrow {
         let order_save = escrow.get_order(order_id);
         assert(order.recipient_address == order_save.recipient_address, 'wrong recipient_address');
         assert(order.amount == order_save.amount, 'wrong amount');
-        assert(!escrow.get_order_used(order_id), 'wrong order used');
+        assert(escrow.get_order_pending(order_id), 'wrong order used');
 
         let mut l1_handler = L1HandlerTrait::new(
             contract_address: escrow.contract_address,
@@ -131,7 +131,7 @@ mod Escrow {
         l1_handler.execute().expect('Failed to execute l1_handler');
 
         // check Order
-        assert(escrow.get_order_used(order_id), 'wrong order used');
+        assert(!escrow.get_order_pending(order_id), 'wrong order used');
         // check balance
         assert(eth_token.balanceOf(escrow.contract_address) == 0, 'withdraw: wrong balance');
         assert(eth_token.balanceOf(MM_STARKNET()) == 500, 'withdraw: wrong balance');

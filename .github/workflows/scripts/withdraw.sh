@@ -17,7 +17,7 @@ cast send --rpc-url $ETH_RPC_URL --private-key $ETH_PRIVATE_KEY \
 
 sleep 15
 
-starkli call $ESCROW_CONTRACT_ADDRESS get_order_used u256:0
+starkli call $ESCROW_CONTRACT_ADDRESS get_order_pending u256:0
 
 ESCROW_FINAL_BALANCE=$(starkli balance $ESCROW_CONTRACT_ADDRESS)
 MM_FINAL_BALANCE=$(starkli balance $MM_SN_WALLET_ADDR)
