@@ -1,8 +1,5 @@
 #!/bin/bash
-
-# ANSI format
-GREEN='\e[32m'
-COLOR_RESET='\033[0m'
+. contracts/utils/colors.sh #for ANSI colors
 
 if [ -z "$YAB_TRANSFER_PROXY_ADDRESS" ]; then
     printf "\n${RED}ERROR:${COLOR_RESET}\n"
