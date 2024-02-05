@@ -1,5 +1,5 @@
 #!/bin/bash
-. contracts/general/colors.sh #for ANSI colors
+. contracts/utils/colors.sh #for ANSI colors
 
 cd contracts/solidity
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-. contracts/general/colors.sh #for ANSI colors
+. contracts/utils/colors.sh #for ANSI colors
 
 # Starkli implicitly utilizes these environment variables, so every time we use Starkli,
 # we avoid adding flags such as --account, --keystore, and --rpc.

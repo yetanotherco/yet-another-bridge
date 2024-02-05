@@ -1,5 +1,5 @@
 #!/bin/bash
-. contracts/general/colors.sh #for ANSI colors
+. contracts/utils/colors.sh #for ANSI colors
 
 if [ -z "$STARKNET_ACCOUNT" ]; then
     echo "\n${RED}ERROR:${COLOR_RESET}"

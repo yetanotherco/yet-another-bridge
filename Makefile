@@ -64,4 +64,4 @@ deploy-all:
 	@. ./contracts/cairo/deploy.sh
 	@. ./contracts/solidity/set_escrow.sh
 	@. ./contracts/solidity/set_withdraw_selector.sh
-	@. ./contracts/general/display_info.sh
+	@. ./contracts/utils/display_info.sh

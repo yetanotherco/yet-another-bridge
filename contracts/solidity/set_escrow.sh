@@ -1,5 +1,5 @@
 #!/bin/bash
-. contracts/general/colors.sh #for ANSI colors
+. contracts/utils/colors.sh #for ANSI colors
 
 if [ -z "$YAB_TRANSFER_PROXY_ADDRESS" ]; then
     printf "\n${RED}ERROR:${COLOR_RESET}\n"
