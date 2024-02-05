@@ -79,7 +79,7 @@ mod Escrow {
         let address = escrow.deploy(@calldata).unwrap();
         return IEscrowDispatcher { contract_address: address };
     }
-    
+
     fn deploy_erc20(
         name: felt252, symbol: felt252, initial_supply: u256, recipent: ContractAddress
     ) -> IERC20Dispatcher {

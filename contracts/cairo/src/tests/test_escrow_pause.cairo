@@ -25,7 +25,11 @@ mod Escrow {
     use openzeppelin::{
         upgrades::{
             UpgradeableComponent,
-            interface::{IUpgradeable, IUpgradeableDispatcher, IUpgradeableDispatcherTrait}
+            interface::{IUpgradeable, IUpgradeableDispatcher, IUpgradeableDispatcherTrait},
+        },
+        security::{
+            PausableComponent,
+            interface::{IPausable, IPausableDispatcher, IPausableDispatcherTrait},
         },
     };
 
@@ -94,29 +98,35 @@ mod Escrow {
     #[test]
     fn test_start_unpaused() {
         let (escrow, _) = setup();
+        let pausable = IPausableDispatcher { contract_address: escrow.contract_address };
+
         start_prank(CheatTarget::One(escrow.contract_address), OWNER());
-        assert(escrow.pause_state() == false, 'Should start unpaused');
+        assert(pausable.is_paused() == false, 'Should start unpaused');
         stop_prank(CheatTarget::One(escrow.contract_address));
     }
 
     #[test]
     fn test_pause() {
         let (escrow, _) = setup();
+        let pausable = IPausableDispatcher { contract_address: escrow.contract_address };
+
         start_prank(CheatTarget::One(escrow.contract_address), OWNER());
         escrow.pause();
-        assert(escrow.pause_state() == true, 'Should be paused');
+        assert(pausable.is_paused() == true, 'Should be paused');
         stop_prank(CheatTarget::One(escrow.contract_address));
     }
 
     #[test]
     fn test_pause_unpause() {
         let (escrow, _) = setup();
+        let pausable = IPausableDispatcher { contract_address: escrow.contract_address };
+
         start_prank(CheatTarget::One(escrow.contract_address), OWNER());
-        assert(escrow.pause_state() == false, 'Should start unpaused');
+        assert(pausable.is_paused() == false, 'Should start unpaused');
         escrow.pause();
-        assert(escrow.pause_state() == true, 'Should be paused');
+        assert(pausable.is_paused() == true, 'Should be paused');
         escrow.unpause();
-        assert(escrow.pause_state() == false, 'Should be unpaused');
+        assert(pausable.is_paused() == false, 'Should be unpaused');
         stop_prank(CheatTarget::One(escrow.contract_address));
     }
 
@@ -124,8 +134,10 @@ mod Escrow {
     #[should_panic(expected: ('Caller is not the owner',))]
     fn test_fail_pause_not_owner() {
         let (escrow, _) = setup();
+        let pausable = IPausableDispatcher { contract_address: escrow.contract_address };
+
         start_prank(CheatTarget::One(escrow.contract_address), USER());
-        assert(escrow.pause_state() == false, 'Should start unpaused');
+        assert(pausable.is_paused() == false, 'Should start unpaused');
         escrow.pause();
         stop_prank(CheatTarget::One(escrow.contract_address));
     }
@@ -134,10 +146,12 @@ mod Escrow {
     #[should_panic(expected: ('Caller is not the owner',))]
     fn test_fail_unpause_not_owner() {
         let (escrow, _) = setup();
+        let pausable = IPausableDispatcher { contract_address: escrow.contract_address };
+
         start_prank(CheatTarget::One(escrow.contract_address), OWNER());
-        assert(escrow.pause_state() == false, 'Should start unpaused');
+        assert(pausable.is_paused() == false, 'Should start unpaused');
         escrow.pause();
-        assert(escrow.pause_state() == true, 'Should be paused');
+        assert(pausable.is_paused() == true, 'Should be paused');
         stop_prank(CheatTarget::One(escrow.contract_address));
         
         start_prank(CheatTarget::One(escrow.contract_address), USER());
@@ -149,10 +163,12 @@ mod Escrow {
     #[should_panic(expected: ('Pausable: paused',))]
     fn test_fail_pause_while_paused() {
         let (escrow, _) = setup();
+        let pausable = IPausableDispatcher { contract_address: escrow.contract_address };
+
         start_prank(CheatTarget::One(escrow.contract_address), OWNER());
-        assert(escrow.pause_state() == false, 'Should start unpaused');
+        assert(pausable.is_paused() == false, 'Should start unpaused');
         escrow.pause();
-        assert(escrow.pause_state() == true, 'Should be paused');
+        assert(pausable.is_paused() == true, 'Should be paused');
         escrow.pause();
         stop_prank(CheatTarget::One(escrow.contract_address));
     }
@@ -161,10 +177,12 @@ mod Escrow {
     #[should_panic(expected: ('Pausable: not paused',))]
     fn test_fail_unpause_while_unpaused() {
         let (escrow, _) = setup();
+        let pausable = IPausableDispatcher { contract_address: escrow.contract_address };
+
         start_prank(CheatTarget::One(escrow.contract_address), OWNER());
-        assert(escrow.pause_state() == false, 'Should start unpaused');
+        assert(pausable.is_paused() == false, 'Should start unpaused');
         escrow.unpause();
-        assert(escrow.pause_state() == false, 'Should be unpaused');
+        assert(pausable.is_paused() == false, 'Should be unpaused');
         escrow.unpause();
         stop_prank(CheatTarget::One(escrow.contract_address));
     }
@@ -173,6 +191,8 @@ mod Escrow {
     #[should_panic(expected: ('Pausable: paused',))]
     fn test_fail_set_order_when_paused() {
         let (escrow, _) = setup();
+        let pausable = IPausableDispatcher { contract_address: escrow.contract_address };
+
         start_prank(CheatTarget::One(escrow.contract_address), OWNER());
         escrow.pause();
         stop_prank(CheatTarget::One(escrow.contract_address));
@@ -186,6 +206,8 @@ mod Escrow {
     #[test]
     fn test_set_order_when_unpaused_after_prev_pause() {
         let (escrow, _) = setup();
+        let pausable = IPausableDispatcher { contract_address: escrow.contract_address };
+
 
         start_prank(CheatTarget::One(escrow.contract_address), USER());
         let order = Order { recipient_address: 12345.try_into().unwrap(), amount: 500, fee: 0 };
@@ -206,6 +228,7 @@ mod Escrow {
     #[test]
     fn test_upgrade_when_paused() {
         let (escrow, _) = setup();
+        let pausable = IPausableDispatcher { contract_address: escrow.contract_address };
         let upgradeable = IUpgradeableDispatcher { contract_address: escrow.contract_address };
 
         start_prank(CheatTarget::One(escrow.contract_address), OWNER());
@@ -221,6 +244,8 @@ mod Escrow {
     #[test]
     fn test_fail_call_l1_handler_while_paused() {
         let (escrow, _) = setup();
+        let pausable = IPausableDispatcher { contract_address: escrow.contract_address };
+
         start_prank(CheatTarget::One(escrow.contract_address), OWNER());
         escrow.pause();
         stop_prank(CheatTarget::One(escrow.contract_address));

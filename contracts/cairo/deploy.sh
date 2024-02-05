@@ -6,9 +6,9 @@ if [ -z "$STARKNET_ACCOUNT" ]; then
     echo "STARKNET_ACCOUNT Variable is empty. Aborting execution.\n"
     exit 1
 fi
-if [ -z "$STARKNET_KEYSTORE" ]; then
+if [ -z "$STARKNET_KEYSTORE" ] && [ -z "$STARKNET_PRIVATE_KEY" ]; then
     echo "\n${RED}ERROR:${COLOR_RESET}"
-    echo "STARKNET_KEYSTORE Variable is empty. Aborting execution.\n"
+    echo "STARKNET_KEYSTORE and STARKNET_PRIVATE_KEY Variables are empty. Aborting execution.\n"
     exit 1
 fi
 if [ -z "$MM_SN_WALLET_ADDR" ]; then
@@ -35,7 +35,9 @@ fi
 
 echo "${GREEN}\n=> [SN] Declaring Escrow${COLOR_RESET}"
 ESCROW_CLASS_HASH=$(starkli declare \
-  --account $STARKNET_ACCOUNT --keystore $STARKNET_KEYSTORE \
+  --account $STARKNET_ACCOUNT \
+  $(if [ -n "$STARKNET_KEYSTORE" ]; then echo "--keystore $STARKNET_KEYSTORE"; fi) \
+  $(if [ -n "$STARKNET_PRIVATE_KEY" ]; then echo "--private-key $STARKNET_PRIVATE_KEY"; fi) \
   --watch contracts/cairo/target/dev/yab_Escrow.contract_class.json)
 
 
@@ -62,7 +64,9 @@ printf "${PINK}[ETH] Market Maker ETH Wallet: $MM_ETHEREUM_WALLET${COLOR_RESET}\
 
 printf "${GREEN}\n=> [SN] Deploying Escrow${COLOR_RESET}\n"
 ESCROW_CONTRACT_ADDRESS=$(starkli deploy \
-  --account $STARKNET_ACCOUNT --keystore $STARKNET_KEYSTORE \
+  --account $STARKNET_ACCOUNT \
+  $(if [ -n "$STARKNET_KEYSTORE" ]; then echo "--keystore $STARKNET_KEYSTORE"; fi) \
+  $(if [ -n "$STARKNET_PRIVATE_KEY" ]; then echo "--private-key $STARKNET_PRIVATE_KEY"; fi) \
   --watch $ESCROW_CLASS_HASH \
     $SN_ESCROW_OWNER \
     $YAB_TRANSFER_PROXY_ADDRESS \
