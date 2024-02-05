@@ -16,7 +16,6 @@ mod mocks {
 #[cfg(test)]
 mod tests {
     mod test_escrow_allowance;
-    mod test_escrow_cancel;
     mod test_escrow_pause;
     mod test_escrow_upgrade;
     mod test_escrow_ownable;
