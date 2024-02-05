@@ -1,8 +1,6 @@
 #!/bin/bash
 
-# ANSI format
-GREEN='\e[32m'
-RESET='\e[0m'
+. contracts/utils/colors.sh #for ANSI colors
 
 #fee=24044002524012
 FEE=25000000000000

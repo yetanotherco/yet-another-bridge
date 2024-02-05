@@ -1,14 +1,12 @@
 #!/bin/bash
 
+. contracts/utils/colors.sh #for ANSI colors
+
 source .github/workflows/katana/katana.env
 set -e
 
 export STARKNET_ACCOUNT=$ACCOUNT_SRC
 export STARKNET_RPC=$RPC_URL
-
-# ANSI format
-GREEN='\e[32m'
-RESET='\e[0m'
 
 # Check if the JSON file exists
 if [ ! -f "$ACCOUNT_SRC" ]; then

@@ -1,9 +1,6 @@
 #!/bin/bash
 
-# ANSI format
-GREEN='\e[32m'
-RED='\033[0;31m'
-RESET='\e[0m'
+. contracts/utils/colors.sh #for ANSI colors
 
 assert() {
   # Usage: assert <condition> <placeholder_text> <expected_value> <obtained_value>

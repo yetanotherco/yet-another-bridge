@@ -1,8 +1,6 @@
 #!/bin/bash
 
-# ANSI format
-GREEN='\e[32m'
-RESET='\e[0m'
+. contracts/utils/colors.sh #for ANSI colors
 
 echo -e "${GREEN}\n=> [SN] Making withdraw${COLOR_RESET}" # 0x70997970C51812dc3A010C7d01b50e0d17dc79C8 -> 642829559307850963015472508762062935916233390536
 
