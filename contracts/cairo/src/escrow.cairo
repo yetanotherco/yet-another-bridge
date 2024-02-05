@@ -36,7 +36,7 @@ mod Escrow {
     use openzeppelin::{
         access::ownable::OwnableComponent,
         upgrades::{UpgradeableComponent, interface::IUpgradeable},
-        security::PausableComponent
+        security::PausableComponent,
     };
     use starknet::{
         ContractAddress, EthAddress, ClassHash, get_caller_address, get_contract_address,
