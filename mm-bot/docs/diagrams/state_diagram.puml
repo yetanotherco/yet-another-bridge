@@ -1,0 +1,60 @@
+@startuml
+
+skin rose
+
+State Pending
+State Processing
+State Transferring
+State Fulfilled
+State Proving
+State Proved
+State Completed #lightgreen
+State Dropped #pink
+
+[*] -d-> Pending
+note on link
+  Creates a new order in the database
+end note
+
+Pending -d[#black]-> Processing
+note on link
+  MM Starts processing the order
+end note
+
+State CheckFee <<choice>>
+State CheckAmount <<choice>>
+Processing -d[#black]-> CheckFee
+CheckFee -d[#black]-> CheckAmount : [fee is enough]
+
+CheckFee -r[#red]-> Dropped
+
+CheckAmount -d[#black]-> Transferring : [amount <= 0.1 ETH]
+note on link
+  Transfers funds on L1
+end note
+CheckAmount -r[#red]-> Dropped
+
+Transferring -d[#black]-> Fulfilled
+note on link
+  Waits for transfer confirmation
+end note
+
+Fulfilled -d[#black]-> Proving
+note on link
+  Send proof of payment
+end note
+
+Proving -d[#black]-> Proved
+note on link
+  Waits for proof confirmation
+end note
+
+Proved -d[#black]-> Completed
+note on link
+  Order is completed
+end note
+
+Completed -d-> [*]
+Dropped --> [*]
+
+@enduml
