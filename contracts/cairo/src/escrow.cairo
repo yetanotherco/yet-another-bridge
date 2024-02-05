@@ -13,8 +13,6 @@ trait IEscrow<ContractState> {
 
     fn set_order(ref self: ContractState, order: Order) -> u256;
 
-    fn cancel_order(ref self: ContractState, order_id: u256);
-
     fn get_order_pending(self: @ContractState, order_id: u256) -> bool;
 
     fn get_order_fee(self: @ContractState, order_id: u256) -> u256;
@@ -29,7 +27,6 @@ trait IEscrow<ContractState> {
 
     fn pause(ref self: ContractState);
     fn unpause(ref self: ContractState);
-    fn pause_state(ref self: ContractState) -> bool;
 }
 
 #[starknet::contract]
@@ -185,26 +182,6 @@ mod Escrow {
             order_id
         }
 
-        fn cancel_order(ref self: ContractState, order_id: u256) {
-            self.pausable.assert_not_paused();
-            assert(self.orders_pending.read(order_id), 'Order withdrawn or nonexistent');
-            assert(
-                get_block_timestamp() - self.orders_timestamps.read(order_id) > 43200,
-                'Not enough time has passed'
-            );
-
-            let sender = self.orders_senders.read(order_id);
-            assert(sender == get_caller_address(), 'Only sender allowed');
-
-            self.orders_pending.write(order_id, false);
-
-            let order = self.orders.read(order_id);
-            let payment_amount = order.amount + order.fee;
-
-            IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
-                .transfer(sender, payment_amount);
-        }
-
         fn get_order_pending(self: @ContractState, order_id: u256) -> bool {
             self.orders_pending.read(order_id)
         }
@@ -252,10 +229,6 @@ mod Escrow {
         fn unpause(ref self: ContractState) {
             self.ownable.assert_only_owner();
             self.pausable._unpause();
-        }
-
-        fn pause_state(ref self: ContractState) -> bool {
-            self.pausable.is_paused()
         }
     }
 

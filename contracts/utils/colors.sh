@@ -1,0 +1,6 @@
+GREEN='\e[32m'
+CYAN='\033[36m'
+PINK='\033[1;35m'
+ORANGE='\033[1;33m'
+RED='\033[0;31m'
+COLOR_RESET='\033[0m'

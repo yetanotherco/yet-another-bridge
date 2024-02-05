@@ -14,6 +14,8 @@ contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     }
 
     event Transfer(uint256 indexed orderId, address srcAddress, TransferInfo transferInfo);
+    event ModifiedEscrowAddress(uint256 newEscrowAddress);
+    event ModifiedEscrowWithdrawSelector(uint256 newEscrowWithdrawSelector);
 
     mapping(bytes32 => TransferInfo) public transfers;
     address private _marketMaker;
@@ -77,10 +79,12 @@ contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
     function setEscrowAddress(uint256 snEscrowAddress) external onlyOwner {
         _snEscrowAddress = snEscrowAddress;
+        emit ModifiedEscrowAddress(snEscrowAddress);        
     }
 
     function setEscrowWithdrawSelector(uint256 snEscrowWithdrawSelector) external onlyOwner {
         _snEscrowWithdrawSelector = snEscrowWithdrawSelector;
+        emit ModifiedEscrowWithdrawSelector(snEscrowWithdrawSelector);
     }
 
     
