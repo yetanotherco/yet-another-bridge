@@ -8,6 +8,7 @@ install-starkli:
 
 install-starknet-foundry:
 	curl -L https://raw.githubusercontent.com/foundry-rs/starknet-foundry/master/scripts/install.sh | sh -s -- -v 0.12.0
+	snfoundryup
 
 install-ethereum-foundry:
 	curl -L https://foundry.paradigm.xyz | bash && foundryup
@@ -48,6 +49,13 @@ starknet-deploy: starknet-build
 starknet-upgrade: starknet-build
 	@. ./contracts/cairo/.env && . ./contracts/cairo/upgrade.sh
 
+starknet-pause:
+	@. ./contracts/cairo/.env && ./contracts/cairo/change_pause_state.sh pause
+
+starknet-unpause:
+	@. ./contracts/cairo/.env && ./contracts/cairo/change_pause_state.sh unpause
+
+
 .ONESHELL:
 starknet-deploy-and-connect: starknet-build
 	@. ./contracts/solidity/.env && . ./contracts/cairo/.env
@@ -64,4 +72,4 @@ deploy-all:
 	@. ./contracts/cairo/deploy.sh
 	@. ./contracts/solidity/set_escrow.sh
 	@. ./contracts/solidity/set_withdraw_selector.sh
-	@. ./contracts/display_info.sh
+	@. ./contracts/utils/display_info.sh

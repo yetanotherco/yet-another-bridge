@@ -1,8 +1,5 @@
 #!/bin/bash
-
-# ANSI format
-GREEN='\e[32m'
-COLOR_RESET='\033[0m'
+. contracts/utils/colors.sh #for ANSI colors
 
 cd contracts/solidity
 
