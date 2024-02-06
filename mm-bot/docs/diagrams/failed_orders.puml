@@ -6,15 +6,16 @@ control "Order Processor" as OP
 control "Failed Order Processor" as FOP
 database Database
 
-U -[#purple]> E : Set Order
-OP -[#purple]> E : Get Order
-OP ->x OP : Processing Order
-OP -> Database : Store Order as failed due to error
-FOP -> Database : Get failed orders
-FOP -> OP : Process failed order
-OP -[#blue]> PR : Transfer funds
-PR -[#blue]> U: Transfer funds
-OP -[#purple]> E : Repay funds
-OP -> Database : Store Order as completed
+U -[#purple]> E : Sets Order
+OP -[#purple]> E : Gets Order
+OP ->x OP : Processes Order
+OP -> Database : Stores Order as failed due to an error
+FOP -> Database : Gets failed orders
+FOP -> OP : Processes failed order
+OP -[#blue]> PR : Transfers funds
+PR -[#blue]> U: Transfers funds
+OP -[#blue]> PR : Sends proof of payment
+PR -[#purple]> E : Sends proof of payment
+OP -> Database : Stores Order as completed
 
 @enduml

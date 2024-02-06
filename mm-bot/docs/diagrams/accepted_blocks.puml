@@ -6,14 +6,15 @@ control "Order Processor" as OP
 control "Order from Accepted Blocks Processor" as ABP
 database Database
 
-ABP -[#purple]> E : Get Orders from Accepted Blocks
-ABP -> Database : Store missing orders
-ABP -> OP : Process missing Order
-OP -> OP : Processing Order
-OP -[#blue]> PR : Transfer funds
-PR -[#blue]> U: Transfer funds
-OP -[#purple]> E : Repay funds
-OP -> Database : Store Order as completed
+ABP -[#purple]> E : Gets Orders from Accepted Blocks
+ABP -> Database : Stores missing orders
+ABP -> OP : Processes missing Order
+OP -> OP : Processes Order
+OP -[#blue]> PR : Transfers funds
+PR -[#blue]> U: Transfers funds
+OP -[#blue]> PR : Sends proof of payment
+PR -[#purple]> E : Sends proof of payment
+OP -> Database : Stores Order as completed
 
 @enduml
 

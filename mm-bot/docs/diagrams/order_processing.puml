@@ -5,15 +5,15 @@ entity "Payment Registry" as PR #blue
 control "Order Processor" as OP
 database Database
 
-U -[#purple]> E : Set Order
+U -[#purple]> E : Sets Order
 OP -[#purple]> E : Gets Order
 OP -> Database : Stores Order
-OP -> OP : Process Order
+OP -> OP : Processes Order
 OP -[#blue]> PR : Transfers funds
 PR -[#blue]> U: Transfers funds
 OP -[#blue]> PR : Sends proof of payment
 PR -[#purple]> E : Sends proof of payment
-OP -> Database : Store Order as completed
+OP -> Database : Stores Order as completed
 
 
 @enduml
