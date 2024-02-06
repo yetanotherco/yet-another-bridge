@@ -12,6 +12,7 @@ State Proved
 State Completed #lightgreen
 State Dropped #pink
 
+note "User sets a new order" as N1
 [*] -d-> Pending
 note on link
   Creates a new order in the database
@@ -19,11 +20,11 @@ end note
 
 Pending -d[#black]-> Processing
 note on link
-  MM Starts processing the order
+  Starts processing order
 end note
 
 State CheckFee <<choice>>
-note left of CheckFee
+note right of CheckFee
     Is fee enough?
 end note
 State CheckAmount <<choice>>
@@ -31,10 +32,10 @@ note left of CheckAmount
     amount <= 0.1 ETH?
 end note
 Processing -d[#black]-> CheckFee
-CheckFee -[#black]-> CheckAmount
+CheckFee -[#black]-> CheckAmount : yes
 CheckFee -r[#red]-> Dropped : no
 
-CheckAmount -d[#black]-> Transferring
+CheckAmount -[#black]-> Transferring
 note on link
   Transfers funds on L1
 end note
