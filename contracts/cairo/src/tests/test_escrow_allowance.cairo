@@ -191,7 +191,7 @@ mod Escrow {
         match l1_handler.execute() {
             Result::Ok(_) => panic_with_felt252('shouldve panicked'),
             Result::Err(RevertedTransaction) => {
-                assert(*RevertedTransaction.panic_data.at(0) == 'Only YAB_TRANSFER_CONTRACT', *RevertedTransaction.panic_data.at(0));
+                assert(*RevertedTransaction.panic_data.at(0) == 'Only PAYMENT_REGISTRY_CONTRACT', *RevertedTransaction.panic_data.at(0));
             }
         }
     }

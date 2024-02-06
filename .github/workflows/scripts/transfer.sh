@@ -14,7 +14,7 @@ echo "Initial Destination balance: $DESTINATION_INITIAL_BALANCE"
 
 echo "Transferring $AMOUNT to $DESTINATION_ADDRESS"
 cast send --rpc-url $ETH_RPC_URL --private-key $ETH_PRIVATE_KEY \
-  $YAB_TRANSFER_PROXY_ADDRESS "transfer(uint256, uint256, uint256)" \
+  $PAYMENT_REGISTRY_PROXY_ADDRESS "transfer(uint256, uint256, uint256)" \
   "0" "$DESTINATION_ADDRESS_UINT" "$AMOUNT" \
   --value $AMOUNT >> /dev/null
 

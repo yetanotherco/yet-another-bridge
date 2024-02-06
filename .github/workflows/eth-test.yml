@@ -1,4 +1,4 @@
-name: ETH YABTransfer Tests
+name: ETH PaymentRegistry Tests
 
 on:
   push:

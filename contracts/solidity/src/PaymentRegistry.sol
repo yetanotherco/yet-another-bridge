@@ -6,7 +6,7 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
+contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     struct TransferInfo {
         uint256 destAddress;
         uint256 amount;

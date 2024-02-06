@@ -55,7 +55,7 @@
             }
           ],
           "indexed": false,
-          "internalType": "struct YABTransfer.TransferInfo",
+          "internalType": "struct PaymentRegistry.TransferInfo",
           "name": "transferInfo",
           "type": "tuple"
         }
@@ -182,7 +182,7 @@
     "transfers(bytes32)": "3c64f04b",
     "withdraw(uint256,uint256,uint256)": "a41fe49f"
   },
-  "rawMetadata": "{\"compiler\":{\"version\":\"0.8.21+commit.d9974bed\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"snMessaging\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"snEscrowAddress\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"snEscrowWithdrawSelector\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"orderId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"srcAddress\",\"type\":\"address\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"destAddress\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"isUsed\",\"type\":\"bool\"}],\"indexed\":false,\"internalType\":\"struct YABTransfer.TransferInfo\",\"name\":\"transferInfo\",\"type\":\"tuple\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"snEscrowAddress\",\"type\":\"uint256\"}],\"name\":\"setEscrowAddress\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"snEscrowWithdrawSelector\",\"type\":\"uint256\"}],\"name\":\"setEscrowWithdrawSelector\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"orderId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"destAddress\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"transfers\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"destAddress\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"isUsed\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"orderId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"destAddress\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"withdraw\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"src/YABTransfer.sol\":\"YABTransfer\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":ds-test/=lib/forge-std/lib/ds-test/src/\",\":forge-std/=lib/forge-std/src/\",\":starknet/=lib/starknet/\"]},\"sources\":{\"lib/starknet/IStarknetMessaging.sol\":{\"keccak256\":\"0x40014108e2795fd544af0f6322882e99cc3f0872990d504c1ccebce2afea9617\",\"license\":\"Apache-2.0.\",\"urls\":[\"bzz-raw://d3eec1c3f47243734573b4ac3fc42db2eee4d110d8c39be16fbc6f93498e318d\",\"dweb:/ipfs/QmdYdJFPdEPUFQATa24jNvL59GtdoJeym1w7EARyCq8CvY\"]},\"lib/starknet/IStarknetMessagingEvents.sol\":{\"keccak256\":\"0x71171b10854a020b53b175ed9dc068a56675e2b80f823c0f841ae18977b96e8c\",\"license\":\"Apache-2.0.\",\"urls\":[\"bzz-raw://70d345e80b4fbbceba9bc0b64be0688710434a5b5d6eb4a60fae808d2bcc03d9\",\"dweb:/ipfs/QmQBdERT6NHiC2cDvTwS7aob1CwuuqQZvZt5ibGzvYawvB\"]},\"src/YABTransfer.sol\":{\"keccak256\":\"0xf299be714d637c45b70e5e33fc5bb7fdf212250426f0bd8d5b07c670af15fce1\",\"license\":\"Apache-2.0\",\"urls\":[\"bzz-raw://960761a2e29d625090440d2745fd240c18e68bbb25a25d8e4e8c4f1cbf57dc80\",\"dweb:/ipfs/QmP6ZGkfS1uJYDkDGu2N82BpDs6ixrQRk1ycPqnKuLBJv6\"]}},\"version\":1}",
+  "rawMetadata": "{\"compiler\":{\"version\":\"0.8.21+commit.d9974bed\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"snMessaging\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"snEscrowAddress\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"snEscrowWithdrawSelector\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"orderId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"srcAddress\",\"type\":\"address\"},{\"components\":[{\"internalType\":\"uint256\",\"name\":\"destAddress\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"isUsed\",\"type\":\"bool\"}],\"indexed\":false,\"internalType\":\"struct PaymentRegistry.TransferInfo\",\"name\":\"transferInfo\",\"type\":\"tuple\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"snEscrowAddress\",\"type\":\"uint256\"}],\"name\":\"setEscrowAddress\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"snEscrowWithdrawSelector\",\"type\":\"uint256\"}],\"name\":\"setEscrowWithdrawSelector\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"orderId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"destAddress\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"transfers\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"destAddress\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"isUsed\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"orderId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"destAddress\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"withdraw\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"src/PaymentRegistry.sol\":\"PaymentRegistry\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":ds-test/=lib/forge-std/lib/ds-test/src/\",\":forge-std/=lib/forge-std/src/\",\":starknet/=lib/starknet/\"]},\"sources\":{\"lib/starknet/IStarknetMessaging.sol\":{\"keccak256\":\"0x40014108e2795fd544af0f6322882e99cc3f0872990d504c1ccebce2afea9617\",\"license\":\"Apache-2.0.\",\"urls\":[\"bzz-raw://d3eec1c3f47243734573b4ac3fc42db2eee4d110d8c39be16fbc6f93498e318d\",\"dweb:/ipfs/QmdYdJFPdEPUFQATa24jNvL59GtdoJeym1w7EARyCq8CvY\"]},\"lib/starknet/IStarknetMessagingEvents.sol\":{\"keccak256\":\"0x71171b10854a020b53b175ed9dc068a56675e2b80f823c0f841ae18977b96e8c\",\"license\":\"Apache-2.0.\",\"urls\":[\"bzz-raw://70d345e80b4fbbceba9bc0b64be0688710434a5b5d6eb4a60fae808d2bcc03d9\",\"dweb:/ipfs/QmQBdERT6NHiC2cDvTwS7aob1CwuuqQZvZt5ibGzvYawvB\"]},\"src/PaymentRegistry.sol\":{\"keccak256\":\"0xf299be714d637c45b70e5e33fc5bb7fdf212250426f0bd8d5b07c670af15fce1\",\"license\":\"Apache-2.0\",\"urls\":[\"bzz-raw://960761a2e29d625090440d2745fd240c18e68bbb25a25d8e4e8c4f1cbf57dc80\",\"dweb:/ipfs/QmP6ZGkfS1uJYDkDGu2N82BpDs6ixrQRk1ycPqnKuLBJv6\"]}},\"version\":1}",
   "metadata": {
     "compiler": {
       "version": "0.8.21+commit.d9974bed"
@@ -226,7 +226,7 @@
               "indexed": false
             },
             {
-              "internalType": "struct YABTransfer.TransferInfo",
+              "internalType": "struct PaymentRegistry.TransferInfo",
               "name": "transferInfo",
               "type": "tuple",
               "components": [
@@ -376,7 +376,7 @@
         "bytecodeHash": "ipfs"
       },
       "compilationTarget": {
-        "src/YABTransfer.sol": "YABTransfer"
+        "src/PaymentRegistry.sol": "PaymentRegistry"
       },
       "libraries": {}
     },
@@ -397,7 +397,7 @@
         ],
         "license": "Apache-2.0."
       },
-      "src/YABTransfer.sol": {
+      "src/PaymentRegistry.sol": {
         "keccak256": "0xf299be714d637c45b70e5e33fc5bb7fdf212250426f0bd8d5b07c670af15fce1",
         "urls": [
           "bzz-raw://960761a2e29d625090440d2745fd240c18e68bbb25a25d8e4e8c4f1cbf57dc80",
@@ -409,13 +409,13 @@
     "version": 1
   },
   "ast": {
-    "absolutePath": "src/YABTransfer.sol",
+    "absolutePath": "src/PaymentRegistry.sol",
     "id": 45077,
     "exportedSymbols": {
       "IStarknetMessaging": [
         44666
       ],
-      "YABTransfer": [
+      "PaymentRegistry": [
         45076
       ]
     },
@@ -470,7 +470,7 @@
             "nodeType": "StructDefinition",
             "src": "161:101:24",
             "nodes": [],
-            "canonicalName": "YABTransfer.TransferInfo",
+            "canonicalName": "PaymentRegistry.TransferInfo",
             "members": [
               {
                 "constant": false,
@@ -643,7 +643,7 @@
                   "storageLocation": "default",
                   "typeDescriptions": {
                     "typeIdentifier": "t_struct$_TransferInfo_$44801_memory_ptr",
-                    "typeString": "struct YABTransfer.TransferInfo"
+                    "typeString": "struct PaymentRegistry.TransferInfo"
                   },
                   "typeName": {
                     "id": 44807,
@@ -662,7 +662,7 @@
                     "src": "328:12:24",
                     "typeDescriptions": {
                       "typeIdentifier": "t_struct$_TransferInfo_$44801_storage_ptr",
-                      "typeString": "struct YABTransfer.TransferInfo"
+                      "typeString": "struct PaymentRegistry.TransferInfo"
                     }
                   },
                   "visibility": "internal"
@@ -686,7 +686,7 @@
             "storageLocation": "default",
             "typeDescriptions": {
               "typeIdentifier": "t_mapping$_t_bytes32_$_t_struct$_TransferInfo_$44801_storage_$",
-              "typeString": "mapping(bytes32 => struct YABTransfer.TransferInfo)"
+              "typeString": "mapping(bytes32 => struct PaymentRegistry.TransferInfo)"
             },
             "typeName": {
               "id": 44814,
@@ -706,7 +706,7 @@
               "src": "361:32:24",
               "typeDescriptions": {
                 "typeIdentifier": "t_mapping$_t_bytes32_$_t_struct$_TransferInfo_$44801_storage_$",
-                "typeString": "mapping(bytes32 => struct YABTransfer.TransferInfo)"
+                "typeString": "mapping(bytes32 => struct PaymentRegistry.TransferInfo)"
               },
               "valueName": "",
               "valueNameLocation": "-1:-1:-1",
@@ -727,7 +727,7 @@
                 "src": "380:12:24",
                 "typeDescriptions": {
                   "typeIdentifier": "t_struct$_TransferInfo_$44801_storage_ptr",
-                  "typeString": "struct YABTransfer.TransferInfo"
+                  "typeString": "struct PaymentRegistry.TransferInfo"
                 }
               }
             },
@@ -1747,7 +1747,7 @@
                               "src": "1308:9:24",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_mapping$_t_bytes32_$_t_struct$_TransferInfo_$44801_storage_$",
-                                "typeString": "mapping(bytes32 => struct YABTransfer.TransferInfo storage ref)"
+                                "typeString": "mapping(bytes32 => struct PaymentRegistry.TransferInfo storage ref)"
                               }
                             },
                             "id": 44898,
@@ -1771,7 +1771,7 @@
                             "src": "1308:16:24",
                             "typeDescriptions": {
                               "typeIdentifier": "t_struct$_TransferInfo_$44801_storage",
-                              "typeString": "struct YABTransfer.TransferInfo storage ref"
+                              "typeString": "struct PaymentRegistry.TransferInfo storage ref"
                             }
                           },
                           "id": 44899,
@@ -1892,7 +1892,7 @@
                         "src": "1383:9:24",
                         "typeDescriptions": {
                           "typeIdentifier": "t_mapping$_t_bytes32_$_t_struct$_TransferInfo_$44801_storage_$",
-                          "typeString": "mapping(bytes32 => struct YABTransfer.TransferInfo storage ref)"
+                          "typeString": "mapping(bytes32 => struct PaymentRegistry.TransferInfo storage ref)"
                         }
                       },
                       "id": 44907,
@@ -1916,7 +1916,7 @@
                       "src": "1383:16:24",
                       "typeDescriptions": {
                         "typeIdentifier": "t_struct$_TransferInfo_$44801_storage",
-                        "typeString": "struct YABTransfer.TransferInfo storage ref"
+                        "typeString": "struct PaymentRegistry.TransferInfo storage ref"
                       }
                     },
                     "nodeType": "Assignment",
@@ -1987,7 +1987,7 @@
                         "src": "1402:12:24",
                         "typeDescriptions": {
                           "typeIdentifier": "t_type$_t_struct$_TransferInfo_$44801_storage_ptr_$",
-                          "typeString": "type(struct YABTransfer.TransferInfo storage pointer)"
+                          "typeString": "type(struct PaymentRegistry.TransferInfo storage pointer)"
                         }
                       },
                       "id": 44912,
@@ -2011,13 +2011,13 @@
                       "tryCall": false,
                       "typeDescriptions": {
                         "typeIdentifier": "t_struct$_TransferInfo_$44801_memory_ptr",
-                        "typeString": "struct YABTransfer.TransferInfo memory"
+                        "typeString": "struct PaymentRegistry.TransferInfo memory"
                       }
                     },
                     "src": "1383:89:24",
                     "typeDescriptions": {
                       "typeIdentifier": "t_struct$_TransferInfo_$44801_storage",
-                      "typeString": "struct YABTransfer.TransferInfo storage ref"
+                      "typeString": "struct PaymentRegistry.TransferInfo storage ref"
                     }
                   },
                   "id": 44914,
@@ -2447,7 +2447,7 @@
                           "src": "1658:9:24",
                           "typeDescriptions": {
                             "typeIdentifier": "t_mapping$_t_bytes32_$_t_struct$_TransferInfo_$44801_storage_$",
-                            "typeString": "mapping(bytes32 => struct YABTransfer.TransferInfo storage ref)"
+                            "typeString": "mapping(bytes32 => struct PaymentRegistry.TransferInfo storage ref)"
                           }
                         },
                         "id": 44945,
@@ -2471,7 +2471,7 @@
                         "src": "1658:16:24",
                         "typeDescriptions": {
                           "typeIdentifier": "t_struct$_TransferInfo_$44801_storage",
-                          "typeString": "struct YABTransfer.TransferInfo storage ref"
+                          "typeString": "struct PaymentRegistry.TransferInfo storage ref"
                         }
                       }
                     ],
@@ -2487,7 +2487,7 @@
                         },
                         {
                           "typeIdentifier": "t_struct$_TransferInfo_$44801_storage",
-                          "typeString": "struct YABTransfer.TransferInfo storage ref"
+                          "typeString": "struct PaymentRegistry.TransferInfo storage ref"
                         }
                       ],
                       "id": 44939,
@@ -2498,7 +2498,7 @@
                       "src": "1628:8:24",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_uint256_$_t_address_$_t_struct$_TransferInfo_$44801_memory_ptr_$returns$__$",
-                        "typeString": "function (uint256,address,struct YABTransfer.TransferInfo memory)"
+                        "typeString": "function (uint256,address,struct PaymentRegistry.TransferInfo memory)"
                       }
                     },
                     "id": 44946,
@@ -2827,7 +2827,7 @@
                       "storageLocation": "storage",
                       "typeDescriptions": {
                         "typeIdentifier": "t_struct$_TransferInfo_$44801_storage_ptr",
-                        "typeString": "struct YABTransfer.TransferInfo"
+                        "typeString": "struct PaymentRegistry.TransferInfo"
                       },
                       "typeName": {
                         "id": 44970,
@@ -2846,7 +2846,7 @@
                         "src": "1870:12:24",
                         "typeDescriptions": {
                           "typeIdentifier": "t_struct$_TransferInfo_$44801_storage_ptr",
-                          "typeString": "struct YABTransfer.TransferInfo"
+                          "typeString": "struct PaymentRegistry.TransferInfo"
                         }
                       },
                       "visibility": "internal"
@@ -2863,7 +2863,7 @@
                       "src": "1906:9:24",
                       "typeDescriptions": {
                         "typeIdentifier": "t_mapping$_t_bytes32_$_t_struct$_TransferInfo_$44801_storage_$",
-                        "typeString": "mapping(bytes32 => struct YABTransfer.TransferInfo storage ref)"
+                        "typeString": "mapping(bytes32 => struct PaymentRegistry.TransferInfo storage ref)"
                       }
                     },
                     "id": 44974,
@@ -2887,7 +2887,7 @@
                     "src": "1906:16:24",
                     "typeDescriptions": {
                       "typeIdentifier": "t_struct$_TransferInfo_$44801_storage",
-                      "typeString": "struct YABTransfer.TransferInfo storage ref"
+                      "typeString": "struct PaymentRegistry.TransferInfo storage ref"
                     }
                   },
                   "nodeType": "VariableDeclarationStatement",
@@ -2916,7 +2916,7 @@
                             "src": "1940:12:24",
                             "typeDescriptions": {
                               "typeIdentifier": "t_struct$_TransferInfo_$44801_storage_ptr",
-                              "typeString": "struct YABTransfer.TransferInfo storage pointer"
+                              "typeString": "struct PaymentRegistry.TransferInfo storage pointer"
                             }
                           },
                           "id": 44978,
@@ -3347,7 +3347,7 @@
                         "src": "2122:12:24",
                         "typeDescriptions": {
                           "typeIdentifier": "t_struct$_TransferInfo_$44801_storage_ptr",
-                          "typeString": "struct YABTransfer.TransferInfo storage pointer"
+                          "typeString": "struct PaymentRegistry.TransferInfo storage pointer"
                         }
                       },
                       "id": 45011,
@@ -3435,7 +3435,7 @@
                         "src": "2169:12:24",
                         "typeDescriptions": {
                           "typeIdentifier": "t_struct$_TransferInfo_$44801_storage_ptr",
-                          "typeString": "struct YABTransfer.TransferInfo storage pointer"
+                          "typeString": "struct PaymentRegistry.TransferInfo storage pointer"
                         }
                       },
                       "id": 45018,
@@ -4268,14 +4268,14 @@
         ],
         "abstract": false,
         "baseContracts": [],
-        "canonicalName": "YABTransfer",
+        "canonicalName": "PaymentRegistry",
         "contractDependencies": [],
         "contractKind": "contract",
         "fullyImplemented": true,
         "linearizedBaseContracts": [
           45076
         ],
-        "name": "YABTransfer",
+        "name": "PaymentRegistry",
         "nameLocation": "143:11:24",
         "scope": 45077,
         "usedErrors": [],

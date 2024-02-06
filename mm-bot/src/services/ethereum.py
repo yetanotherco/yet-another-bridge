@@ -8,7 +8,7 @@ from services.decorators.use_fallback import use_fallback
 
 ETH_CHAIN_ID = int(constants.ETH_CHAIN_ID)
 # get only the abi not the entire file
-abi_file = json.load(open(os.getcwd() + '/abi/YABTransfer.json'))['abi']
+abi_file = json.load(open(os.getcwd() + '/abi/PaymentRegistry.json'))['abi']
 
 
 class EthereumRpcNode:

@@ -242,7 +242,7 @@ mod Escrow {
     ) {
         self.pausable.assert_not_paused();
         let eth_transfer_contract_felt: felt252 = self.eth_transfer_contract.read().into();
-        assert(from_address == eth_transfer_contract_felt, 'Only YAB_TRANSFER_CONTRACT');
+        assert(from_address == eth_transfer_contract_felt, 'Only PAYMENT_REGISTRY_CONTRACT');
         assert(self.orders_pending.read(order_id), 'Order withdrawn or nonexistent');
 
         let order = self.orders.read(order_id);
