@@ -55,6 +55,9 @@ starknet-pause:
 starknet-unpause:
 	@. ./contracts/cairo/.env && ./contracts/cairo/change_pause_state.sh unpause
 
+test: 
+	make starknet-test
+	make ethereum-test
 
 .ONESHELL:
 starknet-deploy-and-connect: starknet-build
