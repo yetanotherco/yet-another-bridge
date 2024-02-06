@@ -5,15 +5,22 @@ hide members
 
 class MM {
   run()
-  process_order_events()
-  create_order_tasks()
-  process_order()
-  failed_orders_job()
-  process_failed_orders()
-  set_order_events_from_accepted_blocks_job()
-  process_orders_from_accepted_blocks()
-  transfer()
-  wait_transfer()
+  process_order_events(order_events: list, order_service: OrderService,
+                         eth_lock: asyncio.Lock, herodotus_semaphore: asyncio.Semaphore)
+  create_order_tasks(order: Order, order_service: OrderService, eth_lock: asyncio.Lock,
+                      herodotus_semaphore: asyncio.Semaphore)
+  process_order(order: Order, order_service: OrderService,
+                        eth_lock: asyncio.Lock, herodotus_semaphore: asyncio.Semaphore)
+  failed_orders_job(order_service: OrderService,
+                      eth_lock: asyncio.Lock, herodotus_semaphore: asyncio.Semaphore)
+  process_failed_orders(order_service: OrderService,
+                                eth_lock: asyncio.Lock, herodotus_semaphore: asyncio.Semaphore)
+  set_order_events_from_accepted_blocks_job(order_service: OrderService, block_dao: BlockDao,
+                                              eth_lock: asyncio.Lock, herodotus_semaphore: asyncio.Semaphore)
+  process_orders_from_accepted_blocks(order_service: OrderService, block_dao: BlockDao,
+                                              eth_lock: asyncio.Lock, herodotus_semaphore: asyncio.Semaphore)
+  transfer(order: Order, order_service: OrderService)
+  wait_transfer(order: Order, order_service: OrderService)
 }
 
 package services {

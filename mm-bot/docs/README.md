@@ -21,7 +21,26 @@ Payment Registry contract.
 - The bot must be able to retry failed orders.
 - The bot must be able to perform adequate logs for the orders tracking.
 
-[Version simplificada de la arquitectura]
+### Simplified Class Diagram
+```plantuml
+@startuml
+class Bot {
+    -order: Order
+    -paymentRegistry: PaymentRegistry
+    -database: Database
+    +run()
+    +readOrder()
+    +transfer()
+    +withdraw()
+    +storeOrder()
+    +updateOrder()
+    +storeError()
+    +retryOrder()
+}
+@enduml
+```
+![MM_Diagram_Class.svg](images%2FMM_Diagram_Class.svg)
+![MM_Diagram_Class_Full.svg](images%2FMM_Diagram_Class_Full.svg)
 
 ## Development View (TODO)
 
