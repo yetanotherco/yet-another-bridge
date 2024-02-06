@@ -34,7 +34,8 @@ showing the attributes and methods of each class.
 ### Architecture
 The bot architecture is as follows:
 
-![architecture.png](images%2Farchitecture.png)
+![architecture.png](images/architecture.png)
+
 The bot is composed of the following components:
 - **Main Process**: The main process of the bot. It has the following subcomponents:
     - `Main Order Indexer`: The `Main Order Indexer` is responsible for indexing the orders from 
