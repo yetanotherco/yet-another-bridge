@@ -11,7 +11,7 @@ echo "Initial MM balance: $MM_INITIAL_BALANCE"
 
 echo "Withdrawing $AMOUNT"
 cast send --rpc-url $ETH_RPC_URL --private-key $ETH_PRIVATE_KEY \
-  $PAYMENT_REGISTRY_PROXY_ADDRESS "withdraw(uint256, uint256, uint256)" \
+  $PAYMENT_REGISTRY_PROXY_ADDRESS "claimPayment(uint256, uint256, uint256)" \
   "0" "642829559307850963015472508762062935916233390536" "$AMOUNT" \
   --value $AMOUNT >> /dev/null
 
