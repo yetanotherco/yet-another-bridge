@@ -10,7 +10,7 @@ OP -[#purple]> E : Get Order
 OP -> Database : Store Order
 OP -> OP : Processing Order
 OP -[#blue]> PR : Transfer funds
-PR -[#blue]> U: Send funds
+PR -[#blue]> U: Transfer funds
 OP -[#purple]> E : Repay funds
 OP -> Database : Store Order as completed
 
