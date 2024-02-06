@@ -6,12 +6,13 @@ control "Order Processor" as OP
 database Database
 
 U -[#purple]> E : Set Order
-OP -[#purple]> E : Get Order
-OP -> Database : Store Order
-OP -> OP : Processing Order
-OP -[#blue]> PR : Transfer funds
-PR -[#blue]> U: Transfer funds
-OP -[#purple]> E : Repay funds
+OP -[#purple]> E : Gets Order
+OP -> Database : Stores Order
+OP -> OP : Process Order
+OP -[#blue]> PR : Transfers funds
+PR -[#blue]> U: Transfers funds
+OP -[#blue]> PR : Sends proof of payment
+PR -[#purple]> E : Sends proof of payment
 OP -> Database : Store Order as completed
 
 

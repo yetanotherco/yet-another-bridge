@@ -24,42 +24,41 @@ showing the attributes and methods of each class.
 
 ## Process View
 ### Non-Functional Requirements
-- The bot must be able to handle multiple orders simultaneously.
-- The bot must be able to retrieve the status of the orders in case of interruption and complete it.
+- The bot must be able to handle multiple orders concurrently.
+- The bot must be able to retrieve the status of the orders in case of interruption and complete them.
 - The bot must be highly available.
 - The bot must index the orders that belong to accepted blocks to ensure that orders are not lost.
 - The bot must be able to retry failed orders.
-- The bot must be able to perform adequate logs for the orders tracking.
+- The bot must generate adequate logs for order tracking.
 
 ### Architecture
 The bot architecture is as follows:
 
 ![architecture.png](images%2Farchitecture.png)
 The bot is composed of the following components:
-- **MM Bot**: The main process of the bot. It has the following subcomponents:
-  - `Main Order Indexer`: The `Main Order Indexer` is responsible for indexing the orders from 
+- **Main Process**: The main process of the bot. It has the following subcomponents:
+    - `Main Order Indexer`: The `Main Order Indexer` is responsible for indexing the orders from 
     the pending blocks.
-  - `Order Processor`: The `Order Processor` is responsible for processing the orders.
-  - `Failed Orders Processor`: The `Failed Orders Processor` is responsible for retrying the failed orders.
+  - `Order Processor`: Responsible for processing the orders.
+  - `Failed Orders Processor`: Responsible for retrying the failed orders.
   It runs every 5 minutes.
-  - `Accepted Blocks Processor`: The `Accepted Blocks Processor` is responsible for indexing the orders
-    that belong to accepted blocks. It runs every 5 minutes.
+  - `Accepted Blocks Processor`: Responsible for indexing the orders that belong to accepted blocks. It runs every 5 minutes.
 - **Database**: The database is used to store the following data:
-  - Orders.
-  - Errors.
-  - Block numbers.
+  - Orders
+  - Errors
+  - Block numbers
 
-An important aspect is that the bot must be able to handle multiple orders simultaneously.
-For that reason, the bot uses asyncio to handle the orders concurrently. This way is preferred
-over using threads, due to the potentially high number of orders that the bot must handle and 
-the fact that the bot is I/O bound.
+An important aspect of the bot is that it must be able to handle multiple orders concurrently.
+For that reason, the bot uses the library 'asyncio' to handle orders concurrently. This approach, 
+preferred over using threads, is particularly suitable for the bot's I/O-bound nature and the potential 
+high volume of orders it could potentially need to manage.
 
-Another important aspect is that the bot must have a reliable network connection to communicate
-with Ethereum and L2 networks RPCs.
+Another important requirement is that the bot must have a reliable network connection to communicate
+with Ethereum's and L2 networks' RPCs.
 
 ## Physical View
-The system is deployed in an EC2 virtual machine in AWS.
-The EC2 runs the bot process and the database.
+The system is currently deployed in an EC2 virtual machine in AWS.
+This EC2 runs the bot Main Process as well as its database. 
 
 ![physical_view.png](images/physical_view.png)
 
@@ -69,13 +68,13 @@ The following diagram shows the complete process of an order.
 
 ![order_processing.svg](images%2Forder_processing.svg)
 
-The order has the following states:
+And each has the following states:
 
 ![state_diagram.svg](images%2Fstate_diagram.svg)
 
 ### 2. Failed Orders Reprocessing
-When an order fails, the bot stores the error and marks the order as failed. So, the `Failed
-Orders Processor` will retry the failed orders. The following diagram shows the flow of a 
+When an order fails, the bot stores the error, and marks the order as failed. This way, the `Failed
+Orders Processor` is able to retry the failed orders. The following diagram shows the flow of a 
 failed order through the bot.
 
 ![failed_orders.svg](images%2Ffailed_orders.svg)

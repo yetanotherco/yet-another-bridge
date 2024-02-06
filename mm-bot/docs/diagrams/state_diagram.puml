@@ -1,6 +1,7 @@
 @startuml
 
 skin rose
+hide empty description
 
 State Pending
 State Processing
@@ -22,17 +23,22 @@ note on link
 end note
 
 State CheckFee <<choice>>
+note left of CheckFee
+    Is fee enough?
+end note
 State CheckAmount <<choice>>
+note left of CheckAmount
+    amount <= 0.1 ETH?
+end note
 Processing -d[#black]-> CheckFee
-CheckFee -d[#black]-> CheckAmount : [fee is enough]
+CheckFee -[#black]-> CheckAmount
+CheckFee -r[#red]-> Dropped : no
 
-CheckFee -r[#red]-> Dropped
-
-CheckAmount -d[#black]-> Transferring : [amount <= 0.1 ETH]
+CheckAmount -d[#black]-> Transferring
 note on link
   Transfers funds on L1
 end note
-CheckAmount -r[#red]-> Dropped
+CheckAmount -d[#red]-> Dropped : no
 
 Transferring -d[#black]-> Fulfilled
 note on link
