@@ -1,0 +1,19 @@
+@startuml
+actor User as U
+entity Escrow as E #purple
+entity "Payment Registry" as PR #blue
+control "Order Processor" as OP
+control "Order from Accepted Blocks Processor" as ABP
+database Database
+
+ABP -[#purple]> E : Get Orders from Accepted Blocks
+ABP -> Database : Store missing orders
+ABP -> OP : Process missing Order
+OP -> OP : Processing Order
+OP -[#blue]> PR : Process Order
+PR -[#blue]> U: Send funds
+OP -[#purple]> E : Repay funds
+OP -> Database : Store Order as completed
+
+@enduml
+

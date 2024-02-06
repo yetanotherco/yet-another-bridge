@@ -1,0 +1,20 @@
+@startuml
+actor User as U
+entity Escrow as E #purple
+entity "Payment Registry" as PR #blue
+control "Order Processor" as OP
+control "Failed Order Processor" as FOP
+database Database
+
+U -[#purple]> E : Set Order
+OP -[#purple]> E : Get Order
+OP ->x OP : Processing Order
+OP -> Database : Store Order as failed due to error
+FOP -> Database : Get failed orders
+FOP -> OP : Process failed order
+OP -[#blue]> PR : Process Order
+PR -[#blue]> U: Send funds
+OP -[#purple]> E : Repay funds
+OP -> Database : Store Order as completed
+
+@enduml
