@@ -2,7 +2,7 @@
 Market Maker Bot is a bot that provides liquidity to the Yet Another Bridge (YAB).
 
 # Prerequisites
-- Python v3.8 or higher
+- Python v3.10 or higher
 - pip
 - Postgres (Native or Docker)
 
@@ -16,7 +16,7 @@ pip install -r requirements.txt
 If you want to use a virtual environment, you can use the following command:
 
 ```bash
-make create_venv
+make create_python_venv
 ```
 To run the virtual environment, you can use the following command:
 
