@@ -75,7 +75,7 @@ mod Escrow {
     #[event]
     #[derive(Drop, starknet::Event)]
     enum Event {
-        Withdraw: Withdraw,
+        ClaimPayment: ClaimPayment,
         SetOrder: SetOrder,
         #[flat]
         OwnableEvent: OwnableComponent::Event,
@@ -94,7 +94,7 @@ mod Escrow {
     }
 
     #[derive(Drop, starknet::Event)]
-    struct Withdraw {
+    struct ClaimPayment {
         order_id: u256,
         address: ContractAddress,
         amount: u256,
@@ -233,7 +233,7 @@ mod Escrow {
     }
 
     #[l1_handler]
-    fn withdraw(
+    fn claimPayment(
         ref self: ContractState,
         from_address: felt252,
         order_id: u256,
@@ -243,7 +243,7 @@ mod Escrow {
         self.pausable.assert_not_paused();
         let eth_transfer_contract_felt: felt252 = self.eth_transfer_contract.read().into();
         assert(from_address == eth_transfer_contract_felt, 'Only PAYMENT_REGISTRY_CONTRACT');
-        assert(self.orders_pending.read(order_id), 'Order withdrawn or nonexistent');
+        assert(self.orders_pending.read(order_id), 'Order claimed or nonexistent');
 
         let order = self.orders.read(order_id);
         assert(order.recipient_address == recipient_address, 'recipient_address not match L1');
@@ -255,6 +255,6 @@ mod Escrow {
         IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
             .transfer(self.mm_starknet_wallet.read(), payment_amount);
 
-        self.emit(Withdraw { order_id, address: self.mm_starknet_wallet.read(), amount });
+        self.emit(ClaimPayment { order_id, address: self.mm_starknet_wallet.read(), amount });
     }
 }

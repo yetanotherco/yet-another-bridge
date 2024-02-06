@@ -12,12 +12,12 @@ contract Deploy is Script {
 
         address snMessagingAddress = vm.envAddress("SN_MESSAGING_ADDRESS");
         uint256 snEscrowAddress = 0x0; // this value is set in a call to the smart contract, once deployed
-        uint256 snWithdrawSelector = 0x0; // this value is set in a call to the smart contract, once deployed
+        uint256 snClaimPaymentSelector = 0x0; // this value is set in a call to the smart contract, once deployed
         address marketMaker = vm.envAddress("MM_ETHEREUM_WALLET");
 
         PaymentRegistry yab = new PaymentRegistry();
         ERC1967Proxy proxy = new ERC1967Proxy(address(yab), "");
-        PaymentRegistry(address(proxy)).initialize(snMessagingAddress, snEscrowAddress, snWithdrawSelector, marketMaker);
+        PaymentRegistry(address(proxy)).initialize(snMessagingAddress, snEscrowAddress, snClaimPaymentSelector, marketMaker);
 
         vm.stopBroadcast();
 

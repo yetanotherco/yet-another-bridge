@@ -161,7 +161,7 @@ For this, you will need to:
    SN_RPC_URL = Infura or Alchemy RPC URL
    SN_ESCROW_OWNER = Public address of the owner of the Escrow contract
    MM_SN_WALLET_ADDR = Starknet wallet of the MarketMaker
-   WITHDRAW_NAME = Exact name of the withdraw function that is called from L1, case sensitive. Example: withdraw_fallback
+   CLAIM_PAYMENT_NAME = Exact name of the claimPayment function that is called from L1, case sensitive. Example: claimPayment
    MM_ETHEREUM_WALLET = Ethereum wallet of the MarketMaker
    NATIVE_TOKEN_ETH_STARKNET = Ethereum's erc20 token handler contract in Starknet, this value is automatically updated after solidity/deploy.sh is run
    PAYMENT_REGISTRY_PROXY_ADDRESS = Address of ETH smart contract Proxy
@@ -184,7 +184,7 @@ For this, you will need to:
    1. make starknet-build; builds the project
    2. make starknet-deploy; deploys the smart contract on the blockchain
    3. make ethereum-set-escrow; sets the newly created Starknet contract address on the Ethereum smart contract, so that the L1 contract can communicate with the L2 contract
-   4. make ethereum-set-withdraw-selector; sets the Starknet _withdraw_ function name on the Ethereum smart contract, so that the L1 contract can communicate with the L2 contract
+   4. make ethereum-set-claim-payment-selector; sets the Starknet _claimPayment_ function name on the Ethereum smart contract, so that the L1 contract can communicate with the L2 contract
 
 ### Second alternative: manual deploy and connect of Escrow and PaymentRegistry
 
@@ -210,16 +210,16 @@ This may be better suited for you if you plan to change some of the automaticall
 
    This script uses the previously set .env variable, **ESCROW_CONTRACT_ADDRESS**
 
-3. Setting _EscrowWithdrawSelector_
+3. Setting _EscrowClaimPaymentSelector_
 
-   Ethereum's smart contract has another variable that must be configured, _EscrowWithdrawSelector_, which is for specifying the _withdraw_ function's name in the Starknet Escrow smart contract.
-   You can set and change Ethereum's _EscrowWithdrawSelector_ variable, doing the following:
+   Ethereum's smart contract has another variable that must be configured, _EscrowClaimPaymentSelector_, which is for specifying the _claimPayment_ function's name in the Starknet Escrow smart contract.
+   You can set and change Ethereum's _EscrowClaimPaymentSelector_ variable, doing the following:
 
    ```bash
-   make ethereum-set-withdraw-selector
+   make ethereum-set-claim-payment-selector
    ```
 
-   This script uses the WITHDRAW_NAME .env variable to automatically generate the selector in the necesary format
+   This script uses the CLAIM_PAYMENT_NAME .env variable to automatically generate the selector in the necesary format
 
 
 ### Note on Starknet Smart Contract

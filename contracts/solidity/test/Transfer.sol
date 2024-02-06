@@ -15,7 +15,7 @@ contract TransferTest is Test {
     PaymentRegistry public yab_caller;
 
     address SN_MESSAGING_ADDRESS = 0xde29d060D45901Fb19ED6C6e959EB22d8626708e;
-    uint256 SN_ESCROW_WITHDRAW_SELECTOR = 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77;
+    uint256 SN_ESCROW_CLAIM_PAYMENT_SELECTOR = 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77;
 
     function setUp() public {
         vm.startPrank(deployer);
@@ -23,7 +23,7 @@ contract TransferTest is Test {
         yab = new PaymentRegistry();
         proxy = new ERC1967Proxy(address(yab), "");
         yab_caller = PaymentRegistry(address(proxy));
-        yab_caller.initialize(SN_MESSAGING_ADDRESS, snEscrowAddress, SN_ESCROW_WITHDRAW_SELECTOR, marketMaker);
+        yab_caller.initialize(SN_MESSAGING_ADDRESS, snEscrowAddress, SN_ESCROW_CLAIM_PAYMENT_SELECTOR, marketMaker);
 
         // Mock calls to Starknet Messaging contract
         vm.mockCall(
@@ -45,48 +45,48 @@ contract TransferTest is Test {
         yab_caller.transfer{value: 100}(1, 0x1, 100);
     }
 
-    function testWithdraw_mm() public {
+    function testClaimPayment_mm() public {
         hoax(marketMaker, 100 wei);
         yab_caller.transfer{value: 100}(1, 0x1, 100);
 
         hoax(marketMaker, 100 wei);
-        yab_caller.withdraw{value: 100}(1, 0x1, 100);
+        yab_caller.claimPayment{value: 100}(1, 0x1, 100);
     }
 
-    function testWithdraw_fail_noOrderId() public {
+    function testClaimPayment_fail_noOrderId() public {
         hoax(marketMaker, 100 wei);
         vm.expectRevert("Transfer not found."); //Won't match to a random transfer number
-        yab_caller.withdraw{value: 100}(1, 0x1, 100);
+        yab_caller.claimPayment{value: 100}(1, 0x1, 100);
     }
 
-    function testWithdraw_fail_notOwnerOrMM() public {
+    function testClaimPayment_fail_notOwnerOrMM() public {
         hoax(makeAddr("bob"), 100 wei);
         vm.expectRevert("Only Owner or MM can call this function");
-        yab_caller.withdraw{value: 100}(1, 0x1, 100);
+        yab_caller.claimPayment{value: 100}(1, 0x1, 100);
     }
 
-    function testWithdraw() public {
+    function testClaimPayment() public {
         hoax(marketMaker, 100 wei);
         yab_caller.transfer{value: 100}(1, 0x1, 100);  
         hoax(marketMaker, 100 wei);
-        yab_caller.withdraw(1, 0x1, 100);
+        yab_caller.claimPayment(1, 0x1, 100);
     }
 
-    function testWithdrawOver() public {
+    function testClaimPaymentOver() public {
         uint256 maxInt = type(uint256).max;
         
         vm.deal(marketMaker, maxInt);
         vm.startPrank(marketMaker);
 
         yab_caller.transfer{value: maxInt}(1, 0x1, maxInt);
-        yab_caller.withdraw(1, 0x1, maxInt);
+        yab_caller.claimPayment(1, 0x1, maxInt);
         vm.stopPrank();
     }
 
-    function testWithdrawLow() public {
+    function testClaimPaymentLow() public {
         hoax(marketMaker, 1 wei);
         yab_caller.transfer{value: 1}(1, 0x1, 1);
         hoax(marketMaker, 1 wei);
-        yab_caller.withdraw(1, 0x1, 1);
+        yab_caller.claimPayment(1, 0x1, 1);
     }
 }

@@ -15,13 +15,13 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
     event Transfer(uint256 indexed orderId, address srcAddress, TransferInfo transferInfo);
     event ModifiedEscrowAddress(uint256 newEscrowAddress);
-    event ModifiedEscrowWithdrawSelector(uint256 newEscrowWithdrawSelector);
+    event ModifiedEscrowClaimPaymentSelector(uint256 newEscrowClaimPaymentSelector);
 
     mapping(bytes32 => TransferInfo) public transfers;
     address private _marketMaker;
     IStarknetMessaging private _snMessaging;
     uint256 private _snEscrowAddress;
-    uint256 private _snEscrowWithdrawSelector;
+    uint256 private _snEscrowClaimPaymentSelector;
 
     constructor() {
         _disableInitializers();
@@ -31,14 +31,14 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     function initialize(
         address snMessaging,
         uint256 snEscrowAddress,
-        uint256 snEscrowWithdrawSelector,
+        uint256 snEscrowClaimPaymentSelector,
         address marketMaker) public initializer { 
         __Ownable_init(msg.sender);
         __UUPSUpgradeable_init();
 
         _snMessaging = IStarknetMessaging(snMessaging);
         _snEscrowAddress = snEscrowAddress;
-        _snEscrowWithdrawSelector = snEscrowWithdrawSelector;
+        _snEscrowClaimPaymentSelector = snEscrowClaimPaymentSelector;
         _marketMaker = marketMaker;
     }
 
@@ -59,7 +59,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         emit Transfer(orderId, msg.sender, transfers[index]);
     }
 
-    function withdraw(uint256 orderId, uint256 destAddress, uint256 amount) external payable onlyOwnerOrMM {
+    function claimPayment(uint256 orderId, uint256 destAddress, uint256 amount) external payable onlyOwnerOrMM {
         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount));
         TransferInfo storage transferInfo = transfers[index];
         require(transferInfo.isUsed == true, "Transfer not found.");
@@ -73,7 +73,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         
         _snMessaging.sendMessageToL2{value: msg.value}(
             _snEscrowAddress,
-            _snEscrowWithdrawSelector,
+            _snEscrowClaimPaymentSelector,
             payload);
     }
 
@@ -82,9 +82,9 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         emit ModifiedEscrowAddress(snEscrowAddress);        
     }
 
-    function setEscrowWithdrawSelector(uint256 snEscrowWithdrawSelector) external onlyOwner {
-        _snEscrowWithdrawSelector = snEscrowWithdrawSelector;
-        emit ModifiedEscrowWithdrawSelector(snEscrowWithdrawSelector);
+    function setEscrowClaimPaymentSelector(uint256 snEscrowClaimPaymentSelector) external onlyOwner {
+        _snEscrowClaimPaymentSelector = snEscrowClaimPaymentSelector;
+        emit ModifiedEscrowClaimPaymentSelector(snEscrowClaimPaymentSelector);
     }
 
     

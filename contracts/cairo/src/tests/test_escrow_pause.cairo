@@ -255,7 +255,7 @@ mod Escrow {
         data.serialize(ref payload_buffer);
         let mut l1_handler = L1HandlerTrait::new(
             contract_address: escrow.contract_address,
-            function_name: 'withdraw',
+            function_name: 'claimPayment',
         );
         l1_handler.from_address = ETH_TRANSFER_CONTRACT().into();
         l1_handler.payload = payload_buffer.span();

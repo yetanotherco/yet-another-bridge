@@ -83,4 +83,4 @@ echo "\nIf you now wish to finish the configuration of this deploy, you will nee
 echo "export PAYMENT_REGISTRY_PROXY_ADDRESS=$PAYMENT_REGISTRY_PROXY_ADDRESS"
 echo "export ESCROW_CONTRACT_ADDRESS=$ESCROW_CONTRACT_ADDRESS"
 echo "make ethereum-set-escrow"
-echo "make ethereum-set-withdraw-selector"
+echo "make ethereum-set-claim-payment-selector"
