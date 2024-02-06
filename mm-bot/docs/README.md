@@ -2,27 +2,25 @@
 MM Bot is a process designed to supply liquidity to YAB Escrow orders.
 ![img.png](images/img.png)
 ## Logical View
-Requisitos funcionales
-- El bot debe ser capaz de leer una orden del Escrow
-- El bot debe ser capaz de realizar un transfer en Ethereum a la dirección de la orden
-- El bot debe ser capaz de realizar un withdraw en Ethereum para recuperar los fondos en la L2
-- El bot debe ser capaz de almacenar las ordenes en una base de datos e ir actualizando su estado
-- En caso de error el bot debe ser capaz de almacenar el error y reintentar la orden
-
-
+### Functional Requirements
+- The bot must be able to read an order from the Escrow contract.
+- The bot must be able to perform a transfer in Ethereum to the recipient address through the Payment
+Registry contract.
+- The bot must be able to perform a withdrawal in Ethereum to recover the funds in the L2 through the
+Payment Registry contract.
+- The bot must be able to store the orders in a database and update their status.
+- In case of an error, the bot must be able to store the error and retry the order.
 
 [Diagrama de clases]
 ## Process View
-Requisitos no funcionales
-- En caso de error el bot debe ser capaz de reintentar las ordenes fallidas
-- El bot debe indexar las ordenes que pertenecen a bloques aceptados para
-garantizar que no se pierden ordenes
-- El bot debe estar disponible en todo momento
-- El bot debe ser capaz de manejar multiples ordenes simultaneamente
-- El bot debe ser capaz de recuperar el estado de las ordenes en caso de
-interrupción
-- El bot debe ser capaz de realizar logs adecuados para el seguimiento de las
-ordenes
+### Non-Functional Requirements
+- The bot must be able to handle multiple orders simultaneously.
+- The bot must be able to retrieve the status of the orders in case of interruption and complete it.
+- The bot must be highly available.
+- The bot must index the orders that belong to accepted blocks to ensure that orders are not lost.
+- The bot must be able to retry failed orders.
+- The bot must be able to perform adequate logs for the orders tracking.
+
 [Version simplificada de la arquitectura]
 
 ## Development View (TODO)
