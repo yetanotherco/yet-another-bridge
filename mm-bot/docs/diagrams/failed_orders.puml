@@ -12,8 +12,8 @@ OP ->x OP : Processing Order
 OP -> Database : Store Order as failed due to error
 FOP -> Database : Get failed orders
 FOP -> OP : Process failed order
-OP -[#blue]> PR : Process Order
-PR -[#blue]> U: Send funds
+OP -[#blue]> PR : Transfer funds
+PR -[#blue]> U: Transfer funds
 OP -[#purple]> E : Repay funds
 OP -> Database : Store Order as completed
 

@@ -65,7 +65,11 @@ The EC2 runs the bot process and the database.
 
 ## Scenarios
 ### 1. Order Processing Flow
-The following diagram shows the flow of an order through the bot.
+The following diagram shows the complete process of an order.
+
+![order_processing.svg](images%2Forder_processing.svg)
+
+The order has the following states:
 
 ![state_diagram.svg](images%2Fstate_diagram.svg)
 
