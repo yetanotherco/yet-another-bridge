@@ -12,6 +12,17 @@ RESULT_LOG=$(forge script ./script/Deploy.s.sol --rpc-url $ETH_RPC_URL --broadca
 PAYMENT_REGISTRY_PROXY_ADDRESS=$(echo "$RESULT_LOG" | grep -Eo '0: address ([^\n]+)' | awk '{print $NF}')
 PAYMENT_REGISTRY_ADDRESS=$(echo "$RESULT_LOG" | grep -Eo '1: address ([^\n]+)' | awk '{print $NF}')
 
+if [ -z "$PAYMENT_REGISTRY_PROXY_ADDRESS" ]; then
+    printf "\n${RED}ERROR:${COLOR_RESET}\n"
+    echo "PAYMENT_REGISTRY_PROXY_ADDRESS Variable is empty. Aborting execution.\n"
+    exit 1
+fi
+if [ -z "$PAYMENT_REGISTRY_ADDRESS" ]; then
+    printf "\n${RED}ERROR:${COLOR_RESET}\n"
+    echo "PAYMENT_REGISTRY_ADDRESS Variable is empty. Aborting execution.\n"
+    exit 1
+fi
+
 printf "${GREEN}\n=> [ETH] Deployed Proxy address: $PAYMENT_REGISTRY_PROXY_ADDRESS ${COLOR_RESET}\n"
 printf "${GREEN}\n=> [ETH] Deployed PaymentRegistry address: $PAYMENT_REGISTRY_ADDRESS ${COLOR_RESET}\n"
 
