@@ -150,13 +150,13 @@ async def get_latest_block(rpc_node=main_rpc_node) -> int:
     return latest_block.block_number
 
 
-async def withdraw(order_id, block, slot) -> bool:
+async def claim_payment(order_id, block, slot) -> bool:
     slot = slot.hex()
     slot_high = int(slot.replace("0x", "")[0:32], 16)
     slot_low = int(slot.replace("0x", "")[32:64], 16)
     call = Call(
         to_addr=int(constants.SN_CONTRACT_ADDR, 0),
-        selector=get_selector_from_name("withdraw"),
+        selector=get_selector_from_name("claim_payment"),
         calldata=[order_id, 0, block, 0, slot_low, slot_high]
     )
     try:
@@ -164,10 +164,10 @@ async def withdraw(order_id, block, slot) -> bool:
         result = await send_transaction(transaction)
         await wait_for_tx(result.transaction_hash)
 
-        logger.info(f"[+] Withdrawn from starknet: {hex(result.transaction_hash)}")
+        logger.info(f"[+] Claim payment from starknet: {hex(result.transaction_hash)}")
         return True
     except Exception as e:
-        logger.error(f"[-] Failed to withdraw from starknet: {e}")
+        logger.error(f"[-] Failed to claim payment from starknet: {e}")
     return False
 
 

@@ -5,7 +5,7 @@ from models.order import Order
 from services.order_service import OrderService
 
 
-class Withdrawer(ABC):
+class PaymentClaimer(ABC):
 
     def __init__(self):
         self.logger = logging.getLogger(__name__)
@@ -13,17 +13,17 @@ class Withdrawer(ABC):
     """
     """
     @abstractmethod
-    async def send_withdraw(self, order: Order, order_service: OrderService):
+    async def send_payment_claim(self, order: Order, order_service: OrderService):
         pass
 
     """
     """
     @abstractmethod
-    async def wait_for_withdraw(self, order: Order, order_service: OrderService):
+    async def wait_for_payment_claim(self, order: Order, order_service: OrderService):
         pass
 
     """
     """
     @abstractmethod
-    async def close_withdraw(self, order: Order, order_service: OrderService):
+    async def close_payment_claim(self, order: Order, order_service: OrderService):
         pass

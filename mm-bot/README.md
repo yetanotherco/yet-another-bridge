@@ -52,7 +52,7 @@ The following environment variables are used:
     POSTGRES_DB=<postgres_db>
     LOGGING_LEVEL=<DEBUG|INFO|WARNING|ERROR|CRITICAL>
     LOGGING_DIR=<logging_directory to save the logs in prod mode>
-    WITHDRAWER=<herodotus|ethereum>
+    PAYMENT_CLAIMER=<herodotus|ethereum>
 
 
 There is a example file called `.env.example` in the root of the project. 
