@@ -17,12 +17,12 @@ contract Malicious is Initializable {
         address snMessaging,
         uint256 snEscrowAddress,
         uint256 snEscrowClaimPaymentSelector,
-        address PaymentRegistryAddress) {
+        address ethPaymentRegistryAddress) {
 
         _snMessaging = IStarknetMessaging(snMessaging);
         _snEscrowAddress = snEscrowAddress;
         _snEscrowClaimPaymentSelector = snEscrowClaimPaymentSelector;
-        myPaymentRegistry = PaymentRegistry(PaymentRegistryAddress);
+        myPaymentRegistry = PaymentRegistry(ethPaymentRegistryAddress);
     }
 
     function steal_from_escrow(uint256 orderId, uint256 destAddress, uint256 amount) external payable {
@@ -40,8 +40,7 @@ contract Malicious is Initializable {
             payload);
     }
 
-    function steal_from_PaymentRegistry(address PaymentRegistry_address, uint256 orderId, uint256 destAddress, uint256 amount) external payable {
-        myPaymentRegistry = PaymentRegistry(PaymentRegistry_address);
+    function steal_from_PaymentRegistry(uint256 orderId, uint256 destAddress, uint256 amount) external payable {
         myPaymentRegistry.claimPayment(orderId, destAddress, amount);
     }
 
