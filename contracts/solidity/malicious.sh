@@ -3,7 +3,7 @@
 
 # 1 make deploy-all
 # 2 deploy malicious
-# 3 call malicious.steal_from_YABTransfer
+# 3 call malicious.steal_from_PaymentRegistry
 # 4 call malicious.steal_from_Escrow
 
 make deploy-all

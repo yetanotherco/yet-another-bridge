@@ -3,26 +3,26 @@ pragma solidity ^0.8.21;
 
 import {IStarknetMessaging} from "starknet/IStarknetMessaging.sol";
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import {YABTransfer} from "../src/YABTransfer.sol";
+import {PaymentRegistry} from "../src/PaymentRegistry.sol";
 
 contract Malicious is Initializable {
 
     IStarknetMessaging private _snMessaging;
     uint256 private _snEscrowAddress;
-    uint256 private _snEscrowWithdrawSelector;
+    uint256 private _snEscrowClaimPaymentSelector;
 
-    YABTransfer public myYABTransfer;
+    PaymentRegistry public myPaymentRegistry;
 
     constructor(
         address snMessaging,
         uint256 snEscrowAddress,
-        uint256 snEscrowWithdrawSelector,
-        address YABTransferAddress) {
+        uint256 snEscrowClaimPaymentSelector,
+        address PaymentRegistryAddress) {
 
         _snMessaging = IStarknetMessaging(snMessaging);
         _snEscrowAddress = snEscrowAddress;
-        _snEscrowWithdrawSelector = snEscrowWithdrawSelector;
-        // myYABTransfer = YABTransfer(YABTransfer_address);
+        _snEscrowClaimPaymentSelector = snEscrowClaimPaymentSelector;
+        myPaymentRegistry = PaymentRegistry(PaymentRegistryAddress);
     }
 
     function steal_from_escrow(uint256 orderId, uint256 destAddress, uint256 amount) external payable {
@@ -36,28 +36,28 @@ contract Malicious is Initializable {
         
         _snMessaging.sendMessageToL2{value: msg.value}(
             _snEscrowAddress,
-            _snEscrowWithdrawSelector,
+            _snEscrowClaimPaymentSelector,
             payload);
     }
 
-    function steal_from_yabtransfer(address YABTransfer_address, uint256 orderId, uint256 destAddress, uint256 amount) external payable {
-        myYABTransfer = YABTransfer(YABTransfer_address);
-        myYABTransfer.withdraw(orderId, destAddress, amount);
+    function steal_from_PaymentRegistry(address PaymentRegistry_address, uint256 orderId, uint256 destAddress, uint256 amount) external payable {
+        myPaymentRegistry = PaymentRegistry(PaymentRegistry_address);
+        myPaymentRegistry.claimPayment(orderId, destAddress, amount);
     }
 
     function setEscrowAddress(uint256 snEscrowAddress) external {
         _snEscrowAddress = snEscrowAddress;
     }
 
-    function setEscrowWithdrawSelector(uint256 snEscrowWithdrawSelector) external {
-        _snEscrowWithdrawSelector = snEscrowWithdrawSelector;
+    function setEscrowClaimPaymentSelector(uint256 snEscrowClaimPaymentSelector) external {
+        _snEscrowClaimPaymentSelector = snEscrowClaimPaymentSelector;
     }
 
     function getEscrowAddress() external view returns (uint256) {
         return _snEscrowAddress;
     }
 
-    function getEscrowWithdrawSelector() external view returns (uint256) {
-        return _snEscrowWithdrawSelector;
+    function getEscrowClaimPaymentSelector() external view returns (uint256) {
+        return _snEscrowClaimPaymentSelector;
     }
 }
