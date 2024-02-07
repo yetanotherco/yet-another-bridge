@@ -7,11 +7,11 @@ import {PaymentRegistry} from "../src/PaymentRegistry.sol";
 
 contract Malicious is Initializable {
 
-    IStarknetMessaging private _snMessaging;
-    uint256 private _snEscrowAddress;
-    uint256 private _snEscrowClaimPaymentSelector;
+    IStarknetMessaging public _snMessaging;
+    uint256 public _snEscrowAddress;
+    uint256 public _snEscrowClaimPaymentSelector;
 
-    PaymentRegistry public myPaymentRegistry;
+    PaymentRegistry public _myPaymentRegistry;
 
     constructor(
         address snMessaging,
@@ -22,7 +22,7 @@ contract Malicious is Initializable {
         _snMessaging = IStarknetMessaging(snMessaging);
         _snEscrowAddress = snEscrowAddress;
         _snEscrowClaimPaymentSelector = snEscrowClaimPaymentSelector;
-        myPaymentRegistry = PaymentRegistry(ethPaymentRegistryAddress);
+        _myPaymentRegistry = PaymentRegistry(ethPaymentRegistryAddress);
     }
 
     function steal_from_escrow(uint256 orderId, uint256 destAddress, uint256 amount) external payable {
@@ -52,11 +52,7 @@ contract Malicious is Initializable {
         _snEscrowClaimPaymentSelector = snEscrowClaimPaymentSelector;
     }
 
-    function getEscrowAddress() external view returns (uint256) {
-        return _snEscrowAddress;
-    }
-
-    function getEscrowClaimPaymentSelector() external view returns (uint256) {
-        return _snEscrowClaimPaymentSelector;
+    function setPaymentRegistryAddress(address newPaymentRegistryAddress) external {
+        _myPaymentRegistry = PaymentRegistry(newPaymentRegistryAddress);
     }
 }

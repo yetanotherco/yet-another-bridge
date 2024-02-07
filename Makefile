@@ -60,8 +60,7 @@ test:
 	make ethereum-test
 
 malo:
-	@. ./contracts/solidity/.env && . ./contracts/cairo/.env
-	@. ./contracts/solidity/malicious.sh
+	@. ./contracts/solidity/.env && . ./contracts/cairo/.env && . ./contracts/solidity/malicious.sh
 
 
 .ONESHELL:
