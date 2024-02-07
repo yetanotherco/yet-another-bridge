@@ -11,8 +11,8 @@ async def estimate_overall_fee(order: Order) -> int:
     """
     Operational cost per order done by the market maker.
     This includes:
-        calling the transfer (from YABTransfer) +
-        withdraw (from YABTransfer) +
+        calling the transfer (from PaymentRegistry) +
+        withdraw (from PaymentRegistry) +
         msg fee paid to Starknet (when calling withdraw)
     """
     transfer_fee = await asyncio.to_thread(estimate_transfer_fee, order)

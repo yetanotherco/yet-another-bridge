@@ -117,7 +117,7 @@ mod Escrow {
 
         let mut l1_handler = L1HandlerTrait::new(
             contract_address: escrow.contract_address,
-            function_name: 'withdraw'
+            function_name: 'claim_payment'
         );
 
         let mut payload_buffer: Array<felt252> = ArrayTrait::new();
@@ -181,7 +181,7 @@ mod Escrow {
         data.serialize(ref payload_buffer);
         let mut l1_handler = L1HandlerTrait::new(
             contract_address: escrow.contract_address,
-            function_name: 'withdraw',
+            function_name: 'claim_payment',
         );
         l1_handler.from_address = ETH_USER().into();
 
@@ -191,7 +191,7 @@ mod Escrow {
         match l1_handler.execute() {
             Result::Ok(_) => panic_with_felt252('shouldve panicked'),
             Result::Err(RevertedTransaction) => {
-                assert(*RevertedTransaction.panic_data.at(0) == 'Only YAB_TRANSFER_CONTRACT', *RevertedTransaction.panic_data.at(0));
+                assert(*RevertedTransaction.panic_data.at(0) == 'Only PAYMENT_REGISTRY_CONTRACT', *RevertedTransaction.panic_data.at(0));
             }
         }
     }

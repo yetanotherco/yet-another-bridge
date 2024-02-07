@@ -21,9 +21,9 @@ if [ -z "$NATIVE_TOKEN_ETH_STARKNET" ]; then
     echo "NATIVE_TOKEN_ETH_STARKNET Variable is empty. Aborting execution.\n"
     exit 1
 fi
-if [ -z "$YAB_TRANSFER_PROXY_ADDRESS" ]; then
+if [ -z "$PAYMENT_REGISTRY_PROXY_ADDRESS" ]; then
     echo "\n${RED}ERROR:${COLOR_RESET}"
-    echo "YAB_TRANSFER_PROXY_ADDRESS Variable is empty. Aborting execution.\n"
+    echo "PAYMENT_REGISTRY_PROXY_ADDRESS Variable is empty. Aborting execution.\n"
     exit 1
 fi
 if [ -z "$MM_ETHEREUM_WALLET" ]; then
@@ -59,7 +59,7 @@ printf "${GREEN}\n=> [SN] Escrow Declared${COLOR_RESET}\n"
 printf "${CYAN}[SN] Escrow ClassHash: $ESCROW_CLASS_HASH${COLOR_RESET}\n"
 printf "${CYAN}[SN] Market Maker SN Wallet: $MM_SN_WALLET_ADDR${COLOR_RESET}\n"
 printf "${CYAN}[SN] Ethereum ERC20 ContractAddress $NATIVE_TOKEN_ETH_STARKNET${COLOR_RESET}\n"
-printf "${PINK}[ETH] YABTransfer Proxy Address: $YAB_TRANSFER_PROXY_ADDRESS${COLOR_RESET}\n"
+printf "${PINK}[ETH] PaymentRegistry Proxy Address: $PAYMENT_REGISTRY_PROXY_ADDRESS${COLOR_RESET}\n"
 printf "${PINK}[ETH] Market Maker ETH Wallet: $MM_ETHEREUM_WALLET${COLOR_RESET}\n"
 
 printf "${GREEN}\n=> [SN] Deploying Escrow${COLOR_RESET}\n"
@@ -69,7 +69,7 @@ ESCROW_CONTRACT_ADDRESS=$(starkli deploy \
   $(if [ -n "$STARKNET_PRIVATE_KEY" ]; then echo "--private-key $STARKNET_PRIVATE_KEY"; fi) \
   --watch $ESCROW_CLASS_HASH \
     $SN_ESCROW_OWNER \
-    $YAB_TRANSFER_PROXY_ADDRESS \
+    $PAYMENT_REGISTRY_PROXY_ADDRESS \
     $MM_ETHEREUM_WALLET \
     $MM_SN_WALLET_ADDR \
     $NATIVE_TOKEN_ETH_STARKNET)
@@ -80,7 +80,7 @@ printf "${GREEN}\n=> [SN] Escrow Deployed${COLOR_RESET}\n"
 printf "${CYAN}[SN] Escrow Address: $ESCROW_CONTRACT_ADDRESS${COLOR_RESET}\n"
 
 echo "\nIf you now wish to finish the configuration of this deploy, you will need to run the following commands:"
-echo "export YAB_TRANSFER_PROXY_ADDRESS=$YAB_TRANSFER_PROXY_ADDRESS"
+echo "export PAYMENT_REGISTRY_PROXY_ADDRESS=$PAYMENT_REGISTRY_PROXY_ADDRESS"
 echo "export ESCROW_CONTRACT_ADDRESS=$ESCROW_CONTRACT_ADDRESS"
 echo "make ethereum-set-escrow"
-echo "make ethereum-set-withdraw-selector"
+echo "make ethereum-set-claim-payment-selector"
