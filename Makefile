@@ -31,8 +31,8 @@ ethereum-upgrade: ethereum-build
 ethereum-set-escrow:
 	@. ./contracts/solidity/.env && . ./contracts/solidity/set_escrow.sh
 
-ethereum-set-withdraw-selector:
-	@. ./contracts/solidity/.env && . ./contracts/cairo/.env && . ./contracts/solidity/set_withdraw_selector.sh
+ethereum-set-claim-payment-selector:
+	@. ./contracts/solidity/.env && . ./contracts/cairo/.env && . ./contracts/solidity/set_claim_payment_selector.sh
 
 starknet-clean:
 	@cd ./contracts/cairo/ && scarb clean
@@ -69,7 +69,7 @@ starknet-deploy-and-connect: starknet-build
 	@. ./contracts/solidity/.env && . ./contracts/cairo/.env
 	@. ./contracts/cairo/deploy.sh
 	@. ./contracts/solidity/set_escrow.sh
-	@. ./contracts/solidity/set_withdraw_selector.sh
+	@. ./contracts/solidity/set_claim_payment_selector.sh
 
 .ONESHELL:
 deploy-all:
@@ -79,5 +79,5 @@ deploy-all:
 	@make starknet-build
 	@. ./contracts/cairo/deploy.sh
 	@. ./contracts/solidity/set_escrow.sh
-	@. ./contracts/solidity/set_withdraw_selector.sh
+	@. ./contracts/solidity/set_claim_payment_selector.sh
 	@. ./contracts/utils/display_info.sh

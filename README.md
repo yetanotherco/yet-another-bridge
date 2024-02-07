@@ -120,7 +120,7 @@ Once we have the dependencies installed, we can proceed. For the Ethereum the de
    ETH_PRIVATE_KEY = private key of your ETH wallet
    ETHERSCAN_API_KEY = API Key to use etherscan to read the Ethereum blockchain
    SN_MESSAGING_ADDRESS = Starknet Messaging address
-   YAB_TRANSFER_PROXY_ADDRESS = Address of the Ethereum Proxy smart contract, this value is automatically created and/or updated after deploy.sh is executed
+   PAYMENT_REGISTRY_PROXY_ADDRESS = Address of the Ethereum Proxy smart contract, this value is automatically created and/or updated after deploy.sh is executed
    ```
 
    **NOTE**:
@@ -139,7 +139,7 @@ Once we have the dependencies installed, we can proceed. For the Ethereum the de
       make ethereum-deploy
    ```
 
-   This will deploy a Proxy smart contract, a YABTransfer smart contract, and it will link them both. The purpose of having a proxy in front of our smart contract is so that it is upgradeable, by simply deploying another smart contract and changing the Proxy's stored address.
+   This will deploy a Proxy smart contract, a PaymentRegistry smart contract, and it will link them both. The purpose of having a proxy in front of our smart contract is so that it is upgradeable, by simply deploying another smart contract and changing the Proxy's stored address.
 
 ### Starknet smart contracts
 
@@ -161,10 +161,10 @@ For this, you will need to:
    SN_RPC_URL = Infura or Alchemy RPC URL
    SN_ESCROW_OWNER = Public address of the owner of the Escrow contract
    MM_SN_WALLET_ADDR = Starknet wallet of the MarketMaker
-   WITHDRAW_NAME = Exact name of the withdraw function that is called from L1, case sensitive. Example: withdraw_fallback
+   CLAIM_PAYMENT_NAME = Exact name of the claim_payment function that is called from L1, case sensitive. Example: claim_payment
    MM_ETHEREUM_WALLET = Ethereum wallet of the MarketMaker
    NATIVE_TOKEN_ETH_STARKNET = Ethereum's erc20 token handler contract in Starknet, this value is automatically updated after solidity/deploy.sh is run
-   YAB_TRANSFER_PROXY_ADDRESS = Address of ETH smart contract Proxy
+   PAYMENT_REGISTRY_PROXY_ADDRESS = Address of ETH smart contract Proxy
    ESCROW_CONTRACT_ADDRESS = Address of the Starknet smart contract, this value is automatically updated after cairo/deploy.sh is run
    ```
 
@@ -173,7 +173,7 @@ For this, you will need to:
 
 2. Declare and Deploy: We sequentially declare and deploy the contracts, and connect it to our Ethereum smart contract.
 
-### First alternative: automatic deploy and connect of Escrow and YABTransfer
+### First alternative: automatic deploy and connect of Escrow and PaymentRegistry
 
    ```bash
       make starknet-deploy-and-connect 
@@ -184,9 +184,9 @@ For this, you will need to:
    1. make starknet-build; builds the project
    2. make starknet-deploy; deploys the smart contract on the blockchain
    3. make ethereum-set-escrow; sets the newly created Starknet contract address on the Ethereum smart contract, so that the L1 contract can communicate with the L2 contract
-   4. make ethereum-set-withdraw-selector; sets the Starknet _withdraw_ function name on the Ethereum smart contract, so that the L1 contract can communicate with the L2 contract
+   4. make ethereum-set-claim-payment-selector; sets the Starknet _claim_payment_ function name on the Ethereum smart contract, so that the L1 contract can communicate with the L2 contract
 
-### Second alternative: manual deploy and connect of Escrow and YABTransfer
+### Second alternative: manual deploy and connect of Escrow and PaymentRegistry
 
 This may be better suited for you if you plan to change some of the automatically declared .env vars, or if you simply want to make sure you understand the process.
 
@@ -210,16 +210,16 @@ This may be better suited for you if you plan to change some of the automaticall
 
    This script uses the previously set .env variable, **ESCROW_CONTRACT_ADDRESS**
 
-3. Setting _EscrowWithdrawSelector_
+3. Setting _EscrowClaimPaymentSelector_
 
-   Ethereum's smart contract has another variable that must be configured, _EscrowWithdrawSelector_, which is for specifying the _withdraw_ function's name in the Starknet Escrow smart contract.
-   You can set and change Ethereum's _EscrowWithdrawSelector_ variable, doing the following:
+   Ethereum's smart contract has another variable that must be configured, _EscrowClaimPaymentSelector_, which is for specifying the _claim_payment_ function's name in the Starknet Escrow smart contract.
+   You can set and change Ethereum's _EscrowClaimPaymentSelector_ variable, doing the following:
 
    ```bash
-   make ethereum-set-withdraw-selector
+   make ethereum-set-claim-payment-selector
    ```
 
-   This script uses the WITHDRAW_NAME .env variable to automatically generate the selector in the necesary format
+   This script uses the CLAIM_PAYMENT_NAME .env variable to automatically generate the selector in the necesary format
 
 
 ### Note on Starknet Smart Contract
@@ -245,7 +245,7 @@ After following this complete README, we should have an ETH smart contract as we
 
 ### Ethereum
 
-After deploying the `YABTransfer` contract, you can perform upgrades to it. To do this you must:
+After deploying the `PaymentRegistry` contract, you can perform upgrades to it. To do this you must:
 
 1. Configure the `contracts/solidity/.env` file.
 
@@ -254,10 +254,10 @@ After deploying the `YABTransfer` contract, you can perform upgrades to it. To d
       ETH_PRIVATE_KEY = private key of your ETH wallet
       ETHERSCAN_API_KEY = API Key to use etherscan to read the Ethereum blockchain
       SN_MESSAGING_ADDRESS = Starknet Messaging address
-      YAB_TRANSFER_PROXY_ADDRESS = Address of the Ethereum Proxy smart contract, this value is automatically created and/or updated after deploy.sh is executed
+      PAYMENT_REGISTRY_PROXY_ADDRESS = Address of the Ethereum Proxy smart contract, this value is automatically created and/or updated after deploy.sh is executed
    ```
 
-2. Use the Makefile command to upgrade `YABTransfer` contract
+2. Use the Makefile command to upgrade `PaymentRegistry` contract
 
    ```bash
       make ethereum-upgrade
@@ -266,7 +266,7 @@ After deploying the `YABTransfer` contract, you can perform upgrades to it. To d
    **Note**
    - You must be the **owner** of the contract to upgrade it.
    - This command will:
-      - Rebuild `YABTransfer.sol`
+      - Rebuild `PaymentRegistry.sol`
       - Deploy the new contract to the network
       - Utilize Foundry to upgrade the contract by changing the proxy's pointing address to the newly deployed contract
 
