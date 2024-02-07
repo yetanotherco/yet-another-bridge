@@ -87,6 +87,14 @@ contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         emit ModifiedEscrowWithdrawSelector(snEscrowWithdrawSelector);
     }
 
+    function getEscrowAddress() external view returns (uint256) {
+        return _snEscrowAddress;
+    }
+
+    function getEscrowClaimPaymentSelector() external view returns (uint256) {
+        return _snEscrowClaimPaymentSelector;
+    }
+    
     
     //// MM ACL:
 
