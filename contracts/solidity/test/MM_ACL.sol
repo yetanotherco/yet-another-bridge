@@ -48,7 +48,7 @@ contract TransferTest is Test {
     }
 
     function test_get_owner() public {
-        address ownerAddress = yab_caller.getOwner();
+        address ownerAddress = yab_caller.owner();
         assertEq(ownerAddress, deployer);
     }
 }

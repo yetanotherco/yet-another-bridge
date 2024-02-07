@@ -98,10 +98,6 @@ contract YABTransfer is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         _marketMaker = newMMAddress;
     }
 
-    function getOwner() external view returns (address) {
-        return owner();
-    }
-
     modifier onlyOwnerOrMM {
         require(msg.sender == owner() || msg.sender == _marketMaker, "Only Owner or MM can call this function");
         _;
