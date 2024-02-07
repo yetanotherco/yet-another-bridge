@@ -59,6 +59,11 @@ test:
 	make starknet-test
 	make ethereum-test
 
+malo:
+	@. ./contracts/solidity/.env && . ./contracts/cairo/.env
+	@. ./contracts/solidity/malicious.sh
+
+
 .ONESHELL:
 starknet-deploy-and-connect: starknet-build
 	@. ./contracts/solidity/.env && . ./contracts/cairo/.env
