@@ -233,7 +233,7 @@ mod Escrow {
     }
 
     #[l1_handler]
-    fn claimPayment(
+    fn claim_payment(
         ref self: ContractState,
         from_address: felt252,
         order_id: u256,

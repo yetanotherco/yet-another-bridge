@@ -117,7 +117,7 @@ mod Escrow {
 
         let mut l1_handler = L1HandlerTrait::new(
             contract_address: escrow.contract_address,
-            function_name: 'claimPayment'
+            function_name: 'claim_payment'
         );
 
         let mut payload_buffer: Array<felt252> = ArrayTrait::new();
@@ -181,7 +181,7 @@ mod Escrow {
         data.serialize(ref payload_buffer);
         let mut l1_handler = L1HandlerTrait::new(
             contract_address: escrow.contract_address,
-            function_name: 'claimPayment',
+            function_name: 'claim_payment',
         );
         l1_handler.from_address = ETH_USER().into();
 
