@@ -1,11 +1,22 @@
 @startuml
+hide footbox
 actor User as U
+box Starknet #ebc7ff
 entity Escrow as E #purple
+end box
+box Ethereum #99e6ff
 entity "Payment Registry" as PR #blue
+end box
+box "Market Maker"
 control "Order Processor" as OP
 control "Order from Accepted Blocks Processor" as ABP
 database Database
+end box
 
+note right of U
+    Order already exists
+     in an accepted block
+end note
 ABP -[#purple]> E : Gets Orders from Accepted Blocks
 ABP -> Database : Stores missing orders
 ABP -> OP : Processes missing Order
@@ -14,6 +25,7 @@ OP -[#blue]> PR : Transfers funds
 PR -[#blue]> U: Transfers funds
 OP -[#blue]> PR : Sends proof of payment
 PR -[#purple]> E : Sends proof of payment
+E -[#purple]> OP : Send funds
 OP -> Database : Stores Order as completed
 
 @enduml
