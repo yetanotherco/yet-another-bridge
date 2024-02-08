@@ -22,9 +22,12 @@ Another starknet dependency used in this project:
 
 ## Deploy YABTransfer (on Ethereum)
 
-First, the Ethereum smart contract must be deployed. For Ethereum the deployment process you will need to:
+First, the Ethereum smart contract must be deployed. For Ethereum the deployment process 
+you will need to:
 
-1. Create your `.env` file: you need to configure the following variables in your own .env file on the contracts/solidity/ folder. You can use the env.example file as a template for creating your .env file, paying special attention to the formats provided
+1. Create your `.env` file: you need to configure the following variables in your own 
+.env file on the contracts/solidity/ folder. You can use the env.example file as a 
+template for creating your .env file, paying special attention to the formats provided
 
    ```bash
    ETH_RPC_URL = Infura or Alchemy RPC URL
@@ -43,7 +46,9 @@ First, the Ethereum smart contract must be deployed. For Ethereum the deployment
    - You can generate ETHERSCAN_API_KEY [following these steps](https://docs.etherscan.io/getting-started/creating-an-account).
    - For the deployment, you will need some ETH.
      - You can get some GoerliEth from this [faucet](https://goerlifaucet.com/).
-   - SN_MESSAGING_ADDRESS is for when a L1 contract initiates a message to a L2 contract on Starknet. It does so by calling the sendMessageToL2 function on the Starknet Core Contract with the message parameters. Starknet Core Contracts are the following:
+   - SN_MESSAGING_ADDRESS is for when a L1 contract initiates a message to a L2 contract 
+   on Starknet. It does so by calling the sendMessageToL2 function on the Starknet Core 
+   Contract with the message parameters. Starknet Core Contracts are the following:
       - Goerli: `0xde29d060D45901Fb19ED6C6e959EB22d8626708e`
       - Sepolia: `0xE2Bb56ee936fd6433DC0F6e7e3b8365C906AA057`
       - Mainnet: `0xc662c410C0ECf747543f5bA90660f6ABeBD9C8c4`
@@ -54,11 +59,16 @@ First, the Ethereum smart contract must be deployed. For Ethereum the deployment
       make ethereum-deploy
    ```
 
-This will deploy a [ERC1967 Proxy](https://docs.openzeppelin.com/contracts/4.x/api/proxy#ERC1967Proxy) smart contract, a [YABTransfer](solidity/src/YABTransfer.sol) smart contract, and it will link them both. The purpose of having a proxy in front of our smart contract is so that it is [upgradeable](https://docs.openzeppelin.com/contracts/4.x/api/proxy#UUPSUpgradeable), by simply deploying another smart contract and changing the address pointed by the Proxy.
+This will deploy a [ERC1967 Proxy](https://docs.openzeppelin.com/contracts/4.x/api/proxy#ERC1967Proxy) smart contract, a [YABTransfer](solidity/src/YABTransfer.sol) smart 
+contract, and it will link them both. The purpose of having a proxy in front of our 
+smart contract is so that it is [upgradeable](https://docs.openzeppelin.com/contracts/4.x/api/proxy#UUPSUpgradeable), by simply deploying another smart 
+contract and changing the address pointed by the Proxy.
 
 ## Deploy Escrow (on Starknet)
 
-After the Ethereum smart contract is deployed, the Starknet smart contracts must be declared and deployed.
+After the Ethereum smart contract is deployed, the Starknet smart contracts must be 
+declared and deployed.
+
 On Starknet, the deployment process is in two steps:
 
 - Declaring the class of your contract, or sending your contract’s code to the
@@ -68,7 +78,9 @@ On Starknet, the deployment process is in two steps:
 
 For this, you will need to:
 
-1. Create your `.env` file: you need to configure the following variables in your own .env file on the contracts/solidity folder. You can use the env.example file as a template for creating your .env file, paying special attention to the formats provided
+1. Create your `.env` file: you need to configure the following variables in your own 
+.env file on the contracts/solidity folder. You can use the env.example file as a 
+template for creating your .env file, paying special attention to the formats provided
 
    ```env
    STARKNET_ACCOUNT = Absolute path of your starknet testnet account
@@ -81,7 +93,8 @@ For this, you will need to:
 
    MM_SN_WALLET_ADDR = Starknet wallet of the MarketMaker
 
-   WITHDRAW_NAME = The exact plain name of the withdraw function that is called from L1, case sensitive
+   WITHDRAW_NAME = The exact plain name of the withdraw function that is called 
+   from L1, case sensitive
 
    MM_ETHEREUM_WALLET = Ethereum wallet of the MarketMaker
 
@@ -90,9 +103,12 @@ For this, you will need to:
 
    **Note**
    - For how to create Starknet ACCOUNT and KEYSTORE, you can follow [this tutorial](starknet_wallet_setup.md)
-   - SN_ESCROW_OWNER is the only one who can perform upgrades, pause and unpause the smart contract. If not defined, this value will be set (by deploy.sh) to the current deployer of the smart contract.
+   - SN_ESCROW_OWNER is the only one who can perform upgrades, pause and unpause the 
+   smart contract. If not defined, this value will be set (by deploy.sh) to the current 
+   deployer of the smart contract.
 
-2. Declare and Deploy: We sequentially declare and deploy the contracts, and connect it to our Ethereum smart contract.
+2. Declare and Deploy: We sequentially declare and deploy the contracts, and connect it 
+to our Ethereum smart contract.
 
 ### First alternative: automatic deploy and connect of Escrow and YABTransfer
 
@@ -104,53 +120,69 @@ For this, you will need to:
 
    1. make starknet-build; builds the project
    2. make starknet-deploy; deploys the smart contract on the blockchain
-   3. make ethereum-set-escrow; sets the newly created Starknet contract address on the Ethereum smart contract, so that the L1 contract can communicate with the L2 contract
-   4. make ethereum-set-withdraw-selector; sets the Starknet _withdraw_ function name on the Ethereum smart contract, so that the L1 contract can communicate with the L2 contract
+   3. make ethereum-set-escrow; sets the newly created Starknet contract address on the 
+Ethereum smart contract, so that the L1 contract can communicate with the L2 contract
+   4. make ethereum-set-withdraw-selector; sets the Starknet _withdraw_ function name on 
+the Ethereum smart contract, so that the L1 contract can communicate with the L2 contract
 
 ### Second alternative: manual deploy and connect of Escrow and YABTransfer
 
-This may be better suited for you if you plan to change some of the automatically declared variables, or if you simply want to make sure you understand the process.
+This may be better suited for you if you plan to change some of the automatically 
+declared variables, or if you simply want to make sure you understand the process.
 
-1. Declare and Deploy: We sequentially declare and deploy the contracts.
+1. Declare and Deploy
+    
+    We sequentially declare and deploy the contracts.
 
    ```bash
-      make starknet-deploy
+    make starknet-deploy
    ```
 
    This script also defines an important variable, **ESCROW_CONTRACT_ADDRESS**
 
 2. Setting _EscrowAddress_
 
-   After the Starknet smart contracts are declared and deployed, the variable _EscrowAddress_ from the Ethereum smart contract must be updated with the newly created Starknet smart contract address.
+   After the Starknet smart contracts are declared and deployed, the variable 
+_EscrowAddress_ from the Ethereum smart contract must be updated with the newly created 
+Starknet smart contract address.
 
    To do this, you can use
 
    ```bash
-   make ethereum-set-escrow
+    make ethereum-set-escrow
    ```
 
    This script uses the previously set variable, **ESCROW_CONTRACT_ADDRESS**
 
 3. Setting _EscrowWithdrawSelector_
 
-   Ethereum's smart contract has another variable that must be configured, _EscrowWithdrawSelector_, which is for specifying the _withdraw_ function's name in the Starknet Escrow smart contract.
+   Ethereum's smart contract has another variable that must be configured, 
+_EscrowWithdrawSelector_, which is for specifying the _withdraw_ function's name in the 
+Starknet Escrow smart contract.
+
    You can set and change Ethereum's _EscrowWithdrawSelector_ variable, doing the following:
 
    ```bash
-   make ethereum-set-withdraw-selector
+    make ethereum-set-withdraw-selector
    ```
 
-   This script uses the WITHDRAW_NAME .env variable to automatically generate the selector in the necessary format
+   This script uses the WITHDRAW_NAME .env variable to automatically generate the 
+selector in the necessary format
 
 ## Recap
 
-At this point, we should have deployed an ETH smart contract as well as declared and deployed a Starknet smart contract, both connected to act as a bridge between these two chains.
+At this point, we should have deployed an ETH smart contract as well as declared and 
+deployed a Starknet smart contract, both connected to act as a bridge between these 
+two chains.
 
 ## Upgrade Contracts in Testnet
 
 ### Upgrading YABTransfer (on Ethereum)
 
-After deploying the `YABTransfer` contract, you can perform [upgrades](https://docs.openzeppelin.com/contracts/4.x/api/proxy#UUPSUpgradeable) to it. As mentioned previously, this is done via a [ERC1967 Proxy](https://docs.openzeppelin.com/contracts/4.x/api/proxy#ERC1967Proxy). So, to upgrade YABTransfer, another smart contract must be deployed, and the address stored inside the Proxy must be changed.
+After deploying the `YABTransfer` contract, you can perform [upgrades](https://docs.openzeppelin.com/contracts/4.x/api/proxy#UUPSUpgradeable) to it. As 
+mentioned previously, this is done via a [ERC1967 Proxy](https://docs.openzeppelin.com/contracts/4.x/api/proxy#ERC1967Proxy). So, to upgrade 
+YABTransfer, another smart contract must be deployed, and the address stored inside 
+the Proxy must be changed.
 
 To do this you must:
 
@@ -166,7 +198,8 @@ To do this you must:
       SN_MESSAGING_ADDRESS = Starknet Messaging address
    ```
 
-   **NOTE:** This is a very similar configuration than the mentioned before, but MM_ETHEREUM_WALLET is not necessary
+   **NOTE:** This is a very similar configuration than the mentioned before, but 
+MM_ETHEREUM_WALLET is not necessary
 
 2. Configure the address of the proxy to be upgraded:
 
@@ -185,13 +218,19 @@ To do this you must:
    - This command will:
       - Rebuild `YABTransfer.sol`
       - Deploy the new contract to the network
-      - Utilize Foundry to upgrade the previous contract, changing the proxy's pointing address to the newly deployed contract
+      - Utilize Foundry to upgrade the previous contract, changing the proxy's pointing 
+     address to the newly deployed contract
 
 ### Upgrade Escrow (on Starknet)
 
-Our Escrow contract is also upgradeable, but it's method and process of upgrading is different from YABTransfer's upgrade. Starknet implemented the `replace_class` syscall, allowing a contract to update its source code by replacing its class hash once deployed. So, to upgrade Escrow, a new class hash must be declared, and the contract's class hash must be replaced.
+Our Escrow contract is also upgradeable, but it's method and process of upgrading is 
+different from YABTransfer's upgrade. Starknet implemented the `replace_class` syscall, 
+allowing a contract to update its source code by replacing its class hash once deployed. 
+So, to upgrade Escrow, a new class hash must be declared, and the contract's class 
+hash must be replaced.
 
-We will perform the upgrade using the `starkli` tool, so the same configuration used for deployment is necessary:
+We will perform the upgrade using the `starkli` tool, so the same configuration used 
+for deployment is necessary:
 
 1. Configure `contracts/cairo/.env` file.
 
@@ -219,13 +258,17 @@ We will perform the upgrade using the `starkli` tool, so the same configuration 
 - This command will:
   - **rebuild** `Escrow.cairo`
   - **declare** it on Starknet
-  - Call the external **upgrade()** function, from [OpenZeppellin's Upgradeable implementation](https://github.com/OpenZeppelin/cairo-contracts/blob/release-v0.8.0/src/upgrades/upgradeable.cairo), with the new class hash
+  - Call the external **upgrade()** function, 
+  from [OpenZeppellin's Upgradeable implementation](https://github.com/OpenZeppelin/cairo-contracts/blob/release-v0.8.0/src/upgrades/upgradeable.cairo), with the new class hash
 
 ### Pausable
 
-Escrow also implements the interesting `Pauseable` module. This means the smart contract can be paused and unpaused by the smart contract Owner. When paused, all modifying functions are unavailable for everyone, including the Owner.
+Escrow also implements the interesting `Pauseable` module. This means the smart contract 
+can be paused and unpaused by the smart contract Owner. When paused, all modifying 
+functions are unavailable for everyone, including the Owner.
 
-For this, the Owner must execute the `pause` or `unpause` function from the smart contract, you can execute the following:
+For this, the Owner must execute the `pause` or `unpause` function from the smart 
+contract, you can execute the following:
 
 ```bash
 make starknet-pause
@@ -235,7 +278,9 @@ make starknet-pause
 make starknet-unpause
 ```
 
-Alternatively, you can directly execute the function using the starkli tool. Note however, to run starkli this way, you must have exported the STARKNET_ACCOUNT and STARKNET_KEYSTORE variables:
+Alternatively, you can directly execute the function using the starkli tool. Note 
+however, to run starkli this way, you must have exported the STARKNET_ACCOUNT and 
+STARKNET_KEYSTORE variables:
 
 ```bash
 starkli invoke $ESCROW_CONTRACT_ADDRESS pause
