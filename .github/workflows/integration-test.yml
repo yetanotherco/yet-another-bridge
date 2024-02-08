@@ -149,7 +149,7 @@ jobs:
         run: |
           make starknet-build
 
-      # Deploy PaymentRegistry, Escrow, set escrow, set withdraw selector and test complete flow
+      # Deploy PaymentRegistry, Escrow, set escrow, set claimPayment selector and test complete flow
       - name: Deploy and test complete flow
         run: |
           export ETH_RPC_URL=${{vars.ETH_RPC_URL}}
@@ -165,13 +165,13 @@ jobs:
           . ./contracts/cairo/deploy.sh
           
           . ./contracts/solidity/set_escrow.sh
-          . ./contracts/solidity/set_withdraw_selector.sh
+          . ./contracts/solidity/set_claim_payment_selector.sh
           
           export AMOUNT=1000000000000000000
           . ./.github/workflows/scripts/set_order.sh
           
           . ./.github/workflows/scripts/transfer.sh
-          . ./.github/workflows/scripts/withdraw.sh
+          . ./.github/workflows/scripts/claim_payment.sh
           
           . ./.github/workflows/scripts/assert.sh
           

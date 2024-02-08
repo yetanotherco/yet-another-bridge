@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS orders
     herodotus_task_id    VARCHAR(64)    NULL,
     herodotus_block      BIGINT         NULL,     -- uint 64
     herodotus_slot       BYTEA          NULL,     -- 32 bytes
-    eth_withdraw_tx_hash BYTEA          NULL,     -- 32 bytes
+    eth_claim_tx_hash BYTEA          NULL,     -- 32 bytes
     completed_at         TIMESTAMP      NULL,
     created_at           TIMESTAMP      NOT NULL DEFAULT clock_timestamp()
 );

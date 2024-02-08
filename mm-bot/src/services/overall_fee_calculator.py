@@ -4,21 +4,21 @@ from web3 import Web3
 
 from models.order import Order
 from services.ethereum import create_transfer, estimate_transaction_fee, get_gas_price
-from services.withdrawer.ethereum_withdrawer import EthereumWithdrawer
+from services.payment_claimer.ethereum_payment_claimer import EthereumPaymentClaimer
 
 
 async def estimate_overall_fee(order: Order) -> int:
     """
     Operational cost per order done by the market maker.
     This includes:
-        calling the transfer (from YABTransfer) +
-        withdraw (from YABTransfer) +
-        msg fee paid to Starknet (when calling withdraw)
+        calling the transfer (from PaymentRegistry) +
+        claimPayment (from PaymentRegistry) +
+        msg fee paid to Starknet (when calling claim_payment)
     """
     transfer_fee = await asyncio.to_thread(estimate_transfer_fee, order)
     message_fee = await estimate_message_fee(order)
-    withdraw_fee = estimate_yab_withdraw_fee()
-    return transfer_fee + message_fee + withdraw_fee
+    claim_payment_fee = estimate_claim_payment_fee()
+    return transfer_fee + message_fee + claim_payment_fee
 
 
 def estimate_transfer_fee(order: Order) -> int:
@@ -31,17 +31,17 @@ def estimate_transfer_fee(order: Order) -> int:
     return estimate_transaction_fee(unsent_tx)
 
 
-def estimate_yab_withdraw_fee() -> int:
+def estimate_claim_payment_fee() -> int:
     """
     Due to the deposit does not exist on ethereum at this point,
-    we cannot estimate the gas fee of the withdrawal transaction
+    we cannot estimate the gas fee of the claim payment transaction
     So we will use fixed values for the gas
     """
-    eth_withdrawal_gas = 86139  # TODO this is a fixed value, if the contract changes, this should be updated
-    return eth_withdrawal_gas * get_gas_price()
+    eth_claim_payment_gas = 86139  # TODO this is a fixed value, if the contract changes, this should be updated
+    return eth_claim_payment_gas * get_gas_price()
 
 
 async def estimate_message_fee(order: Order) -> int:
-    return await EthereumWithdrawer.estimate_withdraw_fallback_message_fee(order.order_id,
-                                                                           order.recipient_address,
-                                                                           order.get_int_amount())
+    return await EthereumPaymentClaimer.estimate_claim_payment_fallback_message_fee(order.order_id,
+                                                                                    order.recipient_address,
+                                                                                    order.get_int_amount())

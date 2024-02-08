@@ -87,4 +87,5 @@ When the bot starts, it retrieves incomplete orders from the database and contin
 The Main Order Indexer processes orders from pending blocks. The `Orders from
 Accepted Blocks Processor` will index the orders that belong to accepted blocks. This way, if the `Main Order
 Indexer` loses an order, it will be captured and processed by the `Orders from Accepted Blocks Processor`.
+
 ![accepted_blocks.svg](images%2Faccepted_blocks.svg)
