@@ -4,7 +4,7 @@
 <div align="center">
   <br />
   <br />
-  <a href="https://yetanotherswap.com/bridge"><img alt="YAB" src="YAB-header.jpg" width=600></a></a>
+  <a href="https://yetanotherswap.com/bridge"><img alt="YAB" src="assets/YAB-header.jpg" width=600></a></a>
   <br />
   <h3><a href="https://yetanotherswap.com/bridge">Yet Another Bridge</a> is the cheapest, fastest and most secure bridge solution from Starknet to Ethereum</h3>
   <br />
@@ -37,7 +37,7 @@ And, of course, the users.
 
 The whole process is shown in the following diagram:
 
-![YAB-diagram](YAB-diagram.png)
+![YAB-diagram](assets/YAB-diagram.png)
 
 ## Risks
 
