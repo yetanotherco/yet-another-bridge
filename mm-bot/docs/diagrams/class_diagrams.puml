@@ -28,7 +28,7 @@ package services {
     class Ethereum {
       __ main methods __
       + transfer(deposit_id, dst_addr, amount)
-      + withdraw(deposit_id, dst_addr, amount, value)
+      + claim_payment(deposit_id, dst_addr, amount, value)
       + get_is_used_order(order_id, recipient_address, amount, rpc_node): bool
 
       __ auxiliary methods __
@@ -36,7 +36,7 @@ package services {
       + get_balance(rpc_node): int
       + has_funds(amount: int): bool
       + create_transfer(deposit_id, dst_addr_bytes, amount, rpc_node)
-      + create_withdraw(deposit_id, dst_addr_bytes, amount, value, rpc_node)
+      + create_claim_payment(deposit_id, dst_addr_bytes, amount, value, rpc_node)
       + get_nonce(w3: Web3, address)
       + estimate_transaction_fee(transaction, rpc_node)
       + get_gas_price(rpc_node)
@@ -82,7 +82,7 @@ package services {
   class OverallFeeCalculator {
     estimate_overall_fee(order: Order): int
     estimate_transfer_fee(order: Order): int
-    estimate_yab_withdraw_fee(): int
+    estimate_yab_claim_payment_fee(): int
     estimate_message_fee(order: Order):
   }
   MM *-- OverallFeeCalculator
@@ -93,7 +93,7 @@ package services {
                                   to_block_number: Literal["pending", "latest"] | int | None,
                                   continuation_token, rpc_node)
       + get_order_events(from_block_number, to_block_number): list[SetOrderEvent]
-      + withdraw(order_id, block, slot): bool
+      + claim_payment(order_id, block, slot): bool
 
       __ auxiliary methods __
       + create_set_order_event(event)
@@ -132,23 +132,23 @@ package services {
     }
   }
 
-  package withdrawers {
-    interface Withdrawer {
-    + send_withdraw(order: Order, order_service: OrderService)
-    + wait_for_withdraw(order: Order, order_service: OrderService)
-    + close_withdraw(order: Order, order_service: OrderService)
+  package payment_claimer {
+   abstract PaymentClaimer {
+    + send_payment_claim(order: Order, order_service: OrderService)
+    + wait_for_payment_claim(order: Order, order_service: OrderService)
+    + close_payment_claim(order: Order, order_service: OrderService)
     }
-    MM *-right- Withdrawer
+    MM *-right- PaymentClaimer
 
-    class EthereumWithdrawer {
-      {static} estimate_withdraw_fallback_message_fee(order_id, recipient_address, amount)
+    class EthereumPaymentClaimer {
+      {static} estimate_claim_payment_fallback_message_fee(order_id, recipient_address, amount)
     }
-    Withdrawer <|-- EthereumWithdrawer
+    PaymentClaimer <|-- EthereumPaymentClaimer
 
-    class HerodotusWithdrawer {
+    class HerodotusPaymentClaimer {
     }
-    Withdrawer <|-- HerodotusWithdrawer
-    HerodotusWithdrawer *-- Herodotus
+    PaymentClaimer <|-- HerodotusPaymentClaimer
+    HerodotusPaymentClaimer *-- Herodotus
   }
 }
 
@@ -203,7 +203,7 @@ package models {
     + herodotus_task_id
     + herodotus_block
     + herodotus_slot
-    + eth_withdraw_tx_hash
+    + eth_claim_tx_hash
     + completed_at
     + created_at
 

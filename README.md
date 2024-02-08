@@ -13,21 +13,21 @@
 ## Ok, but how does it work?
 
 YAB is conformed primarily by 2 Smart Contracts, one Smart Contract on L1 ETH blockchain 
-(called [YABTransfer](contracts/solidity/src/YABTransfer.sol)), and one Smart Contract on L2 Starknet blockchain 
-(called [Escrow](contracts/cairo/src/escrow.cairo)). Another vital entity for YAB's functionality is the Market Maker
-(MM for short).
+(called [Payment Registry](contracts/solidity/src/PaymentRegistry.sol)), and one Smart 
+Contract on L2 Starknet blockchain (called [Escrow](contracts/cairo/src/escrow.cairo)). Another vital entity for 
+YAB's functionality is the Market Maker (MM for short).
 
 And, of course, the users.
 
 - To the user, the process is as follows:
 
-    1. The user want to bridge L2 ETH tokens from Starknet to L1 Ethereum
-    2. The user deposits ETH tokens on L2 Escrow, while also sending some extra 
+    1. The User wants to bridge L2 ETH tokens from Starknet to L1 Ethereum
+    2. The User deposits ETH tokens on L2 Escrow, while also sending some extra 
   information; such as where does the user want to receive the money on L1, how much 
-  fee does he want to give to the Market Maker, etc. So the user sends to the Escrow 
+  fee does he want to give to the Market Maker, etc. So the User sends to the Escrow 
   the amount plus a fee
-    3. The user receives in his L1 wallet a transaction of the amount sent to Escrow 
-  from a YABTransfer's address
+    3. The User receives in his L1 wallet a transaction of the amount sent to Escrow 
+  from a Payment Registry's address
 
     Done, the User has bridged tokens from L2 to L1, in the time it takes to complete 
     2 simple transactions.
@@ -39,9 +39,9 @@ And, of course, the users.
   to bridge tokens
     3. MM detects a User that has transferred ETH tokens to L2 Escrow, and decides 
   the amount to bridge with the transfer fee is acceptable
-    4. MM sends the ETH tokens on L1 to YABTransfer, specifying the User's orderID, 
+    4. MM sends the ETH tokens on L1 to Payment Registry, specifying the User's orderID, 
   L1 recipient address and amount.
-    5. Then, YABTransfer sends the ETH tokens to the User, and proves to the Escrow 
+    5. Then, Payment Registry sends the ETH tokens to the User, and proves to the Escrow 
   contract, either using the messaging system or storage proofs, that the User has 
   received the appropriate funds.
     6. Escrow validates the proof, and sends the ETH Tokens (plus fees) to MM's 
@@ -73,7 +73,7 @@ reducing its attractiveness as a potential exploit.
 
 # This Project
 
-In this repo you will find both Smart Contracts, L1 [YABTransfer contract](contracts/solidity/src/YABTransfer.sol) 
+In this repo you will find both Smart Contracts, L1 [Payment Registry contract](contracts/solidity/src/PaymentRegistry.sol) 
 (written in Solidity) and L2 [Escrow contract](contracts/cairo/src/escrow.cairo) (written in Cairo), and an MM-bot 
 (written in Python).
 
@@ -112,30 +112,30 @@ this information so that MMs can decide if they want to accept this offer.
 The user must wait until an MM picks its order, which should be almost instantaneous 
 if the transfer fee is the suggested one.
 
-After an MM consolidates an order, Escrow will receive a `withdraw` call from 
-YABTransfer, containing the information about how MM has indeed bridged the funds 
+After an MM consolidates an order, Escrow will receive a `claim_payment` call from 
+Payment Registry, containing the information about how MM has indeed bridged the funds 
 to the User's L1 address, and where does MM want to receive it's L2 tokens. Escrow 
 will then cross-check this information to its own records, and if everything is in 
 check, Escrow will transfer the bridged amount of tokens, plus the fee, to MM's L2 
 address.
 
-## YABTransfer
+## Payment Registry
 
-[YABTransfer](contracts/solidity/src/YABTransfer.sol) is a Smart Contract that resides in Ethereum's L1, responsible for 
+[Payment Registry](contracts/solidity/src/Payment Registry.sol) is a Smart Contract that resides in Ethereum's L1, responsible for 
 receiving MM's transaction on L1, forwarding it to the User's address, and sending 
 the information of this transaction to Escrow.
 
 So, when MM wants to complete an order it has read on Escrow, it will call the 
-`transfer` function from YABTransfer, containing the relevant information 
-(orderID, User's address on L1, and amount). YABTransfer will verify the information 
+`transfer` function from Payment Registry, containing the relevant information 
+(orderID, User's address on L1, and amount). Payment Registry will verify the information 
 is acceptable, store it, and send the desired amount to User's L1 address.
 
-After this transfer is completed, MM must call `withdraw` function on YABTransfer to 
-withdraw its funds, so that YABTransfer can verify MM has previously sent the order's 
-amount to the User. If it has, this same function will call Escrow's `withdraw` 
-function, informing Escrow that MM has indeed bridged funds for User, and that he 
-wants to withdraw his amount on L2. Then, as mentioned before, Escrow will release 
-MM's funds to his desired L2 address.
+After this transfer is completed, MM must call `claimPayment` on Payment Registry to 
+receive back the initial deposit made by the User, so that Payment Registry can verify 
+MM has previously sent the order's amount to the User. If it has, this same function will 
+call Escrow's `claim_payment`, informing Escrow that MM has indeed bridged funds for User, 
+and that he wants to receive back his amount on L2. Then, as mentioned before, Escrow will 
+release MM's funds to his desired L2 address.
 
 ## MM-bot
 
@@ -146,9 +146,9 @@ With this, the bot can detect almost instantaneously when a user creates a new o
 allowing it to be the one who bridges the tokens for the user.
 
 It reads every new order's information, analyzes if it capable of completing such 
-order, and, if so, it makes the transfer to YABTransfer using the funds available 
+order, and, if so, it makes the transfer to Payment Registry using the funds available 
 on its L1 address. After this transfer is complete, MM-bot will execute the appropriate 
-withdrawal so that it can regain its tokens on L2.
+payment claim so that it can receive back its tokens on L2.
 
-MM-bot has a L1 address to transfer funds to user through YABTransfer (as stated above), 
+MM-bot has a L1 address to transfer funds to user through Payment Registry (as stated above), 
 and a L2 address to receive the L2 tokens after successfully completing the bridge.

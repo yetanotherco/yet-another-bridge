@@ -20,7 +20,7 @@ Another starknet dependency used in this project:
 
 - [OpenZeppelin cairo contracts](https://github.com/OpenZeppelin/cairo-contracts/)
 
-## Deploy YABTransfer (on Ethereum)
+## Deploy Payment Registry (on Ethereum)
 
 First, the Ethereum smart contract must be deployed. For Ethereum the deployment process 
 you will need to:
@@ -59,7 +59,7 @@ template for creating your .env file, paying special attention to the formats pr
       make ethereum-deploy
    ```
 
-This will deploy a [ERC1967 Proxy](https://docs.openzeppelin.com/contracts/4.x/api/proxy#ERC1967Proxy) smart contract, a [YABTransfer](solidity/src/YABTransfer.sol) smart 
+This will deploy a [ERC1967 Proxy](https://docs.openzeppelin.com/contracts/4.x/api/proxy#ERC1967Proxy) smart contract, a [Payment Registry](solidity/src/PaymentRegistry.sol) smart 
 contract, and it will link them both. The purpose of having a proxy in front of our 
 smart contract is so that it is [upgradeable](https://docs.openzeppelin.com/contracts/4.x/api/proxy#UUPSUpgradeable), by simply deploying another smart 
 contract and changing the address pointed by the Proxy.
@@ -93,8 +93,8 @@ template for creating your .env file, paying special attention to the formats pr
 
    MM_SN_WALLET_ADDR = Starknet wallet of the MarketMaker
 
-   WITHDRAW_NAME = The exact plain name of the withdraw function that is called 
-   from L1, case sensitive
+   CLAIM_PAYMENT_NAME = Exact name of the claim_payment function that is called from L1, case sensitive. 
+   Example: claim_payment
 
    MM_ETHEREUM_WALLET = Ethereum wallet of the MarketMaker
 
@@ -110,7 +110,7 @@ template for creating your .env file, paying special attention to the formats pr
 2. Declare and Deploy: We sequentially declare and deploy the contracts, and connect it 
 to our Ethereum smart contract.
 
-### First alternative: automatic deploy and connect of Escrow and YABTransfer
+### First alternative: automatic deploy and connect of Escrow and Payment Registry
 
    ```bash
       make starknet-deploy-and-connect
@@ -122,10 +122,10 @@ to our Ethereum smart contract.
    2. make starknet-deploy; deploys the smart contract on the blockchain
    3. make ethereum-set-escrow; sets the newly created Starknet contract address on the 
 Ethereum smart contract, so that the L1 contract can communicate with the L2 contract
-   4. make ethereum-set-withdraw-selector; sets the Starknet _withdraw_ function name on 
+   4. make ethereum-set-claim-payment-selector; sets the Starknet _claim_payment_ function name on 
 the Ethereum smart contract, so that the L1 contract can communicate with the L2 contract
 
-### Second alternative: manual deploy and connect of Escrow and YABTransfer
+### Second alternative: manual deploy and connect of Escrow and Payment Registry
 
 This may be better suited for you if you plan to change some of the automatically 
 declared variables, or if you simply want to make sure you understand the process.
@@ -154,19 +154,19 @@ Starknet smart contract address.
 
    This script uses the previously set variable, **ESCROW_CONTRACT_ADDRESS**
 
-3. Setting _EscrowWithdrawSelector_
+3. Setting _EscrowClaimPaymentSelector_
 
    Ethereum's smart contract has another variable that must be configured, 
-_EscrowWithdrawSelector_, which is for specifying the _withdraw_ function's name in the 
+_EscrowClaimPaymentSelector_, which is for specifying the _claim_payment_ function's name in the 
 Starknet Escrow smart contract.
 
-   You can set and change Ethereum's _EscrowWithdrawSelector_ variable, doing the following:
+   You can set and change Ethereum's _EscrowClaimPaymentSelector_ variable, doing the following:
 
    ```bash
-    make ethereum-set-withdraw-selector
+    make ethereum-set-claim-payment-selector
    ```
 
-   This script uses the WITHDRAW_NAME .env variable to automatically generate the 
+   This script uses the CLAIM_PAYMENT_NAME .env variable to automatically generate the 
 selector in the necessary format
 
 ## Recap
@@ -177,11 +177,11 @@ two chains.
 
 ## Upgrade Contracts in Testnet
 
-### Upgrading YABTransfer (on Ethereum)
+### Upgrading Payment Registry (on Ethereum)
 
-After deploying the `YABTransfer` contract, you can perform [upgrades](https://docs.openzeppelin.com/contracts/4.x/api/proxy#UUPSUpgradeable) to it. As 
+After deploying the `Payment Registry` contract, you can perform [upgrades](https://docs.openzeppelin.com/contracts/4.x/api/proxy#UUPSUpgradeable) to it. As 
 mentioned previously, this is done via a [ERC1967 Proxy](https://docs.openzeppelin.com/contracts/4.x/api/proxy#ERC1967Proxy). So, to upgrade 
-YABTransfer, another smart contract must be deployed, and the address stored inside 
+Payment Registry, another smart contract must be deployed, and the address stored inside 
 the Proxy must be changed.
 
 To do this you must:
@@ -204,10 +204,10 @@ MM_ETHEREUM_WALLET is not necessary
 2. Configure the address of the proxy to be upgraded:
 
    ```b
-      export YAB_TRANSFER_PROXY_ADDRESS = Address of your YABTransfer's Proxy
+      export PAYMENT_REGISTRY_PROXY_ADDRESS = Address of your Payment Registry's Proxy
    ```
 
-3. Use the Makefile command to upgrade `YABTransfer` contract
+3. Use the Makefile command to upgrade `Payment Registry` contract
 
    ```bash
       make ethereum-upgrade
@@ -216,7 +216,7 @@ MM_ETHEREUM_WALLET is not necessary
    **Note**
    - You must be the **owner** of the contract to upgrade it.
    - This command will:
-      - Rebuild `YABTransfer.sol`
+      - Rebuild `Payment Registry.sol`
       - Deploy the new contract to the network
       - Utilize Foundry to upgrade the previous contract, changing the proxy's pointing 
      address to the newly deployed contract
@@ -224,7 +224,7 @@ MM_ETHEREUM_WALLET is not necessary
 ### Upgrade Escrow (on Starknet)
 
 Our Escrow contract is also upgradeable, but it's method and process of upgrading is 
-different from YABTransfer's upgrade. Starknet implemented the `replace_class` syscall, 
+different from Payment Registry's upgrade. Starknet implemented the `replace_class` syscall, 
 allowing a contract to update its source code by replacing its class hash once deployed. 
 So, to upgrade Escrow, a new class hash must be declared, and the contract's class 
 hash must be replaced.
