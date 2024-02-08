@@ -1,0 +1,26 @@
+@startuml
+hide footbox
+actor User as U
+box Starknet #ebc7ff
+entity Escrow as E #purple
+end box
+box Ethereum #99e6ff
+entity "Payment Registry" as PR #blue
+box "Market Maker"
+control "Order Processor" as OP
+database Database
+end box
+
+U -[#purple]> E : Sets Order
+OP -[#purple]> E : Gets Order
+OP -> Database : Stores Order as pending
+OP -> OP : Processes Order
+OP -[#blue]> PR : Transfers funds
+PR -[#blue]> U: Transfers funds
+OP -[#blue]> PR : Sends proof of payment
+PR -[#purple]> E : Sends proof of payment
+E -[#purple]> OP : Send funds
+OP -> Database : Stores Order as completed
+
+
+@enduml

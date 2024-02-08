@@ -1,8 +1,8 @@
 # Database variables
-container = postgres
+container = mm-bot
 user = user
 password = 123123123
-database = mm-bot
+database = mm-bot-db
 
 
 # Application Commands
@@ -30,10 +30,10 @@ stop_db:
 	docker stop $(container)
 
 create_db:
-	@if [ "$(container)" = "postgres" ]; then echo "Using default container name: 'postgres'."; fi
+	@if [ "$(container)" = "mm-bot" ]; then echo "Using default container name: 'mm-bot'."; fi
 	@if [ "$(user)" = "user" ]; then echo "Using default user name: 'user'."; fi
 	@if [ "$(password)" = "123123123" ]; then echo "Using default password: '123123123'."; fi
-	@if [ "$(database)" = "mm-bot" ]; then echo "Using default database name: 'yas-api'."; fi
+	@if [ "$(database)" = "mm-bot-db" ]; then echo "Using default database name: 'mm-bot-db'."; fi
 
 	docker run --name $(container) -e POSTGRES_PASSWORD=$(password) -e POSTGRES_USER=$(user) -p 5432:5432 -d postgres
 	sleep 5  # Wait for the PostgreSQL container to start (you can adjust this as needed)
