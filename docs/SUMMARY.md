@@ -8,6 +8,8 @@
 
 ## Market Maker Bot
 
+* [🤖 Architecture](mm_bot/README.md)
+
 ## User Guides
 
 * [👜 Starknet Wallet](user_guides/starknet_wallet_setup.md)
