@@ -10,6 +10,8 @@
 
 ## User Guides
 
+* [👜 Starknet Wallet](user_guides/starknet_wallet_setup.md)
+
 ## Links
 
 * [Telegram Group](https://t.me/grindlabs)
