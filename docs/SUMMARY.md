@@ -2,7 +2,7 @@
 
 ## About YAB 
 
-* [FAQ](about_yab/FAQ.md)
+* [❓ FAQ](about_yab/FAQ.md)
 
 
 ## Links

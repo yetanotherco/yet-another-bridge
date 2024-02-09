@@ -1,4 +1,4 @@
-# YAB’s Frequently Asked Questions
+# FAQ
 
 ## What is YAB?
 Yet Another Bridge (YAB) is the cheapest, fastest and most secure bridge 
