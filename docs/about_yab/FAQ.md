@@ -21,7 +21,7 @@ after paying the user and sending a message using the native messaging system.
 It takes less than 30 seconds, due to the time it takes to make a transaction 
 in Ethereum and the L2’s sequencer receiving the message.
 
-Storage proofs are also implemented but not in use because they are useful to 
+Storage proofs are also implemented but they are not in use because they are useful to 
 scale and bridge from multiple L2 chains. This normally takes between 5 and 15 
 minutes.
 
