@@ -26,7 +26,7 @@ scale and bridge from multiple L2 chains. This normally takes between 5 and 15
 minutes.
 
 ## How much does it cost to bridge?
-The cost of this bridge is similar to an ERC20 transfer plus the cost of proving the state of the L1 and L2. So, the bridge cost is approximately $15.
+The base cost of YAB is similar to an ERC20 transfer plus the cost of proving the state of the L1 and L2. Therefore, the bridge's final cost would be approximately $15.
 
 ## What chains are currently supported?
 Currently, Starknet is the only supported chain.
