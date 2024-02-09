@@ -8,7 +8,11 @@
 
 ## Market Maker Bot
 
-* [🤖 Architecture](mm_bot/README.md)
+* [🤖 Introduction](mm_bot/introduction.md)
+
+* [🏗️ Architecture](mm_bot/architecture.md)
+
+* [🚀 Deploy](mm_bot/deploy.md)
 
 ## User Guides
 
