@@ -58,8 +58,8 @@ Another important requirement is that the bot must have a reliable network conne
 with Ethereum's and L2 networks' RPCs.
 
 ## Physical View
-The system is currently deployed in an EC2 virtual machine in AWS.
-This EC2 runs the bot Main Process as well as its database. 
+There is a server to run the MM Bot Main Process as well as its
+database.
 
 ![physical_view.png](images/physical_view.png)
 
