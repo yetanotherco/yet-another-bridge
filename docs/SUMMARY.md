@@ -2,7 +2,7 @@
 
 ## About YAB
 
-* [🌉 Introduction](about_yab/README)
+* [🌉 Introduction](about_yab/README.md)
 
 * [⭐️ Features](about_yab/features.md)
 
@@ -12,7 +12,7 @@
 
 ## Contracts
 
-* [📜 Introduction](contracts/README)
+* [📜 Introduction](contracts/README.md)
 
 * [🏦 Escrow](contracts/escrow.md)
 
@@ -26,7 +26,7 @@
 
 ## Market Maker Bot
 
-* [🤖 Introduction](mm_bot/README)
+* [🤖 Introduction](mm_bot/README.md)
 
 * [🏗️ Architecture](mm_bot/architecture.md)
 
