@@ -15,4 +15,9 @@ We propose a bridge design that is simple, modular, and utilizes multi-storage
 proofs and the native messaging system between Ethereum and Layer 2 networks (L2s)
 as a fallback mechanism.
 
+In the following sections, you will find information about:
+- [Features](features.md)
+- [How it works](how_it_works.md)
+- [FAQ](FAQ.md)
+
 
