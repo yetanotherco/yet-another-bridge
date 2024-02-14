@@ -22,7 +22,7 @@ class Order(Base):
     herodotus_task_id: str = Column(String, nullable=True)
     herodotus_block: int = Column(Integer, nullable=True)
     herodotus_slot: HexBytes = Column(LargeBinary, nullable=True)
-    eth_withdraw_tx_hash: HexBytes = Column(LargeBinary, nullable=True)
+    eth_claim_tx_hash: HexBytes = Column(LargeBinary, nullable=True)
     completed_at: datetime = Column(DateTime, nullable=True)
     created_at: datetime = Column(DateTime, nullable=False, server_default="clock_timestamp()")
 
