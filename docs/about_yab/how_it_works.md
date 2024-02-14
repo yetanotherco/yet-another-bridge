@@ -34,3 +34,20 @@ If the storage proof providers are not available, the market maker can prove
 to the Escrow contract that they fulfilled the user's intent through the rollup's
 native messaging system. Using this messaging system has the same trust 
 assumptions as the L2s used in the transfer.
+
+## Risks
+For the user, the risks include the existence of a bug in the code of the smart 
+contract, the existence of a bug in the circuits of the ZK/validity proof 
+verification and the fact that the storage proof provider can go offline. 
+The first risk is mitigated by having a very simple smart contract. The second 
+risk is mitigated by using multi-proof storage proofs and multiple ZK/validity 
+proof implementations or TEEs. If the storage proof provider goes offline 
+the fallback mechanism can be used.
+
+The risks for market makers are the same as for users, plus the risk of 
+reorganization of the chain and the fact that the market maker receives the 
+same tokens on the L2s rather than on Ethereum.
+
+Since the capital is locked for a short period (until the proof is generated or 
+the message arrives), the risks are minimized and the attack surface is smaller 
+for the market maker.
