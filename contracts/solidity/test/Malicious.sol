@@ -55,4 +55,5 @@ contract Malicious is Initializable {
     function setPaymentRegistryAddress(address newPaymentRegistryAddress) external {
         _myPaymentRegistry = PaymentRegistry(newPaymentRegistryAddress);
     }
+    
 }
