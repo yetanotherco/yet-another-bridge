@@ -1,6 +1,6 @@
 # Contracts
 
-YAB is conformed primarily by 2 Smart Contracts, one Smart Contract on L1 ETH blockchain 
+YAB is conformed primarily by two Smart Contracts, one Smart Contract on L1 ETH blockchain 
 (called [Payment Registry](../../contracts/solidity/src/PaymentRegistry.sol)), and one
 Smart Contract on L2 Starknet blockchain 
 (called [Escrow](../../contracts/cairo/src/escrow.cairo)). Another vital entity for 
