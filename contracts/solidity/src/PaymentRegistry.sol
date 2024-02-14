@@ -87,6 +87,14 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         emit ModifiedEscrowClaimPaymentSelector(snEscrowClaimPaymentSelector);
     }
 
+    function getEscrowAddress() external view returns (uint256) {
+        return _snEscrowAddress;
+    }
+
+    function getEscrowClaimPaymentSelector() external view returns (uint256) {
+        return _snEscrowClaimPaymentSelector;
+    }
+    
     
     //// MM ACL:
 
@@ -96,10 +104,6 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
     function setMMAddress(address newMMAddress) external onlyOwner {
         _marketMaker = newMMAddress;
-    }
-
-    function getOwner() external view returns (address) {
-        return owner();
     }
 
     modifier onlyOwnerOrMM {
