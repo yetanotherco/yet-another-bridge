@@ -1,1 +1,18 @@
-# 🚧 Work In Progress 🚧
+# Yet Another Bridge 🍭
+
+<div align="center">
+  <br />
+  <br />
+  <a href="https://yetanotherbridge.com/bridge"><img alt="YAB" src="../images/YAB-header.jpg" width=600></a></a>
+  <br />
+  <h3><a href="https://yetanotherbridge.com/bridge">Yet Another Bridge</a> is the cheapest, fastest and most secure bridge solution from Starknet to Ethereum</h3>
+  <br />
+</div>
+
+Bridges are generally insecure and economically inefficient. They exhibit an 
+asymmetry between users and bridge operators, where users can easily lose funds. 
+We propose a bridge design that is simple, modular, and utilizes multi-storage 
+proofs and the native messaging system between Ethereum and Layer 2 networks (L2s)
+as a fallback mechanism.
+
+
