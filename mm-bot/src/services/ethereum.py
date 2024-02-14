@@ -143,4 +143,4 @@ def send_raw_transaction(signed_tx, rpc_node=main_rpc_node):
 
 @use_fallback(rpc_nodes, logger, "Failed to wait for transaction receipt")
 def wait_for_transaction_receipt(tx_hash, rpc_node=main_rpc_node):
-    rpc_node.w3.eth.wait_for_transaction_receipt(tx_hash)
+    rpc_node.w3.eth.wait_for_transaction_receipt(tx_hash, poll_latency=1)
