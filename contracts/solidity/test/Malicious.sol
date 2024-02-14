@@ -41,7 +41,7 @@ contract Malicious is Initializable {
     }
 
     function steal_from_PaymentRegistry(uint256 orderId, uint256 destAddress, uint256 amount) external payable {
-        myPaymentRegistry.claimPayment(orderId, destAddress, amount);
+        _myPaymentRegistry.claimPayment(orderId, destAddress, amount);
     }
 
     function setEscrowAddress(uint256 snEscrowAddress) external {

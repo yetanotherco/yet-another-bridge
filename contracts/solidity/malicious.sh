@@ -63,19 +63,31 @@ cd contracts/solidity
 # CLAIM_PAYMENT_SELECTOR=$(starkli selector $CLAIM_PAYMENT_NAME)
 # cast send --rpc-url $ETH_RPC_URL --private-key $ETH_PRIVATE_KEY $MALICIOUS_ADDRESS "setEscrowClaimPaymentSelector(uint256)" "${CLAIM_PAYMENT_SELECTOR}" | grep "transactionHash"
 
-MALICIOUS_ADDRESS=0xD7659274b6Ed72Ec6D9f8fA1ad45B5476856e0CF
-AMOUNT=10000000000000000 #0.01 ETH
-FEE=25000000000000 #0.000025
-APPROVE_AMOUNT=$((${AMOUNT}+${FEE}))
-# 3 set orders on Escrow
-printf "${GREEN}\n=> [SN] Setting orders on Escrow${COLOR_RESET}\n"
 
-# printf "${GREEN}\n=> [ETH] Executing Steal jobs on Malicious${COLOR_RESET}\n"
- starkli invoke \
-  $NATIVE_TOKEN_ETH_STARKNET approve $ESCROW_CONTRACT_ADDRESS u256:$APPROVE_AMOUNT \
-  / $ESCROW_CONTRACT_ADDRESS set_order 0xB321099cf86D9BB913b891441B014c03a6CcFc54 \
-  u256:$AMOUNT u256:$FEE --account $STARKNET_ACCOUNT --keystore $STARKNET_KEYSTORE
-#   --private-key $STARKNET_PRIVATE_KEY 
+# # 3 set orders on Escrow
+# MALICIOUS_ADDRESS=0x29DA5c62565CB567988F2549aE8575cb3E4d5ec8
+# AMOUNT=10000000000000000 #0.01 ETH
+# FEE=25000000000000 #0.000025
+# APPROVE_AMOUNT=$((${AMOUNT}+${FEE}))
+# printf "${GREEN}\n=> [SN] Setting orders on Escrow${COLOR_RESET}\n"
+#  starkli invoke \
+#   $NATIVE_TOKEN_ETH_STARKNET approve $ESCROW_CONTRACT_ADDRESS u256:$APPROVE_AMOUNT \
+#   / $ESCROW_CONTRACT_ADDRESS set_order 0xda963fA72caC2A3aC01c642062fba3C099993D56 \
+#   u256:$AMOUNT u256:$FEE --account $STARKNET_ACCOUNT --keystore $STARKNET_KEYSTORE
+# #   --private-key $STARKNET_PRIVATE_KEY 
+# # Invoke transaction: 0x049a7f4f851b01fa913fd76f79c83d6482bf7516c349d9b38ee4e399a9554d53
+# #  done
+
+# 4 do transfer on paymentregistry
+# do on etherscan
+
+# 5 and 6
+# do on etherscan. They are both blocked by corresponding ACL
+
+
+
+
+# # printf "${GREEN}\n=> [ETH] Executing Steal jobs on Malicious${COLOR_RESET}\n"
 
 
 
