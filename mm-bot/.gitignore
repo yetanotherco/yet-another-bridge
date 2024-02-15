@@ -4,3 +4,4 @@ __pycache__/
 venv
 .env.sepolia
 .env.goerli
+.env.local
