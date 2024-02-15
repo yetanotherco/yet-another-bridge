@@ -13,7 +13,7 @@ if [ -z "$ESCROW_CONTRACT_ADDRESS" ]; then
     exit 1
 fi
 
-cd contracts/cairo
+cd contracts/starknet
 
 printf "${GREEN}\n=> [SN] Declare Escrow${COLOR_RESET}\n"
 NEW_ESCROW_CLASS_HASH=$(starkli declare --watch target/dev/yab_Escrow.contract_class.json)

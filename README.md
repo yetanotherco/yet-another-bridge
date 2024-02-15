@@ -14,7 +14,7 @@
 
 YAB is conformed primarily by 2 Smart Contracts, one Smart Contract on L1 ETH blockchain 
 (called [Payment Registry](contracts/ethereum/src/PaymentRegistry.sol)), and one Smart 
-Contract on L2 Starknet blockchain (called [Escrow](contracts/cairo/src/escrow.cairo)). Another vital entity for 
+Contract on L2 Starknet blockchain (called [Escrow](contracts/starknet/src/escrow.cairo)). Another vital entity for 
 YAB's functionality is the Market Maker (MM for short).
 
 And, of course, the users.
@@ -74,7 +74,7 @@ reducing its attractiveness as a potential exploit.
 # This Project
 
 In this repo you will find both Smart Contracts, L1 [Payment Registry contract](contracts/ethereum/src/PaymentRegistry.sol) 
-(written in Solidity) and L2 [Escrow contract](contracts/cairo/src/escrow.cairo) (written in Cairo), and an MM-bot 
+(written in Solidity) and L2 [Escrow contract](contracts/starknet/src/escrow.cairo) (written in Cairo), and an MM-bot 
 (written in Python).
 
 Both the [contracts](contracts/README.md) and the [MM-bot](mm-bot/README.md) have their own README, to deploy and 
@@ -94,7 +94,7 @@ All these are installed with `make deps`.
 
 ## Escrow
 
-[Escrow](contracts/cairo/src/escrow.cairo) is a Smart Contract written in Cairo that resides in Ethereum's L2 Starknet.
+[Escrow](contracts/starknet/src/escrow.cairo) is a Smart Contract written in Cairo that resides in Ethereum's L2 Starknet.
 
 This contract is responsible for receiving Users' payments in L2, and liberating them 
 to the MM when, and only when, the MM has proved the L1 payment.

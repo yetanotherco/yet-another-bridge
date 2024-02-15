@@ -32,28 +32,28 @@ ethereum-set-escrow:
 	@. ./contracts/ethereum/.env && . ./contracts/ethereum/set_escrow.sh
 
 ethereum-set-claim-payment-selector:
-	@. ./contracts/ethereum/.env && . ./contracts/cairo/.env && . ./contracts/ethereum/set_claim_payment_selector.sh
+	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env && . ./contracts/ethereum/set_claim_payment_selector.sh
 
 starknet-clean:
-	@cd ./contracts/cairo/ && scarb clean
+	@cd ./contracts/starknet/ && scarb clean
 
 starknet-build: starknet-clean
-	@cd ./contracts/cairo/ && scarb build
+	@cd ./contracts/starknet/ && scarb build
 
 starknet-test: starknet-clean
-	@cd ./contracts/cairo/ && snforge test
+	@cd ./contracts/starknet/ && snforge test
 
 starknet-deploy: starknet-build
-	@. ./contracts/cairo/.env && . ./contracts/cairo/deploy.sh
+	@. ./contracts/starknet/.env && . ./contracts/starknet/deploy.sh
 
 starknet-upgrade: starknet-build
-	@. ./contracts/cairo/.env && . ./contracts/cairo/upgrade.sh
+	@. ./contracts/starknet/.env && . ./contracts/starknet/upgrade.sh
 
 starknet-pause:
-	@. ./contracts/cairo/.env && ./contracts/cairo/change_pause_state.sh pause
+	@. ./contracts/starknet/.env && ./contracts/starknet/change_pause_state.sh pause
 
 starknet-unpause:
-	@. ./contracts/cairo/.env && ./contracts/cairo/change_pause_state.sh unpause
+	@. ./contracts/starknet/.env && ./contracts/starknet/change_pause_state.sh unpause
 
 test: 
 	make starknet-test
@@ -61,18 +61,18 @@ test:
 
 .ONESHELL:
 starknet-deploy-and-connect: starknet-build
-	@. ./contracts/ethereum/.env && . ./contracts/cairo/.env
-	@. ./contracts/cairo/deploy.sh
+	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env
+	@. ./contracts/starknet/deploy.sh
 	@. ./contracts/ethereum/set_escrow.sh
 	@. ./contracts/ethereum/set_claim_payment_selector.sh
 
 .ONESHELL:
 deploy-all:
-	@. ./contracts/ethereum/.env && . ./contracts/cairo/.env
+	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env
 	@make ethereum-build
 	@. ./contracts/ethereum/deploy.sh
 	@make starknet-build
-	@. ./contracts/cairo/deploy.sh
+	@. ./contracts/starknet/deploy.sh
 	@. ./contracts/ethereum/set_escrow.sh
 	@. ./contracts/ethereum/set_claim_payment_selector.sh
 	@. ./contracts/utils/display_info.sh

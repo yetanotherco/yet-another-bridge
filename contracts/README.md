@@ -232,7 +232,7 @@ hash must be replaced.
 We will perform the upgrade using the `starkli` tool, so the same configuration used 
 for deployment is necessary:
 
-1. Configure `contracts/cairo/.env` file.
+1. Configure `contracts/starknet/.env` file.
 
    ```env
       STARKNET_ACCOUNT = Path of your starknet account
