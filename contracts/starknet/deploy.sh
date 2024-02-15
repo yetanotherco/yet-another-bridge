@@ -38,7 +38,7 @@ ESCROW_CLASS_HASH=$(starkli declare \
   --account $STARKNET_ACCOUNT \
   $(if [ -n "$STARKNET_KEYSTORE" ]; then echo "--keystore $STARKNET_KEYSTORE"; fi) \
   $(if [ -n "$STARKNET_PRIVATE_KEY" ]; then echo "--private-key $STARKNET_PRIVATE_KEY"; fi) \
-  --watch contracts/cairo/target/dev/yab_Escrow.contract_class.json)
+  --watch contracts/starknet/target/dev/yab_Escrow.contract_class.json)
 
 
 if [ -z "$ESCROW_CLASS_HASH" ]; then
