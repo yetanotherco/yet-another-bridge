@@ -1,7 +1,7 @@
 #!/bin/bash
 . contracts/utils/colors.sh #for ANSI colors
 
-cd contracts/solidity
+cd contracts/ethereum
 
 printf "${GREEN}\n=> [ETH] Deploying ERC1967Proxy & PaymentRegistry ${COLOR_RESET}\n"
 

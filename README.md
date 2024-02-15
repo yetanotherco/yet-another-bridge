@@ -13,7 +13,7 @@
 ## Ok, but how does it work?
 
 YAB is conformed primarily by 2 Smart Contracts, one Smart Contract on L1 ETH blockchain 
-(called [Payment Registry](contracts/solidity/src/PaymentRegistry.sol)), and one Smart 
+(called [Payment Registry](contracts/ethereum/src/PaymentRegistry.sol)), and one Smart 
 Contract on L2 Starknet blockchain (called [Escrow](contracts/cairo/src/escrow.cairo)). Another vital entity for 
 YAB's functionality is the Market Maker (MM for short).
 
@@ -73,7 +73,7 @@ reducing its attractiveness as a potential exploit.
 
 # This Project
 
-In this repo you will find both Smart Contracts, L1 [Payment Registry contract](contracts/solidity/src/PaymentRegistry.sol) 
+In this repo you will find both Smart Contracts, L1 [Payment Registry contract](contracts/ethereum/src/PaymentRegistry.sol) 
 (written in Solidity) and L2 [Escrow contract](contracts/cairo/src/escrow.cairo) (written in Cairo), and an MM-bot 
 (written in Python).
 
@@ -121,7 +121,7 @@ address.
 
 ## Payment Registry
 
-[Payment Registry](contracts/solidity/src/Payment Registry.sol) is a Smart Contract that resides in Ethereum's L1, responsible for 
+[Payment Registry](contracts/ethereum/src/Payment Registry.sol) is a Smart Contract that resides in Ethereum's L1, responsible for 
 receiving MM's transaction on L1, forwarding it to the User's address, and sending 
 the information of this transaction to Escrow.
 
