@@ -109,12 +109,12 @@ jobs:
 
       - name: Install Forge
         run: |
-          cd starknet-messaging-dev/ethereum
+          cd starknet-messaging-dev/solidity
           forge install
 
       - name: Deploy Starknet Messaging Contract
         run: |
-          cd starknet-messaging-dev/ethereum
+          cd starknet-messaging-dev/solidity
           cp anvil.env .env
           source .env
           forge script script/LocalTesting.s.sol:LocalSetup --broadcast --rpc-url ${ETH_RPC_URL}
