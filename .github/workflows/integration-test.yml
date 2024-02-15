@@ -67,7 +67,7 @@ jobs:
 
       - name: Install Forge
         run: |
-          cd contracts/solidity
+          cd contracts/ethereum
           forge install
 
       # Starknet Setup
@@ -109,12 +109,12 @@ jobs:
 
       - name: Install Forge
         run: |
-          cd starknet-messaging-dev/solidity
+          cd starknet-messaging-dev/ethereum
           forge install
 
       - name: Deploy Starknet Messaging Contract
         run: |
-          cd starknet-messaging-dev/solidity
+          cd starknet-messaging-dev/ethereum
           cp anvil.env .env
           source .env
           forge script script/LocalTesting.s.sol:LocalSetup --broadcast --rpc-url ${ETH_RPC_URL}
@@ -158,14 +158,14 @@ jobs:
           export SN_MESSAGING_ADDRESS=${{vars.SN_MESSAGING_ADDRESS}}
           export MM_ETHEREUM_WALLET=${{vars.MM_ETHEREUM_WALLET}}
           export SKIP_VERIFY=true
-          . ./contracts/solidity/deploy.sh
+          . ./contracts/ethereum/deploy.sh
           
           export STARKNET_RPC=${{vars.STARKNET_RPC}}
-          source ./contracts/cairo/.env.test
-          . ./contracts/cairo/deploy.sh
+          source ./contracts/starknet/.env.test
+          . ./contracts/starknet/deploy.sh
           
-          . ./contracts/solidity/set_escrow.sh
-          . ./contracts/solidity/set_claim_payment_selector.sh
+          . ./contracts/ethereum/set_escrow.sh
+          . ./contracts/ethereum/set_claim_payment_selector.sh
           
           export AMOUNT=1000000000000000000
           . ./.github/workflows/scripts/set_order.sh
