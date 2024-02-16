@@ -1,12 +1,12 @@
-# zkSync Hardhat project template
+# zkSync Escrow
 
-This project was scaffolded with [zksync-cli](https://github.com/matter-labs/zksync-cli).
+This project was initialized with [zksync-cli](https://github.com/matter-labs/zksync-cli).
 
 ## Project Layout
 
-- `/contracts`: Contains solidity smart contracts.
-- `/deploy`: Scripts for contract deployment and interaction.
-- `/test`: Test files.
+- `/src`: Contains source files, solidity smart contracts.
+- `/scripts`: Scripts for contract deployment and interaction.
+- `/tests`: Test files.
 - `hardhat.config.ts`: Configuration settings.
 
 ## How to Use

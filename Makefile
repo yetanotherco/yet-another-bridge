@@ -55,6 +55,25 @@ starknet-pause:
 starknet-unpause:
 	@. ./contracts/starknet/.env && ./contracts/starknet/change_pause_state.sh unpause
 
+## new zksync make targets:
+install zksync:
+	@cd ./contracts/zksync/ && yarn install
+
+zksync-clean:
+	@cd ./contracts/zksync/ && yarn clean
+
+zksync-build: zksync-clean
+	@cd ./contracts/zksync/ && yarn compile
+
+zksync-test:
+	@cd ./contracts/zksync/ && yarn test
+
+zksync-deploy:
+	@cd ./contracts/zksync/ && yarn deploy
+
+# zksync-upgrade:
+
+
 test: 
 	make starknet-test
 	make ethereum-test
