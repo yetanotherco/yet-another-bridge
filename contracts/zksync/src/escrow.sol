@@ -13,6 +13,18 @@ contract Escrow {//is Initializable, OwnableUpgradeable, UUPSUpgradeable{
         uint256 amount;
         uint256 fee;
     }
+    struct SetOrder {
+        uint256 order_id;
+        address recipient_address;
+        uint256 amount;
+        uint256 fee;
+    }
+    struct ClaimPayment {
+        uint256 order_id;
+        address claimerAddress;
+        uint256 amount;
+    }
+
     // enum Event {
     //     ClaimPayment: ClaimPayment,
     //     SetOrder: SetOrder,
@@ -23,26 +35,13 @@ contract Escrow {//is Initializable, OwnableUpgradeable, UUPSUpgradeable{
     //     #[flat]
     //     PausableEvent: PausableComponent::Event
     // }
-    // #[derive(Drop, starknet::Event)]
-    // struct SetOrder {
-    //     order_id: u256,
-    //     recipient_address: EthAddress,
-    //     amount: u256,
-    //     fee: u256
-    // }
-    // #[derive(Drop, starknet::Event)]
-    // struct ClaimPayment {
-    //     order_id: u256,
-    //     address: ContractAddress,
-    //     amount: u256,
-    // }
 
     //storage
-    uint256 private current_order_id; 
+    uint256 private _current_order_id; 
     mapping(uint256 => Order) private _orders;
-    mapping(uint256 => bool) private orders_pending;
-    mapping(uint256 => address) private orders_senders;
-    mapping(uint256 => uint64) private orders_timestamps;
+    mapping(uint256 => bool) private _orders_pending;
+    mapping(uint256 => address) private _orders_senders;
+    mapping(uint256 => uint64) private _orders_timestamps;
     address public ethereum_payment_registry; //called eth_transfer_contract in cairo
     address public mm_ethereum_wallet;
     address public mm_zksync_wallet; //verify this is address type
@@ -53,32 +52,38 @@ contract Escrow {//is Initializable, OwnableUpgradeable, UUPSUpgradeable{
 
 
     // no constructors can be used in upgradeable contracts. 
+////this is the posta, commented to deploy a simpler version
+    // constructor() {
+    //     _disableInitializers(); //import from where?
+    // }
+
+    // function initialize(
+    //     address ethereum_payment_registry_,
+    //     address mm_ethereum_wallet_,
+    //     address mm_zksync_wallet_,
+    //     address native_token_eth_in_zksync_
+    // ) public initializer {
+    //     __Ownable_init(msg.sender);
+    //     __UUPSUpgradeable_init();
+
+    //     current_order_id = 0;
+    //     ethereum_payment_registry = ethereum_payment_registry_;
+    //     mm_ethereum_wallet = mm_ethereum_wallet_;
+    //     mm_zksync_wallet = mm_zksync_wallet_;
+    //     native_token_eth_in_zksync = native_token_eth_in_zksync_;
+    // }
+////^^
+
     constructor() {
-        _disableInitializers(); //import from where?
-    }
-
-    function initialize(
-        address ethereum_payment_registry_,
-        address mm_ethereum_wallet_,
-        address mm_zksync_wallet_,
-        address native_token_eth_in_zksync_
-    ) public initializer {
-        __Ownable_init(msg.sender);
-        __UUPSUpgradeable_init();
-
-        current_order_id = 0;
-        ethereum_payment_registry = ethereum_payment_registry_;
-        mm_ethereum_wallet = mm_ethereum_wallet_;
-        mm_zksync_wallet = mm_zksync_wallet_;
-        native_token_eth_in_zksync = native_token_eth_in_zksync_;
+        _current_order_id = 0;
     }
 
     //functions
-    function greet() public view returns (string memory) {
-        return greeting;
+    function helloworld() public view returns (uint256) {
+        return _current_order_id;
     }
 
-    function setGreeting(string memory _greeting) public {
-        greeting = _greeting;
+    function setC(uint256 newNumber) public {
+        _current_order_id = newNumber;
     }
 }
