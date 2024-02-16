@@ -1,10 +1,6 @@
 {
-  "name": "zksync-hardhat-template",
-  "description": "A template for zkSync smart contracts development with Hardhat",
+  "name": "zksync-hardhat-escrow",
   "private": true,
-  "author": "Matter Labs",
-  "license": "MIT",
-  "repository": "https://github.com/matter-labs/zksync-hardhat-template.git",
   "scripts": {
     "deploy": "hardhat deploy-zksync --script deploy.ts",
     "compile": "hardhat compile",
@@ -19,6 +15,7 @@
     "@matterlabs/zksync-contracts": "^0.6.1",
     "@nomiclabs/hardhat-etherscan": "^3.1.7",
     "@openzeppelin/contracts": "^4.6.0",
+    "@openzeppelin/contracts-upgradeable": "^4.6.0",
     "@types/chai": "^4.3.4",
     "@types/mocha": "^10.0.1",
     "chai": "^4.3.7",

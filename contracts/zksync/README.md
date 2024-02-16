@@ -11,22 +11,9 @@ This project was initialized with [zksync-cli](https://github.com/matter-labs/zk
 
 ## How to Use
 
-- `npm run compile`: Compiles contracts.
-- `npm run deploy`: Deploys using script `/deploy/deploy.ts`.
-- `npm run interact`: Interacts with the deployed contract using `/deploy/interact.ts`.
-- `npm run test`: Tests the contracts.
-
-Note: Both `npm run deploy` and `npm run interact` are set in the `package.json`. You can also run your files directly, for example: `npx hardhat deploy-zksync --script deploy.ts`
-
-### Environment Settings
-
-To keep private keys safe, this project pulls in environment variables from `.env` files. Primarily, it fetches the wallet's private key.
-
-Rename `.env.example` to `.env` and fill in your private key:
-
-```
-WALLET_PRIVATE_KEY=your_private_key_here...
-```
+- `make zksync-build`: Compiles contracts.
+- `make zksync-deploy`: Deploys using script `/deploy/deploy.ts`.
+- `make zksync-test`: Tests the contracts.
 
 ### Network Support
 
@@ -38,13 +25,7 @@ Running `npm run test` by default runs the [zkSync In-memory Node](https://era.z
 
 Important: zkSync In-memory Node currently supports only the L2 node. If contracts also need L1, use another testing environment like Dockerized Node. Refer to [test documentation](https://era.zksync.io/docs/tools/testing/) for details.
 
-## Useful Links
 
-- [Docs](https://era.zksync.io/docs/dev/)
-- [Official Site](https://zksync.io/)
-- [GitHub](https://github.com/matter-labs)
-- [Twitter](https://twitter.com/zksync)
-- [Discord](https://join.zksync.dev/)
 
 ## License
 

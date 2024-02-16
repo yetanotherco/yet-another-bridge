@@ -56,7 +56,7 @@ starknet-unpause:
 	@. ./contracts/starknet/.env && ./contracts/starknet/change_pause_state.sh unpause
 
 ## new zksync make targets:
-install zksync:
+install-zksync:
 	@cd ./contracts/zksync/ && yarn install
 
 zksync-clean:
@@ -68,7 +68,7 @@ zksync-build: zksync-clean
 zksync-test:
 	@cd ./contracts/zksync/ && yarn test
 
-zksync-deploy:
+zksync-deploy: zksync-build
 	@cd ./contracts/zksync/ && yarn deploy
 
 # zksync-upgrade:
