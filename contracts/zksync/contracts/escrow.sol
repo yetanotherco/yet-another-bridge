@@ -49,12 +49,6 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable, UUPSU
     address public mm_zksync_wallet; //verify this is address type
     address public native_token_eth_in_zksync; //erc20 of eth in zksync
 
-
-    // no constructors can be used in upgradeable contracts. 
-    constructor() {
-        _disableInitializers(); //import from where?
-    }
-
     function initialize(
         address ethereum_payment_registry_,
         address mm_ethereum_wallet_,
@@ -63,6 +57,7 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable, UUPSU
     ) public initializer {
         __Ownable_init();
         __UUPSUpgradeable_init();
+        _transferOwnership(0xB321099cf86D9BB913b891441B014c03a6CcFc54);
 
         _current_order_id = 0;
         ethereum_payment_registry = ethereum_payment_registry_;
