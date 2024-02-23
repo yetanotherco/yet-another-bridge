@@ -3,7 +3,7 @@
 <div align="center">
   <br />
   <br />
-  <a href="https://yetanotherbridge.com/bridge"><img alt="YAB" src="../images/YAB-header.jpg" width=600></a></a>
+  <a href="https://yetanotherbridge.com/bridge"><img alt="YAB" src="./images/YAB-header.jpg" width=600></a></a>
   <br />
   <h3><a href="https://yetanotherbridge.com/bridge">Yet Another Bridge</a> is the cheapest, fastest and most secure bridge solution from Starknet to Ethereum</h3>
   <br />
