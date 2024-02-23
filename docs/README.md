@@ -16,8 +16,8 @@ proofs and the native messaging system between Ethereum and Layer 2 networks (L2
 as a fallback mechanism.
 
 In the following sections, you will find information about:
-- [Features](features.md)
-- [How it works](how_it_works.md)
-- [FAQ](FAQ.md)
+- [Features](about_yab/features.md)
+- [How it works](about_yab/how_it_works.md)
+- [FAQ](about_yab/FAQ.md)
 
 

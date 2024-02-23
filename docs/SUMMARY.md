@@ -1,8 +1,8 @@
 # Summary
 
-## About YAB
+## [Yet Another Bridge](README.md)
 
-* [🌉 Introduction](about_yab/README.md)
+## About YAB
 
 * [⭐️ Features](about_yab/features.md)
 
