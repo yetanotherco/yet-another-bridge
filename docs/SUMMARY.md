@@ -1,6 +1,6 @@
 # Summary
 
-## [Yet Another Bridge](README.md)
+* [Yet Another Bridge](README.md)
 
 ## About YAB
 
