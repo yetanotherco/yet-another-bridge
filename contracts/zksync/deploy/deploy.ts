@@ -1,4 +1,5 @@
 import { deployContractWithProxy } from "./utils";
+import { deployContract } from "./utils";
 // import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 // It will deploy a Escrow contract to selected network 
@@ -6,5 +7,7 @@ import { deployContractWithProxy } from "./utils";
 export default async function () {
   const escrowArtifactName = "Escrow";
   const escrowConstructorArguments = [];
-  const escrow = await deployContractWithProxy(escrowArtifactName, escrowConstructorArguments);
+  // const escrow = await deployContractWithProxy(escrowArtifactName, escrowConstructorArguments);
+  const escrow = await deployContract(escrowArtifactName, escrowConstructorArguments);
+
 }

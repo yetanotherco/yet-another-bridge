@@ -120,6 +120,7 @@ export const deployContract = async (contractArtifactName: string, constructorAr
   return contract;
 }
 
+// WIP: deploy upgradeable
 export const deployContractWithProxy = async (contractArtifactName: string, constructorArguments?: any[], options?: DeployContractOptions) => {
   const log = (message: string) => {
     if (!options?.silent) console.log(message);
