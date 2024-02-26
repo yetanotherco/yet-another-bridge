@@ -18,13 +18,10 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
         uint256 amount;
         uint256 fee;
     }
-    struct ClaimPayment {
-        uint256 order_id;
-        address claimerAddress;
-        uint256 amount;
-    }
 
     event SetOrder(uint256 order_id, address recipient_address, uint256 amount, uint256 fee);
+    
+    event ClaimPayment(uint256 order_id, address claimerAddress, uint256 amount);
 
     // im passing this cairo events to sol events as i go needing to implement them
     // enum Event {
@@ -76,7 +73,7 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
     function set_order(Order calldata new_order) public whenNotPaused returns (uint256) {
         require(new_order.amount > 0, 'Amount must be greater than 0');
 
-        uint256 payment_amount = new_order.amount + new_order.fee;
+        uint256 payment_amount = new_order.amount + new_order.fee; // TODO check overflow
         require(native_token_eth_in_zksync.allowance(msg.sender, address(this)) >= payment_amount, 'Not enough allowance');
         require(native_token_eth_in_zksync.balanceOf(msg.sender) >= payment_amount, 'Not enough allowance');
         
@@ -117,13 +114,27 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
         _unpause();
     }
 
-    // function helloworld() public view returns (uint256) {
-    //     return _current_order_id;
-    // }
+    // l1 handler
+    function claim_payment(
+        address from_address,
+        uint256 order_id,
+        address recipient_address,
+        uint256 amount
+    ) public whenNotPaused {
+        require(msg.sender == ethereum_payment_registry, 'Only PAYMENT_REGISTRY_CONTRACT');
+        require(_orders_pending[order_id], 'Order claimed or nonexistent');
 
-    // function setC(uint256 newNumber) public {
-    //     _current_order_id = newNumber;
-    // }
+        Order memory current_order = _orders[order_id]; //TODO check if order is memory
+        require(current_order.recipient_address == recipient_address, 'recipient_address not match L1');
+        require(current_order.amount == amount, 'amount not match L1');
+
+        _orders_pending[order_id] = false;
+        uint256 payment_amount = current_order.amount + current_order.fee;  // TODO check overflow
+
+        native_token_eth_in_zksync.transfer(mm_zksync_wallet, payment_amount);
+
+        emit ClaimPayment(order_id, mm_zksync_wallet, amount);
+    }
 
     // function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
