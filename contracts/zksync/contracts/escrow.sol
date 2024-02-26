@@ -116,7 +116,6 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
 
     // l1 handler
     function claim_payment(
-        address from_address,
         uint256 order_id,
         address recipient_address,
         uint256 amount
