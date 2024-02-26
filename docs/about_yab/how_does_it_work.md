@@ -1,4 +1,4 @@
-# How it works?
+# How does it work?
 
 How can we offer a system where the users don't have to trust a facilitator to exchange their assets from an L2 to
 Ethereum?
@@ -10,11 +10,9 @@ We propose a simple protocol that follows these steps:
 
 2. The market maker is monitoring for a change of state in the escrow smart contract.
 
-3.
+3. a. The market maker calls the transfer function of the PaymentRegistry Contract in Ethereum.
 
-a. The market maker calls the transfer function of the PaymentRegistry Contract in Ethereum.
-
-b. The transfer function of the PaymentRegistry contract in Ethereum pays the X tokens to the user.
+   b. The transfer function of the PaymentRegistry contract in Ethereum pays the X tokens to the user.
 
 4. A storage proof is generated, containing evidence of a transfer from the
    market maker's Ethereum account to the user-specified address in Ethereum.

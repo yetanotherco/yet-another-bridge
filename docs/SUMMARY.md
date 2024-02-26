@@ -6,7 +6,7 @@
 
 * [⭐️  Features](about_yab/features.md)
 
-* [💻 How it works](about_yab/how_it_works.md)
+* [💻 How it works](about_yab/how_does_it_work)
 
 * [❓ FAQ](about_yab/FAQ.md)
 
