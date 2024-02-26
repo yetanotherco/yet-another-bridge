@@ -4,7 +4,7 @@
 
 ## About YAB
 
-* [⭐️ Features](about_yab/features.md)
+* [⭐️  Features](about_yab/features.md)
 
 * [💻 How it works](about_yab/how_it_works.md)
 
@@ -22,7 +22,7 @@
 
 * [📈 Upgrade Contract](contracts/upgrade.md)
 
-* [⛔️ Pause Contract](contracts/pause.md)
+* [⛔️  Pause Contract](contracts/pause.md)
 
 ## Market Maker Bot
 

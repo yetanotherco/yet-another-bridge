@@ -12,9 +12,9 @@ We propose a simple protocol that follows these steps:
 
 3.
 
-   a. The market maker calls the transfer function of the PaymentRegistry Contract in Ethereum.
-   
-   b. The transfer function of the PaymentRegistry contract in Ethereum pays the X tokens to the user.
+a. The market maker calls the transfer function of the PaymentRegistry Contract in Ethereum.
+
+b. The transfer function of the PaymentRegistry contract in Ethereum pays the X tokens to the user.
 
 4. A storage proof is generated, containing evidence of a transfer from the
    market maker's Ethereum account to the user-specified address in Ethereum.
