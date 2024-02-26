@@ -93,7 +93,29 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
         return _current_order_id;
     }
 
+    function get_order_pending(uint256 order_id) public view returns (bool) {
+        return _orders_pending[order_id];
+    }
 
+    function set_ethereum_payment_registry(address new_payment_registry_address) public whenNotPaused onlyOwner {
+        ethereum_payment_registry = new_payment_registry_address;
+    }
+
+    function set_mm_ethereum_wallet(address new_mm_eth_wallet) public whenNotPaused onlyOwner {
+        mm_ethereum_wallet = new_mm_eth_wallet;
+    }
+
+    function set_mm_zksync_wallet(address new_mm_zksync_wallet) public whenNotPaused onlyOwner {
+        mm_zksync_wallet = new_mm_zksync_wallet;
+    }
+
+    function pause() public onlyOwner {
+        _pause();
+    }
+
+    function unpause() public onlyOwner {
+        _unpause();
+    }
 
     // function helloworld() public view returns (uint256) {
     //     return _current_order_id;
