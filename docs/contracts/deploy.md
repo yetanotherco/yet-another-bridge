@@ -30,15 +30,15 @@ you will need to:
 template for creating your .env file, paying special attention to the formats provided
 
    ```bash
-   ETH_RPC_URL = Infura or Alchemy RPC URL
+   ETHEREUM_RPC = RPC provider URL
 
-   ETH_PRIVATE_KEY = private key of your ETH wallet
+   ETHEREUM_PRIVATE_KEY = private key of your ETH wallet
 
    ETHERSCAN_API_KEY = API Key to use etherscan to read the Ethereum blockchain
 
-   SN_MESSAGING_ADDRESS = Starknet Messaging address
+   STARKNET_MESSAGING_ADDRESS = Starknet Messaging address
    
-   MM_ETHEREUM_WALLET = Ethereum wallet address of the MarketMaker
+   MM_ETHEREUM_WALLET_ADDRESS = Ethereum wallet address of the MarketMaker
    ```
 
    **NOTE**:
@@ -46,7 +46,7 @@ template for creating your .env file, paying special attention to the formats pr
    - You can generate ETHERSCAN_API_KEY [following these steps](https://docs.etherscan.io/getting-started/creating-an-account).
    - For the deployment, you will need some ETH.
      - You can get some GoerliEth from this [faucet](https://goerlifaucet.com/).
-   - SN_MESSAGING_ADDRESS is for when a L1 contract initiates a message to a L2 contract 
+   - STARKNET_MESSAGING_ADDRESS is for when a L1 contract initiates a message to a L2 contract 
    on Starknet. It does so by calling the sendMessageToL2 function on the Starknet Core 
    Contract with the message parameters. Starknet Core Contracts are the following:
       - Goerli: `0xde29d060D45901Fb19ED6C6e959EB22d8626708e`
@@ -87,22 +87,22 @@ template for creating your .env file, paying special attention to the formats pr
 
    STARKNET_KEYSTORE = Absolute path of your starknet testnet keystore
 
-   SN_RPC_URL = Infura or Alchemy RPC URL
+   STARKNET_RPC = Infura or Alchemy RPC URL
 
-   SN_ESCROW_OWNER = Public address of the owner of the Escrow contract
+   STARKNET_ESCROW_OWNER = Public address of the owner of the Escrow contract
 
-   MM_SN_WALLET_ADDR = Starknet wallet of the MarketMaker
+   MM_STARKNET_WALLET_ADDRESS = Starknet wallet of the MarketMaker
 
    CLAIM_PAYMENT_NAME = Exact name of the claim_payment function that is called from L1, case sensitive. 
    Example: claim_payment
 
-   MM_ETHEREUM_WALLET = Ethereum wallet of the MarketMaker
+   MM_ETHEREUM_WALLET_ADDRESS = Ethereum wallet of the MarketMaker
 
    NATIVE_TOKEN_ETH_STARKNET = Ethereum's erc20 token handler contract in Starknet
    ```
 
    **Note**
-   - SN_ESCROW_OWNER is the only one who can perform upgrades, pause and unpause the 
+   - STARKNET_ESCROW_OWNER is the only one who can perform upgrades, pause and unpause the 
    smart contract. If not defined, this value will be set (by deploy.sh) to the current 
    deployer of the smart contract.
 

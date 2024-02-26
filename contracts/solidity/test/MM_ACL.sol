@@ -14,7 +14,7 @@ contract TransferTest is Test {
     ERC1967Proxy public proxy;
     PaymentRegistry public yab_caller;
 
-    address SN_MESSAGING_ADDRESS = 0xde29d060D45901Fb19ED6C6e959EB22d8626708e;
+    address STARKNET_MESSAGING_ADDRESS = 0xde29d060D45901Fb19ED6C6e959EB22d8626708e;
     uint256 SN_ESCROW_CLAIM_PAYMENT_SELECTOR = 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77;
 
     function setUp() public {
@@ -23,7 +23,7 @@ contract TransferTest is Test {
         yab = new PaymentRegistry();
         proxy = new ERC1967Proxy(address(yab), "");
         yab_caller = PaymentRegistry(address(proxy));
-        yab_caller.initialize(SN_MESSAGING_ADDRESS, snEscrowAddress, SN_ESCROW_CLAIM_PAYMENT_SELECTOR, marketMaker);
+        yab_caller.initialize(STARKNET_MESSAGING_ADDRESS, snEscrowAddress, SN_ESCROW_CLAIM_PAYMENT_SELECTOR, marketMaker);
 
         vm.stopPrank();
     }

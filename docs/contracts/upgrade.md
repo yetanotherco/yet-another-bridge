@@ -12,17 +12,17 @@ To do this you must:
 1. Configure the `contracts/solidity/.env` file.
 
    ```env
-      ETH_RPC_URL = Infura or Alchemy RPC URL
+      ETHEREUM_RPC = RPC provider URL
 
-      ETH_PRIVATE_KEY = private key of your ETH wallet
+      ETHEREUM_PRIVATE_KEY = private key of your ETH wallet
 
       ETHERSCAN_API_KEY = API Key to use etherscan to read the Ethereum blockchain
 
-      SN_MESSAGING_ADDRESS = Starknet Messaging address
+      STARKNET_MESSAGING_ADDRESS = Starknet Messaging address
    ```
 
    **NOTE:** This is a very similar configuration than the mentioned before, but 
-MM_ETHEREUM_WALLET is not necessary
+MM_ETHEREUM_WALLET_ADDRESS is not necessary
 
 2. Configure the address of the proxy to be upgraded:
 

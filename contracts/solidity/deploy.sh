@@ -5,7 +5,7 @@ cd contracts/solidity
 
 printf "${GREEN}\n=> [ETH] Deploying ERC1967Proxy & PaymentRegistry ${COLOR_RESET}\n"
 
-RESULT_LOG=$(forge script ./script/Deploy.s.sol --rpc-url $ETH_RPC_URL --broadcast ${SKIP_VERIFY:---verify})
+RESULT_LOG=$(forge script ./script/Deploy.s.sol --rpc-url $ETHEREUM_RPC --broadcast ${SKIP_VERIFY:---verify})
 # echo "$RESULT_LOG" #uncomment this line for debugging in detail
 
 # Getting result addresses
