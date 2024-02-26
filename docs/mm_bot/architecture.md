@@ -58,8 +58,8 @@ Another important requirement is that the bot must have a reliable network conne
 with Ethereum's and L2 networks' RPCs.
 
 ## Physical View
-The system is currently deployed in an EC2 virtual machine in AWS.
-This EC2 runs the bot Main Process as well as its database. 
+There is a server to run the MM Bot Main Process as well as its
+database.
 
 ![physical_view.png](images/physical_view.png)
 
@@ -83,7 +83,7 @@ failed order through the bot.
 ### 3. Shutdown Recovery
 When the bot starts, it retrieves incomplete orders from the database and continues their processing.
 
-### Accepted Blocks Indexation
+### 4. Accepted Blocks Indexation
 The Main Order Indexer processes orders from pending blocks. The `Orders from
 Accepted Blocks Processor` will index the orders that belong to accepted blocks. This way, if the `Main Order
 Indexer` loses an order, it will be captured and processed by the `Orders from Accepted Blocks Processor`.
