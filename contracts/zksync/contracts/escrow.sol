@@ -3,12 +3,15 @@ pragma solidity ^0.8.0;
 
 
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+
+
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {PausableUpgradeable} from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 // import {Ownable2StepUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
+// import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+// TODO make upgradeable
 
-contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable, UUPSUpgradeable {
+contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //}, UUPSUpgradeable {
 
     struct Order {
         address recipient_address;
@@ -56,7 +59,7 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable, UUPSU
         address native_token_eth_in_zksync_
     ) public initializer {
         __Ownable_init();
-        __UUPSUpgradeable_init();
+        // __UUPSUpgradeable_init();
         _transferOwnership(0xB321099cf86D9BB913b891441B014c03a6CcFc54);
 
         _current_order_id = 0;
