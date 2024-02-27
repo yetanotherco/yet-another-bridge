@@ -18,5 +18,5 @@ echo "Smart contract being modified:" $PAYMENT_REGISTRY_PROXY_ADDRESS
 CLAIM_PAYMENT_SELECTOR=$(starkli selector $CLAIM_PAYMENT_NAME)
 echo "New ClaimPayment Selector: ${CLAIM_PAYMENT_SELECTOR}"
 
-cast send --rpc-url $ETH_RPC_URL --private-key $ETH_PRIVATE_KEY $PAYMENT_REGISTRY_PROXY_ADDRESS "setEscrowClaimPaymentSelector(uint256)" "${CLAIM_PAYMENT_SELECTOR}" | grep "transactionHash"
+cast send --rpc-url $ETH_RPC_URL --private-key $ETH_PRIVATE_KEY $PAYMENT_REGISTRY_PROXY_ADDRESS "setStarknetClaimPaymentSelector(uint256)" "${CLAIM_PAYMENT_SELECTOR}" | grep "transactionHash"
 echo "Done setting ClaimPayment selector"

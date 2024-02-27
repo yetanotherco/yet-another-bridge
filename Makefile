@@ -13,6 +13,10 @@ install-starknet-foundry:
 install-ethereum-foundry:
 	curl -L https://foundry.paradigm.xyz | bash && foundryup
 
+test: 
+	make starknet-test
+	make ethereum-test
+
 ethereum-clean:
 	@cd ./contracts/ethereum/ && forge clean
 
@@ -29,10 +33,10 @@ ethereum-upgrade: ethereum-build
 	@. ./contracts/ethereum/.env && . ./contracts/ethereum/upgrade.sh
 
 ethereum-set-escrow:
-	@. ./contracts/ethereum/.env && . ./contracts/ethereum/set_escrow.sh
+	@. ./contracts/ethereum/.env && . ./contracts/ethereum/set_starknet_escrow.sh
 
 ethereum-set-claim-payment-selector:
-	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env && . ./contracts/ethereum/set_claim_payment_selector.sh
+	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env && . ./contracts/ethereum/set_starknet_claim_payment_selector.sh
 
 starknet-clean:
 	@cd ./contracts/starknet/ && scarb clean
@@ -71,19 +75,23 @@ zksync-test:
 zksync-deploy: zksync-build
 	@cd ./contracts/zksync/ && yarn deploy
 
-# zksync-upgrade:
+.ONESHELL:
+zksync-deploy-and-connect: zksync-build
+	@. ./contracts/ethereum/.env && . ./contracts/zksync/.env
+	@. ./contracts/zksync/deploy.sh
+	@. ./contracts/ethereum/set_zksync_escrow.sh
+
+# zksync-upgrade: WIP
 
 
-test: 
-	make starknet-test
-	make ethereum-test
+
 
 .ONESHELL:
 starknet-deploy-and-connect: starknet-build
 	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env
 	@. ./contracts/starknet/deploy.sh
-	@. ./contracts/ethereum/set_escrow.sh
-	@. ./contracts/ethereum/set_claim_payment_selector.sh
+	@. ./contracts/ethereum/set_starknet_escrow.sh
+	@. ./contracts/ethereum/set_starknet_claim_payment_selector.sh
 
 .ONESHELL:
 deploy-all:
@@ -92,6 +100,6 @@ deploy-all:
 	@. ./contracts/ethereum/deploy.sh
 	@make starknet-build
 	@. ./contracts/starknet/deploy.sh
-	@. ./contracts/ethereum/set_escrow.sh
-	@. ./contracts/ethereum/set_claim_payment_selector.sh
+	@. ./contracts/ethereum/set_starknet_escrow.sh
+	@. ./contracts/ethereum/set_starknet_claim_payment_selector.sh
 	@. ./contracts/utils/display_info.sh

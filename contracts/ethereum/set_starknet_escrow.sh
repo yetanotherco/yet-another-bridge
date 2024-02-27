@@ -18,5 +18,5 @@ printf "${GREEN}\n=> [ETH] Setting Starknet Escrow Address on ETH Smart Contract
 echo "Smart contract being modified:" $PAYMENT_REGISTRY_PROXY_ADDRESS
 echo "New Escrow address:" $ESCROW_CONTRACT_ADDRESS
 
-cast send --rpc-url $ETH_RPC_URL --private-key $ETH_PRIVATE_KEY $PAYMENT_REGISTRY_PROXY_ADDRESS "setEscrowAddress(uint256)" $ESCROW_CONTRACT_ADDRESS | grep "transactionHash"
+cast send --rpc-url $ETH_RPC_URL --private-key $ETH_PRIVATE_KEY $PAYMENT_REGISTRY_PROXY_ADDRESS "setStarknetEscrowAddress(uint256)" $ESCROW_CONTRACT_ADDRESS | grep "transactionHash"
 echo "Done setting escrow address"
