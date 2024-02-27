@@ -1,4 +1,5 @@
 import asyncio
+import logging
 
 from starknet_py.hash.selector import get_selector_from_name
 
@@ -11,6 +12,10 @@ from services.payment_claimer.payment_claimer import PaymentClaimer
 
 class EthereumPaymentClaimer(PaymentClaimer):
 
+    def __init__(self):
+        super().__init__()
+        self.logger = logging.getLogger(__name__)
+
     async def send_payment_claim(self, order: Order, order_service: OrderService):
         """
         Makes the payment claim on ethereum
@@ -19,8 +24,9 @@ class EthereumPaymentClaimer(PaymentClaimer):
         self.logger.info(f"[+] Sending payment claim tx to ethereum")
         order_id, recipient_address, amount = order.order_id, order.recipient_address, order.get_int_amount()
         value = await self.estimate_claim_payment_fallback_message_fee(order_id, recipient_address, amount)
+        self.logger.info(f"[+] Payment claim value: {value}")
         tx_hash = await asyncio.to_thread(ethereum.claim_payment,
-                                          order_id, recipient_address, amount, value)
+                                          order_id, recipient_address, amount, int(value / 10))
         order_service.set_order_proving_ethereum(order, tx_hash)
         self.logger.info(f"[+] Payment claim tx hash: {tx_hash.hex()}")
 
