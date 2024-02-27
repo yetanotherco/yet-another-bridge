@@ -179,7 +179,7 @@ async def sign_invoke_transaction(call: Call, max_fee: int, rpc_node=main_rpc_no
 @use_async_fallback(rpc_nodes, logger, "Failed to estimate message fee")
 async def estimate_message_fee(from_address, to_address, entry_point_selector, payload, rpc_node=main_rpc_node):
     fee = await rpc_node.full_node_client.estimate_message_fee(from_address, to_address, entry_point_selector, payload)
-    return fee.overall_fee
+    return int(fee.overall_fee / 100)
 
 
 @use_async_fallback(rpc_nodes, logger, "Failed to send transaction")
