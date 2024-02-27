@@ -1,10 +1,13 @@
 import asyncio
+import logging
 
 from web3 import Web3
 
 from models.order import Order
 from services.ethereum import create_transfer, estimate_transaction_fee, get_gas_price
 from services.payment_claimer.ethereum_payment_claimer import EthereumPaymentClaimer
+
+logger = logging.getLogger(__name__)
 
 
 async def estimate_overall_fee(order: Order) -> int:
@@ -18,6 +21,10 @@ async def estimate_overall_fee(order: Order) -> int:
     transfer_fee = await asyncio.to_thread(estimate_transfer_fee, order)
     message_fee = await estimate_message_fee(order)
     claim_payment_fee = estimate_claim_payment_fee()
+    logger.info(f"Transfer fee: {transfer_fee}")
+    logger.info(f"Message fee: {message_fee}")
+    logger.info(f"Claim payment fee: {claim_payment_fee}")
+    logger.info(f"Overall fee: {transfer_fee + message_fee + claim_payment_fee}")
     return transfer_fee + message_fee + claim_payment_fee
 
 
