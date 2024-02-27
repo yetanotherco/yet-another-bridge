@@ -14,14 +14,16 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     }
 
     event Transfer(uint256 indexed orderId, address srcAddress, TransferInfo transferInfo);
-    event ModifiedEscrowAddress(uint256 newEscrowAddress);
+    event ModifiedZKSyncEscrowAddress(uint256 newEscrowAddress);
+    event ModifiedStarknetEscrowAddress(uint256 newEscrowAddress);
     event ModifiedEscrowClaimPaymentSelector(uint256 newEscrowClaimPaymentSelector);
 
     mapping(bytes32 => TransferInfo) public transfers;
-    address private _marketMaker;
+    address public marketMaker;
+    uint256 public StarknetEscrowAddress;
+    address public ZKSyncEscrowAddress;
+    uint256 public StarknetEscrowClaimPaymentSelector;
     IStarknetMessaging private _snMessaging;
-    uint256 private _snEscrowAddress;
-    uint256 private _snEscrowClaimPaymentSelector;
 
     constructor() {
         _disableInitializers();
@@ -30,16 +32,16 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     // no constructors can be used in upgradeable contracts. 
     function initialize(
         address snMessaging,
-        uint256 snEscrowAddress,
-        uint256 snEscrowClaimPaymentSelector,
-        address marketMaker) public initializer { 
+        uint256 StarknetEscrowAddress_,
+        uint256 StarknetEscrowClaimPaymentSelector_,
+        address marketMaker_) public initializer { 
         __Ownable_init(msg.sender);
         __UUPSUpgradeable_init();
 
         _snMessaging = IStarknetMessaging(snMessaging);
-        _snEscrowAddress = snEscrowAddress;
-        _snEscrowClaimPaymentSelector = snEscrowClaimPaymentSelector;
-        _marketMaker = marketMaker;
+        StarknetEscrowAddress = StarknetEscrowAddress_;
+        StarknetEscrowClaimPaymentSelector = StarknetEscrowClaimPaymentSelector_;
+        marketMaker = marketMaker_;
     }
 
 
@@ -72,42 +74,65 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         payload[4] = uint128(amount >> 128); // high
         
         _snMessaging.sendMessageToL2{value: msg.value}(
-            _snEscrowAddress,
-            _snEscrowClaimPaymentSelector,
+            StarknetEscrowAddress,
+            StarknetEscrowClaimPaymentSelector,
             payload);
     }
 
-    function setEscrowAddress(uint256 snEscrowAddress) external onlyOwner {
-        _snEscrowAddress = snEscrowAddress;
-        emit ModifiedEscrowAddress(snEscrowAddress);        
+    //TODO make 1 claimPayment function, its less deployment price and better style
+    function claimPaymentZK(uint256 orderId, address destAddress, uint256 amount, uint256 L2GasLimit) external payable onlyOwnerOrMM {
+        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount));
+        TransferInfo storage transferInfo = transfers[index];
+        require(transferInfo.isUsed == true, "Transfer not found.");
+
+        bytes[] memory payload = new bytes[](5); // TODO verify if this is the way eth calldatas are encoded
+        payload[0] = uint128(orderId); // low
+        payload[1] = uint128(orderId >> 128); // high
+        payload[2] = transferInfo.destAddress;
+        payload[3] = uint128(amount); // low
+        payload[4] = uint128(amount >> 128); // high
+
+
+        IZkSync zksync = IZkSync(zkSyncAddress);
+        zksync.requestL2Transaction{value: msg.value}(ZKSyncEscrowAddress, 0,
+            payload, L2GasLimit, REQUIRED_L1_TO_L2_GAS_PER_PUBDATA_LIMIT, new bytes[](0), msg.sender);
+
+// function requestL2Transaction(
+//     address _contractL2,
+//     uint256 _l2Value,
+//     bytes calldata _calldata,
+//     uint256 _l2GasLimit,
+//     uint256 _l2GasPerPubdataByteLimit,
+//     bytes[] calldata _factoryDeps,
+//     address _refundRecipient
+// ) external payable returns (bytes32 canonicalTxHash);
+
     }
 
-    function setEscrowClaimPaymentSelector(uint256 snEscrowClaimPaymentSelector) external onlyOwner {
-        _snEscrowClaimPaymentSelector = snEscrowClaimPaymentSelector;
-        emit ModifiedEscrowClaimPaymentSelector(snEscrowClaimPaymentSelector);
+    function setStarknetEscrowAddress(uint256 newStarknetEscrowAddress) external onlyOwner {
+        StarknetEscrowAddress = newStarknetEscrowAddress;
+        emit ModifiedStarknetEscrowAddress(newStarknetEscrowAddress);        
     }
 
-    function getEscrowAddress() external view returns (uint256) {
-        return _snEscrowAddress;
+    function setZKSyncEscrowAddress(address newZKSyncEscrowAddress) external onlyOwner {
+        ZKSyncEscrowAddress = newZKSyncEscrowAddress;
+        emit ModifiedZKSyncEscrowAddress(newZKSyncEscrowAddress);        
     }
 
-    function getEscrowClaimPaymentSelector() external view returns (uint256) {
-        return _snEscrowClaimPaymentSelector;
+    function setEscrowClaimPaymentSelector(uint256 NewStarknetEscrowClaimPaymentSelector) external onlyOwner {
+        StarknetEscrowClaimPaymentSelector = NewStarknetEscrowClaimPaymentSelector;
+        emit ModifiedEscrowClaimPaymentSelector(StarknetEscrowClaimPaymentSelector);
     }
     
     
     //// MM ACL:
 
-    function getMMAddress() external view returns (address) {
-        return _marketMaker;
-    }
-
     function setMMAddress(address newMMAddress) external onlyOwner {
-        _marketMaker = newMMAddress;
+        marketMaker = newMMAddress;
     }
 
     modifier onlyOwnerOrMM {
-        require(msg.sender == owner() || msg.sender == _marketMaker, "Only Owner or MM can call this function");
+        require(msg.sender == owner() || msg.sender == marketMaker, "Only Owner or MM can call this function");
         _;
     }
 
