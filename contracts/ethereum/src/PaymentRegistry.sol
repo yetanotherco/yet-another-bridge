@@ -20,13 +20,14 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     event Transfer(uint256 indexed orderId, address srcAddress, TransferInfo transferInfo);
     event ModifiedZKSyncEscrowAddress(uint256 newEscrowAddress);
     event ModifiedStarknetEscrowAddress(uint256 newEscrowAddress);
-    event ModifiedEscrowClaimPaymentSelector(uint256 newEscrowClaimPaymentSelector);
+    event ModifiedStarknetClaimPaymentSelector(uint256 newEscrowClaimPaymentSelector);
 
     mapping(bytes32 => TransferInfo) public transfers;
     address public marketMaker;
     uint256 public StarknetEscrowAddress;
     address public ZKSyncEscrowAddress;
     uint256 public StarknetEscrowClaimPaymentSelector;
+    IZkSync private _ZKSyncCoreContract;
     IStarknetMessaging private _snMessaging;
 
     constructor() {
@@ -38,13 +39,16 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         address snMessaging,
         uint256 StarknetEscrowAddress_,
         uint256 StarknetEscrowClaimPaymentSelector_,
-        address marketMaker_) public initializer { 
+        address marketMaker_,
+        address ZKSyncCoreContractAddress) public initializer { 
         __Ownable_init(msg.sender);
         __UUPSUpgradeable_init();
 
         _snMessaging = IStarknetMessaging(snMessaging);
+        _ZKSyncCoreContract = IZkSync(ZKSyncCoreContractAddress);
+
         StarknetEscrowAddress = StarknetEscrowAddress_;
-        StarknetEscrowClaimPaymentSelector = StarknetEscrowClaimPaymentSelector_;
+        StarknetEscrowClaimPaymentSelector = StarknetEscrowClaimPaymentSelector_; // TODO remove this or set the correct value
         marketMaker = marketMaker_;
     }
 
@@ -87,21 +91,34 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
                 
         } else if(chainID == Chain.ZKSync) {
 
-            IZkSync zksync = IZkSync(zkSyncAddress);
+            // IZkSync zksync = IZkSync(zkSyncAddress);
 
-            zksync.requestL2Transaction{value: msg.value}(
-                ZKSyncEscrowAddress,    //address _contractL2,
-                0,                      //uint256 _l2Value,
-                payload,                //bytes calldata _calldata,
-                msg.value,              //uint256 _l2GasLimit,
-                REQUIRED_L1_TO_L2_GAS_PER_PUBDATA_LIMIT, //uint256 _l2GasPerPubdataByteLimit,
-                new bytes[](0),         //bytes[] calldata _factoryDeps,
-                msg.sender              //address _refundRecipient
-            );
+            // zksync.requestL2Transaction{value: msg.value}(
+            //     ZKSyncEscrowAddress,    //address _contractL2,
+            //     0,                      //uint256 _l2Value,
+            //     payload,                //bytes calldata _calldata,
+            //     msg.value,              //uint256 _l2GasLimit,
+            //     REQUIRED_L1_TO_L2_GAS_PER_PUBDATA_LIMIT, //uint256 _l2GasPerPubdataByteLimit,
+            //     new bytes[](0),         //bytes[] calldata _factoryDeps,
+            //     msg.sender              //address _refundRecipient
+            // );
 
         } else {
             require(false, "Unsupported ChainID");
         }
+    }
+
+    function claimPaymentZKSync(
+        uint256 gasLimit,
+        uint256 gasPerPubdataByteLimit
+    ) external payable {
+        require(msg.sender == governor, "Only governor is allowed");
+
+        bytes data = wip;
+
+        _ZKSyncCoreContract.requestL2Transaction{value: msg.value}(ZKSyncEscrowAddress, 0, 
+            data, gasLimit, gasPerPubdataByteLimit, new bytes[](0), msg.sender);
+
     }
 
     function setStarknetEscrowAddress(uint256 newStarknetEscrowAddress) external onlyOwner {
@@ -114,9 +131,9 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         emit ModifiedZKSyncEscrowAddress(newZKSyncEscrowAddress);        
     }
 
-    function setEscrowClaimPaymentSelector(uint256 NewStarknetEscrowClaimPaymentSelector) external onlyOwner {
+    function setStarknetClaimPaymentSelector(uint256 NewStarknetEscrowClaimPaymentSelector) external onlyOwner {
         StarknetEscrowClaimPaymentSelector = NewStarknetEscrowClaimPaymentSelector;
-        emit ModifiedEscrowClaimPaymentSelector(StarknetEscrowClaimPaymentSelector);
+        emit ModifiedStarknetClaimPaymentSelector(StarknetEscrowClaimPaymentSelector);
     }
     
     
