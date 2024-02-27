@@ -7,10 +7,14 @@ import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Ini
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
+
+    enum Chain { Starknet, ZKSync }
+
     struct TransferInfo {
         uint256 destAddress;
         uint256 amount;
         bool isUsed;
+        Chain chainID;
     }
 
     event Transfer(uint256 indexed orderId, address srcAddress, TransferInfo transferInfo);
@@ -45,7 +49,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     }
 
 
-    function transfer(uint256 orderId, uint256 destAddress, uint256 amount) external payable onlyOwnerOrMM {
+    function transfer(uint256 orderId, uint256 destAddress, uint256 amount, Chain chainID) external payable onlyOwnerOrMM {
         require(destAddress != 0, "Invalid destination address.");
         require(amount > 0, "Invalid amount, should be higher than 0.");
         require(msg.value == amount, "Invalid amount, should match msg.value.");
@@ -53,7 +57,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount));
         require(transfers[index].isUsed == false, "Transfer already processed.");
 
-        transfers[index] = TransferInfo({destAddress: destAddress, amount: amount, isUsed: true});
+        transfers[index] = TransferInfo({destAddress: destAddress, amount: amount, isUsed: true, chainID: chainID});
 
         (bool success,) = payable(address(uint160(destAddress))).call{value: msg.value}("");
 
@@ -61,52 +65,43 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         emit Transfer(orderId, msg.sender, transfers[index]);
     }
 
-    function claimPayment(uint256 orderId, uint256 destAddress, uint256 amount) external payable onlyOwnerOrMM {
+    function claimPayment(uint256 orderId, uint256 destAddress, uint256 amount, Chain chainID) external payable onlyOwnerOrMM {
         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount));
         TransferInfo storage transferInfo = transfers[index];
         require(transferInfo.isUsed == true, "Transfer not found.");
+        require(transferInfo.chainID == chainID, "Wrong ChainID");
 
-        uint256[] memory payload = new uint256[](5);
-        payload[0] = uint128(orderId); // low
-        payload[1] = uint128(orderId >> 128); // high
-        payload[2] = transferInfo.destAddress;
-        payload[3] = uint128(amount); // low
-        payload[4] = uint128(amount >> 128); // high
-        
-        _snMessaging.sendMessageToL2{value: msg.value}(
-            StarknetEscrowAddress,
-            StarknetEscrowClaimPaymentSelector,
-            payload);
-    }
+        if(chainID == Chain.Starknet) {
+            
+            uint256[] memory payload = new uint256[](5);
+            payload[0] = uint128(orderId); // low
+            payload[1] = uint128(orderId >> 128); // high
+            payload[2] = transferInfo.destAddress;
+            payload[3] = uint128(amount); // low
+            payload[4] = uint128(amount >> 128); // high
+            
+            _snMessaging.sendMessageToL2{value: msg.value}(
+                StarknetEscrowAddress,
+                StarknetEscrowClaimPaymentSelector,
+                payload);
+                
+        } else if(chainID == Chain.ZKSync) {
 
-    //TODO make 1 claimPayment function, its less deployment price and better style
-    function claimPaymentZK(uint256 orderId, address destAddress, uint256 amount, uint256 L2GasLimit) external payable onlyOwnerOrMM {
-        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount));
-        TransferInfo storage transferInfo = transfers[index];
-        require(transferInfo.isUsed == true, "Transfer not found.");
+            IZkSync zksync = IZkSync(zkSyncAddress);
 
-        bytes[] memory payload = new bytes[](5); // TODO verify if this is the way eth calldatas are encoded
-        payload[0] = uint128(orderId); // low
-        payload[1] = uint128(orderId >> 128); // high
-        payload[2] = transferInfo.destAddress;
-        payload[3] = uint128(amount); // low
-        payload[4] = uint128(amount >> 128); // high
+            zksync.requestL2Transaction{value: msg.value}(
+                ZKSyncEscrowAddress,    //address _contractL2,
+                0,                      //uint256 _l2Value,
+                payload,                //bytes calldata _calldata,
+                msg.value,              //uint256 _l2GasLimit,
+                REQUIRED_L1_TO_L2_GAS_PER_PUBDATA_LIMIT, //uint256 _l2GasPerPubdataByteLimit,
+                new bytes[](0),         //bytes[] calldata _factoryDeps,
+                msg.sender              //address _refundRecipient
+            );
 
-
-        IZkSync zksync = IZkSync(zkSyncAddress);
-        zksync.requestL2Transaction{value: msg.value}(ZKSyncEscrowAddress, 0,
-            payload, L2GasLimit, REQUIRED_L1_TO_L2_GAS_PER_PUBDATA_LIMIT, new bytes[](0), msg.sender);
-
-// function requestL2Transaction(
-//     address _contractL2,
-//     uint256 _l2Value,
-//     bytes calldata _calldata,
-//     uint256 _l2GasLimit,
-//     uint256 _l2GasPerPubdataByteLimit,
-//     bytes[] calldata _factoryDeps,
-//     address _refundRecipient
-// ) external payable returns (bytes32 canonicalTxHash);
-
+        } else {
+            require(false, "Unsupported ChainID");
+        }
     }
 
     function setStarknetEscrowAddress(uint256 newStarknetEscrowAddress) external onlyOwner {
