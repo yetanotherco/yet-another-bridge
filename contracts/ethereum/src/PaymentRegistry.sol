@@ -111,13 +111,28 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     function claimPaymentZKSync(
         uint256 gasLimit,
         uint256 gasPerPubdataByteLimit
-    ) external payable {
-        require(msg.sender == governor, "Only governor is allowed");
+    ) external payable onlyOwnerOrMM {
+        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount));
+        TransferInfo storage transferInfo = transfers[index];
+        require(transferInfo.isUsed == true, "Transfer not found.");
+        require(transferInfo.chainID == chainID.ZKSync, "Wrong ChainID");
+            
+            // L1 handler in escrow:
+                // function claim_payment(
+                //     uint256 order_id,
+                //     address recipient_address,
+                //     uint256 amount
+                // )
 
-        bytes data = wip;
+        bytes memory payload = new bytes(5);
+        payload[0] = uint128(orderId); // low
+        payload[1] = uint128(orderId >> 128); // high
+        payload[2] = transferInfo.destAddress;
+        payload[3] = uint128(amount); // low
+        payload[4] = uint128(amount >> 128); // high
 
         _ZKSyncCoreContract.requestL2Transaction{value: msg.value}(ZKSyncEscrowAddress, 0, 
-            data, gasLimit, gasPerPubdataByteLimit, new bytes[](0), msg.sender);
+            payload, gasLimit, gasPerPubdataByteLimit, new bytes[](0), msg.sender);
 
     }
 
