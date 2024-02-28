@@ -9,5 +9,4 @@ export default async function () {
   const escrowConstructorArguments = [];
   // const escrow = await deployContractWithProxy(escrowArtifactName, escrowConstructorArguments);
   const escrow = await deployContract(escrowArtifactName, escrowConstructorArguments);
-
 }

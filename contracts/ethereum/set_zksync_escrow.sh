@@ -9,7 +9,14 @@ fi
 if [ -z "$ZKSYNC_ESCROW_CONTRACT_ADDRESS" ]; then
     printf "\n${RED}ERROR:${COLOR_RESET}\n"
     echo "ZKSYNC_ESCROW_CONTRACT_ADDRESS Variable is empty. Aborting execution.\n"
-    exit 1
+fi
+if [ -z "$ETH_RPC_URL" ]; then
+    printf "\n${RED}ERROR:${COLOR_RESET}\n"
+    echo "ETH_RPC_URL Variable is empty. Aborting execution.\n"
+fi
+if [ -z "$ETH_PRIVATE_KEY" ]; then
+    printf "\n${RED}ERROR:${COLOR_RESET}\n"
+    echo "ETH_PRIVATE_KEY Variable is empty. Aborting execution.\n"
 fi
 
 
@@ -18,5 +25,5 @@ printf "${GREEN}\n=> [ETH] Setting ZKSync Escrow Address on ETH Smart Contract${
 echo "Smart contract being modified:" $PAYMENT_REGISTRY_PROXY_ADDRESS
 echo "New ZKSync Escrow address:" $ZKSYNC_ESCROW_CONTRACT_ADDRESS
 
-cast send --rpc-url $ETH_RPC_URL --private-key $ETH_PRIVATE_KEY $PAYMENT_REGISTRY_PROXY_ADDRESS "setZKSyncEscrowAddress(address)" $ZKSYNC_ESCROW_CONTRACT_ADDRESS | grep "transactionHash"
+cast send --rpc-url $ETH_RPC_URL --private-key $ETH_PRIVATE_KEY $PAYMENT_REGISTRY_PROXY_ADDRESS "setZKSyncEscrowAddress(address)" $ZKSYNC_ESCROW_CONTRACT_ADDRESS | grep "transactionHash "
 echo "Done setting escrow address"

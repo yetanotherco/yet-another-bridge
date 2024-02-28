@@ -73,13 +73,12 @@ zksync-test:
 	@cd ./contracts/zksync/ && yarn test
 
 zksync-deploy: zksync-build
-	@cd ./contracts/zksync/ && yarn deploy
+	@. ./contracts/zksync/.env && . ./contracts/zksync/deploy.sh
+
 
 .ONESHELL:
 zksync-deploy-and-connect: zksync-build
-	@. ./contracts/ethereum/.env && . ./contracts/zksync/.env
-	@. ./contracts/zksync/deploy.sh
-	@. ./contracts/ethereum/set_zksync_escrow.sh
+	@. ./contracts/ethereum/.env && . ./contracts/zksync/.env && . ./contracts/zksync/deploy.sh && . ./contracts/ethereum/set_zksync_escrow.sh
 
 # zksync-upgrade: WIP
 
