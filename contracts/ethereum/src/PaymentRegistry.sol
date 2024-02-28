@@ -28,7 +28,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     uint256 public StarknetEscrowAddress;
     address public ZKSyncEscrowAddress;
     uint256 public StarknetEscrowClaimPaymentSelector;
-    IZkSync private _ZKSyncCoreContract;
+    IZkSync private _ZKSyncMailbox;
     IStarknetMessaging private _snMessaging;
 
     constructor() {
@@ -41,12 +41,12 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         uint256 StarknetEscrowAddress_,
         uint256 StarknetEscrowClaimPaymentSelector_,
         address marketMaker_,
-        address ZKSyncCoreContractAddress) public initializer { 
+        address ZKSyncMailboxAddress) public initializer { 
         __Ownable_init(msg.sender);
         __UUPSUpgradeable_init();
 
         _snMessaging = IStarknetMessaging(snMessaging);
-        _ZKSyncCoreContract = IZkSync(ZKSyncCoreContractAddress);
+        _ZKSyncMailbox = IZkSync(ZKSyncMailboxAddress);
 
         StarknetEscrowAddress = StarknetEscrowAddress_;
         StarknetEscrowClaimPaymentSelector = StarknetEscrowClaimPaymentSelector_; // TODO remove this or set the correct value in init
@@ -128,7 +128,8 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             payload[i] = p2[i];     //write p2 in last 32 bytes
         }
 
-        _ZKSyncCoreContract.requestL2Transaction{value: msg.value}(ZKSyncEscrowAddress, 0, 
+        
+        _ZKSyncMailbox.requestL2Transaction{value: msg.value}(ZKSyncEscrowAddress, 0, 
             payload, gasLimit, gasPerPubdataByteLimit, new bytes[](0), msg.sender);
 
     }

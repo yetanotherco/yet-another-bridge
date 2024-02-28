@@ -14,11 +14,11 @@ contract Deploy is Script {
         uint256 snEscrowAddress = 0x0; // this value is set in a call to the smart contract, once deployed
         uint256 snClaimPaymentSelector = 0x0; // this value is set in a call to the smart contract, once deployed
         address marketMaker = vm.envAddress("MM_ETHEREUM_WALLET");
-        address ZKSyncCoreContractAddress = vm.envAddress("ZKSYNC_CORE_CONTRACT_ADDRESS");
+        address ZKSYNC_MAILBOX_ADDRESS = vm.envAddress("ZKSYNC_MAILBOX_ADDRESS");
 
         PaymentRegistry yab = new PaymentRegistry();
         ERC1967Proxy proxy = new ERC1967Proxy(address(yab), "");
-        PaymentRegistry(address(proxy)).initialize(snMessagingAddress, snEscrowAddress, snClaimPaymentSelector, marketMaker, ZKSyncCoreContractAddress);
+        PaymentRegistry(address(proxy)).initialize(snMessagingAddress, snEscrowAddress, snClaimPaymentSelector, marketMaker, ZKSYNC_MAILBOX_ADDRESS);
 
         vm.stopBroadcast();
 
