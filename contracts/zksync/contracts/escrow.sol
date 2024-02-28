@@ -23,17 +23,6 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
     
     event ClaimPayment(uint256 order_id, address claimerAddress, uint256 amount);
 
-    // im passing this cairo events to sol events as i go needing to implement them
-    // enum Event {
-    //     ClaimPayment: ClaimPayment,
-    //     #[flat]
-    //     OwnableEvent: OwnableComponent::Event,
-    //     #[flat]
-    //     UpgradeableEvent: UpgradeableComponent::Event,
-    //     #[flat]
-    //     PausableEvent: PausableComponent::Event
-    // }
-
     //storage
     uint256 private _current_order_id; 
     mapping(uint256 => Order) private _orders;
@@ -43,8 +32,7 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
     address public ethereum_payment_registry; //called eth_transfer_contract in cairo
     address public mm_ethereum_wallet;
     address public mm_zksync_wallet; //TODO verify this is address type, creo que si
-    // address public native_token_eth_in_zksync; //erc20 of eth in zksync
-    ERC20 public native_token_eth_in_zksync;
+    ERC20 public native_token_eth_in_zksync; //TODO make this value internal and hardcoded
 
     function initialize(
         address ethereum_payment_registry_,
@@ -54,7 +42,6 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
     ) public initializer {
         __Ownable_init();
         // __UUPSUpgradeable_init();
-        _transferOwnership(0xB321099cf86D9BB913b891441B014c03a6CcFc54);
 
         _current_order_id = 0;
         ethereum_payment_registry = ethereum_payment_registry_;
@@ -64,7 +51,7 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
     }
 
 
-    //FUNTCIONS
+    // FUNCTIONS :
 
     function get_order(uint256 order_id) public view returns (Order memory) {
         return _orders[order_id];
