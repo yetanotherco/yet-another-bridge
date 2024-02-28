@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: Apache-2.0
-pragma solidity ^0.8.21;
+pragma solidity ^0.8.20;
 
 import {IStarknetMessaging} from "starknet/IStarknetMessaging.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import {IZkSync} from "@matterlabs/interfaces/IZkSync.sol";
 
 contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
@@ -18,7 +19,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     }
 
     event Transfer(uint256 indexed orderId, address srcAddress, TransferInfo transferInfo);
-    event ModifiedZKSyncEscrowAddress(uint256 newEscrowAddress);
+    event ModifiedZKSyncEscrowAddress(address newEscrowAddress);
     event ModifiedStarknetEscrowAddress(uint256 newEscrowAddress);
     event ModifiedStarknetClaimPaymentSelector(uint256 newEscrowClaimPaymentSelector);
 
@@ -109,13 +110,14 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     }
 
     function claimPaymentZKSync(
+        uint256 orderId, uint256 destAddress, uint256 amount, Chain chainID,
         uint256 gasLimit,
         uint256 gasPerPubdataByteLimit
     ) external payable onlyOwnerOrMM {
         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount));
         TransferInfo storage transferInfo = transfers[index];
         require(transferInfo.isUsed == true, "Transfer not found.");
-        require(transferInfo.chainID == chainID.ZKSync, "Wrong ChainID");
+        require(transferInfo.chainID == Chain.ZKSync, "Wrong ChainID");
             
             // L1 handler in escrow:
                 // function claim_payment(
@@ -125,11 +127,29 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
                 // )
 
         bytes memory payload = new bytes(5);
-        payload[0] = uint128(orderId); // low
-        payload[1] = uint128(orderId >> 128); // high
-        payload[2] = transferInfo.destAddress;
-        payload[3] = uint128(amount); // low
-        payload[4] = uint128(amount >> 128); // high
+        // bytes16 a = abi.encodePacked(uint128(orderId)); //not worked
+        // bytes16 a = uint128(orderId); //not worked
+        bytes16 p0 = bytes16(uint128(orderId));
+        bytes16 p1 = bytes16(uint128(orderId >> 128));
+        bytes16 p2 = bytes16(transferInfo.destAddress); //destAddress is a u256, why tho?
+        bytes16 p3 = bytes16(uint128(amount));
+        bytes16 p4 = bytes16(uint128(amount >> 128));
+
+        
+
+        // function toBytes(uint256 x) returns (bytes b) {
+        //     b = new bytes(32);
+        //     assembly { mstore(add(b, 32), x) }
+        // }
+
+
+
+
+        // payload[0] = uint128(orderId); // low
+        // payload[1] = uint128(orderId >> 128); // high
+        // payload[2] = transferInfo.destAddress;
+        // payload[3] = uint128(amount); // low
+        // payload[4] = uint128(amount >> 128); // high
 
         _ZKSyncCoreContract.requestL2Transaction{value: msg.value}(ZKSyncEscrowAddress, 0, 
             payload, gasLimit, gasPerPubdataByteLimit, new bytes[](0), msg.sender);
