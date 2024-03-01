@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import { getWallet, deployContract, LOCAL_RICH_WALLETS } from '../deploy/utils';
 import { Contract, Wallet } from 'ethers';
 import * as hre from "hardhat";
+import * as ethers from 'ethers';
 
 
 export async function deployAndInit(): Promise<Contract> {
@@ -30,5 +31,6 @@ export async function deployPaymentRegistry(): Promise<Contract> {
     const deployer = getWallet(LOCAL_RICH_WALLETS[0].privateKey);
 
     const paymentRegistry = await deployContract("PaymentRegistry", [], { wallet: deployer });
-    return paymentRegistry
+
+    return await paymentRegistry.wait()
 }

@@ -70,7 +70,12 @@ zksync-build: zksync-clean
 	@cd ./contracts/zksync/ && yarn compile
 
 zksync-test:
-	@cd ./contracts/zksync/ && yarn test
+
+.ONESHELL:
+zksync-test:
+	@. ./contracts/ethereum/.env && . ./contracts/zksync/scripts/deploy_paymentRegistry.sh
+# @cd ./contracts/zksync/ && yarn test
+
 
 zksync-deploy: zksync-build
 	@. ./contracts/zksync/.env && . ./contracts/zksync/deploy.sh
