@@ -1,40 +1,39 @@
 import { expect } from 'chai';
 import { deployAndInit } from './utils';
-import { Contract } from 'ethers';
+import { Contract, Wallet } from 'ethers';
+import { getWallet, deployContract, LOCAL_RICH_WALLETS } from '../deploy/utils';
 
-// let escrow: Contract;
+let escrow: Contract;
+let deployer: Wallet;
 
-// beforeEach( async () => {
-//   escrow = await deployAndInit();
-// });
+beforeEach( async () => {
+  escrow = await deployAndInit();
+  deployer = getWallet(LOCAL_RICH_WALLETS[0].privateKey);
+});
 
 
 describe('Pause tests', function () {
 
   it("Should start unpaused", async function () {
-    const escrow = await deployAndInit();
     expect(await escrow.paused()).to.eq(false);
   });
 
-  // it("Should pause", async function ()  {
-  //   const escrow = await deployAndInit();
+  it("Should pause", async function ()  {
+    escrow.connect(deployer);
+    const setPauseTx = await escrow.pause();
+    await setPauseTx.wait();
 
-  //   const setPauseTx = await escrow.pause();
+    expect(await escrow.paused()).to.equal(true);
+  });
 
-  //   await setPauseTx.wait();
+  it("Should unpause", async function ()  {
+    escrow.connect(deployer);
+    const setPauseTx = await escrow.pause();
+    await setPauseTx.wait();
+    
+    const setUnpauseTx = await escrow.unpause();
+    await setUnpauseTx.wait();
 
-  //   expect(await escrow.paused()).to.equal(true);
-  // });
-
-  // it("Should unpause", async function ()  {
-  //   const escrow = await deployAndInit();
-
-  //   const setPauseTx = await escrow.pause();
-  //   await setPauseTx.wait();
-
-  //   const setUnpauseTx = await escrow.unpause();
-  //   await setUnpauseTx.wait();
-
-  //   expect(await escrow.paused()).to.eq(false);
-  // });
+    expect(await escrow.paused()).to.eq(false);
+  });
 });
