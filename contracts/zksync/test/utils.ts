@@ -25,3 +25,10 @@ export async function deployAndInit(): Promise<Contract> {
     await initResult.wait();
     return escrow
 }  
+
+export async function deployPaymentRegistry(): Promise<Contract> {
+    const deployer = getWallet(LOCAL_RICH_WALLETS[0].privateKey);
+
+    const paymentRegistry = await deployContract("PaymentRegistry", [], { wallet: deployer });
+    return paymentRegistry
+}
