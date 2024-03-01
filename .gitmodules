@@ -7,3 +7,6 @@
 [submodule "contracts/ethereum/lib/era-contracts"]
 	path = contracts/ethereum/lib/era-contracts
 	url = https://github.com/matter-labs/era-contracts
+[submodule "contracts/zksync_forge/lib/forge-std"]
+	path = contracts/zksync_forge/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
