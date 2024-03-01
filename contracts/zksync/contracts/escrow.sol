@@ -19,7 +19,13 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
         uint256 fee;
     }
 
-    event SetOrder(uint256 order_id, address recipient_address, uint256 amount, uint256 fee);
+    struct SetOrderContent {
+        uint256 order_id;
+        Order new_order;
+    }
+
+    event SetOrder1(uint256 order_id, address recipient_address, uint256 amount, uint256 fee);
+    event SetOrder2(SetOrderContent new_order);
     
     event ClaimPayment(uint256 order_id, address claimerAddress, uint256 amount);
 
@@ -57,22 +63,22 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
         return _orders[order_id];
     }
 
-    function set_order(Order calldata new_order) public whenNotPaused returns (uint256) {
-        require(new_order.amount > 0, 'Amount must be greater than 0');
+    //TODO recieve struct in param, its broken in zksync?
+    function set_order(address recipient_address, uint256 amount, uint256 fee) public payable whenNotPaused returns (uint256) {
+        require(amount > 0, 'Amount must be greater than 0');
 
-        uint256 payment_amount = new_order.amount + new_order.fee; // TODO check overflow
-        require(native_token_eth_in_zksync.allowance(msg.sender, address(this)) >= payment_amount, 'Not enough allowance');
-        require(native_token_eth_in_zksync.balanceOf(msg.sender) >= payment_amount, 'Not enough allowance');
+        uint256 payment_amount = amount + fee; // TODO check overflow
+        require(msg.value >= payment_amount, "not enough ETH sent");
         
-        _orders[_current_order_id] = new_order;
+        Order memory new_order = Order({recipient_address: recipient_address, amount: amount, fee: fee});
+        _orders[_current_order_id] = new_order; //TODO optimize: evaluate creating the order here and referencing it in the setOrder event
         _orders_pending[_current_order_id] = true;
         _orders_senders[_current_order_id] = msg.sender;
         _orders_timestamps[_current_order_id] = block.timestamp;
         _current_order_id++;
 
-        native_token_eth_in_zksync.transferFrom(msg.sender, address(this), payment_amount);
-
-        emit SetOrder(_current_order_id-1, new_order.recipient_address, new_order.amount, new_order.fee);
+        emit SetOrder1(_current_order_id-1, recipient_address, amount, fee);
+        emit SetOrder2(SetOrderContent({order_id: _current_order_id-1, new_order: new_order}));
 
         return _current_order_id;
     }
@@ -107,16 +113,17 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
         address recipient_address,
         uint256 amount
     ) public whenNotPaused {
-        require(msg.sender == ethereum_payment_registry, 'Only PAYMENT_REGISTRY_CONTRACT');
+        require(msg.sender == ethereum_payment_registry, 'Only PAYMENT_REGISTRY can call');
         require(_orders_pending[order_id], 'Order claimed or nonexistent');
 
-        Order memory current_order = _orders[order_id]; //TODO check if order is memory
+        Order memory current_order = _orders[order_id]; //TODO check if order is memory or calldata
         require(current_order.recipient_address == recipient_address, 'recipient_address not match L1');
         require(current_order.amount == amount, 'amount not match L1');
 
         _orders_pending[order_id] = false;
         uint256 payment_amount = current_order.amount + current_order.fee;  // TODO check overflow
 
+        //TODO this is not an ERC20
         native_token_eth_in_zksync.transfer(mm_zksync_wallet, payment_amount);
 
         emit ClaimPayment(order_id, mm_zksync_wallet, amount);
