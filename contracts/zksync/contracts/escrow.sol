@@ -19,13 +19,7 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
         uint256 fee;
     }
 
-    struct SetOrderContent {
-        uint256 order_id;
-        Order new_order;
-    }
-
-    event SetOrder1(uint256 order_id, address recipient_address, uint256 amount, uint256 fee);
-    event SetOrder2(SetOrderContent new_order);
+    event SetOrder(uint256 order_id, address recipient_address, uint256 amount, uint256 fee);
     
     event ClaimPayment(uint256 order_id, address claimerAddress, uint256 amount);
 
@@ -64,27 +58,26 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
     }
 
     //TODO recieve struct in param, its broken in zksync?
-    //TODO remove amount param, sobra ya que mandamos amount en msg.value
-    function set_order(address recipient_address, uint256 amount, uint256 fee) public payable whenNotPaused returns (uint256) {
-        require(amount > 0, 'Amount must be greater than 0');
+    //TODO function recieves in msg.value the total value, and in fee the user specifies what portion of that msg.value is fee for MM
+    function set_order(address recipient_address, uint256 fee) public payable whenNotPaused returns (uint256) {
+        require(msg.value > 0, 'some ETH must be sent');
+        require(msg.value > fee, 'ETH sent must be more than fee');
 
-        uint256 payment_amount = amount + fee; // TODO check overflow
-        require(msg.value >= payment_amount, "not enough ETH sent");
+        uint256 bridge_amount = msg.value - fee; //no underflow since previous check is made
         
-        Order memory new_order = Order({recipient_address: recipient_address, amount: amount, fee: fee});
+        Order memory new_order = Order({recipient_address: recipient_address, amount: bridge_amount, fee: fee});
         _orders[_current_order_id] = new_order; //TODO optimize: evaluate creating the order here and referencing it in the setOrder event
         _orders_pending[_current_order_id] = true;
         _orders_senders[_current_order_id] = msg.sender;
         _orders_timestamps[_current_order_id] = block.timestamp;
-        _current_order_id++;
+        _current_order_id++; //this here to follow CEI pattern
 
-        emit SetOrder1(_current_order_id-1, recipient_address, amount, fee);
-        emit SetOrder2(SetOrderContent({order_id: _current_order_id-1, new_order: new_order}));
+        emit SetOrder(_current_order_id-1, recipient_address, bridge_amount, fee);
 
         return _current_order_id;
     }
 
-    function get_order_pending(uint256 order_id) public view returns (bool) {
+    function is_order_pending(uint256 order_id) public view returns (bool) {
         return _orders_pending[order_id];
     }
 
