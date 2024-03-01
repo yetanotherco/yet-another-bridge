@@ -64,6 +64,7 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
     }
 
     //TODO recieve struct in param, its broken in zksync?
+    //TODO remove amount param, sobra ya que mandamos amount en msg.value
     function set_order(address recipient_address, uint256 amount, uint256 fee) public payable whenNotPaused returns (uint256) {
         require(amount > 0, 'Amount must be greater than 0');
 
