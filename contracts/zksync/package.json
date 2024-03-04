@@ -3,7 +3,7 @@
   "private": true,
   "packageManager": "yarn@1.22.21",
   "scripts": {
-    "deploy": "hardhat deploy-zksync --script deploy.ts",
+    "deploy": "hardhat deploy-zksync --network zkSyncSepoliaTestnet --script deploy.ts",
     "compile": "hardhat compile",
     "clean": "hardhat clean",
     "test": "hardhat test --network dockerizedNode --parallel --show-stack-traces"
@@ -15,6 +15,8 @@
     "@matterlabs/hardhat-zksync-upgradable": "^1.2.4",
     "@matterlabs/hardhat-zksync-verify": "^1.2.2",
     "@matterlabs/zksync-contracts": "^0.6.1",
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.6",
+    "@nomicfoundation/hardhat-ethers": "^3.0.5",
     "@nomiclabs/hardhat-etherscan": "^3.1.7",
     "@openzeppelin/contracts": "4.9.5",
     "@openzeppelin/contracts-upgradeable": "4.9.5",
