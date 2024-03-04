@@ -17,7 +17,7 @@ contract TransferTest is Test {
 
     address SN_MESSAGING_ADDRESS = 0xde29d060D45901Fb19ED6C6e959EB22d8626708e;
     uint256 SN_ESCROW_CLAIM_PAYMENT_SELECTOR = 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77;
-    address ZKSYNC_MAILBOX_ADDRESS = 0x2eD8eF54a16bBF721a318bd5a5C0F39Be70eaa65; //TODO put correct value
+    address ZKSYNC_MAILBOX_ADDRESS = 0x2eD8eF54a16bBF721a318bd5a5C0F39Be70eaa65; //sepolia ZKSync mailbox address
 
     function setUp() public {
         vm.startPrank(deployer);
@@ -27,19 +27,12 @@ contract TransferTest is Test {
         yab_caller = PaymentRegistry(address(proxy));
         yab_caller.initialize(SN_MESSAGING_ADDRESS, snEscrowAddress, SN_ESCROW_CLAIM_PAYMENT_SELECTOR, marketMaker, ZKSYNC_MAILBOX_ADDRESS);
 
-        // Mock calls to Starknet Messaging contract
+        //Mock calls to ZKSync Mailbox contract
         vm.mockCall(
-            SN_MESSAGING_ADDRESS,
-            abi.encodeWithSelector(IStarknetMessaging(SN_MESSAGING_ADDRESS).sendMessageToL2.selector),
-            abi.encode(0x0, 0x1)
+            ZKSYNC_MAILBOX_ADDRESS,
+            abi.encodeWithSelector(0xeb672419, 0), //TODO add selector
+            abi.encode(0x12345678901234567890123456789012) //TODO add return data
         );
-
-        //TODO Mock calls to ZKSync Mailbox contract
-        // vm.mockCall(
-        //     ZKSYNC_MAILBOX_ADDRESS,
-        //     abi.encodeWithSelector(), //TODO add selector
-        //     abi.encode() //TODO add return data
-        // );
 
         vm.stopPrank();
     }
@@ -52,14 +45,14 @@ contract TransferTest is Test {
     function test_claimPayment_zk_fail_noOrderId() public {
         hoax(marketMaker, 100 wei);
         vm.expectRevert("Transfer not found."); //Won't match to a random transfer number
-        yab_caller.claimPaymentZKSync{value: 100}(1, 0x1, 100, 1, 1);
+        yab_caller.claimPaymentZKSync(1, 0x1, 100, 1, 1);
     }
 
     function test_claimPayment_zk() public {
         hoax(marketMaker, 100 wei);
         yab_caller.transfer{value: 100}(1, 0x1, 100, PaymentRegistry.Chain.ZKSync);  
-        hoax(marketMaker, 1000 wei);
-        // yab_caller.claimPaymentZKSync(1, 0x1, 100, 500, 1); //wip
+        hoax(marketMaker, 100 wei);
+        yab_caller.claimPaymentZKSync(1, 0x1, 100, 1, 1);
     }
 
     function test_claimPayment_zk_maxInt() public {
@@ -69,7 +62,7 @@ contract TransferTest is Test {
         vm.startPrank(marketMaker);
 
         yab_caller.transfer{value: maxInt}(1, 0x1, maxInt, PaymentRegistry.Chain.ZKSync);
-        // yab_caller.claimPaymentZKSync(1, 0x1, maxInt); //wip
+        yab_caller.claimPaymentZKSync(1, 0x1, maxInt, 1, 1);
         vm.stopPrank();
     }
 
@@ -77,6 +70,6 @@ contract TransferTest is Test {
         hoax(marketMaker, 1 wei);
         yab_caller.transfer{value: 1}(1, 0x1, 1, PaymentRegistry.Chain.ZKSync);
         hoax(marketMaker, 1 wei);
-        // yab_caller.claimPaymentZKSync(1, 0x1, 1); //wip
+        yab_caller.claimPaymentZKSync(1, 0x1, 1, 1, 1);
     }
 }
