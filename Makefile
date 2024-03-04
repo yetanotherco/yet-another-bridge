@@ -16,6 +16,7 @@ install-ethereum-foundry:
 test: 
 	make starknet-test
 	make ethereum-test
+	make zksync-test
 
 ethereum-clean:
 	@cd ./contracts/ethereum/ && forge clean
