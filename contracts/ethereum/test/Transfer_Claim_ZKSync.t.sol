@@ -48,6 +48,14 @@ contract TransferTest is Test {
         yab_caller.claimPaymentZKSync(1, 0x1, 100, 1, 1);
     }
 
+    function test_claimPayment_zk_fail_wrongOrderId() public {
+        hoax(marketMaker, 100 wei);
+        yab_caller.transfer{value: 100}(1, 0x1, 100, PaymentRegistry.Chain.ZKSync);  
+        hoax(marketMaker, 100 wei);
+        vm.expectRevert("Transfer not found."); //Won't match to a wrong transfer number
+        yab_caller.claimPaymentZKSync(2, 0x1, 100, 1, 1);
+    }
+
     function test_claimPayment_zk() public {
         hoax(marketMaker, 100 wei);
         yab_caller.transfer{value: 100}(1, 0x1, 100, PaymentRegistry.Chain.ZKSync);  
@@ -71,5 +79,13 @@ contract TransferTest is Test {
         yab_caller.transfer{value: 1}(1, 0x1, 1, PaymentRegistry.Chain.ZKSync);
         hoax(marketMaker, 1 wei);
         yab_caller.claimPaymentZKSync(1, 0x1, 1, 1, 1);
+    }
+
+    function test_claimPayment_fail_wrongChain() public {
+        hoax(marketMaker, 1 wei);
+        yab_caller.transfer{value: 1}(1, 0x1, 1, PaymentRegistry.Chain.ZKSync);
+        hoax(marketMaker, 1 wei);
+        vm.expectRevert("Transfer not found."); //Won't match to a transfer made on the other chain
+        yab_caller.claimPayment(1, 0x1, 1);  
     }
 }
