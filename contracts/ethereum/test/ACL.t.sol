@@ -56,7 +56,7 @@ contract TransferTest is Test {
     function test_transfer_sn_fail_notOwnerOrMM() public {
         hoax(makeAddr("bob"), 100 wei);
         vm.expectRevert("Only Owner or MM can call this function");
-        yab_caller.transfer{value: 100}(1, 0x1, 100, PaymentRegistry.Chain.Starknet);
+        yab_caller.transfer{value: 100}(1, 0x1, PaymentRegistry.Chain.Starknet);
     }
 
     function test_claimPayment_sn_fail_notOwnerOrMM() public {
@@ -68,7 +68,7 @@ contract TransferTest is Test {
     function test_transfer_zk_fail_notOwnerOrMM() public {
         hoax(makeAddr("bob"), 100 wei);
         vm.expectRevert("Only Owner or MM can call this function");
-        yab_caller.transfer{value: 100}(1, 0x1, 100, PaymentRegistry.Chain.ZKSync);
+        yab_caller.transfer{value: 100}(1, 0x1, PaymentRegistry.Chain.ZKSync);
     }
 
     function test_claimPayment_zk_fail_notOwnerOrMM() public {

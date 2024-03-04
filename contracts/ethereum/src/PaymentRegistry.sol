@@ -54,15 +54,16 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     }
 
 //TODO: change orderID to uint32
-    function transfer(uint256 orderId, uint256 destAddress, uint256 amount, Chain chainId) external payable onlyOwnerOrMM {
+//TODO remove amount parameter, it is unnecesarry, only reading msg,value is enough
+    function transfer(uint256 orderId, uint256 destAddress, Chain chainId) external payable onlyOwnerOrMM {
         require(destAddress != 0, "Invalid destination address.");
-        require(amount > 0, "Invalid amount, should be higher than 0.");
-        require(msg.value == amount, "Invalid amount, should match msg.value.");
+        require(msg.value > 0, "Invalid amount, should be higher than 0.");
 
-        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, chainId));
+
+        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, msg.value, chainId));
         require(transfers[index].isUsed == false, "Transfer already processed.");
 
-        transfers[index] = TransferInfo({destAddress: destAddress, amount: amount, isUsed: true, chainId: chainId});
+        transfers[index] = TransferInfo({destAddress: destAddress, amount: msg.value, isUsed: true, chainId: chainId});
 
         (bool success,) = payable(address(uint160(destAddress))).call{value: msg.value}("");
 
