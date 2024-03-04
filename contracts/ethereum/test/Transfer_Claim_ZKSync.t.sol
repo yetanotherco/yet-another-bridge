@@ -35,48 +35,48 @@ contract TransferTest is Test {
         );
 
         //TODO Mock calls to ZKSync Mailbox contract
-        vm.mockCall(
-            ZKSYNC_MAILBOX_ADDRESS,
-            abi.encodeWithSelector(), //TODO add selector
-            abi.encode() //TODO add return data
-        );
+        // vm.mockCall(
+        //     ZKSYNC_MAILBOX_ADDRESS,
+        //     abi.encodeWithSelector(), //TODO add selector
+        //     abi.encode() //TODO add return data
+        // );
 
         vm.stopPrank();
     }
 
     function test_transfer_zk() public {
-        // hoax(marketMaker, 100 wei);
-        // yab_caller.transfer{value: 100}(1, 0x1, 100, PaymentRegistry.Chain.Starknet);
+        hoax(marketMaker, 100 wei);
+        yab_caller.transfer{value: 100}(1, 0x1, 100, PaymentRegistry.Chain.ZKSync);
     }
 
-    function test_claimPayment_sn_fail_noOrderId() public {
-        // hoax(marketMaker, 100 wei);
-        // vm.expectRevert("Transfer not found."); //Won't match to a random transfer number
-        // yab_caller.claimPayment{value: 100}(1, 0x1, 100);
+    function test_claimPayment_zk_fail_noOrderId() public {
+        hoax(marketMaker, 100 wei);
+        vm.expectRevert("Transfer not found."); //Won't match to a random transfer number
+        yab_caller.claimPaymentZKSync{value: 100}(1, 0x1, 100, 1, 1);
     }
 
-    function test_claimPayment_sn() public {
-        // hoax(marketMaker, 100 wei);
-        // yab_caller.transfer{value: 100}(1, 0x1, 100, PaymentRegistry.Chain.Starknet);  
-        // hoax(marketMaker, 100 wei);
-        // yab_caller.claimPayment(1, 0x1, 100);
+    function test_claimPayment_zk() public {
+        hoax(marketMaker, 100 wei);
+        yab_caller.transfer{value: 100}(1, 0x1, 100, PaymentRegistry.Chain.ZKSync);  
+        hoax(marketMaker, 1000 wei);
+        // yab_caller.claimPaymentZKSync(1, 0x1, 100, 500, 1); //wip
     }
 
-    function test_claimPayment_sn_maxInt() public {
-        // uint256 maxInt = type(uint256).max;
+    function test_claimPayment_zk_maxInt() public {
+        uint256 maxInt = type(uint256).max;
         
-        // vm.deal(marketMaker, maxInt);
-        // vm.startPrank(marketMaker);
+        vm.deal(marketMaker, maxInt);
+        vm.startPrank(marketMaker);
 
-        // yab_caller.transfer{value: maxInt}(1, 0x1, maxInt, PaymentRegistry.Chain.Starknet);
-        // yab_caller.claimPayment(1, 0x1, maxInt);
-        // vm.stopPrank();
+        yab_caller.transfer{value: maxInt}(1, 0x1, maxInt, PaymentRegistry.Chain.ZKSync);
+        // yab_caller.claimPaymentZKSync(1, 0x1, maxInt); //wip
+        vm.stopPrank();
     }
 
-    function test_claimPayment_sn_minInt() public {
-        // hoax(marketMaker, 1 wei);
-        // yab_caller.transfer{value: 1}(1, 0x1, 1, PaymentRegistry.Chain.Starknet);
-        // hoax(marketMaker, 1 wei);
-        // yab_caller.claimPayment(1, 0x1, 1);
+    function test_claimPayment_zk_minInt() public {
+        hoax(marketMaker, 1 wei);
+        yab_caller.transfer{value: 1}(1, 0x1, 1, PaymentRegistry.Chain.ZKSync);
+        hoax(marketMaker, 1 wei);
+        // yab_caller.claimPaymentZKSync(1, 0x1, 1); //wip
     }
 }
