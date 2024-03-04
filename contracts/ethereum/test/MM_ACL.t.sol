@@ -29,20 +29,18 @@ contract TransferTest is Test {
         vm.stopPrank();
     }
 
-// TODO fix test
-//     function test_getMMAddress() public {
-//         address mmAddress = yab_caller.getMMAddress();
-//         assertEq(mmAddress, marketMaker);
-//     }
+    function test_getMarketMaker() public {
+        address mmAddress = yab_caller.marketMaker();
+        assertEq(mmAddress, marketMaker);
+    }
 
-//TODO fix test
-    // function test_set_and_get_MMAddress_deployer() public {
-    //     vm.startPrank(deployer);
-    //     address alice = makeAddr("alice");
-    //     yab_caller.setMMAddress(alice);
-    //     assertEq(yab_caller.getMMAddress(), alice);
-    //     vm.stopPrank();
-    // }
+    function test_set_and_get_MMAddress_deployer() public {
+        vm.startPrank(deployer);
+        address alice = makeAddr("alice");
+        yab_caller.setMMAddress(alice);
+        assertEq(yab_caller.marketMaker(), alice);
+        vm.stopPrank();
+    }
 
     function test_set_MMAddress_not_owner() public {
         address bob = makeAddr("bob");
