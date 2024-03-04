@@ -64,4 +64,16 @@ contract TransferTest is Test {
         vm.expectRevert("Only Owner or MM can call this function");
         yab_caller.claimPayment{value: 100}(1, 0x1, 100);
     }
+
+    function test_transfer_zk_fail_notOwnerOrMM() public {
+        hoax(makeAddr("bob"), 100 wei);
+        vm.expectRevert("Only Owner or MM can call this function");
+        yab_caller.transfer{value: 100}(1, 0x1, 100, PaymentRegistry.Chain.ZKSync);
+    }
+
+    function test_claimPayment_zk_fail_notOwnerOrMM() public {
+        hoax(makeAddr("bob"), 100 wei);
+        vm.expectRevert("Only Owner or MM can call this function");
+        yab_caller.claimPaymentZKSync{value: 100}(1, 0x1, 100, 1, 1);
+    }
 }
