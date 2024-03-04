@@ -6,12 +6,16 @@ cd contracts/ethereum
 
 printf "${GREEN}\n=> [ETH] Deploying ERC1967Proxy & PaymentRegistry ${COLOR_RESET}\n"
 
-RESULT_LOG=$(forge script ../zksync/scripts/deploy_paymentRegistry.s.sol --rpc-url http://localhost:8545 --broadcast)
+echo "Going in deploy.s.sol:\n"
+pwd
+RESULT_LOG=$(forge script ./test/ZKsync/deploy_paymentRegistry.s.sol --rpc-url http://localhost:8545 --broadcast)
 # echo "$RESULT_LOG" #uncomment this line for debugging in detail
 
 # Getting result addresses
 PAYMENT_REGISTRY_PROXY_ADDRESS=$(echo "$RESULT_LOG" | grep -Eo '0: address ([^\n]+)' | awk '{print $NF}')
 PAYMENT_REGISTRY_ADDRESS=$(echo "$RESULT_LOG" | grep -Eo '1: address ([^\n]+)' | awk '{print $NF}')
+
+echo "$RESULT_LOG"
 
 if [ -z "$PAYMENT_REGISTRY_PROXY_ADDRESS" ]; then
     printf "\n${RED}ERROR:${COLOR_RESET}\n"

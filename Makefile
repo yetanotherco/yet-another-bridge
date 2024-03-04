@@ -72,9 +72,12 @@ zksync-build: zksync-clean
 zksync-test:
 
 .ONESHELL:
-zksync-test:
-	@. ./contracts/ethereum/.env && . ./contracts/zksync/scripts/deploy_paymentRegistry.sh
-# @cd ./contracts/zksync/ && yarn test
+zksync-test-integration: ethereum-build
+	@. ./contracts/ethereum/.env && . ./contracts/ethereum/test/ZKsync/deploy_paymentRegistry.sh #works but its weird to have the file here
+#wip
+
+zksync-test: zksync-build
+	@cd ./contracts/zksync/ && yarn test
 
 
 zksync-deploy: zksync-build
