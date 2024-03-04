@@ -29,11 +29,11 @@ contract TransferTest is Test {
         vm.stopPrank();
     }
 
-//TODO fix test
-    // function test_getMMAddress() public {
-    //     address mmAddress = yab_caller.getMMAddress();
-    //     assertEq(mmAddress, marketMaker);
-    // }
+// TODO fix test
+//     function test_getMMAddress() public {
+//         address mmAddress = yab_caller.getMMAddress();
+//         assertEq(mmAddress, marketMaker);
+//     }
 
 //TODO fix test
     // function test_set_and_get_MMAddress_deployer() public {
