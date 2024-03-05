@@ -83,10 +83,13 @@ zksync-deploy: zksync-build
 	@. ./contracts/zksync/.env && . ./contracts/zksync/deploy.sh
 
 
+# remove this .oneshell? it is a one liner
 .ONESHELL:
 zksync-deploy-and-connect: zksync-build
 	@. ./contracts/ethereum/.env && . ./contracts/zksync/.env && . ./contracts/zksync/deploy.sh && . ./contracts/ethereum/set_zksync_escrow.sh
 
+zksync-connect:
+	@. ./contracts/ethereum/.env && . ./contracts/zksync/.env && . ./contracts/ethereum/set_zksync_escrow.sh
 # zksync-upgrade: WIP
 
 
