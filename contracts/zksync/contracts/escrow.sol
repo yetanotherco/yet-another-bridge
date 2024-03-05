@@ -23,6 +23,7 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
     
     event ClaimPayment(uint256 order_id, address claimerAddress, uint256 amount);
 
+
     //storage
     uint256 private _current_order_id; 
     mapping(uint256 => Order) private _orders;
@@ -101,12 +102,14 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
         _unpause();
     }
 
+    //TODO consider removing recipient address and amount from params, they can be getted from contract storage
     // l1 handler
     function claim_payment(
         uint256 order_id,
         address recipient_address,
         uint256 amount
     ) public whenNotPaused {
+        //todo resolve bug: from address is not L1 contract
         require(msg.sender == ethereum_payment_registry, 'Only PAYMENT_REGISTRY can call');
         require(_orders_pending[order_id], 'Order claimed or nonexistent');
 
@@ -123,6 +126,7 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
         emit ClaimPayment(order_id, mm_zksync_wallet, amount);
     }
 
+    //todo for upgradeable in zksync:
     // function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
 }

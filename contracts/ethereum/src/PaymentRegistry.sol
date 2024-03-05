@@ -22,6 +22,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     event ModifiedZKSyncEscrowAddress(address newEscrowAddress);
     event ModifiedStarknetEscrowAddress(uint256 newEscrowAddress);
     event ModifiedStarknetClaimPaymentSelector(uint256 newEscrowClaimPaymentSelector);
+    event ClaimPayment(TransferInfo transferInfo);
 
     mapping(bytes32 => TransferInfo) public transfers;
     address public marketMaker;
@@ -59,7 +60,6 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         require(destAddress != 0, "Invalid destination address.");
         require(msg.value > 0, "Invalid amount, should be higher than 0.");
 
-
         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, msg.value, chainId));
         require(transfers[index].isUsed == false, "Transfer already processed.");
 
@@ -90,6 +90,8 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             payload);
     }
 
+// why is destAddress a uint256? should be address?
+// oh, because sn address is not "address" typew]
     function claimPaymentZKSync(
         uint256 orderId, uint256 destAddress, uint256 amount,
         uint256 gasLimit,
@@ -99,40 +101,27 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         TransferInfo storage transferInfo = transfers[index];
         require(transferInfo.isUsed == true, "Transfer not found.");
 
-            // IZkSync zksync = IZkSync(zkSyncAddress);
-            // zksync.requestL2Transaction{value: msg.value}(
-            //     ZKSyncEscrowAddress,    //address _contractL2,
-            //     0,                      //uint256 _l2Value,
-            //     payload,                //bytes calldata _calldata,
-            //     msg.value,              //uint256 _l2GasLimit,
-            //     REQUIRED_L1_TO_L2_GAS_PER_PUBDATA_LIMIT, //uint256 _l2GasPerPubdataByteLimit,
-            //     new bytes[](0),         //bytes[] calldata _factoryDeps,
-            //     msg.sender              //address _refundRecipient
-            // );
-            
-            // L1 handler in escrow:
-                // function claim_payment(
-                //     uint256 order_id,
-                //     address recipient_address,
-                //     uint256 amount
-                // )
+        //epa epa funciona ojo al piojo
+        bytes4 selector = 0xa5168739;//bytes4("0xa5168739");
+        bytes memory messageToL2 = abi.encodeWithSelector(
+            selector,
+            orderId,
+            transferInfo.destAddress,
+            transferInfo.amount
+        );
 
-        bytes memory payload = new bytes(32+32+32); //orderid, address(u256), amount, =96
-        
-        bytes32 p0 = bytes32(orderId);
-        bytes32 p1 = bytes32(transferInfo.destAddress);
-        bytes32 p2 = bytes32(amount);
+        //TODO send message to mailbox, right? or to zksync core? TO diamond proxy!
+        _ZKSyncMailbox.requestL2Transaction{value: msg.value}(
+            ZKSyncEscrowAddress, //L2 contract called
+            0, //msg.value
+            messageToL2, //msg.calldata
+            gasLimit, 
+            gasPerPubdataByteLimit, 
+            new bytes[](0), //factory dependencies
+            msg.sender //refund recipient
+        );
 
-        for(uint i=0; i < 32; i++){
-            payload[64+i] = p0[i];  //write p0 in first 32 bytes
-            payload[32+i] = p1[i];  //write p1 in middle 32 bytes
-            payload[i] = p2[i];     //write p2 in last 32 bytes
-        }
-
-        
-        _ZKSyncMailbox.requestL2Transaction{value: msg.value}(ZKSyncEscrowAddress, 0, 
-            payload, gasLimit, gasPerPubdataByteLimit, new bytes[](0), msg.sender);
-
+        emit ClaimPayment(transferInfo);
     }
 
     function setStarknetEscrowAddress(uint256 newStarknetEscrowAddress) external onlyOwner {
