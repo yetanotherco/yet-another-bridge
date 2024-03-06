@@ -41,7 +41,7 @@ contract TransferTest is Test {
 
     function testTransfer_fail_notOwnerOrMM() public {
         hoax(makeAddr("bob"), 100 wei);
-        vm.expectRevert("Only Owner or MM can call this function");
+        vm.expectRevert(abi.encodePacked("o1"));
         yab_caller.transfer{value: 100}(1, 0x1);
     }
 
@@ -55,13 +55,13 @@ contract TransferTest is Test {
 
     function testClaimPayment_fail_noOrderId() public {
         hoax(marketMaker, 100 wei);
-        vm.expectRevert("Transfer not found."); //Won't match to a random transfer number
+        vm.expectRevert(abi.encodePacked("c1")); //Won't match to a random transfer number
         yab_caller.claimPayment{value: 100}(1, 0x1, 100);
     }
 
     function testClaimPayment_fail_notOwnerOrMM() public {
         hoax(makeAddr("bob"), 100 wei);
-        vm.expectRevert("Only Owner or MM can call this function");
+        vm.expectRevert(abi.encodePacked("o1"));
         yab_caller.claimPayment{value: 100}(1, 0x1, 100);
     }
 

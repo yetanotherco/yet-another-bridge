@@ -46,24 +46,24 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
     // changed removed amount param
     function transfer(uint256 orderId, uint256 destAddress) external payable onlyOwnerOrMM {
-        require(destAddress != 0, "Invalid destination address.");
-        require(msg.value > 0, "Invalid amount, should be higher than 0.");
+        require(destAddress != 0, "t1");
+        require(msg.value > 0, "t2");
 
         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, msg.value));
-        require(transfers[index].isUsed == false, "Transfer already processed.");
+        require(transfers[index].isUsed == false, "t3");
 
         transfers[index] = TransferInfo({destAddress: destAddress, amount: msg.value, isUsed: true});
 
         (bool success,) = payable(address(uint160(destAddress))).call{value: msg.value}("");
 
-        require(success, "Transfer failed.");
+        require(success, "t4");
         emit Transfer(orderId, msg.sender, transfers[index]);
     }
 
     function claimPayment(uint256 orderId, uint256 destAddress, uint256 amount) external payable onlyOwnerOrMM {
         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount));
         TransferInfo storage transferInfo = transfers[index];
-        require(transferInfo.isUsed == true, "Transfer not found.");
+        require(transferInfo.isUsed == true, "c1");
 
         uint256[] memory payload = new uint256[](5);
         payload[0] = uint128(orderId); // low
@@ -108,7 +108,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     }
 
     modifier onlyOwnerOrMM {
-        require(msg.sender == owner() || msg.sender == _marketMaker, "Only Owner or MM can call this function");
+        require(msg.sender == owner() || msg.sender == _marketMaker, "o1");
         _;
     }
 
