@@ -243,11 +243,12 @@ mod Escrow {
         // order_id: u256,
         // recipient_address: EthAddress,
         // amount: u256
+        self.pausable.assert_not_paused();
+        
         let order_id_u256: u256 = order_id.into();
         let recipient_address_ethaddress: EthAddress = recipient_address.try_into().unwrap();
         let amount_u256: u256 = amount.into();
 
-        self.pausable.assert_not_paused();
         let eth_transfer_contract_felt: felt252 = self.eth_transfer_contract.read().into();
         assert(from_address == eth_transfer_contract_felt, 'Only PAYMENT_REGISTRY_CONTRACT');
         assert(self.orders_pending.read(order_id_u256), 'Order claimed or nonexistent');
