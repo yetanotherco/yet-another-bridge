@@ -8,16 +8,17 @@ import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/U
 
 contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     struct TransferInfo {
-        uint256 destAddress;
-        uint256 amount;
+        uint256 destAddress; //cant lower size since SN address is uint256
+        uint256 amount; //cant lower size since msg.value is uint256
         bool isUsed;
     }
 
+    //changing to uint32 is more expensive
     event Transfer(uint256 indexed orderId, address srcAddress, TransferInfo transferInfo);
     event ModifiedEscrowAddress(uint256 newEscrowAddress);
     event ModifiedEscrowClaimPaymentSelector(uint256 newEscrowClaimPaymentSelector);
 
-    mapping(bytes32 => TransferInfo) public transfers;
+    mapping(bytes32 => TransferInfo) private transfers;
     address private _marketMaker;
     IStarknetMessaging private _snMessaging;
     uint256 private _snEscrowAddress;
@@ -38,20 +39,20 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
         _snMessaging = IStarknetMessaging(snMessaging);
         _snEscrowAddress = snEscrowAddress;
-        _snEscrowClaimPaymentSelector = snEscrowClaimPaymentSelector;
+        _snEscrowClaimPaymentSelector = snEscrowClaimPaymentSelector; //recieving from param is cheaper
         _marketMaker = marketMaker;
     }
 
 
-    function transfer(uint256 orderId, uint256 destAddress, uint256 amount) external payable onlyOwnerOrMM {
+    // changed removed amount param
+    function transfer(uint256 orderId, uint256 destAddress) external payable onlyOwnerOrMM {
         require(destAddress != 0, "Invalid destination address.");
-        require(amount > 0, "Invalid amount, should be higher than 0.");
-        require(msg.value == amount, "Invalid amount, should match msg.value.");
+        require(msg.value > 0, "Invalid amount, should be higher than 0.");
 
-        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount));
+        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, msg.value));
         require(transfers[index].isUsed == false, "Transfer already processed.");
 
-        transfers[index] = TransferInfo({destAddress: destAddress, amount: amount, isUsed: true});
+        transfers[index] = TransferInfo({destAddress: destAddress, amount: msg.value, isUsed: true});
 
         (bool success,) = payable(address(uint160(destAddress))).call{value: msg.value}("");
 

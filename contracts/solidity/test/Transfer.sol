@@ -36,18 +36,18 @@ contract TransferTest is Test {
 
     function testTransfer_mm() public {
         hoax(marketMaker, 100 wei);
-        yab_caller.transfer{value: 100}(1, 0x1, 100);
+        yab_caller.transfer{value: 100}(1, 0x1);
     }
 
     function testTransfer_fail_notOwnerOrMM() public {
         hoax(makeAddr("bob"), 100 wei);
         vm.expectRevert("Only Owner or MM can call this function");
-        yab_caller.transfer{value: 100}(1, 0x1, 100);
+        yab_caller.transfer{value: 100}(1, 0x1);
     }
 
     function testClaimPayment_mm() public {
         hoax(marketMaker, 100 wei);
-        yab_caller.transfer{value: 100}(1, 0x1, 100);
+        yab_caller.transfer{value: 100}(1, 0x1);
 
         hoax(marketMaker, 100 wei);
         yab_caller.claimPayment{value: 100}(1, 0x1, 100);
@@ -67,7 +67,7 @@ contract TransferTest is Test {
 
     function testClaimPayment() public {
         hoax(marketMaker, 100 wei);
-        yab_caller.transfer{value: 100}(1, 0x1, 100);  
+        yab_caller.transfer{value: 100}(1, 0x1);  
         hoax(marketMaker, 100 wei);
         yab_caller.claimPayment(1, 0x1, 100);
     }
@@ -78,14 +78,14 @@ contract TransferTest is Test {
         vm.deal(marketMaker, maxInt);
         vm.startPrank(marketMaker);
 
-        yab_caller.transfer{value: maxInt}(1, 0x1, maxInt);
+        yab_caller.transfer{value: maxInt}(1, 0x1);
         yab_caller.claimPayment(1, 0x1, maxInt);
         vm.stopPrank();
     }
 
     function testClaimPaymentLow() public {
         hoax(marketMaker, 1 wei);
-        yab_caller.transfer{value: 1}(1, 0x1, 1);
+        yab_caller.transfer{value: 1}(1, 0x1);
         hoax(marketMaker, 1 wei);
         yab_caller.claimPayment(1, 0x1, 1);
     }
