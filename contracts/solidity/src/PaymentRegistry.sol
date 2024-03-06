@@ -56,12 +56,14 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         require(msg.value >= 1, "t2"); //changed ">=" is cheaper than ">"
 
         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, msg.value));
-        require(transfers[index].isUsed == false, "t3");
+        require(transfers[index].isUsed == false, "t3"); //acts as reentrancy guard
 
         transfers[index] = TransferInfo({destAddress: destAddress, amount: msg.value, isUsed: true});
 
         //todo following call is 30k expensive, try to make it cheaper
-        (bool success,) = payable(address(uint160(destAddress))).call{value: msg.value}("");
+        (bool success,) = payable(address(uint160(destAddress))).call{value: msg.value, gas: 700}("");
+        // (bool success) = payable(address(uint160(destAddress))).send(msg.value); //700 gas cheaper, todo is it safe?
+        
         require(success, "t4");
 
         emit Transfer(orderId, msg.sender, transfers[index]);
