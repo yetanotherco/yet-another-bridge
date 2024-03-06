@@ -180,20 +180,24 @@ mod Escrow {
     #[test]
     fn test_fail_random_eth_user_calls_l1_handler() {
         let (escrow, _) = setup();
-        let random_value: felt252 = 123.try_into().unwrap();
-        let data: Array<felt252> = array![random_value, random_value, random_value, random_value];
-        let mut payload_buffer: Array<felt252> = ArrayTrait::new();
-        data.serialize(ref payload_buffer);
 
         let mut l1_handler = L1HandlerTrait::new(
             contract_address: escrow.contract_address,
-            function_name: 'claim_payment',
+            function_name: 'claim_payment'
         );
-        l1_handler.from_address = ETH_USER().into();
 
+        let order_id_felt252: felt252 = 1.try_into().unwrap();
+        let recipient_address_felt252: felt252 = 1.recipient_address.into();
+        let amount_felt252: felt252 = 1.try_into().unwrap();
+
+        let mut payload_buffer: Array<felt252> = ArrayTrait::new();
+        Serde::serialize(@order_id_felt252, ref payload_buffer);
+        Serde::serialize(@recipient_address_felt252, ref payload_buffer);
+        Serde::serialize(@amount_felt252, ref payload_buffer);
+
+        l1_handler.from_address = ETH_USER().into();
         l1_handler.payload = payload_buffer.span();
 
-        // same as "Should Panic" but for the L1 handler function
         match l1_handler.execute() {
             Result::Ok(_) => panic_with_felt252('shouldve panicked'),
             Result::Err(RevertedTransaction) => {
