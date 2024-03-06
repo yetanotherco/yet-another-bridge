@@ -20,7 +20,7 @@ ethereum-build: ethereum-clean
 	@cd ./contracts/solidity/ && forge build
 
 ethereum-test: ethereum-clean
-	@cd ./contracts/solidity/ && forge test
+	@cd ./contracts/solidity/ && forge test --gas-report
 
 ethereum-deploy: ethereum-build
 	@. ./contracts/solidity/.env && . ./contracts/solidity/deploy.sh

@@ -1,0 +1,50 @@
+Compiling 40 files with 0.8.24
+Solc 0.8.24 finished in 1.17s
+Compiler run [32msuccessful![0m
+
+Ran 4 tests for test/MM_ACL.sol:TransferTest
+[32m[PASS][0m test_getMMAddress() (gas: 14684)
+[32m[PASS][0m test_get_owner() (gas: 14834)
+[32m[PASS][0m test_set_MMAddress_not_owner() (gas: 38622)
+[32m[PASS][0m test_set_and_get_MMAddress_deployer() (gas: 47526)
+Suite result: [32mok[0m. [32m4[0m passed; [31m0[0m failed; [33m0[0m skipped; finished in 1.11ms (448.13µs CPU time)
+
+Ran 8 tests for test/Transfer.sol:TransferTest
+[32m[PASS][0m testClaimPayment() (gas: 200512)
+[32m[PASS][0m testClaimPaymentLow() (gas: 200438)
+[32m[PASS][0m testClaimPaymentOver() (gas: 200703)
+[32m[PASS][0m testClaimPayment_fail_noOrderId() (gas: 51442)
+[32m[PASS][0m testClaimPayment_fail_notOwnerOrMM() (gas: 48567)
+[32m[PASS][0m testClaimPayment_mm() (gas: 213850)
+[32m[PASS][0m testTransfer_fail_notOwnerOrMM() (gas: 48492)
+[32m[PASS][0m testTransfer_mm() (gas: 153048)
+Suite result: [32mok[0m. [32m8[0m passed; [31m0[0m failed; [33m0[0m skipped; finished in 1.12ms (861.12µs CPU time)
+| lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol:ERC1967Proxy contract |                 |        |        |        |         |
+|----------------------------------------------------------------------------------------------------------------------------------|-----------------|--------|--------|--------|---------|
+| Deployment Cost                                                                                                                  | Deployment Size |        |        |        |         |
+| 130457                                                                                                                           | 1130            |        |        |        |         |
+| Function Name                                                                                                                    | min             | avg    | median | max    | # calls |
+| claimPayment                                                                                                                     | 31211           | 42598  | 45931  | 52631  | 6       |
+| getMMAddress                                                                                                                     | 765             | 4015   | 4015   | 7265   | 2       |
+| initialize                                                                                                                       | 144784          | 144784 | 144784 | 144784 | 12      |
+| owner                                                                                                                            | 7325            | 7325   | 7325   | 7325   | 1       |
+| setMMAddress                                                                                                                     | 28990           | 31490  | 31490  | 33991  | 2       |
+| transfer                                                                                                                         | 31168           | 118292 | 135643 | 136015 | 6       |
+
+
+| src/PaymentRegistry.sol:PaymentRegistry contract |                 |        |        |        |         |
+|--------------------------------------------------|-----------------|--------|--------|--------|---------|
+| Deployment Cost                                  | Deployment Size |        |        |        |         |
+| 1155326                                          | 5236            |        |        |        |         |
+| Function Name                                    | min             | avg    | median | max    | # calls |
+| claimPayment                                     | 4809            | 16147  | 19548  | 26248  | 6       |
+| getMMAddress                                     | 375             | 1375   | 1375   | 2375   | 2       |
+| initialize                                       | 117439          | 117439 | 117439 | 117439 | 12      |
+| owner                                            | 2435            | 2435   | 2435   | 2435   | 1       |
+| setMMAddress                                     | 2661            | 5165   | 5165   | 7669   | 2       |
+| transfer                                         | 4766            | 91844  | 109260 | 109260 | 6       |
+
+
+
+
+Ran 2 test suites in 6.83ms (2.22ms CPU time): [32m12[0m tests passed, [31m0[0m failed, [33m0[0m skipped (12 total tests)
