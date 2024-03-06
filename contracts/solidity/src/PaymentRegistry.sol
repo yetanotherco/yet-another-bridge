@@ -15,7 +15,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
     //changing to uint32 is more expensive
     //srcAddress is for explorer, dont remove
-    event Transfer(uint256 indexed orderId, address srcAddress, TransferInfo transferInfo);
+    event Transfer(uint256 orderId, address srcAddress, TransferInfo transferInfo);
     
     //changed removed unnecesarry Events. Their new values can be getted with their getters
     // for now these 2 events are not necesarry since we are the only Market Makers
@@ -50,17 +50,20 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
     // changed removed amount param
     function transfer(uint256 orderId, uint256 destAddress) external payable onlyOwnerOrMM {
-        require(destAddress != 0, "t1");
-        require(msg.value > 0, "t2");
+        //changed removed following require:
+        // require(destAddress != 0, "t1");
+        //todo maybe remove this check as well:
+        require(msg.value >= 1, "t2"); //changed ">=" is cheaper than ">"
 
         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, msg.value));
         require(transfers[index].isUsed == false, "t3");
 
         transfers[index] = TransferInfo({destAddress: destAddress, amount: msg.value, isUsed: true});
 
+        //todo following call is 30k expensive, try to make it cheaper
         (bool success,) = payable(address(uint160(destAddress))).call{value: msg.value}("");
-
         require(success, "t4");
+
         emit Transfer(orderId, msg.sender, transfers[index]);
     }
 
