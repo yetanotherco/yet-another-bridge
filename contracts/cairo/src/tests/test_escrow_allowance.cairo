@@ -187,7 +187,8 @@ mod Escrow {
         );
 
         let order_id_felt252: felt252 = 1.try_into().unwrap();
-        let recipient_address_felt252: felt252 = 1.recipient_address.into();
+        let recipient_address_felt252: felt252 = MM_ETHEREUM().into();
+        
         let amount_felt252: felt252 = 1.try_into().unwrap();
 
         let mut payload_buffer: Array<felt252> = ArrayTrait::new();
