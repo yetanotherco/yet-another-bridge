@@ -180,7 +180,8 @@ mod Escrow {
     #[test]
     fn test_fail_random_eth_user_calls_l1_handler() {
         let (escrow, _) = setup();
-        let data: Array<felt252> = array![1.into(), MM_ETHEREUM().into(), 3.into(), 4.into()];
+        let random_value: felt252 = 123.try_into().unwrap();
+        let data: Array<felt252> = array![random_value, random_value, random_value, random_value];
         let mut payload_buffer: Array<felt252> = ArrayTrait::new();
         data.serialize(ref payload_buffer);
 
