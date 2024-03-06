@@ -66,20 +66,20 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         TransferInfo storage transferInfo = transfers[index];
         require(transferInfo.isUsed == true, "c1");
 
-        uint128[] memory payload = new uint128[](5);
-        payload[0] = uint128(orderId); // low
-        payload[1] = uint128(orderId >> 128); // high
-        payload[2] = transferInfo.destAddress;
-        payload[3] = uint128(amount); // low
-        payload[4] = uint128(amount >> 128); // high
+        // uint256[] memory payload = new uint256[](5);
+        // payload[0] = uint128(orderId); // low
+        // payload[1] = uint128(orderId >> 128); // high
+        // payload[2] = transferInfo.destAddress;
+        // payload[3] = uint128(amount); // low
+        // payload[4] = uint128(amount >> 128); // high
 
-        // //todo check in integration test if it works
-        // uint256[] memory payload = new uint256[](3);
-        // payload[0] = orderId; //unlucky waste of space
-        // // payload[1] = uint128(orderId >> 128); // high
-        // payload[1] = transferInfo.destAddress;
-        // payload[2] = amount; // low
-        // // payload[4] = uint128(amount >> 128); // high
+        //todo check in integration test if it works
+        uint256[] memory payload = new uint256[](3);
+        payload[0] = uint256(orderId); //unlucky waste of space
+        // payload[1] = uint128(orderId >> 128); // high
+        payload[1] = uint256(transferInfo.destAddress);
+        payload[2] = uint256(amount); // low
+        // payload[4] = uint128(amount >> 128); // high
         
         _snMessaging.sendMessageToL2{value: msg.value}(
             _snEscrowAddress,
