@@ -88,6 +88,8 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             StarknetEscrowAddress,
             StarknetEscrowClaimPaymentSelector,
             payload);
+
+        emit ClaimPayment(transferInfo);
     }
 
 // why is destAddress a uint256? should be address?
@@ -101,8 +103,8 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         TransferInfo storage transferInfo = transfers[index];
         require(transferInfo.isUsed == true, "Transfer not found.");
 
-        //epa epa funciona ojo al piojo
-        bytes4 selector = 0xa5168739;//bytes4("0xa5168739");
+        //todo change place of this var
+        bytes4 selector = 0xa5168739; //claim_payment selector in ZKSync
         bytes memory messageToL2 = abi.encodeWithSelector(
             selector,
             orderId,
@@ -134,6 +136,8 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         emit ModifiedZKSyncEscrowAddress(newZKSyncEscrowAddress);        
     }
 
+    //todo change name to something more starknet-ish
+    //this todo applies for this whole contract, but in a future change because MM-bot would need a refactor.
     function setStarknetClaimPaymentSelector(uint256 NewStarknetEscrowClaimPaymentSelector) external onlyOwner {
         StarknetEscrowClaimPaymentSelector = NewStarknetEscrowClaimPaymentSelector;
         emit ModifiedStarknetClaimPaymentSelector(StarknetEscrowClaimPaymentSelector);
