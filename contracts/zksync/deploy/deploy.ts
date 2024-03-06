@@ -2,6 +2,7 @@ import { deployContractWithProxy } from "./utils";
 import { deployContract } from "./utils";
 // import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import * as dotenv from 'dotenv';
+import { utils } from "zksync-ethers";
 
 
 // It will deploy a Escrow contract to selected network 
@@ -22,6 +23,8 @@ export default async function () {
     throw new Error("Missing required environment variables.");
   }
 
-  const initResult = await escrow.initialize(ethereum_payment_registry, mm_ethereum_wallet, mm_zksync_wallet, native_token_eth_in_zksync);
+  const PaymentRegistryL2Alias = utils.applyL1ToL2Alias(ethereum_payment_registry)
+
+  const initResult = await escrow.initialize(PaymentRegistryL2Alias, mm_ethereum_wallet, mm_zksync_wallet, native_token_eth_in_zksync);
   // console.log("Initialization result:", initResult);
 }

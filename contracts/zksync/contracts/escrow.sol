@@ -31,6 +31,7 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
     mapping(uint256 => address) private _orders_senders;
     mapping(uint256 => uint256) private _orders_timestamps;
     address public ethereum_payment_registry; //called eth_transfer_contract in cairo
+    //todo why this variable?
     address public mm_ethereum_wallet;
     address public mm_zksync_wallet; //TODO verify this is address type, creo que si
     ERC20 public native_token_eth_in_zksync; //TODO make this value internal and hardcoded
@@ -75,7 +76,7 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
 
         emit SetOrder(_current_order_id-1, recipient_address, bridge_amount, fee);
 
-        return _current_order_id;
+        return _current_order_id-1;
     }
 
     function is_order_pending(uint256 order_id) public view returns (bool) {
@@ -102,7 +103,7 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
         _unpause();
     }
 
-    //TODO consider removing recipient address and amount from params, they can be getted from contract storage
+    //recipient_address and amount are necesarry because this values are the ones Transferred by MM on L1
     // l1 handler
     function claim_payment(
         uint256 order_id,
