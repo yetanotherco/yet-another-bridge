@@ -240,21 +240,28 @@ mod Escrow {
         recipient_address: felt252,
         amount: felt252
     ) {
+        // order_id: u256,
+        // recipient_address: EthAddress,
+        // amount: u256
+        let order_id_u256: u256 = order_id.into();
+        let recipient_address_ethaddress: EthAddress = recipient_address.try_into().unwrap();
+        let amount_u256: u256 = amount.into();
+
         self.pausable.assert_not_paused();
         let eth_transfer_contract_felt: felt252 = self.eth_transfer_contract.read().into();
         assert(from_address == eth_transfer_contract_felt, 'Only PAYMENT_REGISTRY_CONTRACT');
-        assert(self.orders_pending.read(order_id), 'Order claimed or nonexistent');
+        assert(self.orders_pending.read(order_id_u256), 'Order claimed or nonexistent');
 
-        let order = self.orders.read(order_id);
-        assert(order.recipient_address == recipient_address, 'recipient_address not match L1');
-        assert(order.amount == amount, 'amount not match L1');
+        let order = self.orders.read(order_id_u256);
+        assert(order.recipient_address == recipient_address_ethaddress, 'recipient_address not match L1');
+        assert(order.amount == amount_u256, 'amount not match L1');
 
-        self.orders_pending.write(order_id, false);
+        self.orders_pending.write(order_id_u256, false);
         let payment_amount = order.amount + order.fee;
 
         IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
             .transfer(self.mm_starknet_wallet.read(), payment_amount);
 
-        self.emit(ClaimPayment { order_id, address: self.mm_starknet_wallet.read(), amount });
+        self.emit(ClaimPayment { order_id: order_id_u256, address: self.mm_starknet_wallet.read(), amount: amount_u256 });
     }
 }
