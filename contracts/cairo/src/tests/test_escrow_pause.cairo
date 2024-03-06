@@ -250,9 +250,14 @@ mod Escrow {
         escrow.pause();
         stop_prank(CheatTarget::One(escrow.contract_address));
 
-        let data: Array<felt252> = array![1, MM_ETHEREUM().into(), 3, 4];
+        let order_id_felt252: felt252 = 1.try_into().unwrap();
+        let recipient_address_felt252: felt252 = MM_ETHEREUM().into();
+        let amount_felt252: felt252 = 1.try_into().unwrap();
         let mut payload_buffer: Array<felt252> = ArrayTrait::new();
-        data.serialize(ref payload_buffer);
+        Serde::serialize(@order_id_felt252, ref payload_buffer);
+        Serde::serialize(@recipient_address_felt252, ref payload_buffer);
+        Serde::serialize(@amount_felt252, ref payload_buffer);
+
         let mut l1_handler = L1HandlerTrait::new(
             contract_address: escrow.contract_address,
             function_name: 'claim_payment',
