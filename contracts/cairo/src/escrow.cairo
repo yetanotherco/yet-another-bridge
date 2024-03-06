@@ -236,9 +236,9 @@ mod Escrow {
     fn claim_payment(
         ref self: ContractState,
         from_address: felt252,
-        order_id: u256,
-        recipient_address: EthAddress,
-        amount: u256
+        order_id: felt252,
+        recipient_address: felt252,
+        amount: felt252
     ) {
         self.pausable.assert_not_paused();
         let eth_transfer_contract_felt: felt252 = self.eth_transfer_contract.read().into();
