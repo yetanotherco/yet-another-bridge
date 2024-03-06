@@ -180,9 +180,10 @@ mod Escrow {
     #[test]
     fn test_fail_random_eth_user_calls_l1_handler() {
         let (escrow, _) = setup();
-        let data: Array<felt252> = array![1, MM_ETHEREUM().into(), 3, 4];
+        let data: Array<felt252> = array![1.into(), MM_ETHEREUM().into(), 3.into(), 4.into()];
         let mut payload_buffer: Array<felt252> = ArrayTrait::new();
         data.serialize(ref payload_buffer);
+
         let mut l1_handler = L1HandlerTrait::new(
             contract_address: escrow.contract_address,
             function_name: 'claim_payment',
