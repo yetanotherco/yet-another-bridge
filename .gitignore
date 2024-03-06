@@ -1,2 +1,11 @@
 .idea
 .env
+
+#temporal gitignore of renamed folders:
+contracts/ethereum/*
+contracts/starknet/*
+contracts/zksync/*
+#remove this when PR#170 is closed
+
+
+
