@@ -1,3 +1,8 @@
 .idea
 .env
 .DS_Store
+
+#temporal gitignore of renamed folders:
+contracts/solidity/*
+contracts/cairo/*
+#remove this when PR#170 is closed
