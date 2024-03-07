@@ -14,11 +14,14 @@ from persistence.error_dao import ErrorDao
 from persistence.order_dao import OrderDao
 from services import ethereum
 from services import starknet
+from services.executors.order_executor import OrderExecutor
+from services.indexers.starknet_order_indexer import StarknetOrderIndexer
 from services.overall_fee_calculator import estimate_overall_fee
 from services.order_service import OrderService
 from services.payment_claimer.ethereum_payment_claimer import EthereumPaymentClaimer
 from services.payment_claimer.herodotus_payment_claimer import HerodotusPaymentClaimer
 from services.payment_claimer.payment_claimer import PaymentClaimer
+from services.processors.orders_processor import OrdersProcessor
 
 setup_logger()
 logger = logging.getLogger(__name__)
@@ -44,6 +47,10 @@ async def run():
     eth_lock = asyncio.Lock()
     herodotus_semaphore = asyncio.Semaphore(100)
 
+    order_indexer = StarknetOrderIndexer(order_service)
+    order_executor = OrderExecutor(order_service, payment_claimer, eth_lock, herodotus_semaphore, MAX_ETH_TRANSFER_WEI)
+    orders_processor = OrdersProcessor(order_indexer, order_executor)
+
     (schedule.every(PROCESS_NO_BALANCE_ORDERS_MINUTES_TIMER).minutes
      .do(failed_orders_job, order_service, eth_lock, herodotus_semaphore))
     (schedule.every(PROCESS_ACCEPTED_BLOCKS_MINUTES_TIMER).minutes
@@ -60,11 +67,8 @@ async def run():
 
     while True:
         try:
-            # Listen events on starknet
-            set_order_events: list = await starknet.get_order_events("pending", "pending")
-
-            # Process events (create order, transfer eth, prove, claim payment eth)
-            process_order_events(set_order_events, order_service, eth_lock, herodotus_semaphore)
+            # Process new orders
+            await orders_processor.process_orders()
 
             schedule.run_pending()
         except Exception as e:

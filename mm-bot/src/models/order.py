@@ -44,3 +44,9 @@ class Order(Base):
 
     def get_int_fee(self) -> int:
         return int(self.fee)
+
+    def summary(self) -> str:  # TODO set a better name
+        """
+        Returns a string with the origin network and order id
+        """
+        return f"{self.origin_network.value} ~ {self.order_id}"
