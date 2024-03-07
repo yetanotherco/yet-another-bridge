@@ -148,10 +148,9 @@ def get_fee(event) -> int:
     return parse_u256_from_double_u128(event.data[5], event.data[6])
 
 
-@use_async_fallback(rpc_nodes, logger, "Failed to get latest block")
+@use_async_fallback(rpc_nodes, logger, "Failed to get latest block number")
 async def get_latest_block(rpc_node=main_rpc_node) -> int:
-    latest_block = await rpc_node.full_node_client.get_block("latest")
-    return latest_block.block_number
+    return await rpc_node.full_node_client.get_block_number()
 
 
 async def claim_payment(order_id, block, slot) -> bool:

@@ -6,21 +6,20 @@ import schedule
 from config import constants
 from config.database_config import get_db
 from config.logging_config import setup_logger
-from models.network import Network
 from models.order import Order
 from models.order_status import OrderStatus
 from persistence.block_dao import BlockDao
 from persistence.error_dao import ErrorDao
 from persistence.order_dao import OrderDao
 from services import ethereum
-from services import starknet
 from services.executors.order_executor import OrderExecutor
 from services.indexers.starknet_order_indexer import StarknetOrderIndexer
-from services.overall_fee_calculator import estimate_overall_fee
 from services.order_service import OrderService
+from services.overall_fee_calculator import estimate_overall_fee
 from services.payment_claimer.ethereum_payment_claimer import EthereumPaymentClaimer
 from services.payment_claimer.herodotus_payment_claimer import HerodotusPaymentClaimer
 from services.payment_claimer.payment_claimer import PaymentClaimer
+from services.processors.accepted_blocks_orders_processor import AcceptedBlocksOrdersProcessor
 from services.processors.orders_processor import OrdersProcessor
 from services.senders.ethereum_sender import EthereumSender
 
@@ -54,10 +53,12 @@ async def run():
                                    eth_lock, herodotus_semaphore, MAX_ETH_TRANSFER_WEI)
     orders_processor = OrdersProcessor(order_indexer, order_executor)
 
+    accepted_blocks_orders_processor = AcceptedBlocksOrdersProcessor(order_indexer, order_executor, block_dao)
+
     (schedule.every(PROCESS_NO_BALANCE_ORDERS_MINUTES_TIMER).minutes
      .do(failed_orders_job, order_service, eth_lock, herodotus_semaphore))
     (schedule.every(PROCESS_ACCEPTED_BLOCKS_MINUTES_TIMER).minutes
-     .do(set_order_events_from_accepted_blocks_job, order_service, block_dao, eth_lock, herodotus_semaphore))
+     .do(accepted_blocks_orders_processor.process_orders_job))
     schedule.run_all()
 
     try:
@@ -78,35 +79,6 @@ async def run():
             logger.error(f"[-] Error: {e}")
 
         await asyncio.sleep(SLEEP_TIME)
-
-
-def process_order_events(order_events: list, order_service: OrderService,
-                         eth_lock: asyncio.Lock, herodotus_semaphore: asyncio.Semaphore):
-    for order_event in order_events:
-        order_id = order_event.order_id
-        origin_network = order_event.origin_network
-        recipient_address = order_event.recipient_address
-        amount = order_event.amount
-        fee = order_event.fee
-        set_order_tx_hash = order_event.set_order_tx_hash
-        is_used = order_event.is_used
-
-        if order_service.already_exists(order_id, origin_network):
-            logger.debug(f"[+] Order already processed: [{origin_network} ~ {order_id}]")
-            continue
-
-        try:
-            order = Order(order_id=order_id, origin_network=origin_network,
-                          recipient_address=recipient_address, amount=amount, fee=fee,
-                          set_order_tx_hash=set_order_tx_hash,
-                          status=OrderStatus.COMPLETED if is_used else OrderStatus.PENDING)
-            order = order_service.create_order(order)
-            logger.debug(f"[+] New order: {order}")
-        except Exception as e:
-            logger.error(f"[-] Error: {e}")
-            continue
-
-        create_order_task(order, order_service, eth_lock, herodotus_semaphore)
 
 
 def create_order_task(order: Order, order_service: OrderService, eth_lock: asyncio.Lock,
@@ -180,24 +152,6 @@ async def process_failed_orders(order_service: OrderService,
         for order in orders:
             order_service.reset_failed_order(order)
             create_order_task(order, order_service, eth_lock, herodotus_semaphore)
-    except Exception as e:
-        logger.error(f"[-] Error: {e}")
-
-
-def set_order_events_from_accepted_blocks_job(order_service: OrderService, block_dao: BlockDao,
-                                              eth_lock: asyncio.Lock, herodotus_semaphore: asyncio.Semaphore):
-    asyncio.create_task(process_orders_from_accepted_blocks(order_service, block_dao, eth_lock, herodotus_semaphore),
-                        name="Accepted-blocks")
-
-
-async def process_orders_from_accepted_blocks(order_service: OrderService, block_dao: BlockDao,
-                                              eth_lock: asyncio.Lock, herodotus_semaphore: asyncio.Semaphore):
-    try:
-        latest_block = block_dao.get_latest_block(Network.STARKNET)
-        order_events = await starknet.get_order_events(latest_block, "latest")
-        process_order_events(order_events, order_service, eth_lock, herodotus_semaphore)
-        if len(order_events) > 0:
-            block_dao.update_latest_block(max(map(lambda x: x.block_number, order_events)), Network.STARKNET)
     except Exception as e:
         logger.error(f"[-] Error: {e}")
 
