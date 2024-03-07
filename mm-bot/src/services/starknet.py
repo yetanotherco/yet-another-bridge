@@ -10,6 +10,7 @@ from starknet_py.net.models.chains import StarknetChainId
 from starknet_py.net.signer.stark_curve_signer import KeyPair
 
 from config import constants
+from models.network import Network
 from services import ethereum
 from services.decorators.use_fallback import use_fallback, use_async_fallback
 from services.mm_full_node_client import MmFullNodeClient
@@ -47,9 +48,12 @@ logger = logging.getLogger(__name__)
 
 
 class SetOrderEvent:
-    def __init__(self, order_id, starknet_tx_hash, recipient_address, amount, fee, block_number, is_used=False):
+    def __init__(self, order_id, set_order_tx_hash, recipient_address, amount, fee, block_number, is_used=False):
         self.order_id = order_id
-        self.starknet_tx_hash = starknet_tx_hash
+        self.origin_network = Network.STARKNET  # TODO add origin network
+        # set_order_tx_hash is a string. We need to store it as bytes.
+        # Complete the hash with zeroes because fromhex needs pair number of elements
+        self.set_order_tx_hash = bytes.fromhex(set_order_tx_hash.replace("0x", "").zfill(64))
         self.recipient_address = recipient_address
         self.amount = amount
         self.fee = fee
@@ -115,7 +119,7 @@ async def create_set_order_event(event):
     fee = get_fee(event)
     return SetOrderEvent(
         order_id=order_id,
-        starknet_tx_hash=event.starknet_tx_hash,
+        set_order_tx_hash=event.tx_hash,
         recipient_address=recipient_address,
         amount=amount,
         fee=fee,

@@ -6,6 +6,7 @@ import schedule
 from config import constants
 from config.database_config import get_db
 from config.logging_config import setup_logger
+from models.network import Network
 from models.order import Order
 from models.order_status import OrderStatus
 from persistence.block_dao import BlockDao
@@ -76,19 +77,21 @@ def process_order_events(order_events: list, order_service: OrderService,
                          eth_lock: asyncio.Lock, herodotus_semaphore: asyncio.Semaphore):
     for order_event in order_events:
         order_id = order_event.order_id
+        origin_network = order_event.origin_network
         recipient_address = order_event.recipient_address
         amount = order_event.amount
         fee = order_event.fee
-        starknet_tx_hash = order_event.starknet_tx_hash
+        set_order_tx_hash = order_event.set_order_tx_hash
         is_used = order_event.is_used
 
-        if order_service.already_exists(order_id):
-            logger.debug(f"[+] Order already processed: {order_id}")
+        if order_service.already_exists(order_id, origin_network):
+            logger.debug(f"[+] Order already processed: [{origin_network} ~ {order_id}]")
             continue
 
         try:
-            order = Order(order_id=order_id, starknet_tx_hash=starknet_tx_hash,
+            order = Order(order_id=order_id, origin_network=origin_network,
                           recipient_address=recipient_address, amount=amount, fee=fee,
+                          set_order_tx_hash=set_order_tx_hash,
                           status=OrderStatus.COMPLETED if is_used else OrderStatus.PENDING)
             order = order_service.create_order(order)
             logger.debug(f"[+] New order: {order}")
@@ -183,7 +186,7 @@ def set_order_events_from_accepted_blocks_job(order_service: OrderService, block
 async def process_orders_from_accepted_blocks(order_service: OrderService, block_dao: BlockDao,
                                               eth_lock: asyncio.Lock, herodotus_semaphore: asyncio.Semaphore):
     try:
-        latest_block = block_dao.get_latest_block()
+        latest_block = block_dao.get_latest_block(Network.STARKNET)
         order_events = await starknet.get_order_events(latest_block, "latest")
         process_order_events(order_events, order_service, eth_lock, herodotus_semaphore)
         if len(order_events) > 0:
