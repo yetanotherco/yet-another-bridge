@@ -6,7 +6,9 @@ import { getWallet, deployContract, LOCAL_RICH_WALLETS } from '../deploy/utils';
 let escrow: Contract;
 let deployer: Wallet = getWallet(LOCAL_RICH_WALLETS[0].privateKey);
 let user_zk: Wallet = getWallet(LOCAL_RICH_WALLETS[1].privateKey);
+let user_zk2: Wallet = getWallet(LOCAL_RICH_WALLETS[2].privateKey);
 let user_eth: Wallet = getWallet(LOCAL_RICH_WALLETS[1].privateKey);
+let user_eth2: Wallet = getWallet(LOCAL_RICH_WALLETS[2].privateKey);
 
 
 const fee = 1; //TODO check, maybe make fuzz
@@ -16,6 +18,7 @@ beforeEach( async () => {
   escrow = await deployAndInit();
 });
 
+
 // working:::
 describe('Pause tests', function () {
 
@@ -24,7 +27,6 @@ describe('Pause tests', function () {
   });
 
   it("Should pause", async function ()  {
-    escrow.connect(deployer);
     const setPauseTx = await escrow.pause();
     await setPauseTx.wait();
 
@@ -32,7 +34,6 @@ describe('Pause tests', function () {
   });
 
   it("Should unpause", async function ()  {
-    escrow.connect(deployer);
     const setPauseTx = await escrow.pause();
     await setPauseTx.wait();
 
@@ -118,13 +119,31 @@ describe('Ownable tests', function () {
   it("Should not allow random user to set_mm_ethereum_wallet", async () => {
     await expect(escrow.connect(user_zk).set_mm_ethereum_wallet(user_eth)).to.be.revertedWith("Ownable: caller is not the owner");
   });
+  it("Should allow owner to set_mm_ethereum_wallet", async () => {
+    const setTx = await escrow.set_mm_ethereum_wallet(user_eth2);
+    await setTx.wait();
+
+    expect(await escrow.mm_ethereum_wallet()).to.equals(user_eth2.address);
+  });
 
   it("Should not allow random user to set_mm_zksync_wallet", async () => {
     await expect(escrow.connect(user_zk).set_mm_zksync_wallet(user_zk)).to.be.revertedWith("Ownable: caller is not the owner");
   });
+  it("Should allow owner to set_mm_zksync_wallet", async () => {
+    const setTx = await escrow.set_mm_zksync_wallet(user_zk2);
+    await setTx.wait();
+
+    expect(await escrow.mm_zksync_wallet()).to.equals(user_zk2.address);
+  });
 
   it("Should not allow random user to set_ethereum_payment_registry", async () => {
     await expect(escrow.connect(user_zk).set_ethereum_payment_registry(user_eth)).to.be.revertedWith("Ownable: caller is not the owner");
+  });
+  it("Should allow owner to set_ethereum_payment_registry", async () => {
+    const setTx = await escrow.set_ethereum_payment_registry(user_eth2);
+    await setTx.wait();
+
+    expect(await escrow.ethereum_payment_registry()).to.equals(user_eth2.address);
   });
 
 })
