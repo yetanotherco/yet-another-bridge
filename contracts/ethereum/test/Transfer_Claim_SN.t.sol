@@ -39,6 +39,7 @@ contract TransferTest is Test {
     function test_transfer_sn() public {
         hoax(marketMaker, 100 wei);
         yab_caller.transfer{value: 100}(1, 0x1, PaymentRegistry.Chain.Starknet);
+        assertEq(address(0x1).balance, 100);
     }
 
     function test_claimPayment_sn_fail_noOrderId() public {
@@ -60,6 +61,7 @@ contract TransferTest is Test {
         yab_caller.transfer{value: 100}(1, 0x1, PaymentRegistry.Chain.Starknet);  
         hoax(marketMaker, 100 wei);
         yab_caller.claimPayment(1, 0x1, 100);
+        assertEq(address(marketMaker).balance, 100);
     }
 
     function test_claimPayment_sn_maxInt() public {

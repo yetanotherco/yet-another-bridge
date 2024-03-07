@@ -40,6 +40,7 @@ contract TransferTest is Test {
     function test_transfer_zk() public {
         hoax(marketMaker, 100 wei);
         yab_caller.transfer{value: 100}(1, 0x1, PaymentRegistry.Chain.ZKSync);
+        assertEq(address(0x1).balance, 100);
     }
 
     function test_claimPayment_zk_fail_noOrderId() public {
@@ -61,6 +62,7 @@ contract TransferTest is Test {
         yab_caller.transfer{value: 100}(1, 0x1, PaymentRegistry.Chain.ZKSync);  
         hoax(marketMaker, 100 wei);
         yab_caller.claimPaymentZKSync(1, 0x1, 100, 1, 1);
+        assertEq(address(marketMaker).balance, 100);
     }
 
     function test_claimPayment_zk_maxInt() public {
