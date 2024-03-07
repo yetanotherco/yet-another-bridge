@@ -88,6 +88,14 @@ contract TransferTest is Test {
         yab_caller.setStarknetClaimPaymentSelector(0x123);
     }
 
+    function test_set_and_get_StarknetClaimPaymentSelector() public {
+        vm.startPrank(deployer);
+        uint256 new_selector = 0x123;
+        yab_caller.setStarknetClaimPaymentSelector(new_selector);
+        assertEq(yab_caller.StarknetEscrowClaimPaymentSelector(), new_selector);
+        vm.stopPrank();
+    }
+
     function test_setStarknetEscrowAddress() public {
         vm.startPrank(deployer);
         yab_caller.setStarknetEscrowAddress(0x123);
@@ -99,6 +107,14 @@ contract TransferTest is Test {
         yab_caller.setStarknetEscrowAddress(0x123);
     }
 
+    function test_set_and_get_StarknetEscrowAddress() public {
+        vm.startPrank(deployer);
+        uint256 new_addr = 0x123;
+        yab_caller.setStarknetEscrowAddress(new_addr);
+        assertEq(yab_caller.StarknetEscrowAddress(), new_addr);
+        vm.stopPrank();
+    }
+
     function test_setZKSyncEscrowAddress() public {
         vm.startPrank(deployer);
         yab_caller.setZKSyncEscrowAddress(makeAddr("escrow"));
@@ -108,5 +124,13 @@ contract TransferTest is Test {
         hoax(makeAddr("alice"), 100 wei);
         vm.expectRevert(); //only owner
         yab_caller.setZKSyncEscrowAddress(makeAddr("alice"));
+    }
+
+    function test_set_and_get_ZKSyncEscrowAddress() public {
+        vm.startPrank(deployer);
+        address new_addr = makeAddr("new_addr");
+        yab_caller.setZKSyncEscrowAddress(new_addr);
+        assertEq(yab_caller.ZKSyncEscrowAddress(), new_addr);
+        vm.stopPrank();
     }
 }
