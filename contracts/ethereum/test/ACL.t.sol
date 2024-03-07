@@ -76,4 +76,37 @@ contract TransferTest is Test {
         vm.expectRevert("Only Owner or MM can call this function");
         yab_caller.claimPaymentZKSync{value: 100}(1, 0x1, 100, 1, 1);
     }
+
+    function test_setStarknetClaimPaymentSelector() public {
+        vm.startPrank(deployer);
+        yab_caller.setStarknetClaimPaymentSelector(0x123);
+    }
+
+    function test_setStarknetClaimPaymentSelector_fail_notOwnerOrMM() public {
+        hoax(makeAddr("alice"), 100 wei);
+        vm.expectRevert(); //only owner
+        yab_caller.setStarknetClaimPaymentSelector(0x123);
+    }
+
+    function test_setStarknetEscrowAddress() public {
+        vm.startPrank(deployer);
+        yab_caller.setStarknetEscrowAddress(0x123);
+    }
+
+    function test_setStarknetEscrowAddress_fail_notOwnerOrMM() public {
+        hoax(makeAddr("alice"), 100 wei);
+        vm.expectRevert(); //only owner
+        yab_caller.setStarknetEscrowAddress(0x123);
+    }
+
+    function test_setZKSyncEscrowAddress() public {
+        vm.startPrank(deployer);
+        yab_caller.setZKSyncEscrowAddress(makeAddr("escrow"));
+    }
+
+    function test_setZKSyncEscrowAddress_fail_notOwnerOrMM() public {
+        hoax(makeAddr("alice"), 100 wei);
+        vm.expectRevert(); //only owner
+        yab_caller.setZKSyncEscrowAddress(makeAddr("alice"));
+    }
 }
