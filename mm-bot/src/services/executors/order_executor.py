@@ -3,20 +3,22 @@ import logging
 
 from models.order import Order
 from models.order_status import OrderStatus
-from services import ethereum
 from services.order_service import OrderService
 from services.overall_fee_calculator import estimate_overall_fee
 from services.payment_claimer.payment_claimer import PaymentClaimer
+from services.senders.ethereum_sender import EthereumSender
 
 
 class OrderExecutor:
 
     def __init__(self, order_service: OrderService,
+                 ethereum_sender: EthereumSender,
                  payment_claimer: PaymentClaimer,
                  eth_lock: asyncio.Lock, herodotus_semaphore: asyncio.Semaphore,
                  max_eth_transfer_wei: int):
         self.logger = logging.getLogger(__name__)
         self.order_service: OrderService = order_service
+        self.sender: EthereumSender = ethereum_sender
         self.payment_claimer: PaymentClaimer = payment_claimer
         self.eth_lock: asyncio.Lock = eth_lock
         self.herodotus_semaphore: asyncio.Semaphore = herodotus_semaphore
@@ -54,11 +56,11 @@ class OrderExecutor:
             if order.status in [OrderStatus.PROCESSING, OrderStatus.TRANSFERRING]:
                 async with self.eth_lock:
                     if order.status is OrderStatus.PROCESSING:
-                        await self.transfer(order)
+                        await self.sender.transfer(order)
 
                     # 2.5. Wait for transfer
                     if order.status is OrderStatus.TRANSFERRING:
-                        await self.wait_transfer(order)
+                        await self.sender.wait_transfer(order)
 
             if order.status in [OrderStatus.FULFILLED, OrderStatus.PROVING]:
                 # async with self.herodotus_semaphore if using_herodotus() else eth_lock:
@@ -81,16 +83,3 @@ class OrderExecutor:
         except Exception as e:
             self.logger.error(f"[-] Error: {e}")
             self.order_service.set_order_failed(order, str(e))
-
-    async def transfer(self, order: Order):
-        self.logger.info(f"[+] Transferring eth on ethereum")
-        # in case it's processed on ethereum, but not processed on starknet
-        tx_hash = await asyncio.to_thread(ethereum.transfer, order.order_id, order.recipient_address,
-                                          order.get_int_amount())
-        self.order_service.set_order_transferring(order, tx_hash)
-        self.logger.info(f"[+] Transfer tx hash: {tx_hash.hex()}")
-
-    async def wait_transfer(self, order: Order):
-        await asyncio.to_thread(ethereum.wait_for_transaction_receipt, order.tx_hash)
-        self.order_service.set_order_fulfilled(order)
-        self.logger.info(f"[+] Transfer complete")

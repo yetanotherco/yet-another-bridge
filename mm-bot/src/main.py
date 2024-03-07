@@ -22,6 +22,7 @@ from services.payment_claimer.ethereum_payment_claimer import EthereumPaymentCla
 from services.payment_claimer.herodotus_payment_claimer import HerodotusPaymentClaimer
 from services.payment_claimer.payment_claimer import PaymentClaimer
 from services.processors.orders_processor import OrdersProcessor
+from services.senders.ethereum_sender import EthereumSender
 
 setup_logger()
 logger = logging.getLogger(__name__)
@@ -46,9 +47,11 @@ async def run():
     block_dao = BlockDao(get_db())
     eth_lock = asyncio.Lock()
     herodotus_semaphore = asyncio.Semaphore(100)
+    ethereum_sender = EthereumSender(order_service)
 
     order_indexer = StarknetOrderIndexer(order_service)
-    order_executor = OrderExecutor(order_service, payment_claimer, eth_lock, herodotus_semaphore, MAX_ETH_TRANSFER_WEI)
+    order_executor = OrderExecutor(order_service, ethereum_sender, payment_claimer,
+                                   eth_lock, herodotus_semaphore, MAX_ETH_TRANSFER_WEI)
     orders_processor = OrdersProcessor(order_indexer, order_executor)
 
     (schedule.every(PROCESS_NO_BALANCE_ORDERS_MINUTES_TIMER).minutes
