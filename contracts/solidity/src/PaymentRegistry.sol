@@ -25,7 +25,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     mapping(bytes32 => TransferInfo) private transfers;
     address private _marketMaker;
     IStarknetMessaging private _snMessaging;
-    uint256 private _snEscrowAddress;
+    uint256 private _snEscrowAddress; //private with getters is cheaper and safer.
     uint256 private _snEscrowClaimPaymentSelector;
 
     constructor() {
