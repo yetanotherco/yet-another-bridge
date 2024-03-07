@@ -18,7 +18,7 @@ beforeEach( async () => {
   escrow = await deployAndInit();
 });
 
-
+// /*
 // working:::
 describe('Pause tests', function () {
 
@@ -68,16 +68,14 @@ describe('Pause tests', function () {
   });
   
 });
-
+// */
 // // working ::
 describe('Set Order tests', function () {
   it("Should emit correct Event", async () => {
-    escrow.connect(user_zk);
-
     let events = await escrow.queryFilter("*");
     const events_length = events.length;
 
-    const setOrderTx = await escrow.set_order(user_eth, fee, {value});
+    const setOrderTx = await escrow.connect(user_zk).set_order(user_eth, fee, {value});
     await setOrderTx.wait();
     
     events = await escrow.queryFilter("*");
@@ -86,9 +84,7 @@ describe('Set Order tests', function () {
   });
 
   it("Should get the order setted", async () => {
-    escrow.connect(user_zk);
-
-    const setOrderTx = await escrow.set_order(user_eth, fee, {value});
+    const setOrderTx = await escrow.connect(user_zk).set_order(user_eth, fee, {value});
     await setOrderTx.wait();
 
     let events = await escrow.queryFilter("*");
@@ -102,9 +98,19 @@ describe('Set Order tests', function () {
     expect(Number(newOrder[1])).to.eq(value-fee); //amount
     expect(Number(newOrder[2])).to.eq(fee); //fee
   })
+
+  it("Should get the pending order", async () => {
+    const setOrderTx = await escrow.connect(user_zk).set_order(user_eth, fee, {value});
+    await setOrderTx.wait();
+
+    expect(await escrow.is_order_pending(0)).to.equal(true);
+  })
+  it("Should not get the pending order", async () => {
+    expect(await escrow.is_order_pending(0)).to.equal(false);
+  })
 })
 
-
+// /*
 describe('Ownable tests', function () {
   it("Should not allow random user to pause", async () => {
     await expect(escrow.connect(user_zk).pause()).to.be.revertedWith("Ownable: caller is not the owner");
@@ -119,6 +125,7 @@ describe('Ownable tests', function () {
   it("Should not allow random user to set_mm_ethereum_wallet", async () => {
     await expect(escrow.connect(user_zk).set_mm_ethereum_wallet(user_eth)).to.be.revertedWith("Ownable: caller is not the owner");
   });
+
   it("Should allow owner to set_mm_ethereum_wallet", async () => {
     const setTx = await escrow.set_mm_ethereum_wallet(user_eth2);
     await setTx.wait();
@@ -129,6 +136,7 @@ describe('Ownable tests', function () {
   it("Should not allow random user to set_mm_zksync_wallet", async () => {
     await expect(escrow.connect(user_zk).set_mm_zksync_wallet(user_zk)).to.be.revertedWith("Ownable: caller is not the owner");
   });
+
   it("Should allow owner to set_mm_zksync_wallet", async () => {
     const setTx = await escrow.set_mm_zksync_wallet(user_zk2);
     await setTx.wait();
@@ -139,6 +147,7 @@ describe('Ownable tests', function () {
   it("Should not allow random user to set_ethereum_payment_registry", async () => {
     await expect(escrow.connect(user_zk).set_ethereum_payment_registry(user_eth)).to.be.revertedWith("Ownable: caller is not the owner");
   });
+
   it("Should allow owner to set_ethereum_payment_registry", async () => {
     const setTx = await escrow.set_ethereum_payment_registry(user_eth2);
     await setTx.wait();
@@ -147,3 +156,4 @@ describe('Ownable tests', function () {
   });
 
 })
+// */

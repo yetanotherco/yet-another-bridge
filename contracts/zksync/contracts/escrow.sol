@@ -17,6 +17,7 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
         address recipient_address;
         uint256 amount;
         uint256 fee;
+        //todo add order_id?
     }
 
     event SetOrder(uint256 order_id, address recipient_address, uint256 amount, uint256 fee);
