@@ -72,8 +72,10 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     function claimPayment(uint256 orderId, uint256 destAddress, uint256 amount) external payable onlyOwnerOrMM {
         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount));
         TransferInfo storage transferInfo = transfers[index];
+        //changed error message length
         require(transferInfo.isUsed == true, "c1");
 
+        //changed now only uint256[3];
         uint256[] memory payload = new uint256[](3);
         payload[0] = uint256(orderId);
         payload[1] = uint256(transferInfo.destAddress);
