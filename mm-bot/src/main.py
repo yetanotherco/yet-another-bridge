@@ -190,7 +190,7 @@ async def process_orders_from_accepted_blocks(order_service: OrderService, block
         order_events = await starknet.get_order_events(latest_block, "latest")
         process_order_events(order_events, order_service, eth_lock, herodotus_semaphore)
         if len(order_events) > 0:
-            block_dao.update_latest_block(max(map(lambda x: x.block_number, order_events)))
+            block_dao.update_latest_block(max(map(lambda x: x.block_number, order_events)), Network.STARKNET)
     except Exception as e:
         logger.error(f"[-] Error: {e}")
 
