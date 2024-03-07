@@ -42,7 +42,7 @@ class EthereumPaymentClaimer(PaymentClaimer):
         """
         Waits for the payment claim transaction to be confirmed on ethereum
         """
-        await asyncio.to_thread(ethereum.wait_for_transaction_receipt, order.eth_claim_tx_hash)
+        await asyncio.to_thread(ethereum.wait_for_transaction_receipt, order.claim_tx_hash)
         order_service.set_order_proved(order)
         self.logger.info(f"[+] Claim payment tx confirmed")
 

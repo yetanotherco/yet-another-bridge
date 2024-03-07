@@ -166,7 +166,7 @@ async def transfer(order: Order, order_service: OrderService):
 
 
 async def wait_transfer(order: Order, order_service: OrderService):
-    await asyncio.to_thread(ethereum.wait_for_transaction_receipt, order.tx_hash)
+    await asyncio.to_thread(ethereum.wait_for_transaction_receipt, order.transfer_tx_hash)
     order_service.set_order_fulfilled(order)
     logger.info(f"[+] Transfer complete")
 
