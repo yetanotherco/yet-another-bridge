@@ -18,12 +18,10 @@ if [ -z "$ZKSYNC_ESCROW_CONTRACT_ADDRESS" ]; then
 fi
 
 printf "${CYAN}[ZKSync] Escrow Address: $ZKSYNC_ESCROW_CONTRACT_ADDRESS${COLOR_RESET}\n"
+printf "\nIf you now wish to finish the configuration of this deploy, you will need to run the following commands:\n"
+# echo "export PAYMENT_REGISTRY_PROXY_ADDRESS=$PAYMENT_REGISTRY_PROXY_ADDRESS"
+echo "export ZKSYNC_ESCROW_CONTRACT_ADDRESS=$ZKSYNC_ESCROW_CONTRACT_ADDRESS"
+echo "make zksync-connect"
 
 cd ../..
 
-
-# echo "\nIf you now wish to finish the configuration of this deploy, you will need to run the following commands:"
-# echo "export PAYMENT_REGISTRY_PROXY_ADDRESS=$PAYMENT_REGISTRY_PROXY_ADDRESS"
-# echo "export ESCROW_CONTRACT_ADDRESS=$ESCROW_CONTRACT_ADDRESS"
-# echo "make ethereum-set-escrow"
-# echo "make ethereum-set-claim-payment-selector"

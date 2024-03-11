@@ -57,6 +57,12 @@ starknet-test: starknet-clean
 starknet-deploy: starknet-build
 	@. ./contracts/starknet/.env && . ./contracts/starknet/deploy.sh
 
+starknet-deploy-and-connect: starknet-build
+	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env
+	@. ./contracts/starknet/deploy.sh
+	@. ./contracts/ethereum/set_starknet_escrow.sh
+	@. ./contracts/ethereum/set_starknet_claim_payment_selector.sh
+
 starknet-upgrade: starknet-build
 	@. ./contracts/starknet/.env && . ./contracts/starknet/upgrade.sh
 
@@ -75,14 +81,19 @@ zksync-clean:
 zksync-build: zksync-clean
 	@cd ./contracts/zksync/ && yarn compile
 
-zksync-deploy: zksync-build
-	@. ./contracts/zksync/.env && . ./contracts/zksync/deploy.sh
-
-zksync-deploy-and-connect: zksync-build
-	@. ./contracts/ethereum/.env && . ./contracts/zksync/.env && . ./contracts/zksync/deploy.sh && . ./contracts/ethereum/set_zksync_escrow.sh
+zksync-deploy: 
+	@make zksync-build && \
+	. ./contracts/zksync/.env && . ./contracts/zksync/deploy.sh
 
 zksync-connect:
-	@. ./contracts/ethereum/.env && . ./contracts/zksync/.env && . ./contracts/ethereum/set_zksync_escrow.sh
+	@. ./contracts/ethereum/.env && . ./contracts/zksync/.env && \
+	. ./contracts/ethereum/set_zksync_escrow.sh
+
+zksync-deploy-and-connect: zksync-build
+	@. ./contracts/ethereum/.env && . ./contracts/zksync/.env && \
+	. ./contracts/zksync/deploy.sh && \
+	. ./contracts/ethereum/set_zksync_escrow.sh
+
 
 zksync-test: zksync-build
 	@cd ./contracts/zksync/ && yarn test
@@ -90,7 +101,8 @@ zksync-test: zksync-build
 #wip:
 .ONESHELL:
 zksync-test-integration: ethereum-build
-	@. ./contracts/ethereum/.env && . ./contracts/ethereum/test/ZKsync/deploy_paymentRegistry.sh #works but its weird to have the file here
+	@. ./contracts/ethereum/.env && \
+	. ./contracts/ethereum/test/ZKsync/deploy_paymentRegistry.sh #works but its weird to have the file here
 
 
 # zksync-upgrade: WIP
@@ -98,24 +110,17 @@ zksync-test-integration: ethereum-build
 
 ### MULTI ###
 
-.ONESHELL:
-ethereum-zksync-deploy:
-	@. ./contracts/ethereum/.env && . ./contracts/zksync/.env
-	@make ethereum-build
-	@make zksync-build
-	@. ./contracts/ethereum/deploy.sh
-	@. ./contracts/zksync/deploy.sh
-	@. ./contracts/ethereum/set_zksync_escrow.sh
+ethereum-and-zksync-deploy:
+	@. ./contracts/ethereum/.env && \
+	. ./contracts/zksync/.env && \
+	make ethereum-build && \
+	make zksync-build && \
+	. ./contracts/ethereum/deploy.sh && \
+	. ./contracts/zksync/deploy.sh && \
+	. ./contracts/ethereum/set_zksync_escrow.sh
 
 .ONESHELL:
-starknet-deploy-and-connect: starknet-build
-	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env
-	@. ./contracts/starknet/deploy.sh
-	@. ./contracts/ethereum/set_starknet_escrow.sh
-	@. ./contracts/ethereum/set_starknet_claim_payment_selector.sh
-
-.ONESHELL:
-ethereum-starknet-deploy:
+ethereum-and-starknet-deploy:
 	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env
 	@make ethereum-build
 	@. ./contracts/ethereum/deploy.sh
@@ -129,13 +134,13 @@ ethereum-starknet-deploy:
 #todo add zksync deploy
 .ONESHELL:
 deploy-all:
-	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env && . ./connect/zksync/.env
-	@make ethereum-build
-	@. ./contracts/ethereum/deploy.sh
-	@make starknet-build
-	@. ./contracts/starknet/deploy.sh
-	@. ./contracts/ethereum/set_starknet_escrow.sh
-	@. ./contracts/ethereum/set_starknet_claim_payment_selector.sh
+	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env && . ./contracts/zksync/.env 
+	@make ethereum-build 
+	@. ./contracts/ethereum/deploy.sh 
+	@make starknet-build 
+	@. ./contracts/starknet/deploy.sh 
+	@. ./contracts/ethereum/set_starknet_escrow.sh 
+	@. ./contracts/ethereum/set_starknet_claim_payment_selector.sh 
 	@. ./contracts/utils/display_info.sh
 
 test: 
