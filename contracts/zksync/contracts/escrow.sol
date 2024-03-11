@@ -17,7 +17,6 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
         address recipient_address;
         uint256 amount;
         uint256 fee;
-        //todo add order_id?
     }
 
     event SetOrder(uint256 order_id, address recipient_address, uint256 amount, uint256 fee);
@@ -31,11 +30,11 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
     mapping(uint256 => bool) private _orders_pending;
     mapping(uint256 => address) private _orders_senders;
     mapping(uint256 => uint256) private _orders_timestamps;
-    address public ethereum_payment_registry; //called eth_transfer_contract in cairo
-    //todo why this variable?
-    address public mm_ethereum_wallet;
-    address public mm_zksync_wallet; //TODO verify this is address type, creo que si
-    ERC20 public native_token_eth_in_zksync; //TODO make this value internal and hardcoded
+    address public ethereum_payment_registry;
+    
+    address public mm_ethereum_wallet; //todo remove this var
+    address public mm_zksync_wallet;
+    ERC20 public native_token_eth_in_zksync; //todo remove this, no erc20 is used
 
     function initialize(
         address ethereum_payment_registry_,
@@ -60,8 +59,7 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
         return _orders[order_id];
     }
 
-    //TODO recieve struct in param, its broken in zksync?
-    //TODO function recieves in msg.value the total value, and in fee the user specifies what portion of that msg.value is fee for MM
+    //Function recieves in msg.value the total value, and in fee the user specifies what portion of that msg.value is fee for MM
     function set_order(address recipient_address, uint256 fee) public payable whenNotPaused returns (uint256) {
         require(msg.value > 0, 'some ETH must be sent');
         require(msg.value > fee, 'ETH sent must be more than fee');
@@ -78,6 +76,31 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
         emit SetOrder(_current_order_id-1, recipient_address, bridge_amount, fee);
 
         return _current_order_id-1;
+    }
+
+    // l1 handler
+    function claim_payment(
+        uint256 order_id,
+        address recipient_address,
+        uint256 amount
+    ) public whenNotPaused {
+        require(msg.sender == ethereum_payment_registry, 'Only PAYMENT_REGISTRY can call');
+        require(_orders_pending[order_id], 'Order claimed or nonexistent');
+
+        Order memory current_order = _orders[order_id]; //TODO check if order is memory or calldata
+        require(current_order.recipient_address == recipient_address, 'recipient_address not match L1');
+        require(current_order.amount == amount, 'amount not match L1');
+
+        _orders_pending[order_id] = false;
+        uint256 payment_amount = current_order.amount + current_order.fee;  // TODO check overflow
+
+        //TODO this is not an ERC20
+        // native_token_eth_in_zksync.transfer(mm_zksync_wallet, payment_amount);
+        (bool success,) = payable(address(uint160(mm_zksync_wallet))).call{value: payment_amount}("");
+        require(success, "Transfer failed.");
+
+
+        emit ClaimPayment(order_id, mm_zksync_wallet, amount);
     }
 
     function is_order_pending(uint256 order_id) public view returns (bool) {
@@ -102,30 +125,6 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
 
     function unpause() public onlyOwner {
         _unpause();
-    }
-
-    //recipient_address and amount are necesarry because this values are the ones Transferred by MM on L1
-    // l1 handler
-    function claim_payment(
-        uint256 order_id,
-        address recipient_address,
-        uint256 amount
-    ) public whenNotPaused {
-        //todo resolve bug: from address is not L1 contract
-        require(msg.sender == ethereum_payment_registry, 'Only PAYMENT_REGISTRY can call');
-        require(_orders_pending[order_id], 'Order claimed or nonexistent');
-
-        Order memory current_order = _orders[order_id]; //TODO check if order is memory or calldata
-        require(current_order.recipient_address == recipient_address, 'recipient_address not match L1');
-        require(current_order.amount == amount, 'amount not match L1');
-
-        _orders_pending[order_id] = false;
-        uint256 payment_amount = current_order.amount + current_order.fee;  // TODO check overflow
-
-        //TODO this is not an ERC20
-        native_token_eth_in_zksync.transfer(mm_zksync_wallet, payment_amount);
-
-        emit ClaimPayment(order_id, mm_zksync_wallet, amount);
     }
 
     //todo for upgradeable in zksync:
