@@ -7,6 +7,7 @@ from sqlalchemy import Column, Integer, String, DateTime, Enum, Numeric, LargeBi
 from config.database_config import Base
 from models.network import Network
 from models.order_status import OrderStatus
+from models.set_order_event import SetOrderEvent
 
 
 class Order(Base):
@@ -50,3 +51,15 @@ class Order(Base):
         Returns a string with the origin network and order id
         """
         return f"{self.origin_network.value} ~ {self.order_id}"
+
+    @staticmethod
+    def from_set_order_event(set_order_event: SetOrderEvent):
+        return Order(
+            order_id=set_order_event.order_id,
+            origin_network=set_order_event.origin_network,
+            recipient_address=set_order_event.recipient_address,
+            amount=set_order_event.amount,
+            fee=set_order_event.fee,
+            set_order_tx_hash=set_order_event.set_order_tx_hash,
+            status=OrderStatus.COMPLETED if set_order_event.is_used else OrderStatus.PENDING
+        )

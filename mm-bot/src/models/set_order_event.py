@@ -53,9 +53,45 @@ class SetOrderEvent:
         )
 
     @staticmethod
-    def from_zksync(self):
-        pass
+    async def from_zksync(log):
+        """
+        log = {
+            "transactionHash": "0x",
+            "blockNumber": 0,
+            "args": {
+                "order_id": 0,
+                "recipient_address": "0x",
+                "amount": 0,
+                "fee": 0
+            }
+        }
+        transactionHash: HexBytes
+        recipient_address: str
+        """
+        order_id = log.args.order_id
+        set_order_tx_hash = log.transactionHash
+        recipient_address = log.args.recipient_address
+        amount = log.args.amount
+        fee = log.args.fee
+        is_used = await asyncio.to_thread(ethereum.get_is_used_order, order_id, recipient_address, amount)  # TODO change to new contract signature
+        return SetOrderEvent(
+            order_id=order_id,
+            origin_network=Network.ZKSYNC,
+            set_order_tx_hash=set_order_tx_hash,
+            recipient_address=recipient_address,
+            amount=amount,
+            fee=fee,
+            block_number=log.blockNumber,
+            is_used=is_used
+        )
 
     @staticmethod
     def parse_u256_from_double_u128(low, high) -> int:
         return high << 128 | low
+
+    def __str__(self):
+        return f"Order: {self.order_id} - Origin: {self.origin_network} - Amount: {self.amount} - Fee: {self.fee} - " \
+               f"Recipient: {self.recipient_address} - Is used: {self.is_used} - Block: {self.block_number}"
+
+    def __repr__(self):
+        return self.__str__()
