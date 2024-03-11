@@ -117,7 +117,8 @@ ethereum-and-zksync-deploy:
 	make zksync-build && \
 	. ./contracts/ethereum/deploy.sh && \
 	. ./contracts/zksync/deploy.sh && \
-	. ./contracts/ethereum/set_zksync_escrow.sh
+	. ./contracts/ethereum/set_zksync_escrow.sh && \
+	. ./contracts/utils/display_info.sh
 
 .ONESHELL:
 ethereum-and-starknet-deploy:
