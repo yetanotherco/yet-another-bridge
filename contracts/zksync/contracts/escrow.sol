@@ -31,25 +31,18 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
     mapping(uint256 => address) private _orders_senders;
     mapping(uint256 => uint256) private _orders_timestamps;
     address public ethereum_payment_registry;
-    
-    address public mm_ethereum_wallet; //todo remove this var
     address public mm_zksync_wallet;
-    ERC20 public native_token_eth_in_zksync; //todo remove this, no erc20 is used
 
     function initialize(
         address ethereum_payment_registry_,
-        address mm_ethereum_wallet_,
-        address mm_zksync_wallet_,
-        address native_token_eth_in_zksync_
+        address mm_zksync_wallet_
     ) public initializer {
         __Ownable_init();
         // __UUPSUpgradeable_init();
 
         _current_order_id = 0;
         ethereum_payment_registry = ethereum_payment_registry_;
-        mm_ethereum_wallet = mm_ethereum_wallet_;
         mm_zksync_wallet = mm_zksync_wallet_;
-        native_token_eth_in_zksync = ERC20(native_token_eth_in_zksync_);
     }
 
 
@@ -67,7 +60,7 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
         uint256 bridge_amount = msg.value - fee; //no underflow since previous check is made
         
         Order memory new_order = Order({recipient_address: recipient_address, amount: bridge_amount, fee: fee});
-        _orders[_current_order_id] = new_order; //TODO optimize: evaluate creating the order here and referencing it in the setOrder event
+        _orders[_current_order_id] = new_order;
         _orders_pending[_current_order_id] = true;
         _orders_senders[_current_order_id] = msg.sender;
         _orders_timestamps[_current_order_id] = block.timestamp;
@@ -94,11 +87,8 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
         _orders_pending[order_id] = false;
         uint256 payment_amount = current_order.amount + current_order.fee;  // TODO check overflow
 
-        //TODO this is not an ERC20
-        // native_token_eth_in_zksync.transfer(mm_zksync_wallet, payment_amount);
         (bool success,) = payable(address(uint160(mm_zksync_wallet))).call{value: payment_amount}("");
         require(success, "Transfer failed.");
-
 
         emit ClaimPayment(order_id, mm_zksync_wallet, amount);
     }
@@ -109,10 +99,6 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
 
     function set_ethereum_payment_registry(address new_payment_registry_address) public whenNotPaused onlyOwner {
         ethereum_payment_registry = new_payment_registry_address;
-    }
-
-    function set_mm_ethereum_wallet(address new_mm_eth_wallet) public whenNotPaused onlyOwner {
-        mm_ethereum_wallet = new_mm_eth_wallet;
     }
 
     function set_mm_zksync_wallet(address new_mm_zksync_wallet) public whenNotPaused onlyOwner {
