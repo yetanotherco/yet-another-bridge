@@ -1,3 +1,5 @@
+### SETUP ###
+
 deps: install-scarb install-starkli install-starknet-foundry install-ethereum-foundry install-zksync
 
 install-scarb:
@@ -13,10 +15,11 @@ install-starknet-foundry:
 install-ethereum-foundry:
 	curl -L https://foundry.paradigm.xyz | bash && foundryup
 
-test: 
-	make starknet-test
-	make ethereum-test
-	make zksync-test
+install-zksync:
+	cd ./contracts/zksync/ && yarn install
+
+
+### ETHEREUM ###
 
 ethereum-clean:
 	@cd ./contracts/ethereum/ && forge clean
@@ -39,6 +42,9 @@ ethereum-set-escrow:
 ethereum-set-claim-payment-selector:
 	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env && . ./contracts/ethereum/set_starknet_claim_payment_selector.sh
 
+
+### STARKNET ###
+
 starknet-clean:
 	@cd ./contracts/starknet/ && scarb clean
 
@@ -60,9 +66,8 @@ starknet-pause:
 starknet-unpause:
 	@. ./contracts/starknet/.env && ./contracts/starknet/change_pause_state.sh unpause
 
-## new zksync make targets:
-install-zksync:
-	@cd ./contracts/zksync/ && yarn install
+
+### ZKSYNC ###
 
 zksync-clean:
 	@cd ./contracts/zksync/ && yarn clean
@@ -70,30 +75,37 @@ zksync-clean:
 zksync-build: zksync-clean
 	@cd ./contracts/zksync/ && yarn compile
 
-.ONESHELL:
-zksync-test-integration: ethereum-build
-	@. ./contracts/ethereum/.env && . ./contracts/ethereum/test/ZKsync/deploy_paymentRegistry.sh #works but its weird to have the file here
-#wip
-
-zksync-test: zksync-build
-	@cd ./contracts/zksync/ && yarn test
-
-
 zksync-deploy: zksync-build
 	@. ./contracts/zksync/.env && . ./contracts/zksync/deploy.sh
 
-
-# remove this .oneshell? it is a one liner
-.ONESHELL:
 zksync-deploy-and-connect: zksync-build
 	@. ./contracts/ethereum/.env && . ./contracts/zksync/.env && . ./contracts/zksync/deploy.sh && . ./contracts/ethereum/set_zksync_escrow.sh
 
 zksync-connect:
 	@. ./contracts/ethereum/.env && . ./contracts/zksync/.env && . ./contracts/ethereum/set_zksync_escrow.sh
+
+zksync-test: zksync-build
+	@cd ./contracts/zksync/ && yarn test
+
+#wip:
+.ONESHELL:
+zksync-test-integration: ethereum-build
+	@. ./contracts/ethereum/.env && . ./contracts/ethereum/test/ZKsync/deploy_paymentRegistry.sh #works but its weird to have the file here
+
+
 # zksync-upgrade: WIP
 
 
+### MULTI ###
 
+.ONESHELL:
+ethereum-zksync-deploy:
+	@. ./contracts/ethereum/.env && . ./contracts/zksync/.env
+	@make ethereum-build
+	@make zksync-build
+	@. ./contracts/ethereum/deploy.sh
+	@. ./contracts/zksync/deploy.sh
+	@. ./contracts/ethereum/set_zksync_escrow.sh
 
 .ONESHELL:
 starknet-deploy-and-connect: starknet-build
@@ -103,7 +115,7 @@ starknet-deploy-and-connect: starknet-build
 	@. ./contracts/ethereum/set_starknet_claim_payment_selector.sh
 
 .ONESHELL:
-deploy-all:
+ethereum-starknet-deploy:
 	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env
 	@make ethereum-build
 	@. ./contracts/ethereum/deploy.sh
@@ -112,3 +124,21 @@ deploy-all:
 	@. ./contracts/ethereum/set_starknet_escrow.sh
 	@. ./contracts/ethereum/set_starknet_claim_payment_selector.sh
 	@. ./contracts/utils/display_info.sh
+
+
+#todo add zksync deploy
+.ONESHELL:
+deploy-all:
+	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env && . ./connect/zksync/.env
+	@make ethereum-build
+	@. ./contracts/ethereum/deploy.sh
+	@make starknet-build
+	@. ./contracts/starknet/deploy.sh
+	@. ./contracts/ethereum/set_starknet_escrow.sh
+	@. ./contracts/ethereum/set_starknet_claim_payment_selector.sh
+	@. ./contracts/utils/display_info.sh
+
+test: 
+	make starknet-test
+	make ethereum-test
+	make zksync-test
