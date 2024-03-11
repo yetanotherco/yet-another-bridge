@@ -3,8 +3,8 @@ import logging
 
 from models.order import Order
 from models.order_status import OrderStatus
+from services.fee_calculators.fee_calculator import FeeCalculator
 from services.order_service import OrderService
-from services.overall_fee_calculator import estimate_overall_fee
 from services.payment_claimer.payment_claimer import PaymentClaimer
 from services.senders.ethereum_sender import EthereumSender
 
@@ -14,12 +14,14 @@ class OrderExecutor:
     def __init__(self, order_service: OrderService,
                  ethereum_sender: EthereumSender,
                  payment_claimer: PaymentClaimer,
+                 fee_calculator: FeeCalculator,
                  eth_lock: asyncio.Lock, herodotus_semaphore: asyncio.Semaphore,
                  max_eth_transfer_wei: int):
         self.logger = logging.getLogger(__name__)
         self.order_service: OrderService = order_service
         self.sender: EthereumSender = ethereum_sender
         self.payment_claimer: PaymentClaimer = payment_claimer
+        self.fee_calculator: FeeCalculator = fee_calculator
         self.eth_lock: asyncio.Lock = eth_lock
         self.herodotus_semaphore: asyncio.Semaphore = herodotus_semaphore
         self.MAX_ETH_TRANSFER_WEI: int = max_eth_transfer_wei
@@ -38,7 +40,7 @@ class OrderExecutor:
             self.logger.info(f"[+] Processing order: {order}")
             # 1. Check if the order fee is enough
             if order.status is OrderStatus.PENDING:
-                estimated_fee = await estimate_overall_fee(order)
+                estimated_fee = await self.fee_calculator.estimate_overall_fee(order)
                 if order.get_int_fee() < estimated_fee:
                     self.logger.error(f"[-] Order fee is too low: {order.get_int_fee()} < {estimated_fee}")
                     self.order_service.set_order_dropped(order)

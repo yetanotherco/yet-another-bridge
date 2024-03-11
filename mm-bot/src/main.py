@@ -11,6 +11,7 @@ from persistence.block_dao import BlockDao
 from persistence.error_dao import ErrorDao
 from persistence.order_dao import OrderDao
 from services.executors.order_executor import OrderExecutor
+from services.fee_calculators.starknet_fee_calculator import StarknetFeeCalculator
 from services.indexers.starknet_order_indexer import StarknetOrderIndexer
 from services.indexers.zksync_order_indexer import ZksyncOrderIndexer
 from services.order_service import OrderService
@@ -48,14 +49,19 @@ async def run():
     eth_lock = asyncio.Lock()
     herodotus_semaphore = asyncio.Semaphore(100)
 
+    # Initialize fee calculator
+    starknet_fee_calculator = StarknetFeeCalculator()
+
     # Initialize sender and payment claimer
     ethereum_sender = EthereumSender(order_service)
-    starknet_payment_claimer: PaymentClaimer = HerodotusPaymentClaimer() if using_herodotus() else EthereumPaymentClaimer()
+    starknet_payment_claimer: PaymentClaimer = HerodotusPaymentClaimer() if using_herodotus() \
+        else EthereumPaymentClaimer(starknet_fee_calculator)
 
     # Initialize starknet indexer and processor
     starknet_order_indexer = StarknetOrderIndexer(order_service)
     starknet_order_executor = OrderExecutor(order_service, ethereum_sender, starknet_payment_claimer,
-                                            eth_lock, herodotus_semaphore, MAX_ETH_TRANSFER_WEI)
+                                            starknet_fee_calculator, eth_lock, herodotus_semaphore,
+                                            MAX_ETH_TRANSFER_WEI)
     starknet_orders_processor = OrdersProcessor(starknet_order_indexer, starknet_order_executor)
 
     # Initialize ZkSync indexer and processor
