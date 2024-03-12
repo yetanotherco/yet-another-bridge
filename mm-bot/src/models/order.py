@@ -35,7 +35,7 @@ class Order(Base):
     completed_at: datetime = Column(DateTime, nullable=True)
 
     def __str__(self):
-        return f"[{self.origin_network.value} ~ {self.order_id}], recipient: {self.recipient_address}, amount: {self.amount}, fee: {self.fee}, status: {self.status.value}"
+        return f"[{self.origin_network.name} ~ {self.order_id}], recipient: {self.recipient_address}, amount: {self.amount}, fee: {self.fee}, status: {self.status.value}"
 
     def __repr__(self):
         return str(self)
@@ -50,7 +50,7 @@ class Order(Base):
         """
         Returns a string with the origin network and order id
         """
-        return f"{self.origin_network.value} ~ {self.order_id}"
+        return f"{self.origin_network.name} ~ {self.order_id}"
 
     @staticmethod
     def from_set_order_event(set_order_event: SetOrderEvent):

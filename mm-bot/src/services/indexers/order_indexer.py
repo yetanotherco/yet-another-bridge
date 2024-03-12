@@ -1,5 +1,5 @@
 import logging
-from abc import ABC
+from abc import ABC, abstractmethod
 
 from models.order import Order
 from models.set_order_event import SetOrderEvent
@@ -12,12 +12,14 @@ class OrderIndexer(ABC):
         self.logger = logging.getLogger(__name__)
         self.order_service = order_service
 
+    @abstractmethod
     async def get_orders(self, from_block, to_block) -> list[Order]:
         """
         Get orders from the escrow
         """
         pass
 
+    @abstractmethod
     async def get_new_orders(self) -> list[Order]:
         """
         Get new orders from the escrow

@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from abc import ABC
+from abc import ABC, abstractmethod
 from web3 import Web3
 
 from models.order import Order
@@ -45,6 +45,7 @@ class FeeCalculator(ABC):
         eth_claim_payment_gas = 86139  # TODO this is a fixed value, if the contract changes, this should be updated
         return eth_claim_payment_gas * get_gas_price()
 
+    @abstractmethod
     async def estimate_message_fee(self, order: Order) -> int:
         pass
 

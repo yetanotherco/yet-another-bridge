@@ -12,9 +12,11 @@ from persistence.error_dao import ErrorDao
 from persistence.order_dao import OrderDao
 from services.executors.order_executor import OrderExecutor
 from services.fee_calculators.starknet_fee_calculator import StarknetFeeCalculator
+from services.fee_calculators.zksync_fee_calculator import ZksyncFeeCalculator
 from services.indexers.starknet_order_indexer import StarknetOrderIndexer
 from services.indexers.zksync_order_indexer import ZksyncOrderIndexer
 from services.order_service import OrderService
+from services.payment_claimer.ethereum_2_zksync_payment_claimer import Ethereum2ZksyncPaymentClaimer
 from services.payment_claimer.ethereum_payment_claimer import EthereumPaymentClaimer
 from services.payment_claimer.herodotus_payment_claimer import HerodotusPaymentClaimer
 from services.payment_claimer.payment_claimer import PaymentClaimer
@@ -51,11 +53,13 @@ async def run():
 
     # Initialize fee calculator
     starknet_fee_calculator = StarknetFeeCalculator()
+    zksync_fee_calculator = ZksyncFeeCalculator()
 
     # Initialize sender and payment claimer
     ethereum_sender = EthereumSender(order_service)
     starknet_payment_claimer: PaymentClaimer = HerodotusPaymentClaimer() if using_herodotus() \
         else EthereumPaymentClaimer(starknet_fee_calculator)
+    zksync_payment_claimer: PaymentClaimer = Ethereum2ZksyncPaymentClaimer()
 
     # Initialize starknet indexer and processor
     starknet_order_indexer = StarknetOrderIndexer(order_service)
@@ -66,8 +70,10 @@ async def run():
 
     # Initialize ZkSync indexer and processor
     zksync_order_indexer = ZksyncOrderIndexer(order_service)
-    # TODO implement ZkSyncOrderExecutor -> Implement ZKSyncPaymentClaimer
-    # TODO instantiate ZkSyncOrdersProcessor
+    zksync_order_executor = OrderExecutor(order_service, ethereum_sender, zksync_payment_claimer,
+                                          zksync_fee_calculator, eth_lock, herodotus_semaphore,
+                                          MAX_ETH_TRANSFER_WEI)
+    zksync_order_processor = OrdersProcessor(zksync_order_indexer, zksync_order_executor)
 
     # Initialize failed orders processor for starknet
     failed_orders_processor = FailedOrdersProcessor(starknet_order_executor, order_service)
@@ -87,6 +93,7 @@ async def run():
         for order in orders:
             if order.origin_network is Network.STARKNET:
                 starknet_order_executor.execute(order)
+            # TODO add support for ZkSync
     except Exception as e:
         logger.error(f"[-] Error: {e}")
 
@@ -96,8 +103,7 @@ async def run():
         try:
             # Process new orders
             tasks = [asyncio.create_task(starknet_orders_processor.process_orders(), name="Starknet_Processor"),
-                     asyncio.create_task(zksync_order_indexer.get_new_orders(), name="ZkSync_Indexer")]
-            # TODO change Zksync indexer to Zksync processor
+                     asyncio.create_task(zksync_order_processor.process_orders(), name="ZkSync_Processor")]
             await asyncio.gather(*tasks)
 
             schedule.run_pending()

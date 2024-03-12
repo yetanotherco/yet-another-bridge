@@ -4,6 +4,7 @@ import os
 from web3 import Web3
 
 from config import constants
+from models.network import Network
 from services.decorators.use_fallback import use_fallback
 
 ETHEREUM_CHAIN_ID = int(constants.ETHEREUM_CHAIN_ID)
@@ -54,12 +55,12 @@ def has_funds(amount: int) -> bool:
     return get_balance() >= amount
 
 
-def transfer(deposit_id, dst_addr, amount):
-    dst_addr_bytes = int(dst_addr, 0)
-    deposit_id = Web3.to_int(deposit_id)
+def transfer(order_id: int, destination_address: str, amount: int, chain_id: Network):
+    destination_address_bytes = int(destination_address, 0)
+    order_id = Web3.to_int(order_id)
     amount = Web3.to_int(amount)
 
-    unsent_tx, signed_tx = create_transfer(deposit_id, dst_addr_bytes, amount)
+    unsent_tx, signed_tx = create_transfer(order_id, destination_address_bytes, amount, chain_id.value)
 
     gas_fee = estimate_transaction_fee(unsent_tx)
     if not has_enough_funds(amount, gas_fee):
@@ -72,8 +73,9 @@ def transfer(deposit_id, dst_addr, amount):
 # we need amount so the transaction is valid with the transfer that will be transferred
     # TODO separate create_transfer_unsent_tx and sign_transaction
 @use_fallback(rpc_nodes, logger, "Failed to create ethereum transfer")
-def create_transfer(deposit_id, dst_addr_bytes, amount, rpc_node=main_rpc_node):
-    unsent_tx = rpc_node.contract.functions.transfer(deposit_id, dst_addr_bytes, amount).build_transaction({
+def create_transfer(order_id: int, destination_address_bytes: int, amount: int, chain_id: int,
+                    rpc_node=main_rpc_node):
+    unsent_tx = rpc_node.contract.functions.transfer(order_id, destination_address_bytes, chain_id).build_transaction({
         "chainId": ETHEREUM_CHAIN_ID,
         "from": rpc_node.account.address,
         "nonce": get_nonce(rpc_node.w3, rpc_node.account.address),

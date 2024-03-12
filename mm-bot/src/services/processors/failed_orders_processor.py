@@ -1,6 +1,7 @@
 import asyncio
 import logging
 
+from models.network import Network
 from services.executors.order_executor import OrderExecutor
 from services.order_service import OrderService
 
@@ -20,8 +21,10 @@ class FailedOrdersProcessor:
         try:
             orders = self.order_service.get_failed_orders()
             for order in orders:
-                self.order_service.reset_failed_order(order)
-                self.order_executor.execute(order)
+                if order.origin_network is Network.STARKNET:
+                    self.order_service.reset_failed_order(order)
+                    self.order_executor.execute(order)
+                # TODO add support for ZkSync
         except Exception as e:
             self.logger.error(f"[-] Error: {e}")
 

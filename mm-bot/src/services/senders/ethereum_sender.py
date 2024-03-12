@@ -18,7 +18,7 @@ class EthereumSender:
         """
         self.logger.info(f"[+] Transferring eth on ethereum")
         tx_hash = await asyncio.to_thread(ethereum.transfer, order.order_id, order.recipient_address,
-                                          order.get_int_amount())
+                                          order.get_int_amount(), order.origin_network)
         self.order_service.set_order_transferring(order, tx_hash)
         self.logger.info(f"[+] Transfer tx hash: {tx_hash.hex()}")
 
