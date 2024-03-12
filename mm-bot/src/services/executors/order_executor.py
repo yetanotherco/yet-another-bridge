@@ -67,13 +67,14 @@ class OrderExecutor:
             if order.status in [OrderStatus.FULFILLED, OrderStatus.PROVING]:
                 # async with self.herodotus_semaphore if using_herodotus() else eth_lock:
                 # TODO implement using_herodotus
-                # 3. Call payment claymer to prove
-                if order.status is OrderStatus.FULFILLED:
-                    await self.payment_claimer.send_payment_claim(order, self.order_service)
+                async with self.eth_lock:
+                    # 3. Call payment claimer to prove
+                    if order.status is OrderStatus.FULFILLED:
+                        await self.payment_claimer.send_payment_claim(order, self.order_service)
 
-                # 4. Poll herodotus to check task status
-                if order.status is OrderStatus.PROVING:
-                    await self.payment_claimer.wait_for_payment_claim(order, self.order_service)
+                    # 4. Poll herodotus to check task status
+                    if order.status is OrderStatus.PROVING:
+                        await self.payment_claimer.wait_for_payment_claim(order, self.order_service)
 
             # 5. Claim payment eth from starknet
             # (bridging is complete for the mm)
