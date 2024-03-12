@@ -18,6 +18,11 @@ This project was initialized with [zksync-cli](https://github.com/matter-labs/zk
 - `make zksync-connect`: Connects itself to saved PaymentRegistry address.
 - `make zksync-deploy-and-connect`: Deploys and connects itself to saved PaymentRegistry address.
 - `make ethereum-and-zksync-deploy`: Deploys both smart contracts and connects them to each other.
+
+### Local Tests
+
+To run local tests you should first start a local dockerized node.
+Then:
 - `make zksync-test`: Tests the contracts.
 
 ### Network Support
