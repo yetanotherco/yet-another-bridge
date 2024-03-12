@@ -101,9 +101,8 @@ zksync-test: zksync-build
 #wip:
 .ONESHELL:
 zksync-test-integration: ethereum-build
-	@. ./contracts/ethereum/.env && \
-	. ./contracts/ethereum/test/ZKsync/deploy_paymentRegistry.sh #works but its weird to have the file here
-
+	@. ./contracts/ethereum/test/.env.test && . ./contracts/zksync/.env && \
+	. ./contracts/ethereum/deploy.sh
 
 # zksync-upgrade: WIP
 
