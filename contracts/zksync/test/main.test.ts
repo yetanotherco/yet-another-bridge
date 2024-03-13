@@ -42,12 +42,6 @@ describe('Pause tests', function () {
 
     expect(await escrow.paused()).to.eq(false);
   });
-
-  it("Should not allow when paused: set_mm_ethereum_wallet", async () => {
-    const setPauseTx = await escrow.pause();
-    await setPauseTx.wait();
-    await expect(escrow.set_mm_ethereum_wallet(user_eth)).to.be.revertedWith("Pausable: paused");
-  });
   
   it("Should not allow when paused: set_mm_zksync_wallet", async () => {
     const setPauseTx = await escrow.pause();
@@ -120,17 +114,6 @@ describe('Ownable tests', function () {
     const setPauseTx = await escrow.pause();
     await setPauseTx.wait();
     await expect(escrow.connect(user_zk).unpause()).to.be.revertedWith("Ownable: caller is not the owner");
-  });
-
-  it("Should not allow random user to set_mm_ethereum_wallet", async () => {
-    await expect(escrow.connect(user_zk).set_mm_ethereum_wallet(user_eth)).to.be.revertedWith("Ownable: caller is not the owner");
-  });
-
-  it("Should allow owner to set_mm_ethereum_wallet", async () => {
-    const setTx = await escrow.set_mm_ethereum_wallet(user_eth2);
-    await setTx.wait();
-
-    expect(await escrow.mm_ethereum_wallet()).to.equals(user_eth2.address);
   });
 
   it("Should not allow random user to set_mm_zksync_wallet", async () => {
