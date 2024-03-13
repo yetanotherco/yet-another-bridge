@@ -106,7 +106,8 @@ zksync-test-integration: ethereum-build
 	. ./contracts/zksync/deploy.sh && \
 	. ./contracts/ethereum/set_zksync_escrow.sh && \
 	. ./contracts/zksync/test/set_order.sh && \
-	. ./contracts/zksync/test/transfer.sh
+	. ./contracts/zksync/test/transfer.sh && \
+	. ./contracts/zksync/test/claim_payment.sh
 
 # . ./setOrder - transfer - claim payment
 

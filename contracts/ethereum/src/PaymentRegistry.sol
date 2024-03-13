@@ -104,7 +104,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         require(transferInfo.isUsed == true, "Transfer not found.");
 
         //todo change place of this var
-        bytes4 selector = 0xa5168739; //claim_payment selector in ZKSync
+        bytes4 selector = 0xa5168739; //claim_payment selector in ZKSync //todo add in init, same as in SN
         bytes memory messageToL2 = abi.encodeWithSelector(
             selector,
             orderId,

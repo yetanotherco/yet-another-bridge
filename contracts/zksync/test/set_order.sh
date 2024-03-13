@@ -2,19 +2,25 @@
 
 . contracts/utils/colors.sh #for ANSI colors
 
-FEE=1000000000000000 #in WEI
-VALUE=0.1 #in ETH
-# Convert VALUE to WEI
-VALUE_WEI=$(echo "$VALUE * 10^18" | bc)
-# Calculate BRIDGE_AMOUNT in WEI
-BRIDGE_AMOUNT=$(echo "$VALUE_WEI - $FEE" | bc)
-BRIDGE_AMOUNT=$(printf "%.0f" "$BRIDGE_AMOUNT")
+FEE=10000000000000000 #in WEI
+VALUE=2 #in ETH
+VALUE_WEI=$(echo "scale=0; $VALUE * 10^18" | bc)
+BRIDGE_AMOUNT_WEI=$(echo "scale=0; $VALUE_WEI - $FEE" | bc)
+BRIDGE_AMOUNT_ETH=$(echo "scale=18; $BRIDGE_AMOUNT_WEI / 10^18" | bc)
+# BRIDGE_AMOUNT_WEI=$(printf "%.0f" "$BRIDGE_AMOUNT_WEI")
 
-# export BRIDGE_AMOUNT=$BRIDGE_AMOUNT
 
-RECIPIENT_ADDRESS=0xceee57f2b700c2f37d1476a7974965e149fce2d4 #L1 wallet with no funds
+printf "${GREEN}\n=> [SN] Making Set Order on Escrow${COLOR_RESET}\n"
+echo "\nUser ZKSync funds before setOrder:"
+npx zksync-cli wallet balance --chain "dockerized-node" --address "$USER_ZKSYNC_PUBLIC_ADDRESS" | grep -E -o "\d+(\.\d+)? ETH"
+echo "\nEscrow ZKSync funds before setOrder:"
+npx zksync-cli wallet balance --chain "dockerized-node" --address "$ZKSYNC_ESCROW_CONTRACT_ADDRESS" | grep -E -o "\d+(\.\d+)? ETH"
 
-echo -e "${GREEN}\n=> [SN] Making Set Order on Escrow${COLOR_RESET}"
 
-export 
-npx zksync-cli contract write --private-key $WALLET_PRIVATE_KEY --chain "dockerized-node" --contract "$ZKSYNC_ESCROW_CONTRACT_ADDRESS" --method "set_order(address recipient_address, uint256 fee)" --args "$RECIPIENT_ADDRESS" "$FEE" --value "$VALUE"
+npx zksync-cli contract write --private-key $USER_ZKSYNC_PRIVATE_ADDRESS --chain "dockerized-node" --contract "$ZKSYNC_ESCROW_CONTRACT_ADDRESS" --method "set_order(address recipient_address, uint256 fee)" --args "$USER_ETHEREUM_PUBLIC_ADDRESS" "$FEE" --value "$VALUE" >> /dev/null
+
+
+echo "\nUser ZKSync funds after setOrder:"
+npx zksync-cli wallet balance --chain "dockerized-node" --address "$USER_ZKSYNC_PUBLIC_ADDRESS" | grep -E -o "\d+(\.\d+)? ETH"
+echo "\nEscrow ZKSync funds after setOrder:"
+npx zksync-cli wallet balance --chain "dockerized-node" --address "$ZKSYNC_ESCROW_CONTRACT_ADDRESS" | grep -E -o "\d+(\.\d+)? ETH"
