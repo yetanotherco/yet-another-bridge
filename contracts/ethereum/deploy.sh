@@ -34,8 +34,10 @@ fi
 printf "${GREEN}\n=> [ETH] Deployed Proxy address: $PAYMENT_REGISTRY_PROXY_ADDRESS ${COLOR_RESET}\n"
 printf "${GREEN}\n=> [ETH] Deployed PaymentRegistry address: $PAYMENT_REGISTRY_ADDRESS ${COLOR_RESET}\n"
 
-echo "\nIf you now wish to deploy SN Escrow, you will need to run the following commands:"
+echo "\nIf you now wish to deploy an Escrow, you will need to run the following commands:"
 echo "export PAYMENT_REGISTRY_PROXY_ADDRESS=$PAYMENT_REGISTRY_PROXY_ADDRESS"
 echo "make starknet-deploy"
+echo "\nOR"
+echo "make zksync-deploy"
 
 cd ../.. #to reset working directory
