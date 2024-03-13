@@ -1,13 +1,14 @@
 #!/bin/bash
 . contracts/utils/colors.sh #for ANSI colors
 
+cd ./contracts/zksync/
+
 if [ -z "$PAYMENT_REGISTRY_PROXY_ADDRESS" ]; then
     echo "\n${RED}ERROR:${COLOR_RESET}"
     echo "PAYMENT_REGISTRY_PROXY_ADDRESS Variable is empty. Aborting execution.\n"
     exit 1
 fi
 
-cd ./contracts/zksync/
 
 ZKSYNC_ESCROW_CONTRACT_ADDRESS=$(yarn deploy | grep "Contract address:" | egrep -i -o '0x[a-zA-Z0-9]{40}')
 

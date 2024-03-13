@@ -9,11 +9,11 @@ import {IZkSync} from "@matterlabs/interfaces/IZkSync.sol";
 
 contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
-    enum Chain { Starknet, ZKSync }
+    enum Chain { Starknet, ZKSync } //todo add canonic chainID
 
     struct TransferInfo {
-        uint256 destAddress; //TODO consider changing to address type
-        uint256 amount; //TODO consider lowering this data type
+        uint256 destAddress;
+        uint256 amount;
         bool isUsed;
         Chain chainId;
     }
@@ -29,7 +29,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     uint256 public StarknetEscrowAddress;
     address public ZKSyncEscrowAddress;
     uint256 public StarknetEscrowClaimPaymentSelector;
-    IZkSync private _ZKSyncMailbox;
+    IZkSync private _ZKSyncDiamondProxy; 
     IStarknetMessaging private _snMessaging;
 
     constructor() {
@@ -42,12 +42,12 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         uint256 StarknetEscrowAddress_,
         uint256 StarknetEscrowClaimPaymentSelector_,
         address marketMaker_,
-        address ZKSyncMailboxAddress) public initializer { 
+        address ZKSyncDiamondProxyAddress) public initializer { 
         __Ownable_init(msg.sender);
         __UUPSUpgradeable_init();
 
         _snMessaging = IStarknetMessaging(snMessaging);
-        _ZKSyncMailbox = IZkSync(ZKSyncMailboxAddress);
+        _ZKSyncDiamondProxy = IZkSync(ZKSyncDiamondProxyAddress);
 
         StarknetEscrowAddress = StarknetEscrowAddress_;
         StarknetEscrowClaimPaymentSelector = StarknetEscrowClaimPaymentSelector_; // TODO remove this or set the correct value in init
@@ -112,8 +112,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             transferInfo.amount
         );
 
-        //TODO send message to mailbox, right? or to zksync core? TO diamond proxy!
-        _ZKSyncMailbox.requestL2Transaction{value: msg.value}(
+        _ZKSyncDiamondProxy.requestL2Transaction{value: msg.value}(
             ZKSyncEscrowAddress, //L2 contract called
             0, //msg.value
             messageToL2, //msg.calldata
