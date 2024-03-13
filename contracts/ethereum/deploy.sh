@@ -37,7 +37,7 @@ printf "${GREEN}\n=> [ETH] Deployed PaymentRegistry address: $PAYMENT_REGISTRY_A
 echo "\nIf you now wish to deploy an Escrow, you will need to run the following commands:"
 echo "export PAYMENT_REGISTRY_PROXY_ADDRESS=$PAYMENT_REGISTRY_PROXY_ADDRESS"
 echo "make starknet-deploy"
-echo "\nOR"
+echo "OR"
 echo "make zksync-deploy"
 
 cd ../.. #to reset working directory

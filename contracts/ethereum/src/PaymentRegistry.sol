@@ -12,7 +12,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     enum Chain { Starknet, ZKSync } //todo add canonic chainID
 
     struct TransferInfo {
-        uint256 destAddress;
+        uint256 destAddress; //TODO THIS SHOULD BE TYPE ADDRESS, destAddress is always an L1 address
         uint256 amount;
         bool isUsed;
         Chain chainId;

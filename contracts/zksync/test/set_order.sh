@@ -4,6 +4,13 @@
 
 FEE=1000000000000000 #in WEI
 VALUE=0.1 #in ETH
+# Convert VALUE to WEI
+VALUE_WEI=$(echo "$VALUE * 10^18" | bc)
+# Calculate BRIDGE_AMOUNT in WEI
+BRIDGE_AMOUNT=$(echo "$VALUE_WEI - $FEE" | bc)
+BRIDGE_AMOUNT=$(printf "%.0f" "$BRIDGE_AMOUNT")
+
+# export BRIDGE_AMOUNT=$BRIDGE_AMOUNT
 
 RECIPIENT_ADDRESS=0xceee57f2b700c2f37d1476a7974965e149fce2d4 #L1 wallet with no funds
 
