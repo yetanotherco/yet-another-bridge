@@ -17,9 +17,13 @@ export default async function () {
   const ethereum_payment_registry = process.env.PAYMENT_REGISTRY_PROXY_ADDRESS;
   const mm_zksync_wallet = process.env.MM_ZKSYNC_WALLET;
 
-  if (!ethereum_payment_registry || !mm_zksync_wallet) {
-    throw new Error("Missing required environment variables.");
+  if (!ethereum_payment_registry ){
+    throw new Error("Missing required environment variable: PAYMENT_REGISTRY_PROXY_ADDRESS");
   }
+  if (!mm_zksync_wallet) {
+    throw new Error("Missing required environment variable: MM_ZKSYNC_WALLET");
+  }
+  
 
   const PaymentRegistryL2Alias = utils.applyL1ToL2Alias(ethereum_payment_registry)
 

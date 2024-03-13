@@ -4,6 +4,7 @@
   "packageManager": "yarn@1.22.21",
   "scripts": {
     "deploy": "hardhat deploy-zksync --network zkSyncSepoliaTestnet --script deploy.ts",
+    "deploy-devnet": "hardhat deploy-zksync --network dockerizedNode --script deploy.ts",
     "compile": "hardhat compile",
     "clean": "hardhat clean",
     "test": "hardhat test --network dockerizedNode --parallel --show-stack-traces"
