@@ -31,8 +31,9 @@ class FeeCalculator(ABC):
         dst_addr_bytes = int(order.recipient_address, 0)
         deposit_id = Web3.to_int(order.order_id)
         amount = Web3.to_int(order.get_int_amount())
+        chain_id = order.origin_network.value
 
-        unsent_tx, signed_tx = create_transfer(deposit_id, dst_addr_bytes, amount)
+        unsent_tx, signed_tx = create_transfer(deposit_id, dst_addr_bytes, amount, chain_id)
 
         return estimate_transaction_fee(unsent_tx)
 
