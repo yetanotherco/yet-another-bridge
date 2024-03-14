@@ -40,7 +40,7 @@ class SetOrderEvent:
         recipient_address = hex(event.data[2])
         amount = SetOrderEvent.parse_u256_from_double_u128(event.data[3], event.data[4])
         fee = SetOrderEvent.parse_u256_from_double_u128(event.data[5], event.data[6])
-        is_used = await asyncio.to_thread(ethereum.get_is_used_order, order_id, recipient_address, amount)
+        is_used = await asyncio.to_thread(ethereum.get_is_used_order, order_id, recipient_address, amount, Network.STARKNET.value)
         return SetOrderEvent(
             order_id=order_id,
             origin_network=Network.STARKNET,
@@ -73,7 +73,7 @@ class SetOrderEvent:
         recipient_address = log.args.recipient_address
         amount = log.args.amount
         fee = log.args.fee
-        is_used = await asyncio.to_thread(ethereum.get_is_used_order, order_id, recipient_address, amount)  # TODO change to new contract signature
+        is_used = await asyncio.to_thread(ethereum.get_is_used_order, order_id, recipient_address, amount, Network.ZKSYNC.value)  # TODO change to new contract signature
         return SetOrderEvent(
             order_id=order_id,
             origin_network=Network.ZKSYNC,
