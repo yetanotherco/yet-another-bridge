@@ -73,7 +73,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         //changed now only uint256[3];
         uint256[] memory payload = new uint256[](3);
         payload[0] = uint256(orderId);
-        payload[1] = uint256(uint160(destAddress)); //?
+        payload[1] = uint256(uint160(destAddress));
         payload[2] = uint256(amount);
         
         _snMessaging.sendMessageToL2{value: msg.value}(
