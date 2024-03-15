@@ -83,12 +83,11 @@ contract TransferTest is Test {
         yab_caller.claimPaymentZKSync(1, address(0x1), 1, 1, 1);
     }
 
-    //todo uncomment when perf keccak applied
-    // function test_claimPayment_fail_wrongChain() public {
-    //     hoax(marketMaker, 1 wei);
-    //     yab_caller.transfer{value: 1}(1, address(0x1), PaymentRegistry.Chain.ZKSync);
-    //     hoax(marketMaker, 1 wei);
-    //     vm.expectRevert("Transfer not found."); //Won't match to a transfer made on the other chain
-    //     yab_caller.claimPayment(1, address(0x1), 1);  
-    // }
+    function test_claimPayment_fail_wrongChain() public {
+        hoax(marketMaker, 1 wei);
+        yab_caller.transfer{value: 1}(1, address(0x1), PaymentRegistry.Chain.ZKSync);
+        hoax(marketMaker, 1 wei);
+        vm.expectRevert("Transfer not found."); //Won't match to a transfer made on the other chain
+        yab_caller.claimPayment(1, address(0x1), 1);  
+    }
 }

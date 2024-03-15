@@ -44,44 +44,45 @@ contract TransferTest is Test {
 
     //todo uncomment when applied keccac perf upgrade
 
-    // function test_claimPayment_sn_fail_noOrderId() public {
-    //     hoax(marketMaker, 100 wei);
-    //     vm.expectRevert("Transfer not found."); //Won't match to a random transfer number
-    //     yab_caller.claimPayment{value: 100}(1, 0x1, 100);
-    // }
-    // function test_claimPayment_sn_fail_wrongOrderId() public {
-    //     hoax(marketMaker, 100 wei);
-    //     yab_caller.transfer{value: 100}(1, 0x1, PaymentRegistry.Chain.Starknet);  
-    //     hoax(marketMaker, 100 wei);
-    //     vm.expectRevert("Transfer not found."); //Won't match to a wrong transfer number
-    //     yab_caller.claimPayment(2, 0x1, 100);
-    // }
+    function test_claimPayment_sn_fail_noOrderId() public {
+        hoax(marketMaker, 100 wei);
+        vm.expectRevert("Transfer not found."); //Won't match to a random transfer number
+        yab_caller.claimPayment{value: 100}(1, address(0x1), 100);
+    }
 
-    // function test_claimPayment_sn() public {
-    //     hoax(marketMaker, 100 wei);
-    //     yab_caller.transfer{value: 100}(1, 0x1, PaymentRegistry.Chain.Starknet);  
-    //     hoax(marketMaker, 100 wei);
-    //     yab_caller.claimPayment(1, 0x1, 100);
-    //     assertEq(address(marketMaker).balance, 100);
-    // }
+    function test_claimPayment_sn_fail_wrongOrderId() public {
+        hoax(marketMaker, 100 wei);
+        yab_caller.transfer{value: 100}(1, address(0x1), PaymentRegistry.Chain.Starknet);  
+        hoax(marketMaker, 100 wei);
+        vm.expectRevert("Transfer not found."); //Won't match to a wrong transfer number
+        yab_caller.claimPayment(2, address(0x1), 100);
+    }
 
-    // function test_claimPayment_sn_maxInt() public {
-    //     uint256 maxInt = type(uint256).max;
+    function test_claimPayment_sn() public {
+        hoax(marketMaker, 100 wei);
+        yab_caller.transfer{value: 100}(1, address(0x1), PaymentRegistry.Chain.Starknet);  
+        hoax(marketMaker, 100 wei);
+        yab_caller.claimPayment(1, address(0x1), 100);
+        assertEq(address(marketMaker).balance, 100);
+    }
+
+    function test_claimPayment_sn_maxInt() public {
+        uint256 maxInt = type(uint256).max;
         
-    //     vm.deal(marketMaker, maxInt);
-    //     vm.startPrank(marketMaker);
+        vm.deal(marketMaker, maxInt);
+        vm.startPrank(marketMaker);
 
-    //     yab_caller.transfer{value: maxInt}(1, 0x1, PaymentRegistry.Chain.Starknet);
-    //     yab_caller.claimPayment(1, 0x1, maxInt);
-    //     vm.stopPrank();
-    // }
+        yab_caller.transfer{value: maxInt}(1, address(0x1), PaymentRegistry.Chain.Starknet);
+        yab_caller.claimPayment(1, address(0x1), maxInt);
+        vm.stopPrank();
+    }
 
-    // function test_claimPayment_sn_minInt() public {
-    //     hoax(marketMaker, 1 wei);
-    //     yab_caller.transfer{value: 1}(1, 0x1, PaymentRegistry.Chain.Starknet);
-    //     hoax(marketMaker, 1 wei);
-    //     yab_caller.claimPayment(1, 0x1, 1);
-    // }
+    function test_claimPayment_sn_minInt() public {
+        hoax(marketMaker, 1 wei);
+        yab_caller.transfer{value: 1}(1, address(0x1), PaymentRegistry.Chain.Starknet);
+        hoax(marketMaker, 1 wei);
+        yab_caller.claimPayment(1, address(0x1), 1);
+    }
 
     function test_claimPayment_fail_wrongChain() public {
         hoax(marketMaker, 1 wei);
