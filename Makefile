@@ -100,8 +100,9 @@ zksync-test: zksync-build
 
 #wip:
 .ONESHELL:
-zksync-test-integration: ethereum-build
-	@. ./contracts/ethereum/test/.env.test && . ./contracts/zksync/test/.env.test && \
+zksync-test-integration:
+	@make ethereum-build && make zksync-build && \
+	. ./contracts/ethereum/test/.env.test && . ./contracts/zksync/test/.env.test && \
 	. ./contracts/ethereum/deploy.sh && \
 	. ./contracts/zksync/deploy.sh && \
 	. ./contracts/ethereum/set_zksync_escrow.sh && \
