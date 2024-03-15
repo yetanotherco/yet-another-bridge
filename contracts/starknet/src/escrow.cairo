@@ -232,33 +232,6 @@ mod Escrow {
         }
     }
 
-    // old:
-    // #[l1_handler]
-    // fn claim_payment(
-    //     ref self: ContractState,
-    //     from_address: felt252,
-    //     order_id: u256,
-    //     recipient_address: EthAddress,
-    //     amount: u256
-    // ) {
-    //     self.pausable.assert_not_paused();
-    //     let eth_transfer_contract_felt: felt252 = self.eth_transfer_contract.read().into();
-    //     assert(from_address == eth_transfer_contract_felt, 'Only PAYMENT_REGISTRY_CONTRACT');
-    //     assert(self.orders_pending.read(order_id), 'Order claimed or nonexistent');
-
-    //     let order = self.orders.read(order_id);
-    //     assert(order.recipient_address == recipient_address, 'recipient_address not match L1');
-    //     assert(order.amount == amount, 'amount not match L1');
-
-    //     self.orders_pending.write(order_id, false);
-    //     let payment_amount = order.amount + order.fee;
-
-    //     IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
-    //         .transfer(self.mm_starknet_wallet.read(), payment_amount);
-
-    //     self.emit(ClaimPayment { order_id, address: self.mm_starknet_wallet.read(), amount });
-    // }
-
     #[l1_handler]
     fn claim_payment(
         ref self: ContractState,

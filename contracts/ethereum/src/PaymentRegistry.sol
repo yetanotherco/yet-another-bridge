@@ -66,28 +66,6 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         emit Transfer(orderId, msg.sender, destAddress, msg.value, chainId); //3000 gas (todo verify gas)
     }
 
-    //old
-    //TODO change name to claimPaymentStarknet
-    // function claimPayment(uint256 orderId, address destAddress, uint256 amount) external payable onlyOwnerOrMM {
-    //     bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, Chain.Starknet));
-    //     require(transfers[index] == true, "Transfer not found.");
-    //     transfers[index] = false; //this transfer has been claimed
-    //     uint256 destAddres_uint256 = uint256(uint160(destAddress));
-
-    //     //TODO apply optimization developed in branch optimization-for-SN
-    //     uint256[] memory payload = new uint256[](5);
-    //     payload[0] = uint128(orderId); // low
-    //     payload[1] = uint128(orderId >> 128); // high
-    //     payload[2] = destAddres_uint256;
-    //     payload[3] = uint128(amount); // low
-    //     payload[4] = uint128(amount >> 128); // high
-            
-    //     _snMessaging.sendMessageToL2{value: msg.value}(
-    //         StarknetEscrowAddress,
-    //         StarknetEscrowClaimPaymentSelector,
-    //         payload);
-    // }
-
     function claimPayment(uint256 orderId, address destAddress, uint256 amount) external payable onlyOwnerOrMM {
         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, Chain.Starknet));
         require(transfers[index] == true, "Transfer not found.");
