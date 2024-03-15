@@ -11,7 +11,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
     enum Chain { Starknet, ZKSync } //todo add canonic chainID
 
-    struct TransferInfo {
+    struct TransferInfo { //TODO add orderID, because if same user asks twice the same thing, it will only recieve 1 bridge. MENTIRAA el orderID está en el index, pero no en el transferInfo
         uint256 destAddress; //TODO THIS SHOULD BE TYPE ADDRESS, destAddress is always an L1 address
         uint256 amount;
         bool isUsed;
@@ -60,15 +60,22 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         require(destAddress != 0, "Invalid destination address.");
         require(msg.value > 0, "Invalid amount, should be higher than 0.");
 
-        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, msg.value, chainId));
-        require(transfers[index].isUsed == false, "Transfer already processed.");
+        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, msg.value, chainId)); //200 gas
+        require(transfers[index].isUsed == false, "Transfer already processed."); //3000 gas
 
-        transfers[index] = TransferInfo({destAddress: destAddress, amount: msg.value, isUsed: true, chainId: chainId});
+        // transfers[index] = TransferInfo({destAddress: destAddress, amount: msg.value, isUsed: true, chainId: chainId}); //65000 gas
+        // 64900 gas:
+        transfers[index].destAddress = destAddress;
+        transfers[index].amount = msg.value;
+        transfers[index].isUsed = true;
+        transfers[index].chainId = chainId;
 
-        (bool success,) = payable(address(uint160(destAddress))).call{value: msg.value}("");
+
+        (bool success,) = payable(address(uint160(destAddress))).call{value: msg.value}(""); //34000 gas
+        // (bool success,) = payable(marketMaker).call{value: msg.value}(""); //32000 gas //to implement this, address must be changed to from uint256 to addr
 
         require(success, "Transfer failed.");
-        emit Transfer(orderId, msg.sender, transfers[index]);
+        emit Transfer(orderId, msg.sender, transfers[index]); //3000 gas
     }
 
 //TODO change name to claimPaymentStarknet
