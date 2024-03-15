@@ -67,26 +67,26 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     }
 
 // //TODO change name to claimPaymentStarknet
-// // TODO apply keccak optimization
-//     function claimPayment(uint256 orderId, uint256 destAddress, uint256 amount) external payable onlyOwnerOrMM {
-//         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, Chain.Starknet));
-//         TransferInfo storage transferInfo = transfers[index];
-//         require(transferInfo.isUsed == true, "Transfer not found.");
+// TODO apply keccak optimization
+    function claimPayment(uint256 orderId, address destAddress, uint256 amount) external payable onlyOwnerOrMM {
+        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, Chain.Starknet));
+        TransferInfo storage transferInfo = transfers[index];
+        require(transfers[index] == true, "Transfer not found.");
+        transfers[index] = false; //this transfer has been claimed
 
-//         uint256[] memory payload = new uint256[](5); //TODO why array of 256 if then filled with 128?
-//         payload[0] = uint128(orderId); // low
-//         payload[1] = uint128(orderId >> 128); // high
-//         payload[2] = transferInfo.destAddress;
-//         payload[3] = uint128(amount); // low
-//         payload[4] = uint128(amount >> 128); // high
+
+        uint256[] memory payload = new uint256[](5); //TODO why array of 256 if then filled with 128?
+        payload[0] = uint128(orderId); // low
+        payload[1] = uint128(orderId >> 128); // high
+        payload[2] = destAddress;
+        payload[3] = uint128(amount); // low
+        payload[4] = uint128(amount >> 128); // high
             
-//         _snMessaging.sendMessageToL2{value: msg.value}(
-//             StarknetEscrowAddress,
-//             StarknetEscrowClaimPaymentSelector,
-//             payload);
-
-//         emit ClaimPayment(transferInfo);
-//     }
+        _snMessaging.sendMessageToL2{value: msg.value}(
+            StarknetEscrowAddress,
+            StarknetEscrowClaimPaymentSelector,
+            payload);
+    }
 
     function claimPaymentZKSync(
         uint256 orderId, address destAddress, uint256 amount,
@@ -95,6 +95,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     ) external payable onlyOwnerOrMM {
         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, Chain.ZKSync));
         require(transfers[index] == true, "Transfer not found.");
+        transfers[index] = false; //this transfer has been claimed
 
         //todo change place of this var
         bytes4 selector = 0xa5168739; //claim_payment selector in ZKSync //todo add in init, same as in SN
