@@ -11,20 +11,13 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
     enum Chain { Starknet, ZKSync } //todo add canonic chainID
 
-    struct TransferInfo { //TODO add orderID, because if same user asks twice the same thing, it will only recieve 1 bridge. MENTIRAA el orderID está en el index, pero no en el transferInfo
-        uint256 destAddress; //TODO THIS SHOULD BE TYPE ADDRESS, destAddress is always an L1 address
-        uint256 amount;
-        bool isUsed;
-        Chain chainId;
-    }
+    event Transfer(uint256 indexed orderId, address srcAddress, address destAddress, uint256 amount, Chain chainId);
 
-    event Transfer(uint256 indexed orderId, address srcAddress, TransferInfo transferInfo);
     event ModifiedZKSyncEscrowAddress(address newEscrowAddress);
     event ModifiedStarknetEscrowAddress(uint256 newEscrowAddress);
     event ModifiedStarknetClaimPaymentSelector(uint256 newEscrowClaimPaymentSelector);
-    event ClaimPayment(TransferInfo transferInfo);
 
-    mapping(bytes32 => TransferInfo) public transfers;
+    mapping(bytes32 => bool) public transfers;
     address public marketMaker;
     uint256 public StarknetEscrowAddress;
     address public ZKSyncEscrowAddress;
@@ -56,67 +49,60 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
 //TODO: change orderID to uint32
 //TODO remove amount parameter, it is unnecesarry, only reading msg,value is enough
-    function transfer(uint256 orderId, uint256 destAddress, Chain chainId) external payable onlyOwnerOrMM {
-        require(destAddress != 0, "Invalid destination address.");
+    function transfer(uint256 orderId, address destAddress, Chain chainId) external payable onlyOwnerOrMM {
+        require(destAddress != address(0), "Invalid address");
         require(msg.value > 0, "Invalid amount, should be higher than 0.");
 
         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, msg.value, chainId)); //200 gas
-        require(transfers[index].isUsed == false, "Transfer already processed."); //3000 gas
+        require(transfers[index] == false, "Transfer already processed."); //3000 gas (todo verify gas)
+        transfers[index] = true; //now this transfer is in progress
 
+        //old version: 
         // transfers[index] = TransferInfo({destAddress: destAddress, amount: msg.value, isUsed: true, chainId: chainId}); //65000 gas
-        // 64900 gas:
-        transfers[index].destAddress = destAddress;
-        transfers[index].amount = msg.value;
-        transfers[index].isUsed = true;
-        transfers[index].chainId = chainId;
 
-
-        (bool success,) = payable(address(uint160(destAddress))).call{value: msg.value}(""); //34000 gas
-        // (bool success,) = payable(marketMaker).call{value: msg.value}(""); //32000 gas //to implement this, address must be changed to from uint256 to addr
+        (bool success,) = payable(destAddress).call{value: msg.value}(""); //34000 gas
 
         require(success, "Transfer failed.");
-        emit Transfer(orderId, msg.sender, transfers[index]); //3000 gas
+        emit Transfer(orderId, msg.sender, destAddress, msg.value, chainId); //3000 gas (todo verify gas)
     }
 
-//TODO change name to claimPaymentStarknet
-    function claimPayment(uint256 orderId, uint256 destAddress, uint256 amount) external payable onlyOwnerOrMM {
-        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, Chain.Starknet));
-        TransferInfo storage transferInfo = transfers[index];
-        require(transferInfo.isUsed == true, "Transfer not found.");
+// //TODO change name to claimPaymentStarknet
+// // TODO apply keccak optimization
+//     function claimPayment(uint256 orderId, uint256 destAddress, uint256 amount) external payable onlyOwnerOrMM {
+//         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, Chain.Starknet));
+//         TransferInfo storage transferInfo = transfers[index];
+//         require(transferInfo.isUsed == true, "Transfer not found.");
 
-        uint256[] memory payload = new uint256[](5); //TODO why array of 256 if then filled with 128?
-        payload[0] = uint128(orderId); // low
-        payload[1] = uint128(orderId >> 128); // high
-        payload[2] = transferInfo.destAddress;
-        payload[3] = uint128(amount); // low
-        payload[4] = uint128(amount >> 128); // high
+//         uint256[] memory payload = new uint256[](5); //TODO why array of 256 if then filled with 128?
+//         payload[0] = uint128(orderId); // low
+//         payload[1] = uint128(orderId >> 128); // high
+//         payload[2] = transferInfo.destAddress;
+//         payload[3] = uint128(amount); // low
+//         payload[4] = uint128(amount >> 128); // high
             
-        _snMessaging.sendMessageToL2{value: msg.value}(
-            StarknetEscrowAddress,
-            StarknetEscrowClaimPaymentSelector,
-            payload);
+//         _snMessaging.sendMessageToL2{value: msg.value}(
+//             StarknetEscrowAddress,
+//             StarknetEscrowClaimPaymentSelector,
+//             payload);
 
-        emit ClaimPayment(transferInfo);
-    }
+//         emit ClaimPayment(transferInfo);
+//     }
 
-// why is destAddress a uint256? should be address?
-// oh, because sn address is not "address" typew]
     function claimPaymentZKSync(
-        uint256 orderId, uint256 destAddress, uint256 amount,
+        uint256 orderId, address destAddress, uint256 amount,
         uint256 gasLimit,
         uint256 gasPerPubdataByteLimit
     ) external payable onlyOwnerOrMM {
         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, Chain.ZKSync));
-        TransferInfo storage transferInfo = transfers[index];
-        require(transferInfo.isUsed == true, "Transfer not found.");
+        require(transfers[index] == true, "Transfer not found.");
 
         //todo change place of this var
         bytes4 selector = 0xa5168739; //claim_payment selector in ZKSync //todo add in init, same as in SN
         bytes memory messageToL2 = abi.encodeWithSelector(
             selector,
             orderId,
-            transferInfo.destAddress,
-            transferInfo.amount
+            destAddress,
+            amount
         );
 
         _ZKSyncDiamondProxy.requestL2Transaction{value: msg.value}(
@@ -128,8 +114,6 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             new bytes[](0), //factory dependencies
             msg.sender //refund recipient
         );
-
-        emit ClaimPayment(transferInfo);
     }
 
     function setStarknetEscrowAddress(uint256 newStarknetEscrowAddress) external onlyOwner {
