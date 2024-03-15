@@ -6,7 +6,7 @@
 FEE=25000000000000
 APPROVE_AMOUNT=$((${AMOUNT}+${FEE}))
 
-echo -e "${GREEN}\n=> [SN] Making transfer to Escrow${COLOR_RESET}"
+echo -e "${GREEN}\n=> [SN] Making SetOrder on Escrow${COLOR_RESET}"
 
 starkli invoke \
   $NATIVE_TOKEN_ETH_STARKNET approve $ESCROW_CONTRACT_ADDRESS u256:$APPROVE_AMOUNT \
