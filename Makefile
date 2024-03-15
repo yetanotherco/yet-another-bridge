@@ -28,7 +28,7 @@ ethereum-build: ethereum-clean
 	@cd ./contracts/ethereum/ && forge build
 
 ethereum-test: ethereum-clean
-	@cd ./contracts/ethereum/ && forge test
+	@cd ./contracts/ethereum/ && forge test --gas-report
 
 ethereum-deploy: ethereum-build
 	@. ./contracts/ethereum/.env && . ./contracts/ethereum/deploy.sh
