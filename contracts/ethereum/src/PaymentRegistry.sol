@@ -116,7 +116,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         );
     }
 
-    function setStarknetEscrowAddress(uint256 newStarknetEscrowAddress) external onlyOwner {
+    function setStarknetEscrowAddress(uint256 newStarknetEscrowAddress) external {
         StarknetEscrowAddress = newStarknetEscrowAddress;
         emit ModifiedStarknetEscrowAddress(newStarknetEscrowAddress);        
     }
