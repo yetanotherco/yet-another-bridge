@@ -49,7 +49,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
 //TODO: change orderID to uint32
 //TODO remove amount parameter, it is unnecesarry, only reading msg,value is enough
-    function transfer(uint256 orderId, address destAddress, Chain chainId) external payable {
+    function transfer(uint256 orderId, address destAddress, Chain chainId) external payable onlyOwnerOrMM {
         require(destAddress != address(0), "Invalid address");
         require(msg.value > 0, "Invalid amount, should be higher than 0.");
 
