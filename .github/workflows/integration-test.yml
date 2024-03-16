@@ -152,11 +152,11 @@ jobs:
       # Deploy PaymentRegistry, Escrow, set escrow, set claimPayment selector and test complete flow
       - name: Deploy and test complete flow
         run: |
-          export ETH_RPC_URL=${{vars.ETH_RPC_URL}}
+          export ETHEREUM_RPC=${{vars.ETHEREUM_RPC}}
           export ETHERSCAN_API_KEY=${{vars.ETHERSCAN_API_KEY}}
-          export ETH_PRIVATE_KEY=${{vars.ETH_PRIVATE_KEY}}
-          export SN_MESSAGING_ADDRESS=${{vars.SN_MESSAGING_ADDRESS}}
-          export MM_ETHEREUM_WALLET=${{vars.MM_ETHEREUM_WALLET}}
+          export ETHEREUM_PRIVATE_KEY=${{vars.ETHEREUM_PRIVATE_KEY}}
+          export STARKNET_MESSAGING_ADDRESS=${{vars.STARKNET_MESSAGING_ADDRESS}}
+          export MM_ETHEREUM_WALLET_ADDRESS=${{vars.MM_ETHEREUM_WALLET_ADDRESS}}
           export SKIP_VERIFY=true
           . ./contracts/ethereum/deploy.sh
           

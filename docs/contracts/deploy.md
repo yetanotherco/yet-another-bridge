@@ -1,4 +1,4 @@
-# Declare and Deploy Contracts in Testnet
+# Deploy
 
 ## Install dependencies
 
@@ -30,15 +30,15 @@ you will need to:
 template for creating your .env file, paying special attention to the formats provided
 
    ```bash
-   ETH_RPC_URL = Infura or Alchemy RPC URL
+   ETHEREUM_RPC = RPC provider URL
 
-   ETH_PRIVATE_KEY = private key of your ETH wallet
+   ETHEREUM_PRIVATE_KEY = private key of your ETH wallet
 
    ETHERSCAN_API_KEY = API Key to use etherscan to read the Ethereum blockchain
 
-   SN_MESSAGING_ADDRESS = Starknet Messaging address
+   STARKNET_MESSAGING_ADDRESS = Starknet Messaging address
    
-   MM_ETHEREUM_WALLET = Ethereum wallet address of the MarketMaker
+   MM_ETHEREUM_WALLET_ADDRESS = Ethereum wallet address of the MarketMaker
    ```
 
    **NOTE**:
@@ -46,7 +46,7 @@ template for creating your .env file, paying special attention to the formats pr
    - You can generate ETHERSCAN_API_KEY [following these steps](https://docs.etherscan.io/getting-started/creating-an-account).
    - For the deployment, you will need some ETH.
      - You can get some GoerliEth from this [faucet](https://goerlifaucet.com/).
-   - SN_MESSAGING_ADDRESS is for when a L1 contract initiates a message to a L2 contract 
+   - STARKNET_MESSAGING_ADDRESS is for when a L1 contract initiates a message to a L2 contract 
    on Starknet. It does so by calling the sendMessageToL2 function on the Starknet Core 
    Contract with the message parameters. Starknet Core Contracts are the following:
       - Goerli: `0xde29d060D45901Fb19ED6C6e959EB22d8626708e`
@@ -59,7 +59,7 @@ template for creating your .env file, paying special attention to the formats pr
       make ethereum-deploy
    ```
 
-This will deploy a [ERC1967 Proxy](https://docs.openzeppelin.com/contracts/4.x/api/proxy#ERC1967Proxy) smart contract, a [Payment Registry](ethereum/src/PaymentRegistry.sol) smart 
+This will deploy a [ERC1967 Proxy](https://docs.openzeppelin.com/contracts/4.x/api/proxy#ERC1967Proxy) smart contract, a [Payment Registry](../../contracts/ethereum/src/PaymentRegistry.sol) smart 
 contract, and it will link them both. The purpose of having a proxy in front of our 
 smart contract is so that it is [upgradeable](https://docs.openzeppelin.com/contracts/4.x/api/proxy#UUPSUpgradeable), by simply deploying another smart 
 contract and changing the address pointed by the Proxy.
@@ -87,23 +87,22 @@ template for creating your .env file, paying special attention to the formats pr
 
    STARKNET_KEYSTORE = Absolute path of your starknet testnet keystore
 
-   SN_RPC_URL = Infura or Alchemy RPC URL
+   STARKNET_RPC = Infura or Alchemy RPC URL
 
-   SN_ESCROW_OWNER = Public address of the owner of the Escrow contract
+   STARKNET_ESCROW_OWNER = Public address of the owner of the Escrow contract
 
-   MM_SN_WALLET_ADDR = Starknet wallet of the MarketMaker
+   MM_STARKNET_WALLET_ADDRESS = Starknet wallet of the MarketMaker
 
    CLAIM_PAYMENT_NAME = Exact name of the claim_payment function that is called from L1, case sensitive. 
    Example: claim_payment
 
-   MM_ETHEREUM_WALLET = Ethereum wallet of the MarketMaker
+   MM_ETHEREUM_WALLET_ADDRESS = Ethereum wallet of the MarketMaker
 
    NATIVE_TOKEN_ETH_STARKNET = Ethereum's erc20 token handler contract in Starknet
    ```
 
    **Note**
-   - For how to create Starknet ACCOUNT and KEYSTORE, you can follow [this tutorial](starknet_wallet_setup.md)
-   - SN_ESCROW_OWNER is the only one who can perform upgrades, pause and unpause the 
+   - STARKNET_ESCROW_OWNER is the only one who can perform upgrades, pause and unpause the 
    smart contract. If not defined, this value will be set (by deploy.sh) to the current 
    deployer of the smart contract.
 
@@ -174,124 +173,3 @@ selector in the necessary format
 At this point, we should have deployed an ETH smart contract as well as declared and 
 deployed a Starknet smart contract, both connected to act as a bridge between these 
 two chains.
-
-## Upgrade Contracts in Testnet
-
-### Upgrading Payment Registry (on Ethereum)
-
-After deploying the `Payment Registry` contract, you can perform [upgrades](https://docs.openzeppelin.com/contracts/4.x/api/proxy#UUPSUpgradeable) to it. As 
-mentioned previously, this is done via a [ERC1967 Proxy](https://docs.openzeppelin.com/contracts/4.x/api/proxy#ERC1967Proxy). So, to upgrade 
-Payment Registry, another smart contract must be deployed, and the address stored inside 
-the Proxy must be changed.
-
-To do this you must:
-
-1. Configure the `contracts/ethereum/.env` file.
-
-   ```env
-      ETH_RPC_URL = Infura or Alchemy RPC URL
-
-      ETH_PRIVATE_KEY = private key of your ETH wallet
-
-      ETHERSCAN_API_KEY = API Key to use etherscan to read the Ethereum blockchain
-
-      SN_MESSAGING_ADDRESS = Starknet Messaging address
-   ```
-
-   **NOTE:** This is a very similar configuration than the mentioned before, but 
-MM_ETHEREUM_WALLET is not necessary
-
-2. Configure the address of the proxy to be upgraded:
-
-   ```b
-      export PAYMENT_REGISTRY_PROXY_ADDRESS = Address of your Payment Registry's Proxy
-   ```
-
-3. Use the Makefile command to upgrade `Payment Registry` contract
-
-   ```bash
-      make ethereum-upgrade
-   ```
-
-   **Note**
-   - You must be the **owner** of the contract to upgrade it.
-   - This command will:
-      - Rebuild `Payment Registry.sol`
-      - Deploy the new contract to the network
-      - Utilize Foundry to upgrade the previous contract, changing the proxy's pointing 
-     address to the newly deployed contract
-
-### Upgrade Escrow (on Starknet)
-
-Our Escrow contract is also upgradeable, but it's method and process of upgrading is 
-different from Payment Registry's upgrade. Starknet implemented the `replace_class` syscall, 
-allowing a contract to update its source code by replacing its class hash once deployed. 
-So, to upgrade Escrow, a new class hash must be declared, and the contract's class 
-hash must be replaced.
-
-We will perform the upgrade using the `starkli` tool, so the same configuration used 
-for deployment is necessary:
-
-1. Configure `contracts/starknet/.env` file.
-
-   ```env
-      STARKNET_ACCOUNT = Path of your starknet account
-
-      STARKNET_KEYSTORE = Path of your starknet keystore
-   ```
-
-2. Configure the address of the contract to be upgraded:
-
-   ```bash
-      export ESCROW_CONTRACT_ADDRESS = Address of your Escrow smart contract
-   ```
-
-3. Use the Makefile command to upgrade `Escrow` contract
-
-   ```bash
-      make starknet-upgrade
-   ```
-
-   **Note**
-
-- You must be the **owner** of the contract to upgrade it.
-- This command will:
-  - **rebuild** `Escrow.cairo`
-  - **declare** it on Starknet
-  - Call the external **upgrade()** function, 
-  from [OpenZeppellin's Upgradeable implementation](https://github.com/OpenZeppelin/cairo-contracts/blob/release-v0.8.0/src/upgrades/upgradeable.cairo), with the new class hash
-
-### Pausable
-
-Escrow also implements the interesting `Pauseable` module. This means the smart contract 
-can be paused and unpaused by the smart contract Owner. When paused, all modifying 
-functions are unavailable for everyone, including the Owner.
-
-For this, the Owner must execute the `pause` or `unpause` function from the smart 
-contract, you can execute the following:
-
-```bash
-make starknet-pause
-```
-
-```bash
-make starknet-unpause
-```
-
-Alternatively, you can directly execute the function using the starkli tool. Note 
-however, to run starkli this way, you must have exported the STARKNET_ACCOUNT and 
-STARKNET_KEYSTORE variables:
-
-```bash
-starkli invoke $ESCROW_CONTRACT_ADDRESS pause
-```
-
-```bash
-starkli invoke $ESCROW_CONTRACT_ADDRESS unpause 
-```
-
-You can also see if the contract is paused or unpaused by executing the following:
-
-```bash
-starkli call $ESCROW_CONTRACT_ADDRESS is_paused 
-```

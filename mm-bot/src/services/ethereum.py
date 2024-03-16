@@ -6,7 +6,7 @@ from web3 import Web3
 from config import constants
 from services.decorators.use_fallback import use_fallback
 
-ETH_CHAIN_ID = int(constants.ETH_CHAIN_ID)
+ETHEREUM_CHAIN_ID = int(constants.ETHEREUM_CHAIN_ID)
 # get only the abi not the entire file
 abi_file = json.load(open(os.getcwd() + '/abi/PaymentRegistry.json'))['abi']
 
@@ -18,13 +18,13 @@ class EthereumRpcNode:
         self.contract = self.w3.eth.contract(address=contract_address, abi=abi)
 
 
-main_rpc_node = EthereumRpcNode(constants.ETH_RPC_URL,
-                                constants.ETH_PRIVATE_KEY,
-                                constants.ETH_CONTRACT_ADDR,
+main_rpc_node = EthereumRpcNode(constants.ETHEREUM_RPC,
+                                constants.ETHEREUM_PRIVATE_KEY,
+                                constants.ETHEREUM_CONTRACT_ADDRESS,
                                 abi_file)
-fallback_rpc_node = EthereumRpcNode(constants.ETH_FALLBACK_RPC_URL,
-                                    constants.ETH_PRIVATE_KEY,
-                                    constants.ETH_CONTRACT_ADDR,
+fallback_rpc_node = EthereumRpcNode(constants.ETHEREUM_FALLBACK_RPC,
+                                    constants.ETHEREUM_PRIVATE_KEY,
+                                    constants.ETHEREUM_CONTRACT_ADDRESS,
                                     abi_file)
 rpc_nodes = [main_rpc_node, fallback_rpc_node]
 
@@ -74,7 +74,7 @@ def transfer(deposit_id, dst_addr, amount):
 @use_fallback(rpc_nodes, logger, "Failed to create ethereum transfer")
 def create_transfer(deposit_id, dst_addr_bytes, amount, rpc_node=main_rpc_node):
     unsent_tx = rpc_node.contract.functions.transfer(deposit_id, dst_addr_bytes, amount).build_transaction({
-        "chainId": ETH_CHAIN_ID,
+        "chainId": ETHEREUM_CHAIN_ID,
         "from": rpc_node.account.address,
         "nonce": get_nonce(rpc_node.w3, rpc_node.account.address),
         "value": amount,
@@ -101,7 +101,7 @@ def claim_payment(deposit_id, dst_addr, amount, value):
 @use_fallback(rpc_nodes, logger, "Failed to create claim payment eth")
 def create_claim_payment(deposit_id, dst_addr_bytes, amount, value, rpc_node=main_rpc_node):
     unsent_tx = rpc_node.contract.functions.claimPayment(deposit_id, dst_addr_bytes, amount).build_transaction({
-        "chainId": ETH_CHAIN_ID,
+        "chainId": ETHEREUM_CHAIN_ID,
         "from": rpc_node.account.address,
         "nonce": get_nonce(rpc_node.w3, rpc_node.account.address),
         "value": value,
