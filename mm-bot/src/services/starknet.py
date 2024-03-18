@@ -31,7 +31,7 @@ class StarknetRpcNode:
         self.contract_address = contract_address
 
 
-main_rpc_node = StarknetRpcNode(constants.SN_RPC_URL,
+main_rpc_node = StarknetRpcNode(constants.STARKNET_RPC,
                                 constants.SN_PRIVATE_KEY,
                                 constants.SN_WALLET_ADDR,
                                 constants.SN_CONTRACT_ADDR,

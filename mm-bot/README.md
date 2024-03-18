@@ -37,7 +37,7 @@ The following environment variables are used:
 
     ENVIRONMENT=<dev|prod>
     ETH_RPC_URL=<ethereum_rpc_url>
-    SN_RPC_URL=<starknet_rpc_url>
+    STARKNET_RPC=<starknet_rpc_url>
     ETH_FALLBACK_RPC_URL=<ethereum_fallback_rpc_url>
     SN_FALLBACK_RPC_URL=<starknet_fallback_rpc_url>
     ETH_CONTRACT_ADDR=<ethereum_contract_address>

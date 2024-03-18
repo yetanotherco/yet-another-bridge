@@ -87,7 +87,7 @@ template for creating your .env file, paying special attention to the formats pr
 
    STARKNET_KEYSTORE = Absolute path of your starknet testnet keystore
 
-   SN_RPC_URL = Infura or Alchemy RPC URL
+   STARKNET_RPC = Infura or Alchemy RPC URL
 
    SN_ESCROW_OWNER = Public address of the owner of the Escrow contract
 
