@@ -127,16 +127,18 @@ ethereum-and-zksync-deploy:
 	. ./contracts/ethereum/set_zksync_escrow.sh && \
 	. ./contracts/utils/display_info.sh
 
-.ONESHELL:
 ethereum-and-starknet-deploy:
-	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env
-	@make ethereum-build
-	@. ./contracts/ethereum/deploy.sh
-	@make starknet-build
-	@. ./contracts/starknet/deploy.sh
-	@. ./contracts/ethereum/set_starknet_escrow.sh
-	@. ./contracts/ethereum/set_starknet_claim_payment_selector.sh
-	@. ./contracts/utils/display_info.sh
+	@. ./contracts/ethereum/.env && \
+	. ./contracts/starknet/.env && \
+	make ethereum-build && \
+	make starknet-build && \
+	. ./contracts/ethereum/deploy.sh && \
+	. ./contracts/starknet/deploy.sh && \
+	. ./contracts/ethereum/set_starknet_escrow.sh && \
+	. ./contracts/ethereum/set_starknet_claim_payment_selector.sh && \
+	. ./contracts/utils/display_info.sh
+
+
 
 
 #todo add zksync deploy
