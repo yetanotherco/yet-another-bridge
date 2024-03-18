@@ -43,6 +43,14 @@ contract TransferTest is Test {
         assertEq(address(0x1).balance, 100);
     }
 
+    function test_transfer_zk_fail_already_transferred() public {
+        hoax(marketMaker, 100 wei);
+        yab_caller.transfer{value: 100}(1, address(0x1), PaymentRegistry.Chain.ZKSync);
+        hoax(marketMaker, 100 wei);
+        vm.expectRevert("Transfer already processed.");
+        yab_caller.transfer{value: 100}(1, address(0x1), PaymentRegistry.Chain.ZKSync);
+    }
+
     function test_claimPayment_zk_fail_noOrderId() public {
         hoax(marketMaker, 100 wei);
         vm.expectRevert("Transfer not found."); //Won't match to a random transfer number
@@ -63,6 +71,16 @@ contract TransferTest is Test {
         hoax(marketMaker, 100 wei);
         yab_caller.claimPaymentZKSync(1, address(0x1), 100, 1, 1);
         assertEq(address(marketMaker).balance, 100);
+    }
+
+    function test_claimPayment_zk_fail_already_claimed() public {
+        hoax(marketMaker, 100 wei);
+        yab_caller.transfer{value: 100}(1, address(0x1), PaymentRegistry.Chain.ZKSync);  
+        hoax(marketMaker, 100 wei);
+        yab_caller.claimPaymentZKSync(1, address(0x1), 100, 1, 1);
+        hoax(marketMaker, 100 wei);
+        vm.expectRevert("Transfer already claimed.");
+        yab_caller.claimPaymentZKSync(1, address(0x1), 100, 1, 1);
     }
 
     function test_claimPayment_zk_maxInt() public {
