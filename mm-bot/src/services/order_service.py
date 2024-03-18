@@ -99,9 +99,9 @@ class OrderService:
         Set the order status to "PROVING"
 
         :param order: the order to update
-        :param tx_hash: the tx_hash of the ethereum withdraw transaction
+        :param tx_hash: the tx_hash of the ethereum claim_payment transaction
         """
-        order.eth_withdraw_tx_hash = tx_hash
+        order.eth_claim_tx_hash = tx_hash
         order.status = OrderStatus.PROVING.name
         return self.order_dao.update_order(order)
 

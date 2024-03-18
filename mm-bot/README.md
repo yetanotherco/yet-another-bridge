@@ -2,7 +2,7 @@
 Market Maker Bot is a bot that provides liquidity to the Yet Another Bridge (YAB).
 
 # Prerequisites
-- Python v3.8 or higher
+- Python v3.10 or higher
 - pip
 - Postgres (Native or Docker)
 
@@ -16,7 +16,7 @@ pip install -r requirements.txt
 If you want to use a virtual environment, you can use the following command:
 
 ```bash
-make create_venv
+make create_python_venv
 ```
 To run the virtual environment, you can use the following command:
 
@@ -36,23 +36,23 @@ make create_env
 The following environment variables are used:
 
     ENVIRONMENT=<dev|prod>
-    ETH_RPC_URL=<ethereum_rpc_url>
-    SN_RPC_URL=<starknet_rpc_url>
-    ETH_FALLBACK_RPC_URL=<ethereum_fallback_rpc_url>
-    SN_FALLBACK_RPC_URL=<starknet_fallback_rpc_url>
-    ETH_CONTRACT_ADDR=<ethereum_contract_address>
-    SN_CONTRACT_ADDR=<starknet_contract_address>
-    ETH_PRIVATE_KEY=<ethereum_private_key>
-    SN_WALLET_ADDR=<starknet_wallet_address>
-    SN_PRIVATE_KEY=<starknet_private_key>
+    ETHEREUM_RPC=<ethereum_rpc_url>
+    STARKNET_RPC=<starknet_rpc_url>
+    ETHEREUM_FALLBACK_RPC=<ethereum_fallback_rpc_url>
+    STARKNET_FALLBACK_RPC=<starknet_fallback_rpc_url>
+    ETHEREUM_CONTRACT_ADDRESS=<ethereum_contract_address>
+    STARKNET_CONTRACT_ADDRESS=<starknet_contract_address>
+    ETHEREUM_PRIVATE_KEY=<ethereum_private_key>
+    STARKNET_WALLET_ADDRESS=<starknet_wallet_address>
+    STARKNET_PRIVATE_KEY=<starknet_private_key>
     HERODOTUS_API_KEY=<herodotus_api_key>
     POSTGRES_HOST=<postgres_host>
     POSTGRES_USER=<postgres_user>
     POSTGRES_PASSWORD=<postgres_password>
-    POSTGRES_DB=<postgres_db>
+    POSTGRES_DATABASE=<postgres_db>
     LOGGING_LEVEL=<DEBUG|INFO|WARNING|ERROR|CRITICAL>
-    LOGGING_DIR=<logging_directory to save the logs in prod mode>
-    WITHDRAWER=<herodotus|ethereum>
+    LOGGING_DIRECTORY=<logging_directory to save the logs in prod mode>
+    PAYMENT_CLAIMER=<herodotus|ethereum>
 
 
 There is a example file called `.env.example` in the root of the project. 

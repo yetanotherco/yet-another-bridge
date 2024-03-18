@@ -15,9 +15,9 @@ from services import ethereum
 from services import starknet
 from services.overall_fee_calculator import estimate_overall_fee
 from services.order_service import OrderService
-from services.withdrawer.ethereum_withdrawer import EthereumWithdrawer
-from services.withdrawer.herodotus_withdrawer import HerodotusWithdrawer
-from services.withdrawer.withdrawer import Withdrawer
+from services.payment_claimer.ethereum_payment_claimer import EthereumPaymentClaimer
+from services.payment_claimer.herodotus_payment_claimer import HerodotusPaymentClaimer
+from services.payment_claimer.payment_claimer import PaymentClaimer
 
 setup_logger()
 logger = logging.getLogger(__name__)
@@ -28,10 +28,10 @@ MAX_ETH_TRANSFER_WEI = 100000000000000000  # TODO move to env variable
 
 
 def using_herodotus():
-    return constants.WITHDRAWER == "herodotus"
+    return constants.PAYMENT_CLAIMER == "herodotus"
 
 
-withdrawer: Withdrawer = HerodotusWithdrawer() if using_herodotus() else EthereumWithdrawer()
+payment_claimer: PaymentClaimer = HerodotusPaymentClaimer() if using_herodotus() else EthereumPaymentClaimer()
 
 
 async def run():
@@ -62,7 +62,7 @@ async def run():
             # Listen events on starknet
             set_order_events: list = await starknet.get_order_events("pending", "pending")
 
-            # Process events (create order, transfer eth, prove, withdraw eth)
+            # Process events (create order, transfer eth, prove, claim payment eth)
             process_order_events(set_order_events, order_service, eth_lock, herodotus_semaphore)
 
             schedule.run_pending()
@@ -140,16 +140,16 @@ async def process_order(order: Order, order_service: OrderService,
                 # 3. Call herodotus to prove
                 # extra: validate w3.eth.get_storage_at(addr, pos) before calling herodotus
                 if order.status is OrderStatus.FULFILLED:
-                    await withdrawer.send_withdraw(order, order_service)
+                    await payment_claimer.send_payment_claim(order, order_service)
 
                 # 4. Poll herodotus to check task status
                 if order.status is OrderStatus.PROVING:
-                    await withdrawer.wait_for_withdraw(order, order_service)
+                    await payment_claimer.wait_for_payment_claim(order, order_service)
 
-        # 5. Withdraw eth from starknet
+        # 5. Claim payment eth from starknet
         # (bridging is complete for the mm)
         if order.status is OrderStatus.PROVED:
-            await withdrawer.close_withdraw(order, order_service)
+            await payment_claimer.close_payment_claim(order, order_service)
 
         if order.status is OrderStatus.COMPLETED:
             logger.info(f"[+] Order {order.order_id} completed")

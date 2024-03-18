@@ -1,0 +1,37 @@
+name: SN Escrow Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  test-SN:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install scarb
+        uses: software-mansion/setup-scarb@v1
+        with:
+          scarb-version: "2.3.1"
+
+      - name: Install starkliup
+        run: |
+          curl https://get.starkli.sh | sh
+
+      - name: Install Starkli
+        run: |
+          /home/runner/.config/.starkli/bin/starkliup --version 0.1.20
+          sudo mv /home/runner/.config/.starkli/bin/starkli /usr/local/bin/
+
+      - name: Install snFoundry
+        uses: foundry-rs/setup-snfoundry@v2
+        with: 
+          starknet-foundry-version: 0.12.0
+
+      - name: Run make starknet-test
+        run: |
+          make starknet-test
