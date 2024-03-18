@@ -67,7 +67,7 @@ jobs:
 
       - name: Install Forge
         run: |
-          cd contracts/solidity
+          cd contracts/ethereum
           forge install
 
       # Starknet Setup
@@ -158,14 +158,14 @@ jobs:
           export STARKNET_MESSAGING_ADDRESS=${{vars.STARKNET_MESSAGING_ADDRESS}}
           export MM_ETHEREUM_WALLET_ADDRESS=${{vars.MM_ETHEREUM_WALLET_ADDRESS}}
           export SKIP_VERIFY=true
-          . ./contracts/solidity/deploy.sh
+          . ./contracts/ethereum/deploy.sh
           
           export STARKNET_RPC=${{vars.STARKNET_RPC}}
-          source ./contracts/cairo/.env.test
-          . ./contracts/cairo/deploy.sh
+          source ./contracts/starknet/.env.test
+          . ./contracts/starknet/deploy.sh
           
-          . ./contracts/solidity/set_escrow.sh
-          . ./contracts/solidity/set_claim_payment_selector.sh
+          . ./contracts/ethereum/set_escrow.sh
+          . ./contracts/ethereum/set_claim_payment_selector.sh
           
           export AMOUNT=1000000000000000000
           . ./.github/workflows/scripts/set_order.sh

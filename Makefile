@@ -14,46 +14,46 @@ install-ethereum-foundry:
 	curl -L https://foundry.paradigm.xyz | bash && foundryup
 
 ethereum-clean:
-	@cd ./contracts/solidity/ && forge clean
+	@cd ./contracts/ethereum/ && forge clean
 
 ethereum-build: ethereum-clean
-	@cd ./contracts/solidity/ && forge build
+	@cd ./contracts/ethereum/ && forge build
 
 ethereum-test: ethereum-clean
-	@cd ./contracts/solidity/ && forge test
+	@cd ./contracts/ethereum/ && forge test
 
 ethereum-deploy: ethereum-build
-	@. ./contracts/solidity/.env && . ./contracts/solidity/deploy.sh
+	@. ./contracts/ethereum/.env && . ./contracts/ethereum/deploy.sh
 
 ethereum-upgrade: ethereum-build
-	@. ./contracts/solidity/.env && . ./contracts/solidity/upgrade.sh
+	@. ./contracts/ethereum/.env && . ./contracts/ethereum/upgrade.sh
 
 ethereum-set-escrow:
-	@. ./contracts/solidity/.env && . ./contracts/solidity/set_escrow.sh
+	@. ./contracts/ethereum/.env && . ./contracts/ethereum/set_escrow.sh
 
 ethereum-set-claim-payment-selector:
-	@. ./contracts/solidity/.env && . ./contracts/cairo/.env && . ./contracts/solidity/set_claim_payment_selector.sh
+	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env && . ./contracts/ethereum/set_claim_payment_selector.sh
 
 starknet-clean:
-	@cd ./contracts/cairo/ && scarb clean
+	@cd ./contracts/starknet/ && scarb clean
 
 starknet-build: starknet-clean
-	@cd ./contracts/cairo/ && scarb build
+	@cd ./contracts/starknet/ && scarb build
 
 starknet-test: starknet-clean
-	@cd ./contracts/cairo/ && snforge test
+	@cd ./contracts/starknet/ && snforge test
 
 starknet-deploy: starknet-build
-	@. ./contracts/cairo/.env && . ./contracts/cairo/deploy.sh
+	@. ./contracts/starknet/.env && . ./contracts/starknet/deploy.sh
 
 starknet-upgrade: starknet-build
-	@. ./contracts/cairo/.env && . ./contracts/cairo/upgrade.sh
+	@. ./contracts/starknet/.env && . ./contracts/starknet/upgrade.sh
 
 starknet-pause:
-	@. ./contracts/cairo/.env && ./contracts/cairo/change_pause_state.sh pause
+	@. ./contracts/starknet/.env && ./contracts/starknet/change_pause_state.sh pause
 
 starknet-unpause:
-	@. ./contracts/cairo/.env && ./contracts/cairo/change_pause_state.sh unpause
+	@. ./contracts/starknet/.env && ./contracts/starknet/change_pause_state.sh unpause
 
 test: 
 	make starknet-test
@@ -61,18 +61,18 @@ test:
 
 .ONESHELL:
 starknet-deploy-and-connect: starknet-build
-	@. ./contracts/solidity/.env && . ./contracts/cairo/.env
-	@. ./contracts/cairo/deploy.sh
-	@. ./contracts/solidity/set_escrow.sh
-	@. ./contracts/solidity/set_claim_payment_selector.sh
+	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env
+	@. ./contracts/starknet/deploy.sh
+	@. ./contracts/ethereum/set_escrow.sh
+	@. ./contracts/ethereum/set_claim_payment_selector.sh
 
 .ONESHELL:
 deploy-all:
-	@. ./contracts/solidity/.env && . ./contracts/cairo/.env
+	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env
 	@make ethereum-build
-	@. ./contracts/solidity/deploy.sh
+	@. ./contracts/ethereum/deploy.sh
 	@make starknet-build
-	@. ./contracts/cairo/deploy.sh
-	@. ./contracts/solidity/set_escrow.sh
-	@. ./contracts/solidity/set_claim_payment_selector.sh
+	@. ./contracts/starknet/deploy.sh
+	@. ./contracts/ethereum/set_escrow.sh
+	@. ./contracts/ethereum/set_claim_payment_selector.sh
 	@. ./contracts/utils/display_info.sh

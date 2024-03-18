@@ -26,7 +26,7 @@ First, the Ethereum smart contract must be deployed. For Ethereum the deployment
 you will need to:
 
 1. Create your `.env` file: you need to configure the following variables in your own 
-.env file on the contracts/solidity/ folder. You can use the env.example file as a 
+.env file on the contracts/ethereum/ folder. You can use the env.example file as a 
 template for creating your .env file, paying special attention to the formats provided
 
    ```bash
@@ -53,13 +53,13 @@ template for creating your .env file, paying special attention to the formats pr
       - Sepolia: `0xE2Bb56ee936fd6433DC0F6e7e3b8365C906AA057`
       - Mainnet: `0xc662c410C0ECf747543f5bA90660f6ABeBD9C8c4`
 
-2. Deploy Solidity contract
+2. Deploy Ethereum contract
 
    ```bash
       make ethereum-deploy
    ```
 
-This will deploy a [ERC1967 Proxy](https://docs.openzeppelin.com/contracts/4.x/api/proxy#ERC1967Proxy) smart contract, a [Payment Registry](../../contracts/solidity/src/PaymentRegistry.sol) smart 
+This will deploy a [ERC1967 Proxy](https://docs.openzeppelin.com/contracts/4.x/api/proxy#ERC1967Proxy) smart contract, a [Payment Registry](../../contracts/ethereum/src/PaymentRegistry.sol) smart 
 contract, and it will link them both. The purpose of having a proxy in front of our 
 smart contract is so that it is [upgradeable](https://docs.openzeppelin.com/contracts/4.x/api/proxy#UUPSUpgradeable), by simply deploying another smart 
 contract and changing the address pointed by the Proxy.
@@ -79,7 +79,7 @@ On Starknet, the deployment process is in two steps:
 For this, you will need to:
 
 1. Create your `.env` file: you need to configure the following variables in your own 
-.env file on the contracts/solidity folder. You can use the env.example file as a 
+.env file on the contracts/ethereum folder. You can use the env.example file as a 
 template for creating your .env file, paying special attention to the formats provided
 
    ```env

@@ -1,7 +1,7 @@
 #!/bin/bash
 . contracts/utils/colors.sh #for ANSI colors
 
-cd contracts/solidity
+cd contracts/ethereum
 
 if [ -z "$PAYMENT_REGISTRY_PROXY_ADDRESS" ]; then
     printf "\n${RED}ERROR:${COLOR_RESET}\n"
