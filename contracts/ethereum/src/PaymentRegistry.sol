@@ -17,9 +17,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     event ModifiedStarknetEscrowAddress(uint256 newEscrowAddress);
     event ModifiedStarknetClaimPaymentSelector(uint256 newEscrowClaimPaymentSelector);
 
-    //using the following uint8 AS A LIST OF 8 BITS:
-    //first (rightmost) bit: isTransferred, second bit: isClaimed. next 6 bits are currently unused
-    mapping(bytes32 => uint8) public transfers; 
+    mapping(bytes32 => bool) public transfers; 
     address public marketMaker;
     uint256 public StarknetEscrowAddress;
     address public ZKSyncEscrowAddress;
@@ -49,23 +47,14 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         marketMaker = marketMaker_;
     }
 
-    //TODO compare gas costs of passing the index or the value
-    function hasTransferred(bytes32 index) private view returns (bool) {
-        return (transfers[index] & 1) == 1;
-    }
-
-    function hasClaimed(bytes32 index) private view returns (bool) {
-        return ((transfers[index] >> 1) & 1) == 1;
-    }
-
 //TODO: change orderID to uint32
     function transfer(uint256 orderId, address destAddress, Chain chainId) external payable onlyOwnerOrMM {
         require(msg.value > 0, "Invalid amount, should be higher than 0.");
 
         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, msg.value, chainId));
 
-        require(hasTransferred(index) == false, "Transfer already processed.");
-        transfers[index] = 1; //now this transfer is in progress
+        require(transfers[index] == false, "Transfer already processed.");
+        transfers[index] = true; //now this transfer is in progress
 
         (bool success,) = payable(destAddress).call{value: msg.value}(""); //34000 gas
 
@@ -75,9 +64,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
     function claimPayment(uint256 orderId, address destAddress, uint256 amount) external payable onlyOwnerOrMM {
         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, Chain.Starknet));
-        require(hasTransferred(index) == true, "Transfer not found.");
-        require(hasClaimed(index) == false, "Transfer already claimed.");
-        transfers[index] = 3; //now this transfer is claimed
+        require(transfers[index] == true, "Transfer not found."); //if this is claimed twice, Escrow will know
 
         uint256[] memory payload = new uint256[](3);
         payload[0] = uint256(orderId);
@@ -96,9 +83,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         uint256 gasPerPubdataByteLimit
     ) external payable onlyOwnerOrMM {
         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, Chain.ZKSync));
-        require(hasTransferred(index) == true, "Transfer not found.");
-        require(hasClaimed(index) == false, "Transfer already claimed.");
-        transfers[index] = 3; //now this transfer is claimed
+        require(transfers[index] == true, "Transfer not found."); //if this is claimed twice, Escrow will know
 
         //todo change place of this var
         bytes4 selector = 0xa5168739; //claim_payment selector in ZKSync //todo add in init, same as in SN

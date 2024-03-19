@@ -72,16 +72,6 @@ contract TransferTest is Test {
         assertEq(address(marketMaker).balance, 100);
     }
 
-    function test_claimPayment_sn_fail_already_claimed() public {
-        hoax(marketMaker, 100 wei);
-        yab_caller.transfer{value: 100}(1, address(0x1), PaymentRegistry.Chain.Starknet);  
-        hoax(marketMaker, 100 wei);
-        yab_caller.claimPayment(1, address(0x1), 100);
-        hoax(marketMaker, 100 wei);
-        vm.expectRevert("Transfer already claimed.");
-        yab_caller.claimPayment(1, address(0x1), 100);
-    }
-
     function test_claimPayment_sn_maxInt() public {
         uint256 maxInt = type(uint256).max;
         
