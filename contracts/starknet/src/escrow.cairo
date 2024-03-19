@@ -256,7 +256,7 @@ mod Escrow {
         amounts: Array<u256>
     ) {
         let eth_transfer_contract_felt: felt252 = self.eth_transfer_contract.read().into();
-        assert(from_address == eth_transfer_contract_felt, 'Only YAB_TRANSFER_CONTRACT');
+        assert(from_address == eth_transfer_contract_felt, 'Only PAYMENT_REGISTRY_CONTRACT');
 
         assert(order_ids.len() == recipient_addresses.len(), 'Different lengths');
         assert(order_ids.len() == amounts.len(), 'Different lengths');

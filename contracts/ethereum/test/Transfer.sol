@@ -114,10 +114,11 @@ contract TransferTest is Test {
         amounts[1] = 2;
         amounts[2] = 1;
 
+        hoax(marketMaker);
         yab_caller.claimPaymentBatch(orderIds, destAddresses, amounts);
     }
 
-    function testWithdrawBatchMissingTransfer() public {
+    function testClaimPaymentBatch_fail_MissingTransfer() public {
         hoax(marketMaker, 3 wei);
         yab_caller.transfer{value: 3}(1, 0x1, 3);
         hoax(marketMaker, 2 wei);
@@ -140,6 +141,26 @@ contract TransferTest is Test {
         amounts[2] = 1;
 
         vm.expectRevert("Transfer not found.");
+        hoax(marketMaker);
         yab_caller.claimPaymentBatch(orderIds, destAddresses, amounts);(orderIds, destAddresses, amounts);
+    }
+
+    function testClaimPaymentBatch_fail_notOwnerOrMM() public {
+        hoax(marketMaker, 3 wei);
+        yab_caller.transfer{value: 3}(1, 0x1, 3);
+
+        uint256[] memory orderIds = new uint256[](1);
+        uint256[] memory destAddresses = new uint256[](1);
+        uint256[] memory amounts = new uint256[](1);
+
+        orderIds[0] = 1;
+
+        destAddresses[0] = 0x1;
+
+        amounts[0] = 3;
+
+        hoax(makeAddr("bob"), 100 wei);
+        vm.expectRevert("Only Owner or MM can call this function");
+        yab_caller.claimPaymentBatch(orderIds, destAddresses, amounts);
     }
 }

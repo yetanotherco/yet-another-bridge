@@ -75,7 +75,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             payload);
     }
 
-    function claimPaymentBatch(uint256[] calldata orderIds, uint256[] calldata destAddresses, uint256[] calldata amounts) external payable {
+    function claimPaymentBatch(uint256[] calldata orderIds, uint256[] calldata destAddresses, uint256[] calldata amounts) external payable onlyOwnerOrMM() {
         require(orderIds.length == destAddresses.length, "Invalid lengths.");
         require(orderIds.length == amounts.length, "Invalid lengths.");
 
@@ -102,7 +102,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             payload);
     }
 
-    function _claimPayment(uint256 orderId, uint256 destAddress, uint256 amount) internal {
+    function _claimPayment(uint256 orderId, uint256 destAddress, uint256 amount) internal view {
         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount));
         TransferInfo storage transferInfo = transfers[index];
         require(transferInfo.isUsed == true, "Transfer not found.");
