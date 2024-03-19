@@ -1,18 +1,17 @@
-# Market Maker Bot
-Market Maker Bot is a bot that provides liquidity to the Yet Another Bridge (YAB).
+# Deploy Guide
 
-# Prerequisites
+## Prerequisites
 - Python v3.10 or higher
 - pip
 - Postgres (Native or Docker)
 
-# Setup
-## Installation
+## Setup
+### Installation
 
 ```bash
 pip install -r requirements.txt
 ```
-### Virtual Environment
+#### Virtual Environment
 If you want to use a virtual environment, you can use the following command:
 
 ```bash
@@ -24,7 +23,7 @@ To run the virtual environment, you can use the following command:
 source venv/bin/activate
 ```
 
-## Environment Variables
+### Environment Variables
 This API uses environment variables to configure the application. You can create a `.env` file in the root of the project to set the environment variables.
 
 To create your own `.env` file run the following command:
@@ -38,8 +37,8 @@ The following environment variables are used:
     ENVIRONMENT=<dev|prod>
     ETHEREUM_RPC=<ethereum_rpc_url>
     STARKNET_RPC=<starknet_rpc_url>
-    ETHEREUM_FALLBACK_RPC=<ethereum_fallback_rpc_url>
-    STARKNET_FALLBACK_RPC=<starknet_fallback_rpc_url>
+    ETH_FALLBACK_RPC_URL=<ethereum_fallback_rpc_url>
+    SN_FALLBACK_RPC_URL=<starknet_fallback_rpc_url>
     ETHEREUM_CONTRACT_ADDRESS=<ethereum_contract_address>
     STARKNET_CONTRACT_ADDRESS=<starknet_contract_address>
     ETHEREUM_PRIVATE_KEY=<ethereum_private_key>
@@ -57,8 +56,8 @@ The following environment variables are used:
 
 There is a example file called `.env.example` in the root of the project. 
 
-## Database Setup
-### Create Database Container
+### Database Setup
+#### Create Database Container
 This Bot uses a Postgres database. You can either install Postgres natively or use Docker (recommended for development environment). 
 If you use Docker, you can use the following command to start a Postgres container:
 ```bash
@@ -72,7 +71,7 @@ make create_db container=<container> user=<user> password=<pwd> database=<db_nam
 
 This container will have a database called `<database>`, by default it is `mm-bot`.
 
-### Run Database Container
+#### Run Database Container
 If you want to run or re-run the database container, you can use the following command:
 ```bash
 make run_db container=<container>
@@ -80,7 +79,7 @@ make run_db container=<container>
     Where:
     - container:    the name of the docker container. If not provided, the default value is 'postgres'
 
-### Stop Database Container
+#### Stop Database Container
 If you want to stop the database container, you can use the following command:
 ```bash
 make stop_db container=<container>
@@ -88,21 +87,21 @@ make stop_db container=<container>
     Where:
     - container:    the name of the docker container. If not provided, the default value is 'postgres'
 
-### Database Population
+#### Database Population
 To create the tables, you can use the following command:
 ```bash
 TODO
 ```
 You must run schema.sql into the database to create the tables. You can use pgAdmin or any other tool to run the script.
 
-# Development
+## Development
 To start the Bot, you can use the following command:
 
 ```bash
 python3 src/main.py
 ```
 
-# Test [TODO]
+## Test [TODO]
 To run the tests, you can use the following command:
 
 ```bash

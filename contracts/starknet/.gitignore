@@ -1,3 +1,6 @@
 target
 .snfoundry_cache
 .env
+.env.sepolia
+.env.goerli
+.env.local
