@@ -59,7 +59,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         (bool success,) = payable(destAddress).call{value: msg.value}(""); //34000 gas
 
         require(success, "Transfer failed.");
-        emit Transfer(orderId, msg.sender, destAddress, msg.value, chainId); //3000 gas (todo verify gas)
+        emit Transfer(orderId, msg.sender, destAddress, msg.value, chainId); //2400 gas
     }
 
     function claimPayment(uint256 orderId, address destAddress, uint256 amount) external payable onlyOwnerOrMM {
