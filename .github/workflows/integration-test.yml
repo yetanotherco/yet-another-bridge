@@ -157,6 +157,7 @@ jobs:
           export ETHEREUM_PRIVATE_KEY=${{vars.ETHEREUM_PRIVATE_KEY}}
           export STARKNET_MESSAGING_ADDRESS=${{vars.STARKNET_MESSAGING_ADDRESS}}
           export MM_ETHEREUM_WALLET_ADDRESS=${{vars.MM_ETHEREUM_WALLET_ADDRESS}}
+          export ZKSYNC_DIAMOND_PROXY_ADDRESS=${{vars.ZKSYNC_DIAMOND_PROXY_ADDRESS}}
           export SKIP_VERIFY=true
           . ./contracts/ethereum/deploy.sh
           
