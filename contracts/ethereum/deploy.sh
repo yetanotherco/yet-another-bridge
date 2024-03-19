@@ -5,6 +5,8 @@ cd contracts/ethereum
 
 printf "${GREEN}\n=> [ETH] Deploying ERC1967Proxy & PaymentRegistry ${COLOR_RESET}\n"
 
+echo $MM_ETHEREUM_WALLET_ADDRESS
+
 RESULT_LOG=$(forge script ./script/Deploy.s.sol --rpc-url $ETHEREUM_RPC --broadcast ${SKIP_VERIFY:---verify})
 # echo "$RESULT_LOG" #uncomment this line for debugging in detail
 

@@ -31,7 +31,8 @@ trait IEscrow<ContractState> {
 
 #[starknet::contract]
 mod Escrow {
-    use super::{IEscrow, Order};
+    use core::traits::Into;
+use super::{IEscrow, Order};
 
     use openzeppelin::{
         access::ownable::OwnableComponent,
@@ -251,24 +252,21 @@ mod Escrow {
     fn claim_payment_batch(
         ref self: ContractState,
         from_address: felt252,
-        order_ids: Array<u256>,
-        recipient_addresses: Array<EthAddress>,
-        amounts: Array<u256>
+        orders: Array<(u256, EthAddress, u256)>
     ) {
         let eth_transfer_contract_felt: felt252 = self.eth_transfer_contract.read().into();
         assert(from_address == eth_transfer_contract_felt, 'Only PAYMENT_REGISTRY_CONTRACT');
 
-        assert(order_ids.len() == recipient_addresses.len(), 'Different lengths');
-        assert(order_ids.len() == amounts.len(), 'Different lengths');
-        
         let mut idx = 0;
 
         loop {
-            if idx >= order_ids.len() {
+            if idx >= orders.len() {
                 break;
             }
 
-            _claim_payment(ref self, from_address, *order_ids.at(idx), *recipient_addresses.at(idx), *amounts.at(idx));
+            let (order_id, recipient_address, amount) = *orders.at(idx);
+
+            _claim_payment(ref self, from_address, order_id, recipient_address, amount);
 
             idx += 1;
         };
@@ -290,6 +288,7 @@ mod Escrow {
             self.orders_pending.write(order_id, false);
             let payment_amount = order.amount + order.fee;
 
+            // TODO: Might be best to transfer all at once
             IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
                 .transfer(self.mm_starknet_wallet.read(), payment_amount);
 

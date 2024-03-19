@@ -16,12 +16,14 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     event Transfer(uint256 indexed orderId, address srcAddress, TransferInfo transferInfo);
     event ModifiedEscrowAddress(uint256 newEscrowAddress);
     event ModifiedEscrowClaimPaymentSelector(uint256 newEscrowClaimPaymentSelector);
+    event ModifiedEscrowClaimPaymentBatchSelector(uint256 newEscrowClaimPaymentSelector);
 
     mapping(bytes32 => TransferInfo) public transfers;
     address private _marketMaker;
     IStarknetMessaging private _snMessaging;
     uint256 private _snEscrowAddress;
     uint256 private _snEscrowClaimPaymentSelector;
+    uint256 private _snEscrowClaimPaymentBatchSelector;
 
     constructor() {
         _disableInitializers();
@@ -32,6 +34,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         address snMessaging,
         uint256 snEscrowAddress,
         uint256 snEscrowClaimPaymentSelector,
+        uint256 snEscrowClaimPaymentBatchSelector,
         address marketMaker) public initializer { 
         __Ownable_init(msg.sender);
         __UUPSUpgradeable_init();
@@ -39,6 +42,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         _snMessaging = IStarknetMessaging(snMessaging);
         _snEscrowAddress = snEscrowAddress;
         _snEscrowClaimPaymentSelector = snEscrowClaimPaymentSelector;
+        _snEscrowClaimPaymentBatchSelector = snEscrowClaimPaymentBatchSelector;
         _marketMaker = marketMaker;
     }
 
@@ -75,11 +79,17 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             payload);
     }
 
-    function claimPaymentBatch(uint256[] calldata orderIds, uint256[] calldata destAddresses, uint256[] calldata amounts) external payable onlyOwnerOrMM() {
+    function claimPaymentBatch(
+        uint256[] calldata orderIds,
+        uint256[] calldata destAddresses, 
+        uint256[] calldata amounts
+    ) external payable onlyOwnerOrMM() {
         require(orderIds.length == destAddresses.length, "Invalid lengths.");
         require(orderIds.length == amounts.length, "Invalid lengths.");
 
-        uint256[] memory payload = new uint256[](5 * orderIds.length);
+        uint256[] memory payload = new uint256[](5 * orderIds.length + 1);
+
+        payload[0] = orderIds.length;
         
         for (uint32 idx = 0; idx < orderIds.length; idx++) {
             uint256 orderId = orderIds[idx];
@@ -88,7 +98,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
             _claimPayment(orderId, destAddress, amount);
 
-            uint32 base_idx = 5 * idx;
+            uint32 base_idx = 1 + 5 * idx;
             payload[base_idx] = uint128(orderId); // low
             payload[base_idx + 1] = uint128(orderId >> 128); // high
             payload[base_idx + 2] = destAddress;
@@ -98,7 +108,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         
         _snMessaging.sendMessageToL2{value: msg.value}(
             _snEscrowAddress,
-            _snEscrowClaimPaymentSelector,
+            _snEscrowClaimPaymentBatchSelector,
             payload);
     }
 
@@ -118,12 +128,21 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         emit ModifiedEscrowClaimPaymentSelector(snEscrowClaimPaymentSelector);
     }
 
+    function setEscrowClaimPaymentBatchSelector(uint256 snEscrowClaimPaymentBatchSelector) external onlyOwner {
+        _snEscrowClaimPaymentBatchSelector = snEscrowClaimPaymentBatchSelector;
+        emit ModifiedEscrowClaimPaymentBatchSelector(snEscrowClaimPaymentBatchSelector);
+    }
+
     function getEscrowAddress() external view returns (uint256) {
         return _snEscrowAddress;
     }
 
     function getEscrowClaimPaymentSelector() external view returns (uint256) {
         return _snEscrowClaimPaymentSelector;
+    }
+
+    function getEscrowClaimPaymentBatchSelector() external view returns (uint256) {
+        return _snEscrowClaimPaymentBatchSelector;
     }
     
     

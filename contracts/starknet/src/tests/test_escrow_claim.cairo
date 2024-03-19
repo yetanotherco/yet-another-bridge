@@ -152,7 +152,7 @@ mod Escrow {
         let recipient_adresses_clone = recipient_addresses.clone();
         let amounts_clone = amounts.clone();
 
-        let mut order_ids = array![];
+        let mut orders = array![];
 
         start_prank(CheatTarget::One(escrow.contract_address), USER());
 
@@ -168,7 +168,7 @@ mod Escrow {
 
             let order_id = _create_order(recipient_address, amount, fee, escrow);
 
-            order_ids.append(order_id);
+            orders.append((order_id, recipient_address, amount));
             
             idx += 1;
         };
@@ -184,9 +184,7 @@ mod Escrow {
         );
 
         let mut payload_buffer: Array<felt252> = ArrayTrait::new();
-        Serde::serialize(@order_ids, ref payload_buffer);
-        Serde::serialize(@recipient_adresses_clone, ref payload_buffer);
-        Serde::serialize(@amounts_clone, ref payload_buffer);
+        Serde::serialize(@orders, ref payload_buffer);
 
         l1_handler.from_address = ETH_TRANSFER_CONTRACT().into();
         l1_handler.payload = payload_buffer.span();
@@ -203,7 +201,7 @@ mod Escrow {
                 break;
             }
 
-            let order_id = order_ids.at(idx).clone();
+            let (order_id, _, _) = orders.at(idx).clone();
             assert(!escrow.get_order_pending(order_id), 'Order not used');
             idx += 1;
         };
