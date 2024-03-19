@@ -243,18 +243,56 @@ mod Escrow {
         self.pausable.assert_not_paused();
         let eth_transfer_contract_felt: felt252 = self.eth_transfer_contract.read().into();
         assert(from_address == eth_transfer_contract_felt, 'Only PAYMENT_REGISTRY_CONTRACT');
-        assert(self.orders_pending.read(order_id), 'Order claimed or nonexistent');
 
-        let order = self.orders.read(order_id);
-        assert(order.recipient_address == recipient_address, 'recipient_address not match L1');
-        assert(order.amount == amount, 'amount not match L1');
-
-        self.orders_pending.write(order_id, false);
-        let payment_amount = order.amount + order.fee;
-
-        IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
-            .transfer(self.mm_starknet_wallet.read(), payment_amount);
-
-        self.emit(ClaimPayment { order_id, address: self.mm_starknet_wallet.read(), amount });
+        _claim_payment(ref self, from_address, order_id, recipient_address, amount);
     }
+
+    #[l1_handler]
+    fn claim_payment_batch(
+        ref self: ContractState,
+        from_address: felt252,
+        order_ids: Array<u256>,
+        recipient_addresses: Array<EthAddress>,
+        amounts: Array<u256>
+    ) {
+        let eth_transfer_contract_felt: felt252 = self.eth_transfer_contract.read().into();
+        assert(from_address == eth_transfer_contract_felt, 'Only YAB_TRANSFER_CONTRACT');
+
+        assert(order_ids.len() == recipient_addresses.len(), 'Different lengths');
+        assert(order_ids.len() == amounts.len(), 'Different lengths');
+        
+        let mut idx = 0;
+
+        loop {
+            if idx >= order_ids.len() {
+                break;
+            }
+
+            _claim_payment(ref self, from_address, *order_ids.at(idx), *recipient_addresses.at(idx), *amounts.at(idx));
+
+            idx += 1;
+        };
+    }
+
+    fn _claim_payment(
+        ref self: ContractState,
+        from_address: felt252,
+        order_id: u256,
+        recipient_address: EthAddress,
+        amount: u256
+        ) {
+            assert(self.orders_pending.read(order_id), 'Order withdrew or nonexistent');
+            
+            let order = self.orders.read(order_id);
+            assert(order.recipient_address == recipient_address, 'recipient_address not match L1');
+            assert(order.amount == amount, 'amount not match L1');
+
+            self.orders_pending.write(order_id, false);
+            let payment_amount = order.amount + order.fee;
+
+            IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
+                .transfer(self.mm_starknet_wallet.read(), payment_amount);
+
+            self.emit(ClaimPayment { order_id, address: self.mm_starknet_wallet.read(), amount });
+        }
 }
