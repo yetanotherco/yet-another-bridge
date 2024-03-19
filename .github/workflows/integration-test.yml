@@ -165,8 +165,8 @@ jobs:
           source ./contracts/starknet/.env.test
           . ./contracts/starknet/deploy.sh
           
-          . ./contracts/ethereum/set_escrow.sh
-          . ./contracts/ethereum/set_claim_payment_selector.sh
+          . ./contracts/ethereum/set_starknet_escrow.sh
+          . ./contracts/ethereum/set_starknet_claim_payment_selector.sh
           
           export AMOUNT=1000000000000000000
           . ./.github/workflows/scripts/set_order.sh
