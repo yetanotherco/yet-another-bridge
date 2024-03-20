@@ -176,29 +176,22 @@ mod Escrow {
         let order_id = escrow.set_order(order);
         stop_prank(CheatTarget::One(escrow.contract_address));
     }
-    
+
     #[test]
     fn test_fail_random_eth_user_calls_l1_handler() {
         let (escrow, _) = setup();
-
+        let data: Array<felt252> = array![1, MM_ETHEREUM().into(), 3, 4];
+        let mut payload_buffer: Array<felt252> = ArrayTrait::new();
+        data.serialize(ref payload_buffer);
         let mut l1_handler = L1HandlerTrait::new(
             contract_address: escrow.contract_address,
-            function_name: 'claim_payment'
+            function_name: 'claim_payment',
         );
-
-        let order_id_felt252: felt252 = 1.try_into().unwrap();
-        let recipient_address_felt252: felt252 = MM_ETHEREUM().into();
-        
-        let amount_felt252: felt252 = 1.try_into().unwrap();
-
-        let mut payload_buffer: Array<felt252> = ArrayTrait::new();
-        Serde::serialize(@order_id_felt252, ref payload_buffer);
-        Serde::serialize(@recipient_address_felt252, ref payload_buffer);
-        Serde::serialize(@amount_felt252, ref payload_buffer);
-
         l1_handler.from_address = ETH_USER().into();
+
         l1_handler.payload = payload_buffer.span();
 
+        // same as "Should Panic" but for the L1 handler function
         match l1_handler.execute() {
             Result::Ok(_) => panic_with_felt252('shouldve panicked'),
             Result::Err(RevertedTransaction) => {
@@ -206,34 +199,4 @@ mod Escrow {
             }
         }
     }
-
-    // #[test]
-    // fn test_max_amount_in_l1_handler() {
-    //     let (escrow, _) = setup();
-
-    //     let mut l1_handler = L1HandlerTrait::new(
-    //         contract_address: escrow.contract_address,
-    //         function_name: 'claim_payment'
-    //     );
-
-    //     let order_id_felt252: felt252 = 0.try_into().unwrap();
-    //     let recipient_address_felt252: felt252 = MM_ETHEREUM().into();
-        
-    //     let amount_felt252: felt252 = 115792089237316195423570985008687907853269984665640564039457584007913129639935.try_into().unwrap();
-
-    //     let mut payload_buffer: Array<felt252> = ArrayTrait::new();
-    //     Serde::serialize(@order_id_felt252, ref payload_buffer);
-    //     Serde::serialize(@recipient_address_felt252, ref payload_buffer);
-    //     Serde::serialize(@amount_felt252, ref payload_buffer);
-
-    //     l1_handler.from_address = ETH_USER().into();
-    //     l1_handler.payload = payload_buffer.span();
-
-    //     match l1_handler.execute() {
-    //         Result::Ok(_) => panic_with_felt252('shouldve panicked'),
-    //         Result::Err(RevertedTransaction) => {
-    //             assert(*RevertedTransaction.panic_data.at(0) == 'Only PAYMENT_REGISTRY_CONTRACT', *RevertedTransaction.panic_data.at(0));
-    //         }
-    //     }
-    // }
 }
