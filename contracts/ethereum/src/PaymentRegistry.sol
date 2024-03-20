@@ -12,6 +12,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     enum Chain { Starknet, ZKSync } //todo add canonic chainID
 
     event Transfer(uint256 indexed orderId, address srcAddress, address destAddress, uint256 amount, Chain chainId);
+    event ClaimPayment(uint256 indexed orderId, address destAddress, uint256 amount, Chain chainId);
 
     event ModifiedZKSyncEscrowAddress(address newEscrowAddress);
     event ModifiedStarknetEscrowAddress(uint256 newEscrowAddress);
@@ -47,7 +48,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         marketMaker = marketMaker_;
     }
 
-//TODO: change orderID to uint32
+    //TODO: change orderID to uint32
     function transfer(uint256 orderId, address destAddress, Chain chainId) external payable onlyOwnerOrMM {
         require(msg.value > 0, "Invalid amount, should be higher than 0.");
 
@@ -66,15 +67,20 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, Chain.Starknet));
         require(transfers[index] == true, "Transfer not found."); //if this is claimed twice, Escrow will know
 
-        uint256[] memory payload = new uint256[](3);
-        payload[0] = uint256(orderId);
-        payload[1] = uint256(uint160(destAddress));
-        payload[2] = uint256(amount);
+        uint256[] memory payload = new uint256[](5); //this is not an array of u128 because sendMessageToL2 takes an array of uint256
+        payload[0] = uint128(orderId); // low
+        payload[1] = uint128(orderId >> 128); // high
+        payload[2] = uint256(uint160(destAddress));
+        payload[3] = uint128(amount); // low
+        payload[4] = uint128(amount >> 128); // high
         
+        //10k gas:
         _snMessaging.sendMessageToL2{value: msg.value}(
             StarknetEscrowAddress,
             StarknetEscrowClaimPaymentSelector,
             payload);
+
+        emit ClaimPayment(orderId, destAddress, amount, Chain.Starknet); //2100 gas
     }
 
     function claimPaymentZKSync(
@@ -103,6 +109,8 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             new bytes[](0), //factory dependencies
             msg.sender //refund recipient
         );
+
+        emit ClaimPayment(orderId, destAddress, amount, Chain.ZKSync); //2100 gas
     }
 
     function setStarknetEscrowAddress(uint256 newStarknetEscrowAddress) external onlyOwner {
