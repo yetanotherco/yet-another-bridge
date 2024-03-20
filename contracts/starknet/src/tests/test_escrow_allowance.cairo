@@ -120,14 +120,10 @@ mod Escrow {
             function_name: 'claim_payment'
         );
 
-        let order_id_felt252: felt252 = order_id.try_into().unwrap();
-        let recipient_address_felt252: felt252 = order.recipient_address.into();
-        let amount_felt252: felt252 = order.amount.try_into().unwrap();
-
         let mut payload_buffer: Array<felt252> = ArrayTrait::new();
-        Serde::serialize(@order_id_felt252, ref payload_buffer);
-        Serde::serialize(@recipient_address_felt252, ref payload_buffer);
-        Serde::serialize(@amount_felt252, ref payload_buffer);
+        Serde::serialize(@order_id, ref payload_buffer);
+        Serde::serialize(@order.recipient_address, ref payload_buffer);
+        Serde::serialize(@order.amount, ref payload_buffer);
 
         l1_handler.from_address = ETH_TRANSFER_CONTRACT().into();
         l1_handler.payload = payload_buffer.span();
