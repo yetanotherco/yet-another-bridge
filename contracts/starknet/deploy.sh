@@ -34,8 +34,6 @@ if [ -z "$MM_ETHEREUM_WALLET_ADDRESS" ]; then
     exit 1
 fi
 
-export STARKNET_RPC=$STARKNET_RPC
-
 
 echo "${GREEN}\n=> [SN] Declaring Escrow${COLOR_RESET}"
 ESCROW_CLASS_HASH=$(starkli declare \
