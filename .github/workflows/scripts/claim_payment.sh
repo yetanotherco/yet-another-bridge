@@ -14,7 +14,7 @@ echo "Initial MM balance: $MM_INITIAL_BALANCE"
 echo "Withdrawing $AMOUNT"
 cast send --rpc-url $ETHEREUM_RPC --private-key $ETHEREUM_PRIVATE_KEY \
   $PAYMENT_REGISTRY_PROXY_ADDRESS "claimPayment(uint256, address, uint256)" \
-  "0" $DESTINATION_ADDRESS "$AMOUNT" \
+  "0" DESTINATION_ADDRESS "$AMOUNT" \
   --value $AMOUNT >> /dev/null
 
 sleep 15
