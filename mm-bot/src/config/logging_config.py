@@ -37,7 +37,7 @@ def get_development_handler(formatter):
 # File Handler for production with daily rotation
 def get_production_handler(formatter):
     file_handler = TimedRotatingFileHandler(
-        filename=f"{constants.LOGGING_DIR}/mm-bot.log",
+        filename=f"{constants.LOGGING_DIRECTORY}/mm-bot.log",
         when="midnight",
         interval=1,
         backupCount=7,  # Keep up to 7 old log files

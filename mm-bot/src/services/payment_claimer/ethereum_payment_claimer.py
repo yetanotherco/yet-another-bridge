@@ -26,8 +26,8 @@ class EthereumPaymentClaimer(PaymentClaimer):
 
     @staticmethod
     async def estimate_claim_payment_fallback_message_fee(order_id, recipient_address, amount):
-        from_address = constants.ETH_CONTRACT_ADDR
-        to_address = constants.SN_CONTRACT_ADDR
+        from_address = constants.ETHEREUM_CONTRACT_ADDRESS
+        to_address = constants.STARKNET_CONTRACT_ADDRESS
         entry_point_selector = hex(get_selector_from_name("claim_payment"))
         payload = [
             hex(order_id),

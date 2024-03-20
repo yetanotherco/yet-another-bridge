@@ -165,6 +165,7 @@ mod Escrow {
             self.orders_pending.write(order_id, true);
             self.orders_senders.write(order_id, get_caller_address());
             self.orders_timestamps.write(order_id, get_block_timestamp());
+            self.current_order_id.write(order_id + 1);
 
             dispatcher.transferFrom(get_caller_address(), get_contract_address(), payment_amount);
 
@@ -178,7 +179,6 @@ mod Escrow {
                     }
                 );
 
-            self.current_order_id.write(order_id + 1);
             order_id
         }
 

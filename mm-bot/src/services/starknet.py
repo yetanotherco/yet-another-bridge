@@ -14,7 +14,7 @@ from services import ethereum
 from services.decorators.use_fallback import use_fallback, use_async_fallback
 from services.mm_full_node_client import MmFullNodeClient
 
-SN_CHAIN_ID = int_from_bytes(constants.SN_CHAIN_ID.encode("utf-8"))
+STARKNET_CHAIN_ID = int_from_bytes(constants.STARKNET_CHAIN_ID.encode("utf-8"))
 SET_ORDER_EVENT_KEY = 0x2c75a60b5bdad73ebbf539cc807fccd09875c3cbf3f44041f852cdb96d8acd3
 
 
@@ -32,15 +32,15 @@ class StarknetRpcNode:
 
 
 main_rpc_node = StarknetRpcNode(constants.STARKNET_RPC,
-                                constants.SN_PRIVATE_KEY,
-                                constants.SN_WALLET_ADDR,
-                                constants.SN_CONTRACT_ADDR,
-                                SN_CHAIN_ID)
-fallback_rpc_node = StarknetRpcNode(constants.SN_FALLBACK_RPC_URL,
-                                    constants.SN_PRIVATE_KEY,
-                                    constants.SN_WALLET_ADDR,
-                                    constants.SN_CONTRACT_ADDR,
-                                    SN_CHAIN_ID)
+                                constants.STARKNET_PRIVATE_KEY,
+                                constants.STARKNET_WALLET_ADDRESS,
+                                constants.STARKNET_CONTRACT_ADDRESS,
+                                STARKNET_CHAIN_ID)
+fallback_rpc_node = StarknetRpcNode(constants.STARKNET_FALLBACK_RPC,
+                                    constants.STARKNET_PRIVATE_KEY,
+                                    constants.STARKNET_WALLET_ADDRESS,
+                                    constants.STARKNET_CONTRACT_ADDRESS,
+                                    STARKNET_CHAIN_ID)
 rpc_nodes = [main_rpc_node, fallback_rpc_node]
 
 logger = logging.getLogger(__name__)
@@ -65,7 +65,7 @@ async def get_starknet_events(from_block_number: Literal["pending", "latest"] | 
                               to_block_number: Literal["pending", "latest"] | int | None = "pending",
                               continuation_token=None, rpc_node=main_rpc_node):
     events_response = await rpc_node.full_node_client.get_events(
-        address=constants.SN_CONTRACT_ADDR,
+        address=constants.STARKNET_CONTRACT_ADDRESS,
         chunk_size=1000,
         keys=[[SET_ORDER_EVENT_KEY]],
         from_block_number=from_block_number,
@@ -78,7 +78,7 @@ async def get_starknet_events(from_block_number: Literal["pending", "latest"] | 
 @use_async_fallback(rpc_nodes, logger, "Failed to set order")
 async def get_is_used_order(order_id, rpc_node=main_rpc_node) -> bool:
     call = Call(
-        to_addr=constants.SN_CONTRACT_ADDR,
+        to_addr=constants.STARKNET_CONTRACT_ADDRESS,
         selector=get_selector_from_name("get_order_used"),
         calldata=[order_id, 0],
     )
@@ -155,7 +155,7 @@ async def claim_payment(order_id, block, slot) -> bool:
     slot_high = int(slot.replace("0x", "")[0:32], 16)
     slot_low = int(slot.replace("0x", "")[32:64], 16)
     call = Call(
-        to_addr=int(constants.SN_CONTRACT_ADDR, 0),
+        to_addr=int(constants.STARKNET_CONTRACT_ADDRESS, 0),
         selector=get_selector_from_name("claim_payment"),
         calldata=[order_id, 0, block, 0, slot_low, slot_high]
     )
@@ -179,7 +179,7 @@ async def sign_invoke_transaction(call: Call, max_fee: int, rpc_node=main_rpc_no
 @use_async_fallback(rpc_nodes, logger, "Failed to estimate message fee")
 async def estimate_message_fee(from_address, to_address, entry_point_selector, payload, rpc_node=main_rpc_node):
     fee = await rpc_node.full_node_client.estimate_message_fee(from_address, to_address, entry_point_selector, payload)
-    return fee.overall_fee
+    return int(fee.overall_fee / 100)
 
 
 @use_async_fallback(rpc_nodes, logger, "Failed to send transaction")

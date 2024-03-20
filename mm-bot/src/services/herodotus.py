@@ -20,7 +20,7 @@ async def herodotus_prove(block, order_id, slot) -> str:
             constants.HERODOTUS_ORIGIN_CHAIN: {
                 "block:{}".format(block): {
                     "accounts": {
-                        constants.ETH_CONTRACT_ADDR: {
+                        constants.ETHEREUM_CONTRACT_ADDRESS: {
                             "slots": [
                                 slot.hex(),
                                 hex(int(slot.hex(), 16) + 1),

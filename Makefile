@@ -139,8 +139,6 @@ ethereum-and-starknet-deploy:
 	. ./contracts/utils/display_info.sh
 
 
-
-
 #todo add zksync deploy
 .ONESHELL:
 deploy-all:

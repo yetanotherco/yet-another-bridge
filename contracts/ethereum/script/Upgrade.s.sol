@@ -9,7 +9,7 @@ import {UUPSUpgradeable} from "@openzeppelin/contracts/proxy/utils/UUPSUpgradeab
 contract Upgrade is Script {
     function run() external returns (address, address) {
         address PaymentRegistryProxyAddress = vm.envAddress("PAYMENT_REGISTRY_PROXY_ADDRESS");
-        uint256 deployerPrivateKey = vm.envUint("ETH_PRIVATE_KEY");
+        uint256 deployerPrivateKey = vm.envUint("ETHEREUM_PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
 
         // Deploy new PaymentRegistry contract to upgrade proxy
@@ -23,7 +23,7 @@ contract Upgrade is Script {
         address proxyAddress,
         address newImplementationAddress
     ) public returns (address, address) {
-        uint256 deployerPrivateKey = vm.envUint("ETH_PRIVATE_KEY");
+        uint256 deployerPrivateKey = vm.envUint("ETHEREUM_PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
         
         PaymentRegistry proxy = PaymentRegistry(payable(proxyAddress));

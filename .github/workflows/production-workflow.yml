@@ -6,14 +6,11 @@ on:
 
 jobs:
   Deploy:
-    name: Deploy to EC2
+    name: Deploy to MM Server
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy
-        run: echo I am deploying the api to AWS
-
-      - name: Deploy in EC2
+      - name: Deploy to MM Server
         env:
           PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           HOST_NAME: ${{ secrets.HOST_NAME }}
@@ -28,3 +25,4 @@ jobs:
             sudo systemctl stop ${SERVICE_NAME} &&
             git pull &&
             sudo systemctl start ${SERVICE_NAME} "
+

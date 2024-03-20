@@ -8,15 +8,15 @@ if [ -z "$PAYMENT_REGISTRY_PROXY_ADDRESS" ]; then
     echo "PAYMENT_REGISTRY_PROXY_ADDRESS Variable is empty. Aborting execution.\n"
     exit 1
 fi
-if [ -z "$ETH_PRIVATE_KEY" ]; then
+if [ -z "$ETHEREUM_PRIVATE_KEY" ]; then
     printf "\n${RED}ERROR:${COLOR_RESET}\n"
-    echo "ETH_PRIVATE_KEY Variable is empty. Aborting execution.\n"
+    echo "ETHEREUM_PRIVATE_KEY Variable is empty. Aborting execution.\n"
     exit 1
 fi
 
 printf "${GREEN}\n=> [ETH] Upgrading PaymentRegistry ${COLOR_RESET}\n"
 
-RESULT_LOG=$(forge script ./script/Upgrade.s.sol --rpc-url $ETH_RPC_URL --broadcast --verify)
+RESULT_LOG=$(forge script ./script/Upgrade.s.sol --rpc-url $ETHEREUM_RPC --broadcast --verify)
 # echo "$RESULT_LOG" #uncomment this line for debugging in detail
 
 # Getting result addresses

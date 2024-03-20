@@ -11,9 +11,9 @@ if [ "$SKIP_VERIFY" == true ]; then
     VERIFY=""
 fi
 
-export ETH_PRIVATE_KEY=$ETH_PRIVATE_KEY
+export ETHEREUM_PRIVATE_KEY=$ETHEREUM_PRIVATE_KEY
 
-RESULT_LOG=$(forge script ./script/Deploy.s.sol --rpc-url $ETH_RPC_URL --broadcast $VERIFY)
+RESULT_LOG=$(forge script ./script/Deploy.s.sol --rpc-url $ETHEREUM_RPC --broadcast $VERIFY)
 # echo "$RESULT_LOG" #uncomment this line for debugging in detail
 
 # Getting result addresses

@@ -60,8 +60,15 @@ Follow the steps below to set up a smart wallet using `starkli`:
    1. **Initiate the account with the Open Zeppelin Account contract**:
 
       ```bash
-      starkli account oz init --keystore ~/.starkli-wallets/keystore.json ~/.starkli-wallets/account.json
+      starkli account <account-variant> init --keystore ~/.starkli-wallets/keystore.json ~/.starkli-wallets/account.json
       ```
+      The [current version of Starkli](https://book.starkli.rs/accounts) supports these account variants (by alphabetical order):
+   
+       | Vendor       | Identifier | Link                                            |
+       |--------------|------------|-------------------------------------------------|
+       | Argent       | argent     | https://www.argent.xyz/argent-x/                |
+       | Braavos      | braavos    | https://braavos.app/                            |
+       | OpenZeppelin | oz         | https://github.com/OpenZeppelin/cairo-contracts |
 
    2. **Deploy the account by running**:
 
@@ -72,6 +79,7 @@ Follow the steps below to set up a smart wallet using `starkli`:
       For the deployment `starkli` will ask you to fund an account. To do so
       you will need to fund the address given by `starkli`.
       - In Goerli you can use [Goerli Starknet Faucet](https://faucet.goerli.starknet.io)
+      
 4. **Setting Up Environment Variables**: There are two primary environment
    variables vital for effective usage of Starkli’s CLI. These are the location
    of the keystore file for the Signer, and the location of the Account
