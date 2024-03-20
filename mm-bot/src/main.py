@@ -59,7 +59,7 @@ async def run():
     ethereum_sender = EthereumSender(order_service)
     starknet_payment_claimer: PaymentClaimer = HerodotusPaymentClaimer() if using_herodotus() \
         else EthereumPaymentClaimer(starknet_fee_calculator)
-    zksync_payment_claimer: PaymentClaimer = Ethereum2ZksyncPaymentClaimer()
+    zksync_payment_claimer: PaymentClaimer = Ethereum2ZksyncPaymentClaimer(zksync_fee_calculator)
 
     # Initialize starknet indexer and processor
     starknet_order_indexer = StarknetOrderIndexer(order_service)
@@ -93,7 +93,8 @@ async def run():
         for order in orders:
             if order.origin_network is Network.STARKNET:
                 starknet_order_executor.execute(order)
-            # TODO add support for ZkSync
+            elif order.origin_network is Network.ZKSYNC:
+                zksync_order_executor.execute(order)
     except Exception as e:
         logger.error(f"[-] Error: {e}")
 

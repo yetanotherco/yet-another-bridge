@@ -71,7 +71,7 @@ def transfer(order_id: int, destination_address: str, amount: int, chain_id: Net
 
 
 # we need amount so the transaction is valid with the transfer that will be transferred
-    # TODO separate create_transfer_unsent_tx and sign_transaction
+# TODO separate create_transfer_unsent_tx and sign_transaction
 @use_fallback(rpc_nodes, logger, "Failed to create ethereum transfer")
 def create_transfer(order_id: int, destination_address_bytes: int, amount: int, chain_id: int,
                     rpc_node=main_rpc_node):
@@ -103,6 +103,32 @@ def claim_payment(deposit_id, dst_addr, amount, value):
 @use_fallback(rpc_nodes, logger, "Failed to create claim payment eth")
 def create_claim_payment(deposit_id, dst_addr_bytes, amount, value, rpc_node=main_rpc_node):
     unsent_tx = rpc_node.contract.functions.claimPayment(deposit_id, dst_addr_bytes, amount).build_transaction({
+        "chainId": ETHEREUM_CHAIN_ID,
+        "from": rpc_node.account.address,
+        "nonce": get_nonce(rpc_node.w3, rpc_node.account.address),
+        "value": value,
+    })
+    signed_tx = rpc_node.w3.eth.account.sign_transaction(unsent_tx, private_key=rpc_node.account.key)
+    return unsent_tx, signed_tx
+
+
+def claim_payment_zksync(order_id: int, destination_address: str, amount: int,
+                         value: int, gas_limit: int, gas_per_pub_data_byte_limit: int):
+    order_id = Web3.to_int(order_id)  # I think it is not necessary because it is already an int
+    destination_address_bytes = int(destination_address, 0)
+    amount = Web3.to_int(amount)
+
+    unsent_tx, signed_tx = create_claim_payment_zksync(order_id, destination_address_bytes, amount,
+                                                       value, gas_limit, gas_per_pub_data_byte_limit)
+
+    return send_raw_transaction(signed_tx)
+
+
+@use_fallback(rpc_nodes, logger, "Failed to create claim payment eth")
+def create_claim_payment_zksync(order_id: int, destination_address_bytes: int, amount: int,
+                                value: int, gas_limit: int, gas_per_pub_data_byte_limit: int,
+                                rpc_node=main_rpc_node):
+    unsent_tx = rpc_node.contract.functions.claimPaymentZKSync(order_id, destination_address_bytes, amount, gas_limit, gas_per_pub_data_byte_limit).build_transaction({
         "chainId": ETHEREUM_CHAIN_ID,
         "from": rpc_node.account.address,
         "nonce": get_nonce(rpc_node.w3, rpc_node.account.address),
