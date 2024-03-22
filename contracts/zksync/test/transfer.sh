@@ -15,7 +15,7 @@ echo "Initial Destination balance: $DESTINATION_INITIAL_BALANCE"
 
 echo "Transferring $BRIDGE_AMOUNT_WEI WEI to $USER_ETHEREUM_PUBLIC_ADDRESS"
 
-cast send --rpc-url $ETHEREUM_RPC --private-key $MM_ETHEREUM_PRIVATE_ADDRESS \
+cast send --rpc-url $ETHEREUM_RPC --private-key $MM_ETHEREUM_PRIVATE_KEY \
   $PAYMENT_REGISTRY_PROXY_ADDRESS "transfer(uint256, uint256, uint8)" \
   "0" "$USER_ETHEREUM_PUBLIC_ADDRESS_UINT" "1"\
   --value $BRIDGE_AMOUNT_WEI >> /dev/null
