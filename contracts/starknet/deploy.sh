@@ -35,7 +35,7 @@ if [ -z "$MM_ETHEREUM_WALLET_ADDRESS" ]; then
 fi
 
 
-printf "${GREEN}\n=> [SN] Declaring Escrow${COLOR_RESET}"
+printf "${GREEN}\n=> [SN] Declaring Escrow${COLOR_RESET}\n"
 ESCROW_CLASS_HASH=$(starkli declare \
   --account $STARKNET_ACCOUNT \
   $(if [ -n "$STARKNET_KEYSTORE" ]; then echo "--keystore $STARKNET_KEYSTORE"; fi) \

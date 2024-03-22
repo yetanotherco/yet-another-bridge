@@ -60,11 +60,12 @@ starknet-test: starknet-clean
 starknet-deploy: starknet-build
 	@. ./contracts/starknet/.env && . ./contracts/starknet/deploy.sh
 
-starknet-deploy-and-connect: starknet-build
-	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env
-	@. ./contracts/starknet/deploy.sh
-	@. ./contracts/ethereum/set_starknet_escrow.sh
-	@. ./contracts/ethereum/set_starknet_claim_payment_selector.sh
+starknet-deploy-and-connect:
+	@make starknet-build && \
+	. ./contracts/ethereum/.env && . ./contracts/starknet/.env && \
+	. ./contracts/starknet/deploy.sh && \
+	. ./contracts/ethereum/set_starknet_escrow.sh && \
+	. ./contracts/ethereum/set_starknet_claim_payment_selector.sh
 
 starknet-upgrade: starknet-build
 	@. ./contracts/starknet/.env && . ./contracts/starknet/upgrade.sh
