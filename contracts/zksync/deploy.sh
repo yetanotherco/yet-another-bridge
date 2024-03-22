@@ -28,7 +28,7 @@ fi
 
 printf "${CYAN}[ZKSync] Escrow Address: $ZKSYNC_ESCROW_CONTRACT_ADDRESS${COLOR_RESET}\n"
 printf "\nIf you now wish to finish the configuration of this deploy, you will need to run the following commands:\n"
-# echo "export PAYMENT_REGISTRY_PROXY_ADDRESS=$PAYMENT_REGISTRY_PROXY_ADDRESS"
+echo "export PAYMENT_REGISTRY_PROXY_ADDRESS=$PAYMENT_REGISTRY_PROXY_ADDRESS"
 echo "export ZKSYNC_ESCROW_CONTRACT_ADDRESS=$ZKSYNC_ESCROW_CONTRACT_ADDRESS"
 echo "make zksync-connect"
 
