@@ -6,14 +6,9 @@ cd contracts/ethereum
 printf "${GREEN}\n=> [ETH] Deploying ERC1967Proxy & PaymentRegistry ${COLOR_RESET}\n"
 
 
-VERIFY="--verify"
-if [ "$SKIP_VERIFY" == true ]; then
-    VERIFY=""
-fi
-
 export ETHEREUM_PRIVATE_KEY=$ETHEREUM_PRIVATE_KEY
 
-RESULT_LOG=$(forge script ./script/Deploy.s.sol --rpc-url $ETHEREUM_RPC --broadcast $VERIFY)
+RESULT_LOG=$(forge script ./script/Deploy.s.sol --rpc-url $ETHEREUM_RPC --broadcast ${SKIP_VERIFY:---verify})
 # echo "$RESULT_LOG" #uncomment this line for debugging in detail
 
 # Getting result addresses

@@ -151,29 +151,29 @@ export const deployContractWithProxy = async (contractArtifactName: string, cons
   const escrow = await hre.zkUpgrades.deployProxy(deployer.zkWallet, contract, [42], { initializer: "initialize" });
   await escrow.waitForDeployment();
 
-  // // const contract = await deployer.deploy(artifact, constructorArguments);
-  // const address = await escrow.getAddress();
-  // console.log(contractArtifactName + " deployed to:", await escrow.getAddress());
+  // const contract = await deployer.deploy(artifact, constructorArguments);
+  const address = await escrow.getAddress();
+  console.log(contractArtifactName + " deployed to:", await escrow.getAddress());
 
 
-  // const constructorArgs = contract.interface.encodeDeploy(constructorArguments);
-  // const fullContractSource = `${artifact.sourceName}:${artifact.contractName}`;
+  const constructorArgs = contract.interface.encodeDeploy(constructorArguments);
+  const fullContractSource = `${artifact.sourceName}:${artifact.contractName}`;
 
-  // // Display contract deployment info
-  // log(`\n"${artifact.contractName}" was successfully deployed:`);
-  // log(` - Contract address: ${address}`);
-  // log(` - Contract source: ${fullContractSource}`);
-  // log(` - Encoded constructor arguments: ${constructorArgs}\n`);
+  // Display contract deployment info
+  log(`\n"${artifact.contractName}" was successfully deployed:`);
+  log(` - Contract address: ${address}`);
+  log(` - Contract source: ${fullContractSource}`);
+  log(` - Encoded constructor arguments: ${constructorArgs}\n`);
 
-  // if (!options?.noVerify && hre.network.config.verifyURL) {
-  //   log(`Requesting contract verification...`);
-  //   await verifyContract({
-  //     address,
-  //     contract: fullContractSource,
-  //     constructorArguments: constructorArgs,
-  //     bytecode: artifact.bytecode,
-  //   });
-  // }
+  if (!options?.noVerify && hre.network.config.verifyURL) {
+    log(`Requesting contract verification...`);
+    await verifyContract({
+      address,
+      contract: fullContractSource,
+      constructorArguments: constructorArgs,
+      bytecode: artifact.bytecode,
+    });
+  }
 
   return escrow;
 }

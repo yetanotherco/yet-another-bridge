@@ -104,7 +104,6 @@ describe('Set Order tests', function () {
   })
 })
 
-// /*
 describe('Ownable tests', function () {
   it("Should not allow random user to pause", async () => {
     await expect(escrow.connect(user_zk).pause()).to.be.revertedWith("Ownable: caller is not the owner");
@@ -139,4 +138,3 @@ describe('Ownable tests', function () {
   });
 
 })
-// */
