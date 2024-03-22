@@ -3,7 +3,10 @@ src = "src"
 out = "out"
 libs = ["lib"]
 gas_reports = ["*"]
-remappings = ["@openzeppelin/contracts-upgradeable=lib/openzeppelin-contracts-upgradeable/contracts"]
+remappings = [
+    "@openzeppelin/contracts-upgradeable=lib/openzeppelin-contracts-upgradeable/contracts",
+    "@matterlabs/interfaces=lib/era-contracts/l1-contracts/contracts/zksync/interfaces",
+    ]
 
 [rpc_endpoints]
 goerli = "${GOERLI_RPC_URL}"
