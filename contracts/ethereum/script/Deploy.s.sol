@@ -12,7 +12,7 @@ contract Deploy is Script {
 
         address snMessagingAddress = vm.envAddress("STARKNET_MESSAGING_ADDRESS");
         uint256 snEscrowAddress = 0x0; // this value is set in a call to the smart contract, once deployed
-        uint256 snClaimPaymentSelector = 0x0; // this value is set in a call to the smart contract, once deployed
+        uint256 snClaimPaymentSelector = vm.envUint("STARKNET_CLAIM_PAYMENT_SELECTOR");
         address marketMaker = vm.envAddress("MM_ETHEREUM_WALLET_ADDRESS");
         address ZKSYNC_DIAMOND_PROXY_ADDRESS = vm.envAddress("ZKSYNC_DIAMOND_PROXY_ADDRESS");
 

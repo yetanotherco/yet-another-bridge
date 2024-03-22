@@ -50,7 +50,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         _ZKSyncDiamondProxy = IZkSync(ZKSyncDiamondProxyAddress);
 
         StarknetEscrowAddress = StarknetEscrowAddress_;
-        StarknetEscrowClaimPaymentSelector = StarknetEscrowClaimPaymentSelector_; // TODO remove this or set the correct value in init
+        StarknetEscrowClaimPaymentSelector = StarknetEscrowClaimPaymentSelector_;
         marketMaker = marketMaker_;
     }
 
