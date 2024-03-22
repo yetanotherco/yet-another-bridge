@@ -4,32 +4,32 @@
 export STARKNET_RPC=$STARKNET_RPC
 
 if [ -z "$STARKNET_ACCOUNT" ]; then
-    echo "\n${RED}ERROR:${COLOR_RESET}"
+    printf "\n${RED}ERROR:${COLOR_RESET}"
     echo "STARKNET_ACCOUNT Variable is empty. Aborting execution.\n"
     exit 1
 fi
 if [ -z "$STARKNET_KEYSTORE" ] && [ -z "$STARKNET_PRIVATE_KEY" ]; then
-    echo "\n${RED}ERROR:${COLOR_RESET}"
+    printf "\n${RED}ERROR:${COLOR_RESET}"
     echo "STARKNET_KEYSTORE and STARKNET_PRIVATE_KEY Variables are empty. Aborting execution.\n"
     exit 1
 fi
 if [ -z "$MM_STARKNET_WALLET_ADDRESS" ]; then
-    echo "\n${RED}ERROR:${COLOR_RESET}"
+    printf "\n${RED}ERROR:${COLOR_RESET}"
     echo "MM_STARKNET_WALLET_ADDRESS Variable is empty. Aborting execution.\n"
     exit 1
 fi
 if [ -z "$NATIVE_TOKEN_ETH_STARKNET" ]; then
-    echo "\n${RED}ERROR:${COLOR_RESET}"
+    printf "\n${RED}ERROR:${COLOR_RESET}"
     echo "NATIVE_TOKEN_ETH_STARKNET Variable is empty. Aborting execution.\n"
     exit 1
 fi
 if [ -z "$PAYMENT_REGISTRY_PROXY_ADDRESS" ]; then
-    echo "\n${RED}ERROR:${COLOR_RESET}"
+    printf "\n${RED}ERROR:${COLOR_RESET}"
     echo "PAYMENT_REGISTRY_PROXY_ADDRESS Variable is empty. Aborting execution.\n"
     exit 1
 fi
 if [ -z "$MM_ETHEREUM_WALLET_ADDRESS" ]; then
-    echo "\n${RED}ERROR:${COLOR_RESET}"
+    printf "\n${RED}ERROR:${COLOR_RESET}"
     echo "MM_ETHEREUM_WALLET_ADDRESS Variable is empty. Aborting execution.\n"
     exit 1
 fi
