@@ -117,7 +117,7 @@ jobs:
           cd starknet-messaging-dev/solidity
           cp anvil.env .env
           source .env
-          forge script script/LocalTesting.s.sol:LocalSetup --broadcast --rpc-url ${ETH_RPC_URL}
+          forge script script/LocalTesting.s.sol:LocalSetup --broadcast --rpc-url ${ETHEREUM_RPC}
 
       # Run Katana
       - name: Run Katana

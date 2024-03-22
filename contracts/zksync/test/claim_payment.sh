@@ -4,7 +4,7 @@
 
 printf "${GREEN}\n=> [ETH] Making Claim Payment${COLOR_RESET}\n"
 
-MM_INITIAL_BALANCE_L1=$(cast balance --rpc-url $ETH_RPC_URL --ether $MM_ETHEREUM_PUBLIC_ADDRESS)
+MM_INITIAL_BALANCE_L1=$(cast balance --rpc-url $ETHEREUM_RPC --ether $MM_ETHEREUM_PUBLIC_ADDRESS)
 echo "Initial MM balance L1:"
 echo "$MM_INITIAL_BALANCE_L1"
 
@@ -18,7 +18,7 @@ npx zksync-cli wallet balance --chain "dockerized-node" --address "$ZKSYNC_ESCRO
 echo "Withdrawing $BRIDGE_AMOUNT_ETH ETH"
 echo "Withdrawing $BRIDGE_AMOUNT_WEI WEI"
 
-cast send --rpc-url $ETH_RPC_URL --private-key $ETH_PRIVATE_KEY \
+cast send --rpc-url $ETHEREUM_RPC --private-key $ETHEREUM_PRIVATE_KEY \
   $PAYMENT_REGISTRY_PROXY_ADDRESS "claimPaymentZKSync(uint256, uint256, uint256, uint256, uint256)" \
   "0" "$USER_ETHEREUM_PUBLIC_ADDRESS_UINT" "$BRIDGE_AMOUNT_WEI" "2000000000" "800"\
   --value 5000000000000000000
@@ -32,7 +32,7 @@ cast send --rpc-url $ETH_RPC_URL --private-key $ETH_PRIVATE_KEY \
 sleep 15
 
 
-MM_INITIAL_BALANCE_L1=$(cast balance --rpc-url $ETH_RPC_URL --ether $MM_ETHEREUM_PUBLIC_ADDRESS)
+MM_INITIAL_BALANCE_L1=$(cast balance --rpc-url $ETHEREUM_RPC --ether $MM_ETHEREUM_PUBLIC_ADDRESS)
 echo "After MM balance L1:"
 echo "$MM_INITIAL_BALANCE_L1"
 
