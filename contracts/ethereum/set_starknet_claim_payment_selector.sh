@@ -30,5 +30,5 @@ printf "${GREEN}\n=> [ETH] Setting Starknet ClaimPaymentBatch Selector on ETH Sm
 CLAIM_PAYMENT_BATCH_SELECTOR=$(starkli selector $CLAIM_PAYMENT_BATCH_NAME)
 echo "New ClaimPaymentBatch Selector: ${CLAIM_PAYMENT_BATCH_SELECTOR}"
 
-cast send --rpc-url $ETHEREUM_RPC --private-key $ETHEREUM_PRIVATE_KEY $PAYMENT_REGISTRY_PROXY_ADDRESS "setEscrowClaimPaymentBatchSelector(uint256)" "${CLAIM_PAYMENT_BATCH_SELECTOR}" | grep "transactionHash"
+cast send --rpc-url $ETHEREUM_RPC --private-key $ETHEREUM_PRIVATE_KEY $PAYMENT_REGISTRY_PROXY_ADDRESS "setStarknetClaimPaymentBatchSelector(uint256)" "${CLAIM_PAYMENT_BATCH_SELECTOR}" | grep "transactionHash"
 echo "Done setting ClaimPaymentBatch selector"
