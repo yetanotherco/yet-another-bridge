@@ -60,9 +60,8 @@ starknet-test: starknet-clean
 starknet-deploy: starknet-build
 	@. ./contracts/starknet/.env && . ./contracts/starknet/deploy.sh
 
-starknet-deploy-and-connect:
-	@make starknet-build && \
-	. ./contracts/ethereum/.env && . ./contracts/starknet/.env && \
+starknet-deploy-and-connect: starknet-build
+	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env && \
 	. ./contracts/starknet/deploy.sh && \
 	. ./contracts/ethereum/set_starknet_escrow.sh && \
 	. ./contracts/ethereum/set_starknet_claim_payment_selector.sh
@@ -85,9 +84,8 @@ zksync-clean:
 zksync-build: zksync-clean
 	@cd ./contracts/zksync/ && yarn compile
 
-zksync-deploy: 
-	@make zksync-build && \
-	. ./contracts/zksync/.env && . ./contracts/zksync/deploy.sh
+zksync-deploy: zksync-build
+	@. ./contracts/zksync/.env && . ./contracts/zksync/deploy.sh
 
 zksync-connect:
 	@. ./contracts/ethereum/.env && . ./contracts/zksync/.env && \
@@ -103,7 +101,6 @@ zksync-test: zksync-build
 	@cd ./contracts/zksync/ && yarn test
 
 #wip:
-.ONESHELL:
 zksync-test-integration:
 	@make ethereum-build && make zksync-build && \
 	. ./contracts/ethereum/test/.env.test && . ./contracts/zksync/test/.env.test && \
@@ -113,8 +110,6 @@ zksync-test-integration:
 	. ./contracts/zksync/test/set_order.sh && \
 	. ./contracts/zksync/test/transfer.sh && \
 	. ./contracts/zksync/test/claim_payment.sh
-
-# . ./setOrder - transfer - claim payment
 
 # zksync-upgrade: WIP
 
@@ -142,18 +137,18 @@ ethereum-and-starknet-deploy:
 	. ./contracts/ethereum/set_starknet_claim_payment_selector.sh && \
 	. ./contracts/utils/display_info.sh
 
-
-#todo add zksync deploy
-.ONESHELL:
 deploy-all:
-	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env && . ./contracts/zksync/.env 
-	@make ethereum-build 
-	@. ./contracts/ethereum/deploy.sh 
-	@make starknet-build 
-	@. ./contracts/starknet/deploy.sh 
-	@. ./contracts/ethereum/set_starknet_escrow.sh 
-	@. ./contracts/ethereum/set_starknet_claim_payment_selector.sh 
-	@. ./contracts/utils/display_info.sh
+	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env && . ./contracts/zksync/.env && \
+	make ethereum-build && \
+	. ./contracts/ethereum/deploy.sh && \
+	make starknet-build && \
+	. ./contracts/starknet/deploy.sh && \
+	. ./contracts/ethereum/set_starknet_escrow.sh && \
+	. ./contracts/ethereum/set_starknet_claim_payment_selector.sh && \
+	. ./contracts/utils/display_info.sh && \
+	make zksync-build && \
+	. ./contracts/zksync/deploy.sh && \
+	. ./contracts/ethereum/set_zksync_escrow.sh
 
 test: 
 	make starknet-test
