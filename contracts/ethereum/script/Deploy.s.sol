@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-pragma solidity ^0.8.21;
+pragma solidity ^0.8.20;
 
 import {Script} from "forge-std/Script.sol";
 import {PaymentRegistry} from "../src/PaymentRegistry.sol";
@@ -14,10 +14,11 @@ contract Deploy is Script {
         uint256 snEscrowAddress = 0x0; // this value is set in a call to the smart contract, once deployed
         uint256 snClaimPaymentSelector = 0x0; // this value is set in a call to the smart contract, once deployed
         address marketMaker = vm.envAddress("MM_ETHEREUM_WALLET_ADDRESS");
+        address ZKSYNC_DIAMOND_PROXY_ADDRESS = vm.envAddress("ZKSYNC_DIAMOND_PROXY_ADDRESS");
 
         PaymentRegistry yab = new PaymentRegistry();
         ERC1967Proxy proxy = new ERC1967Proxy(address(yab), "");
-        PaymentRegistry(address(proxy)).initialize(snMessagingAddress, snEscrowAddress, snClaimPaymentSelector, marketMaker);
+        PaymentRegistry(address(proxy)).initialize(snMessagingAddress, snEscrowAddress, snClaimPaymentSelector, marketMaker, ZKSYNC_DIAMOND_PROXY_ADDRESS);
 
         vm.stopBroadcast();
 

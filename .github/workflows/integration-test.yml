@@ -117,7 +117,7 @@ jobs:
           cd starknet-messaging-dev/solidity
           cp anvil.env .env
           source .env
-          forge script script/LocalTesting.s.sol:LocalSetup --broadcast --rpc-url ${ETH_RPC_URL}
+          forge script script/LocalTesting.s.sol:LocalSetup --broadcast --rpc-url ${{vars.ETHEREUM_RPC}}
 
       # Run Katana
       - name: Run Katana
@@ -157,6 +157,7 @@ jobs:
           export ETHEREUM_PRIVATE_KEY=${{vars.ETHEREUM_PRIVATE_KEY}}
           export STARKNET_MESSAGING_ADDRESS=${{vars.STARKNET_MESSAGING_ADDRESS}}
           export MM_ETHEREUM_WALLET_ADDRESS=${{vars.MM_ETHEREUM_WALLET_ADDRESS}}
+          export ZKSYNC_DIAMOND_PROXY_ADDRESS=${{vars.ZKSYNC_DIAMOND_PROXY_ADDRESS}}
           export SKIP_VERIFY=true
           . ./contracts/ethereum/deploy.sh
           
@@ -164,8 +165,8 @@ jobs:
           source ./contracts/starknet/.env.test
           . ./contracts/starknet/deploy.sh
           
-          . ./contracts/ethereum/set_escrow.sh
-          . ./contracts/ethereum/set_claim_payment_selector.sh
+          . ./contracts/ethereum/set_starknet_escrow.sh
+          . ./contracts/ethereum/set_starknet_claim_payment_selector.sh
           
           export AMOUNT=1000000000000000000
           . ./.github/workflows/scripts/set_order.sh
