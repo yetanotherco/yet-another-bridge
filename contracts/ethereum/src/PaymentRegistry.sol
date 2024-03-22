@@ -63,12 +63,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, msg.value, chainId)); //200 gas
         require(transfers[index].isUsed == false, "Transfer already processed."); //3000 gas
 
-        // transfers[index] = TransferInfo({destAddress: destAddress, amount: msg.value, isUsed: true, chainId: chainId}); //65000 gas
-        // 64900 gas:
-        transfers[index].destAddress = destAddress;
-        transfers[index].amount = msg.value;
-        transfers[index].isUsed = true;
-        transfers[index].chainId = chainId;
+        transfers[index] = TransferInfo({destAddress: destAddress, amount: msg.value, isUsed: true, chainId: chainId});
 
 
         (bool success,) = payable(address(uint160(destAddress))).call{value: msg.value}(""); //34000 gas
