@@ -99,8 +99,6 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         emit ClaimPayment(transferInfo);
     }
 
-// why is destAddress a uint256? should be address?
-// oh, because sn address is not "address" typew]
     function claimPaymentZKSync(
         uint256 orderId, uint256 destAddress, uint256 amount,
         uint256 gasLimit,
