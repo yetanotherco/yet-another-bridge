@@ -14,9 +14,11 @@ contract TransferTest is Test {
     ERC1967Proxy public proxy;
     PaymentRegistry public yab_caller;
 
-    address SN_MESSAGING_ADDRESS = 0xde29d060D45901Fb19ED6C6e959EB22d8626708e;
-    uint256 SN_ESCROW_CLAIM_PAYMENT_SELECTOR = 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77;
+    address STARKNET_MESSAGING_ADDRESS = 0xde29d060D45901Fb19ED6C6e959EB22d8626708e;
+    uint256 STARKNET_CLAIM_PAYMENT_SELECTOR = 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77;
     address ZKSYNC_DIAMOND_PROXY_ADDRESS = 0x2eD8eF54a16bBF721a318bd5a5C0F39Be70eaa65;
+    bytes4 ZKSYNC_CLAIM_PAYMENT_SELECTOR = 0xa5168739;
+
 
     function setUp() public {
         vm.startPrank(deployer);
@@ -24,7 +26,7 @@ contract TransferTest is Test {
         yab = new PaymentRegistry();
         proxy = new ERC1967Proxy(address(yab), "");
         yab_caller = PaymentRegistry(address(proxy));
-        yab_caller.initialize(SN_MESSAGING_ADDRESS, snEscrowAddress, SN_ESCROW_CLAIM_PAYMENT_SELECTOR, marketMaker, ZKSYNC_DIAMOND_PROXY_ADDRESS);
+        yab_caller.initialize(STARKNET_MESSAGING_ADDRESS, STARKNET_CLAIM_PAYMENT_SELECTOR, marketMaker, ZKSYNC_DIAMOND_PROXY_ADDRESS, ZKSYNC_CLAIM_PAYMENT_SELECTOR);
 
         vm.stopPrank();
     }
