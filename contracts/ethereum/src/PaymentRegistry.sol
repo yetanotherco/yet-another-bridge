@@ -22,6 +22,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     event ModifiedZKSyncEscrowAddress(address newEscrowAddress);
     event ModifiedStarknetEscrowAddress(uint256 newEscrowAddress);
     event ModifiedStarknetClaimPaymentSelector(uint256 newEscrowClaimPaymentSelector);
+    event ModifiedZKSyncEscrowClaimPaymentSelector(bytes4 newZKSyncEscrowClaimPaymentSelector);
     event ClaimPayment(TransferInfo transferInfo);
 
     mapping(bytes32 => TransferInfo) public transfers;
@@ -31,6 +32,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     uint256 public StarknetEscrowClaimPaymentSelector;
     IZkSync private _ZKSyncDiamondProxy; 
     IStarknetMessaging private _snMessaging;
+    bytes4 public ZKSyncEscrowClaimPaymentSelector;
 
     constructor() {
         _disableInitializers();
@@ -39,18 +41,18 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     // no constructors can be used in upgradeable contracts. 
     function initialize(
         address snMessaging,
-        uint256 StarknetEscrowAddress_,
         uint256 StarknetEscrowClaimPaymentSelector_,
         address marketMaker_,
-        address ZKSyncDiamondProxyAddress) public initializer { 
+        address ZKSyncDiamondProxyAddress,
+        bytes4 ZKSyncEscrowClaimPaymentSelector_) public initializer { 
         __Ownable_init(msg.sender);
         __UUPSUpgradeable_init();
 
         _snMessaging = IStarknetMessaging(snMessaging);
         _ZKSyncDiamondProxy = IZkSync(ZKSyncDiamondProxyAddress);
 
-        StarknetEscrowAddress = StarknetEscrowAddress_;
         StarknetEscrowClaimPaymentSelector = StarknetEscrowClaimPaymentSelector_;
+        ZKSyncEscrowClaimPaymentSelector = ZKSyncEscrowClaimPaymentSelector_;
         marketMaker = marketMaker_;
     }
 
@@ -104,9 +106,9 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         require(transferInfo.isUsed == true, "Transfer not found.");
 
         //todo change place of this var
-        bytes4 selector = 0xa5168739; //claim_payment selector in ZKSync //todo add in init, same as in SN
+        // bytes4 selector = 0xa5168739; //claim_payment selector in ZKSync //todo add in init, same as in SN
         bytes memory messageToL2 = abi.encodeWithSelector(
-            selector,
+            ZKSyncEscrowClaimPaymentSelector,
             orderId,
             transferInfo.destAddress,
             transferInfo.amount
@@ -140,6 +142,11 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     function setStarknetClaimPaymentSelector(uint256 NewStarknetEscrowClaimPaymentSelector) external onlyOwner {
         StarknetEscrowClaimPaymentSelector = NewStarknetEscrowClaimPaymentSelector;
         emit ModifiedStarknetClaimPaymentSelector(StarknetEscrowClaimPaymentSelector);
+    }
+
+    function setZKSyncEscrowClaimPaymentSelector(bytes4 NewZKSyncEscrowClaimPaymentSelector) external onlyOwner {
+        ZKSyncEscrowClaimPaymentSelector = NewZKSyncEscrowClaimPaymentSelector;
+        emit ModifiedZKSyncEscrowClaimPaymentSelector(ZKSyncEscrowClaimPaymentSelector);
     }
     
     
