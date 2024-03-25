@@ -91,6 +91,45 @@ contract TransferTest is Test {
         yab_caller.claimPaymentBatchZKSync(orderIds, destAddresses, amounts, 1, 1);
     }
 
+    function test_claimPaymentBatch_zk_fail_MissingTransfer() public {
+        hoax(marketMaker, 100 wei);
+        yab_caller.transfer{value: 100}(1, 0x1, PaymentRegistry.Chain.ZKSync);  
+
+        uint256[] memory orderIds = new uint256[](2);
+        uint256[] memory destAddresses = new uint256[](2);
+        uint256[] memory amounts = new uint256[](2);
+
+        orderIds[0] = 1;
+        orderIds[1] = 2;
+        destAddresses[0] = 0x1;
+        destAddresses[1] = 0x1;
+        amounts[0] = 100;
+        amounts[1] = 100;
+
+        vm.expectRevert("Transfer not found.");
+        hoax(marketMaker);
+        yab_caller.claimPaymentBatchZKSync(orderIds, destAddresses, amounts, 1, 1);
+    }
+
+    function test_claimPaymentBatch_zk_fail_notOwnerOrMM() public {
+        hoax(marketMaker, 100 wei);
+        yab_caller.transfer{value: 100}(1, 0x1, PaymentRegistry.Chain.ZKSync);  
+
+        uint256[] memory orderIds = new uint256[](2);
+        uint256[] memory destAddresses = new uint256[](2);
+        uint256[] memory amounts = new uint256[](2);
+
+        orderIds[0] = 1;
+        orderIds[1] = 2;
+        destAddresses[0] = 0x1;
+        destAddresses[1] = 0x1;
+        amounts[0] = 100;
+        amounts[1] = 100;
+
+        vm.expectRevert("Only Owner or MM can call this function");
+        yab_caller.claimPaymentBatchZKSync(orderIds, destAddresses, amounts, 0, 1);
+    }
+
     function test_claimPayment_zk_maxInt() public {
         uint256 maxInt = type(uint256).max;
         
