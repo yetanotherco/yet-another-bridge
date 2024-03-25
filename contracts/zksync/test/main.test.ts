@@ -139,4 +139,38 @@ describe('Ownable tests', function () {
 
 })
 
+describe('Claim payment batch tests', function () { 
+  
+  it("Should claim payment batch", async () => {
+    const setOrderTx = await escrow.connect(user_zk).set_order(user_eth, fee, {value});
+    await setOrderTx.wait();
+
+    const setOrderTx2 = await escrow.connect(user_zk2).set_order(user_eth2, fee, {value});
+    await setOrderTx2.wait();
+
+    await escrow.connect(deployer).set_ethereum_payment_registry(user_eth);
+    await escrow.connect(deployer).set_mm_zksync_wallet(user_zk);
+
+    const tx = await escrow.connect(user_eth).claim_payment_batch([0, 1], [user_eth.address, user_eth2.address], [value-fee, value-fee]);
+
+    await expect(tx)
+      .to.emit(escrow, "ClaimPayment").withArgs(0, user_zk.address, value-fee)
+      .to.emit(escrow, "ClaimPayment").withArgs(1, user_zk.address, value-fee);
+
+    expect(await escrow.is_order_pending(0)).to.equal(false);
+  });
+
+  it("Should not claim payment batch when order missing", async () => {
+    await escrow.connect(deployer).set_ethereum_payment_registry(user_eth);
+
+    await expect(escrow.connect(user_eth).claim_payment_batch([0], [user_eth.address], [value-fee])).to.be.revertedWith("Order claimed or nonexistent");
+  });
+
+  it("Should not claim payment batch when not PAYMENT_REGISTRY", async () => {
+    const setOrderTx = await escrow.connect(user_zk).set_order(user_eth, fee, {value});
+    await setOrderTx.wait();
+
+    await expect(escrow.connect(user_eth).claim_payment_batch([0], [user_eth.address], [value-fee])).to.be.revertedWith("Only PAYMENT_REGISTRY can call");
+  });
+});
 
