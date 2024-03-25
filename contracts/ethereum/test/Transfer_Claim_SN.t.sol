@@ -6,6 +6,7 @@ import "../src/PaymentRegistry.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 contract TransferTest is Test {
+    event ClaimPaymentBatch(uint256[] orderIds, uint256[] destAddresses, uint256[] amounts, PaymentRegistry.Chain chainId);
 
     address public deployer = makeAddr('deployer');
     address public marketMaker = makeAddr("marketMaker");
@@ -107,6 +108,8 @@ contract TransferTest is Test {
         amounts[2] = 1;
 
         hoax(marketMaker);
+        vm.expectEmit(true, true, true, true);
+        emit ClaimPaymentBatch(orderIds, destAddresses, amounts, PaymentRegistry.Chain.Starknet);
         yab_caller.claimPaymentBatch(orderIds, destAddresses, amounts);
 
         assertEq(address(0x1).balance, 3);

@@ -23,6 +23,8 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     event ModifiedStarknetEscrowAddress(uint256 newEscrowAddress);
     event ModifiedStarknetClaimPaymentSelector(uint256 newEscrowClaimPaymentSelector);
     event ModifiedStarknetClaimPaymentBatchSelector(uint256 newEscrowClaimPaymentSelector);
+    event ClaimPayment(uint256 orderId, uint256 destAddress, uint256 amount, Chain chainId);
+    event ClaimPaymentBatch(uint256[] orderIds, uint256[] destAddresses, uint256[] amounts, Chain chainId);
 
     mapping(bytes32 => TransferInfo) public transfers;
     address public marketMaker;
@@ -93,6 +95,8 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             StarknetEscrowAddress,
             StarknetEscrowClaimPaymentSelector,
             payload);
+
+        emit ClaimPayment(orderId, destAddress, amount, Chain.Starknet);
     }
 
     function claimPaymentBatch(
@@ -126,6 +130,8 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             StarknetEscrowAddress,
             StarknetEscrowClaimPaymentBatchSelector,
             payload);
+
+        emit ClaimPaymentBatch(orderIds, destAddresses, amounts, Chain.Starknet);
     }
 
     function _claimPaymentStarknet(uint256 orderId, uint256 destAddress, uint256 amount) internal view {
@@ -161,6 +167,8 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             new bytes[](0), //factory dependencies
             msg.sender //refund recipient
         );
+
+        emit ClaimPayment(orderId, destAddress, amount, Chain.ZKSync);
     }
 
     function setStarknetEscrowAddress(uint256 newStarknetEscrowAddress) external onlyOwner {
