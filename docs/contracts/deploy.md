@@ -20,6 +20,8 @@ Another starknet dependency used in this project:
 
 - [OpenZeppelin cairo contracts](https://github.com/OpenZeppelin/cairo-contracts/)
 
+[comment]: TODO add install ZKSync dockerized L1-L2 or in-memory-node if/when necesarry, for make tests 
+
 ## Deploy Payment Registry (on Ethereum)
 
 First, the Ethereum smart contract must be deployed. For Ethereum the deployment process 
@@ -36,22 +38,31 @@ template for creating your .env file, paying special attention to the formats pr
 
    ETHERSCAN_API_KEY = API Key to use etherscan to read the Ethereum blockchain
 
-   STARKNET_MESSAGING_ADDRESS = Starknet Messaging address
-   
    MM_ETHEREUM_WALLET_ADDRESS = Ethereum wallet address of the MarketMaker
+
+   STARKNET_MESSAGING_ADDRESS = Starknet Messaging address in L1
+
+   STARKNET_CLAIM_PAYMENT_SELECTOR = hex value of starknet\'s claim_payment selector
+
+   ZKSYNC_DIAMOND_PROXY_ADDRESS = ZKSync Diamond Proxy address in L1
+
+   ZKSYNC_CLAIM_PAYMENT_SELECTOR = hex value of ZKSync's claim_payment selct
+
    ```
 
    **NOTE**:
 
    - You can generate ETHERSCAN_API_KEY [following these steps](https://docs.etherscan.io/getting-started/creating-an-account).
    - For the deployment, you will need some ETH.
-     - You can get some GoerliEth from this [faucet](https://goerlifaucet.com/).
+     - You can get some SepoliaETH from [Infura](https://www.infura.io/faucet/sepolia) or [Alchemy](https://www.alchemy.com/faucets/ethereum-sepolia).
    - STARKNET_MESSAGING_ADDRESS is for when a L1 contract initiates a message to a L2 contract 
    on Starknet. It does so by calling the sendMessageToL2 function on the Starknet Core 
    Contract with the message parameters. Starknet Core Contracts are the following:
-      - Goerli: `0xde29d060D45901Fb19ED6C6e959EB22d8626708e`
       - Sepolia: `0xE2Bb56ee936fd6433DC0F6e7e3b8365C906AA057`
       - Mainnet: `0xc662c410C0ECf747543f5bA90660f6ABeBD9C8c4`
+   - ZKSYNC_DIAMOND_PROXY_ADDRESS is for when a L1 contract initiates a message to a L2 contract on ZKSync. It does so by calling the requestL2Transaction function on the ZKSync Core Contract with the message parameters. ZKSync Diamond Proxy's addresses are the following:
+      - Sepolia: `0x9A6DE0f62Aa270A8bCB1e2610078650D539B1Ef9`
+      - Mainnet: `0x32400084C286CF3E17e7B677ea9583e60a000324`
 
 2. Deploy Ethereum contract
 
