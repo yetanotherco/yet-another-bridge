@@ -163,6 +163,46 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         );
     }
 
+    function claimPaymentBatchZKSync(
+        uint256[] calldata orderIds,
+        uint256[] calldata destAddresses, 
+        uint256[] calldata amounts,
+        uint256 gasLimit,
+        uint256 gasPerPubdataByteLimit
+    ) external payable onlyOwnerOrMM {
+        require(orderIds.length == destAddresses.length, "Invalid lengths.");
+        require(orderIds.length == amounts.length, "Invalid lengths.");
+
+        for (uint32 idx = 0; idx < orderIds.length; idx++) {
+            _claimPaymentZKSync(orderIds[idx], destAddresses[idx], amounts[idx]);
+        }
+
+        //todo change place of this var
+        bytes4 selector = 0x156be1ae; //claim_payment_batch selector in ZKSync //todo add in init, same as in SN
+        bytes memory messageToL2 = abi.encodeWithSelector(
+            selector,
+            orderIds,
+            destAddresses,
+            amounts
+        );
+
+        _ZKSyncDiamondProxy.requestL2Transaction{value: msg.value}(
+            ZKSyncEscrowAddress, //L2 contract called
+            0, //msg.value
+            messageToL2, //msg.calldata
+            gasLimit, 
+            gasPerPubdataByteLimit, 
+            new bytes[](0), //factory dependencies
+            msg.sender //refund recipient
+        );
+    }
+
+    function _claimPaymentZKSync(uint256 orderId, uint256 destAddress, uint256 amount) internal view {
+        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, Chain.ZKSync));
+        TransferInfo storage transferInfo = transfers[index];
+        require(transferInfo.isUsed == true, "Transfer not found.");
+    }
+
     function setStarknetEscrowAddress(uint256 newStarknetEscrowAddress) external onlyOwner {
         StarknetEscrowAddress = newStarknetEscrowAddress;
         emit ModifiedStarknetEscrowAddress(newStarknetEscrowAddress);        
