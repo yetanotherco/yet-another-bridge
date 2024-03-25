@@ -101,7 +101,7 @@ mod Escrow {
         assert(eth_token.balanceOf(MM_STARKNET()) == 0, 'init: wrong balance');
 
         start_prank(CheatTarget::One(escrow.contract_address), USER());
-        let order = Order { recipient_address: 12345.try_into().unwrap(), amount: 500, fee: 0 };
+        let order = Order { recipient_address: ETH_USER(), amount: 500, fee: 0 };
         let order_id = escrow.set_order(order);
         stop_prank(CheatTarget::One(escrow.contract_address));
 
@@ -271,7 +271,7 @@ mod Escrow {
         assert(eth_token.balanceOf(escrow.contract_address) == 0, 'init: wrong balance');
         assert(eth_token.balanceOf(MM_STARKNET()) == 0, 'init: wrong balance');
 
-        let recipient_addresses = array![12345.try_into().unwrap(), 12346.try_into().unwrap(), 12347.try_into().unwrap()];
+        let recipient_addresses = array![ETH_USER(), ETH_USER_2(), ETH_USER_3()];
         let amounts = array![500, 501, 502];
         let fees = array![3, 2, 1];
 
