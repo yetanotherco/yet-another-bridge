@@ -18,8 +18,7 @@ beforeEach( async () => {
   escrow = await deployAndInit();
 });
 
-// /*
-// working:::
+
 describe('Pause tests', function () {
 
   it("Should start unpaused", async function () {
@@ -62,31 +61,24 @@ describe('Pause tests', function () {
   });
   
 });
-// */
-// // working ::
+
 describe('Set Order tests', function () {
   it("Should emit correct Event", async () => {
-    let events = await escrow.queryFilter("*");
-    const events_length = events.length;
-
     const setOrderTx = await escrow.connect(user_zk).set_order(user_eth, fee, {value});
-    await setOrderTx.wait();
-    
-    events = await escrow.queryFilter("*");
-    expect(events.length).to.equal(events_length + 1);
-    expect(events[events.length - 1].fragment.name).to.equal("SetOrder");
+    // await setOrderTx.wait();
+
+    await expect(setOrderTx)
+      .to.emit(escrow, "SetOrder").withArgs(0, user_eth, value-fee, fee)
   });
 
   it("Should get the order setted", async () => {
     const setOrderTx = await escrow.connect(user_zk).set_order(user_eth, fee, {value});
-    await setOrderTx.wait();
+    // await setOrderTx.wait();
 
-    let events = await escrow.queryFilter("*");
-    const newOrderEvent = events[events.length - 1];
+    await expect(setOrderTx)
+      .to.emit(escrow, "SetOrder").withArgs(0, user_eth, value-fee, fee)
 
-    const orderId = newOrderEvent.args[0];
-
-    const newOrder = await escrow.get_order(orderId);
+    const newOrder = await escrow.get_order(0);
 
     expect(newOrder[0]).to.eq(user_eth.address); //recipient_address
     expect(Number(newOrder[1])).to.eq(value-fee); //amount
