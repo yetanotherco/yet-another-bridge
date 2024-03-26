@@ -161,16 +161,6 @@ Starknet smart contract address.
    This script uses the previously set variable, **ESCROW_CONTRACT_ADDRESS**
 </details>
 
-## Recap
-
-At this point, we should have deployed an ETH smart contract as well as declared and 
-deployed a Starknet smart contract, both connected to act as a bridge between these 
-two chains.
-
-
-
-
-
 
 ## Deploy Escrow (on ZKSync)
 
