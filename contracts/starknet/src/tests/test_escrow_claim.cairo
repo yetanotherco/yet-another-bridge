@@ -34,14 +34,6 @@ mod Escrow {
         setup_general(BoundedInt::max(), BoundedInt::max())
     }
 
-    // fn setup_approved(approved: u256) -> (IEscrowDispatcher, IERC20Dispatcher){
-    //     setup_general(BoundedInt::max(), approved)
-    // }
-
-    // fn setup_balance(balance: u256) -> (IEscrowDispatcher, IERC20Dispatcher){
-    //     setup_general(balance, BoundedInt::max())
-    // }
-
     fn setup_general(balance: u256, approved: u256) -> (IEscrowDispatcher, IERC20Dispatcher){
         let eth_token = deploy_erc20('ETH', '$ETH', BoundedInt::max(), OWNER());
         let escrow = deploy_escrow(
@@ -93,7 +85,7 @@ mod Escrow {
     }
 
     #[test]
-    fn test_happy_path() {
+    fn test_claim_payment() {
         let (escrow, eth_token) = setup();
 
         // check balance
@@ -139,7 +131,7 @@ mod Escrow {
     }
 
     #[test]
-    fn test_claim_batch_happy() {
+    fn test_claim_payment_batch() {
         let (escrow, eth_token) = setup();
 
         // check balance
