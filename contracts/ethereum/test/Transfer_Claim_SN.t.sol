@@ -8,7 +8,7 @@ import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.s
 contract TransferTest is Test {
 
     address public deployer = makeAddr('deployer');
-    address public marketMaker = makeAddr("marketMaker");
+    address public MM_ETHEREUM_WALLET_ADDRESS = makeAddr("marketMaker");
     uint256 public snEscrowAddress = 0x0;
 
     PaymentRegistry public yab;
@@ -16,8 +16,9 @@ contract TransferTest is Test {
     PaymentRegistry public yab_caller;
 
     address STARKNET_MESSAGING_ADDRESS = 0xde29d060D45901Fb19ED6C6e959EB22d8626708e;
-    uint256 SN_ESCROW_CLAIM_PAYMENT_SELECTOR = 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77;
+    uint256 STARKNET_CLAIM_PAYMENT_SELECTOR = 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77;
     address ZKSYNC_DIAMOND_PROXY_ADDRESS = 0x2eD8eF54a16bBF721a318bd5a5C0F39Be70eaa65;
+    bytes4 ZKSYNC_CLAIM_PAYMENT_SELECTOR = 0xa5168739;
 
     function setUp() public {
         vm.startPrank(deployer);
@@ -25,7 +26,7 @@ contract TransferTest is Test {
         yab = new PaymentRegistry();
         proxy = new ERC1967Proxy(address(yab), "");
         yab_caller = PaymentRegistry(address(proxy));
-        yab_caller.initialize(STARKNET_MESSAGING_ADDRESS, snEscrowAddress, SN_ESCROW_CLAIM_PAYMENT_SELECTOR, marketMaker, ZKSYNC_DIAMOND_PROXY_ADDRESS);
+        yab_caller.initialize(STARKNET_MESSAGING_ADDRESS, STARKNET_CLAIM_PAYMENT_SELECTOR, MM_ETHEREUM_WALLET_ADDRESS, ZKSYNC_DIAMOND_PROXY_ADDRESS, ZKSYNC_CLAIM_PAYMENT_SELECTOR);
 
         // Mock calls to Starknet Messaging contract
         vm.mockCall(
@@ -37,38 +38,38 @@ contract TransferTest is Test {
     }
 
     function test_transfer_sn() public {
-        hoax(marketMaker, 100 wei);
+        hoax(MM_ETHEREUM_WALLET_ADDRESS, 100 wei);
         yab_caller.transfer{value: 100}(1, 0x1, PaymentRegistry.Chain.Starknet);
         assertEq(address(0x1).balance, 100);
     }
 
     function test_claimPayment_sn_fail_noOrderId() public {
-        hoax(marketMaker, 100 wei);
+        hoax(MM_ETHEREUM_WALLET_ADDRESS, 100 wei);
         vm.expectRevert("Transfer not found."); //Won't match to a random transfer number
         yab_caller.claimPayment{value: 100}(1, 0x1, 100);
     }
 
     function test_claimPayment_sn_fail_wrongOrderId() public {
-        hoax(marketMaker, 100 wei);
+        hoax(MM_ETHEREUM_WALLET_ADDRESS, 100 wei);
         yab_caller.transfer{value: 100}(1, 0x1, PaymentRegistry.Chain.Starknet);  
-        hoax(marketMaker, 100 wei);
+        hoax(MM_ETHEREUM_WALLET_ADDRESS, 100 wei);
         vm.expectRevert("Transfer not found."); //Won't match to a wrong transfer number
         yab_caller.claimPayment(2, 0x1, 100);
     }
 
     function test_claimPayment_sn() public {
-        hoax(marketMaker, 100 wei);
+        hoax(MM_ETHEREUM_WALLET_ADDRESS, 100 wei);
         yab_caller.transfer{value: 100}(1, 0x1, PaymentRegistry.Chain.Starknet);  
-        hoax(marketMaker, 100 wei);
+        hoax(MM_ETHEREUM_WALLET_ADDRESS, 100 wei);
         yab_caller.claimPayment(1, 0x1, 100);
-        assertEq(address(marketMaker).balance, 100);
+        assertEq(address(MM_ETHEREUM_WALLET_ADDRESS).balance, 100);
     }
 
     function test_claimPayment_sn_maxInt() public {
         uint256 maxInt = type(uint256).max;
         
-        vm.deal(marketMaker, maxInt);
-        vm.startPrank(marketMaker);
+        vm.deal(MM_ETHEREUM_WALLET_ADDRESS, maxInt);
+        vm.startPrank(MM_ETHEREUM_WALLET_ADDRESS);
 
         yab_caller.transfer{value: maxInt}(1, 0x1, PaymentRegistry.Chain.Starknet);
         yab_caller.claimPayment(1, 0x1, maxInt);
@@ -76,16 +77,16 @@ contract TransferTest is Test {
     }
 
     function test_claimPayment_sn_minInt() public {
-        hoax(marketMaker, 1 wei);
+        hoax(MM_ETHEREUM_WALLET_ADDRESS, 1 wei);
         yab_caller.transfer{value: 1}(1, 0x1, PaymentRegistry.Chain.Starknet);
-        hoax(marketMaker, 1 wei);
+        hoax(MM_ETHEREUM_WALLET_ADDRESS, 1 wei);
         yab_caller.claimPayment(1, 0x1, 1);
     }
 
     function test_claimPayment_fail_wrongChain() public {
-        hoax(marketMaker, 1 wei);
+        hoax(MM_ETHEREUM_WALLET_ADDRESS, 1 wei);
         yab_caller.transfer{value: 1}(1, 0x1, PaymentRegistry.Chain.Starknet);
-        hoax(marketMaker, 1 wei);
+        hoax(MM_ETHEREUM_WALLET_ADDRESS, 1 wei);
         vm.expectRevert("Transfer not found."); //Won't match to a transfer made on the other chain
         yab_caller.claimPaymentZKSync(1, 0x1, 1, 1 ,1);  
     }
