@@ -15,9 +15,8 @@ export async function deployAndInit(): Promise<Contract> {
     const ethereum_payment_registry = "0x4337768cB3eC57Dd2cb843eFb929B773B13322de"; //process.env.PAYMENT_REGISTRY_PROXY_ADDRESS;
     const mm_ethereum_wallet = process.env.MM_ZKSYNC_WALLET;
     const mm_zksync_wallet = process.env.MM_ZKSYNC_WALLET;
-    const native_token_eth_in_zksync = process.env.NATIVE_TOKEN_ETH_IN_ZKSYNC;
-    if (!ethereum_payment_registry || !mm_ethereum_wallet || !mm_zksync_wallet || !native_token_eth_in_zksync) {
-        console.log(ethereum_payment_registry,mm_ethereum_wallet,mm_zksync_wallet,native_token_eth_in_zksync);
+    if (!ethereum_payment_registry || !mm_ethereum_wallet || !mm_zksync_wallet) {
+        console.log(ethereum_payment_registry,mm_ethereum_wallet,mm_zksync_wallet);
         throw new Error("Missing required environment variables.");
     }
 
