@@ -1,7 +1,7 @@
 # Deploy Guide
 
 ## Prerequisites
-- [Python v3.10 or higher](https://www.python.org/downloads/)
+- [Python v3.10](https://www.python.org/downloads/)
 - [pip](https://pip.pypa.io/en/stable/installation/)
 - Postgres ([Local](https://www.postgresql.org/) or [Docker](https://hub.docker.com/_/postgres))
 - [pyenv](https://github.com/pyenv/pyenv) (Optional)
