@@ -145,17 +145,15 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         uint256 gasLimit,
         uint256 gasPerPubdataByteLimit
     ) external payable onlyOwnerOrMM {
-        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, Chain.ZKSync));
-        TransferInfo storage transferInfo = transfers[index];
-        require(transferInfo.isUsed == true, "Transfer not found.");
+        _verifyTransferExistsZKSync(orderId, destAddress, amount);
 
         //todo change place of this var
         bytes4 selector = 0xa5168739; //claim_payment selector in ZKSync //todo add in init, same as in SN
         bytes memory messageToL2 = abi.encodeWithSelector(
             selector,
             orderId,
-            transferInfo.destAddress,
-            transferInfo.amount
+            destAddress,
+            amount
         );
 
         _ZKSyncDiamondProxy.requestL2Transaction{value: msg.value}(
@@ -169,6 +167,48 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         );
 
         emit ClaimPayment(orderId, destAddress, amount, Chain.ZKSync);
+    }
+
+    function claimPaymentBatchZKSync(
+        uint256[] calldata orderIds,
+        uint256[] calldata destAddresses, 
+        uint256[] calldata amounts,
+        uint256 gasLimit,
+        uint256 gasPerPubdataByteLimit
+    ) external payable onlyOwnerOrMM {
+        require(orderIds.length == destAddresses.length, "Invalid lengths.");
+        require(orderIds.length == amounts.length, "Invalid lengths.");
+
+        for (uint32 idx = 0; idx < orderIds.length; idx++) {
+            _verifyTransferExistsZKSync(orderIds[idx], destAddresses[idx], amounts[idx]);
+        }
+
+        //todo change place of this var
+        bytes4 selector = 0x156be1ae; //claim_payment_batch selector in ZKSync //todo add in init, same as in SN
+        bytes memory messageToL2 = abi.encodeWithSelector(
+            selector,
+            orderIds,
+            destAddresses,
+            amounts
+        );
+
+        _ZKSyncDiamondProxy.requestL2Transaction{value: msg.value}(
+            ZKSyncEscrowAddress, //L2 contract called
+            0, //msg.value
+            messageToL2, //msg.calldata
+            gasLimit, 
+            gasPerPubdataByteLimit, 
+            new bytes[](0), //factory dependencies
+            msg.sender //refund recipient
+        );
+
+        emit ClaimPaymentBatch(orderIds, destAddresses, amounts, Chain.ZKSync);
+    }
+
+    function _verifyTransferExistsZKSync(uint256 orderId, uint256 destAddress, uint256 amount) internal view {
+        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, Chain.ZKSync));
+        TransferInfo storage transferInfo = transfers[index];
+        require(transferInfo.isUsed == true, "Transfer not found.");
     }
 
     function setStarknetEscrowAddress(uint256 newStarknetEscrowAddress) external onlyOwner {

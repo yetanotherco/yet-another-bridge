@@ -29,5 +29,5 @@ export default async function () {
 
   const initResult = await escrow.initialize(PaymentRegistryL2Alias, mm_zksync_wallet);
   
-  // console.log("Initialization result:", initResult);
+  console.log("Initialization result:", initResult);
 }
