@@ -24,7 +24,7 @@ contract TransferTest is Test {
         yab = new PaymentRegistry();
         proxy = new ERC1967Proxy(address(yab), "");
         yab_caller = PaymentRegistry(address(proxy));
-        yab_caller.initialize(SN_MESSAGING_ADDRESS, snEscrowAddress, SN_ESCROW_CLAIM_PAYMENT_SELECTOR, marketMaker, ZKSYNC_DIAMOND_PROXY_ADDRESS);
+        yab_caller.initialize(SN_MESSAGING_ADDRESS, snEscrowAddress, SN_ESCROW_CLAIM_PAYMENT_SELECTOR, 0x0, marketMaker, ZKSYNC_DIAMOND_PROXY_ADDRESS);
 
         vm.stopPrank();
     }

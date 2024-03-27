@@ -22,13 +22,17 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     event ModifiedZKSyncEscrowAddress(address newEscrowAddress);
     event ModifiedStarknetEscrowAddress(uint256 newEscrowAddress);
     event ModifiedStarknetClaimPaymentSelector(uint256 newEscrowClaimPaymentSelector);
-    event ClaimPayment(TransferInfo transferInfo);
+    event ModifiedStarknetClaimPaymentBatchSelector(uint256 newEscrowClaimPaymentSelector);
+    event ClaimPayment(uint256 orderId, uint256 destAddress, uint256 amount, Chain chainId);
+    event ClaimPaymentBatch(uint256[] orderIds, uint256[] destAddresses, uint256[] amounts, Chain chainId);
 
     mapping(bytes32 => TransferInfo) public transfers;
     address public marketMaker;
     uint256 public StarknetEscrowAddress;
     address public ZKSyncEscrowAddress;
     uint256 public StarknetEscrowClaimPaymentSelector;
+    uint256 public StarknetEscrowClaimPaymentBatchSelector;
+
     IZkSync private _ZKSyncDiamondProxy; 
     IStarknetMessaging private _snMessaging;
 
@@ -41,6 +45,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         address snMessaging,
         uint256 StarknetEscrowAddress_,
         uint256 StarknetEscrowClaimPaymentSelector_,
+        uint256 StarknetEscrowClaimPaymentBatchSelector_,
         address marketMaker_,
         address ZKSyncDiamondProxyAddress) public initializer { 
         __Ownable_init(msg.sender);
@@ -51,6 +56,8 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
         StarknetEscrowAddress = StarknetEscrowAddress_;
         StarknetEscrowClaimPaymentSelector = StarknetEscrowClaimPaymentSelector_; // TODO remove this or set the correct value in init
+        StarknetEscrowClaimPaymentBatchSelector = StarknetEscrowClaimPaymentBatchSelector_; // TODO remove this or set the correct value in init
+
         marketMaker = marketMaker_;
     }
 
@@ -75,14 +82,12 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
 //TODO change name to claimPaymentStarknet
     function claimPayment(uint256 orderId, uint256 destAddress, uint256 amount) external payable onlyOwnerOrMM {
-        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, Chain.Starknet));
-        TransferInfo storage transferInfo = transfers[index];
-        require(transferInfo.isUsed == true, "Transfer not found.");
+        _verifyTransferExistsStarknet(orderId, destAddress, amount);
 
         uint256[] memory payload = new uint256[](5); //TODO why array of 256 if then filled with 128?
         payload[0] = uint128(orderId); // low
         payload[1] = uint128(orderId >> 128); // high
-        payload[2] = transferInfo.destAddress;
+        payload[2] = destAddress;
         payload[3] = uint128(amount); // low
         payload[4] = uint128(amount >> 128); // high
             
@@ -91,7 +96,48 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             StarknetEscrowClaimPaymentSelector,
             payload);
 
-        emit ClaimPayment(transferInfo);
+        emit ClaimPayment(orderId, destAddress, amount, Chain.Starknet);
+    }
+
+    function claimPaymentBatch(
+        uint256[] calldata orderIds,
+        uint256[] calldata destAddresses, 
+        uint256[] calldata amounts
+    ) external payable onlyOwnerOrMM() {
+        require(orderIds.length == destAddresses.length, "Invalid lengths.");
+        require(orderIds.length == amounts.length, "Invalid lengths.");
+
+        uint256[] memory payload = new uint256[](5 * orderIds.length + 1);
+
+        payload[0] = orderIds.length;
+        
+        for (uint32 idx = 0; idx < orderIds.length; idx++) {
+            uint256 orderId = orderIds[idx];
+            uint256 destAddress = destAddresses[idx];
+            uint256 amount = amounts[idx];
+
+            _verifyTransferExistsStarknet(orderId, destAddress, amount);
+
+            uint32 base_idx = 1 + 5 * idx;
+            payload[base_idx] = uint128(orderId); // low
+            payload[base_idx + 1] = uint128(orderId >> 128); // high
+            payload[base_idx + 2] = destAddress;
+            payload[base_idx + 3] = uint128(amount); // low
+            payload[base_idx + 4] = uint128(amount >> 128); // high
+        }
+        
+        _snMessaging.sendMessageToL2{value: msg.value}(
+            StarknetEscrowAddress,
+            StarknetEscrowClaimPaymentBatchSelector,
+            payload);
+
+        emit ClaimPaymentBatch(orderIds, destAddresses, amounts, Chain.Starknet);
+    }
+
+    function _verifyTransferExistsStarknet(uint256 orderId, uint256 destAddress, uint256 amount) internal view {
+        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, Chain.Starknet));
+        TransferInfo storage transferInfo = transfers[index];
+        require(transferInfo.isUsed == true, "Transfer not found.");
     }
 
     function claimPaymentZKSync(
@@ -122,13 +168,14 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             msg.sender //refund recipient
         );
 
-        emit ClaimPayment(transferInfo);
+        emit ClaimPayment(orderId, destAddress, amount, Chain.ZKSync);
     }
 
     function setStarknetEscrowAddress(uint256 newStarknetEscrowAddress) external onlyOwner {
         StarknetEscrowAddress = newStarknetEscrowAddress;
         emit ModifiedStarknetEscrowAddress(newStarknetEscrowAddress);        
     }
+
 
     function setZKSyncEscrowAddress(address newZKSyncEscrowAddress) external onlyOwner {
         ZKSyncEscrowAddress = newZKSyncEscrowAddress;
@@ -141,7 +188,11 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         StarknetEscrowClaimPaymentSelector = NewStarknetEscrowClaimPaymentSelector;
         emit ModifiedStarknetClaimPaymentSelector(StarknetEscrowClaimPaymentSelector);
     }
-    
+
+    function setStarknetClaimPaymentBatchSelector(uint256 NewStarknetEscrowClaimPaymentBatchSelector) external onlyOwner {
+        StarknetEscrowClaimPaymentBatchSelector = NewStarknetEscrowClaimPaymentBatchSelector;
+        emit ModifiedStarknetClaimPaymentBatchSelector(StarknetEscrowClaimPaymentBatchSelector);
+    }
     
     //// MM ACL:
 
