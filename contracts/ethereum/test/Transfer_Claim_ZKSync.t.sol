@@ -39,29 +39,37 @@ contract TransferTest is Test {
 
     function test_transfer_zk() public {
         hoax(marketMaker, 100 wei);
-        yab_caller.transfer{value: 100}(1, 0x1, PaymentRegistry.Chain.ZKSync);
+        yab_caller.transfer{value: 100}(1, address(0x1), PaymentRegistry.Chain.ZKSync);
         assertEq(address(0x1).balance, 100);
+    }
+
+    function test_transfer_zk_fail_already_transferred() public {
+        hoax(marketMaker, 100 wei);
+        yab_caller.transfer{value: 100}(1, address(0x1), PaymentRegistry.Chain.ZKSync);
+        hoax(marketMaker, 100 wei);
+        vm.expectRevert("Transfer already processed.");
+        yab_caller.transfer{value: 100}(1, address(0x1), PaymentRegistry.Chain.ZKSync);
     }
 
     function test_claimPayment_zk_fail_noOrderId() public {
         hoax(marketMaker, 100 wei);
         vm.expectRevert("Transfer not found."); //Won't match to a random transfer number
-        yab_caller.claimPaymentZKSync(1, 0x1, 100, 1, 1);
+        yab_caller.claimPaymentZKSync(1, address(0x1), 100, 1, 1);
     }
 
     function test_claimPayment_zk_fail_wrongOrderId() public {
         hoax(marketMaker, 100 wei);
-        yab_caller.transfer{value: 100}(1, 0x1, PaymentRegistry.Chain.ZKSync);  
+        yab_caller.transfer{value: 100}(1, address(0x1), PaymentRegistry.Chain.ZKSync);  
         hoax(marketMaker, 100 wei);
         vm.expectRevert("Transfer not found."); //Won't match to a wrong transfer number
-        yab_caller.claimPaymentZKSync(2, 0x1, 100, 1, 1);
+        yab_caller.claimPaymentZKSync(2, address(0x1), 100, 1, 1);
     }
 
     function test_claimPayment_zk() public {
         hoax(marketMaker, 100 wei);
-        yab_caller.transfer{value: 100}(1, 0x1, PaymentRegistry.Chain.ZKSync);  
+        yab_caller.transfer{value: 100}(1, address(0x1), PaymentRegistry.Chain.ZKSync);  
         hoax(marketMaker, 100 wei);
-        yab_caller.claimPaymentZKSync(1, 0x1, 100, 1, 1);
+        yab_caller.claimPaymentZKSync(1, address(0x1), 100, 1, 1);
         assertEq(address(marketMaker).balance, 100);
     }
 
@@ -71,23 +79,23 @@ contract TransferTest is Test {
         vm.deal(marketMaker, maxInt);
         vm.startPrank(marketMaker);
 
-        yab_caller.transfer{value: maxInt}(1, 0x1, PaymentRegistry.Chain.ZKSync);
-        yab_caller.claimPaymentZKSync(1, 0x1, maxInt, 1, 1);
+        yab_caller.transfer{value: maxInt}(1, address(0x1), PaymentRegistry.Chain.ZKSync);
+        yab_caller.claimPaymentZKSync(1, address(0x1), maxInt, 1, 1);
         vm.stopPrank();
     }
 
     function test_claimPayment_zk_minInt() public {
         hoax(marketMaker, 1 wei);
-        yab_caller.transfer{value: 1}(1, 0x1, PaymentRegistry.Chain.ZKSync);
+        yab_caller.transfer{value: 1}(1, address(0x1), PaymentRegistry.Chain.ZKSync);
         hoax(marketMaker, 1 wei);
-        yab_caller.claimPaymentZKSync(1, 0x1, 1, 1, 1);
+        yab_caller.claimPaymentZKSync(1, address(0x1), 1, 1, 1);
     }
 
     function test_claimPayment_fail_wrongChain() public {
         hoax(marketMaker, 1 wei);
-        yab_caller.transfer{value: 1}(1, 0x1, PaymentRegistry.Chain.ZKSync);
+        yab_caller.transfer{value: 1}(1, address(0x1), PaymentRegistry.Chain.ZKSync);
         hoax(marketMaker, 1 wei);
         vm.expectRevert("Transfer not found."); //Won't match to a transfer made on the other chain
-        yab_caller.claimPayment(1, 0x1, 1);  
+        yab_caller.claimPayment(1, address(0x1), 1);  
     }
 }
