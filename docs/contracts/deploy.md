@@ -62,6 +62,8 @@ template for creating your .env file, paying special attention to the formats pr
    - ZKSYNC_DIAMOND_PROXY_ADDRESS is for when a L1 contract initiates a message to a L2 contract on ZKSync. It does so by calling the requestL2Transaction function on the ZKSync Core Contract with the message parameters. ZKSync Diamond Proxy's addresses are the following:
       - Sepolia: `0x9A6DE0f62Aa270A8bCB1e2610078650D539B1Ef9`
       - Mainnet: `0x32400084C286CF3E17e7B677ea9583e60a000324`
+   - You can generate STARKNET_CLAIM_PAYMENT_SELECTOR this value with `starkli`, by running, for example: `stakli selector claim_payment`
+   - You can get ZKSYNC_CLAIM_PAYMENT_SELECTOR by deploying the contract and reading the claim_payment selector on [an explorer](https://explorer.zksync.io/)
 
 2. Deploy Ethereum contract
 
