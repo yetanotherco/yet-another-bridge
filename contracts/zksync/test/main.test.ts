@@ -65,7 +65,6 @@ describe('Pause tests', function () {
 describe('Set Order tests', function () {
   it("Should emit correct Event", async () => {
     const setOrderTx = await escrow.connect(user_zk).set_order(user_eth, fee, {value});
-    // await setOrderTx.wait();
 
     await expect(setOrderTx)
       .to.emit(escrow, "SetOrder").withArgs(0, user_eth, value-fee, fee)
