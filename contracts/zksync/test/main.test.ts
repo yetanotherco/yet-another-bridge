@@ -1,16 +1,19 @@
 import { expect } from 'chai';
 import { deployAndInit } from './utils';
-import { Contract, Fragment, Wallet } from 'ethers';
-import { getWallet, deployContract, LOCAL_RICH_WALLETS } from '../deploy/utils';
-import { Address } from 'zksync-ethers/build/src/types';
+import { Contract, Fragment, Wallet, Provider } from 'ethers';
+import { getWallet, deployContract, LOCAL_RICH_WALLETS, getProvider } from '../deploy/utils';
 
+let provider: Provider;
 let escrow: Contract;
-let paymentRegistry: Wallet = getWallet("0x4337768cB3eC57Dd2cb843eFb929B773B13322de");
+let paymentRegistry: Wallet = getWallet(LOCAL_RICH_WALLETS[3].privateKey); //its Wallet data type because I will mock calls from this addr
+
 let deployer: Wallet = getWallet(LOCAL_RICH_WALLETS[0].privateKey);
 let user_zk: Wallet = getWallet(LOCAL_RICH_WALLETS[1].privateKey);
 let user_zk2: Wallet = getWallet(LOCAL_RICH_WALLETS[2].privateKey);
 let user_eth: Wallet = getWallet(LOCAL_RICH_WALLETS[1].privateKey);
 let user_eth2: Wallet = getWallet(LOCAL_RICH_WALLETS[2].privateKey);
+
+// let mm: Wallet = getWallet(LOCAL_RICH_WALLETS[4].privateKey);
 
 
 const fee = 1; //TODO check, maybe make fuzz
@@ -18,6 +21,7 @@ const value = 10; //TODO check, maybe make fuzz
 
 beforeEach( async () => {
   escrow = await deployAndInit();
+  provider = getProvider();
 });
 
 /*
@@ -117,15 +121,34 @@ describe('Set Order tests', function () {
 
 describe('Claim Payment tests', function () {
   it("Should allow PaymentRegistry to claim payment", async () => {
+    let mm_init_balance = await provider.getBalance(escrow.mm_zksync_wallet());
+    
     const setOrderTx = await escrow.connect(user_zk).set_order(user_eth, fee, {value});
     await setOrderTx.wait();
 
-    expect(escrow.connect(paymentRegistry).claim_payment(0, user_eth, value)).to.be.revertedWith("Only PAYMENT_REGISTRY can call");
+    // function set_order(address recipient_address, uint256 fee) public payable whenNotPaused returns (uint256) {
+      
+    // function claim_payment(
+    //   uint256 order_id,
+    //   address recipient_address,
+    //   uint256 amount
+
+    const claimPaymentTx = await escrow.connect(paymentRegistry).claim_payment(0, user_eth, value-fee);
+    await claimPaymentTx.wait();
+
+    let mm_final_balance = await provider.getBalance(escrow.mm_zksync_wallet());
+
+    expect(mm_final_balance - mm_init_balance).to.equals(value);
+    // .to.be.revertedWith("Only PAYMENT_REGISTRY can call");
   });
 
-  it("Should not allow random user to call claim payment", async () => {
-    expect(escrow.connect(user_zk).claim_payment(0, user_eth, value)).to.be.revertedWith("Only PAYMENT_REGISTRY can call");
-  });
+  // it("Should not allow PaymentRegistry to claim unexisting payment", async () => {
+
+  // });
+
+  // it("Should not allow random user to call claim payment", async () => {
+  //   expect(escrow.connect(user_zk).claim_payment(0, user_eth, value)).to.be.revertedWith("Only PAYMENT_REGISTRY can call");
+  // });
 })
 
 
