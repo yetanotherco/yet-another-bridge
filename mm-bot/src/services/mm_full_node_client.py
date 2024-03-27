@@ -11,12 +11,12 @@ EXCLUDE = "exclude"
 
 @dataclass
 class MmEvent(Event):
-    starknet_tx_hash: str
+    tx_hash: str
     block_number: int
 
 
 class MmEventSchema(EventSchema):
-    starknet_tx_hash = fields.String(data_key="transaction_hash", required=True)
+    tx_hash = fields.String(data_key="transaction_hash", required=True)
     block_number = fields.Integer(data_key="block_number", load_default=None)
 
     @post_load
