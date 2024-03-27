@@ -82,7 +82,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
 //TODO change name to claimPaymentStarknet
     function claimPayment(uint256 orderId, uint256 destAddress, uint256 amount) external payable onlyOwnerOrMM {
-        _claimPaymentStarknet(orderId, destAddress, amount);
+        _verifyTransferExistsStarknet(orderId, destAddress, amount);
 
         uint256[] memory payload = new uint256[](5); //TODO why array of 256 if then filled with 128?
         payload[0] = uint128(orderId); // low
@@ -116,7 +116,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             uint256 destAddress = destAddresses[idx];
             uint256 amount = amounts[idx];
 
-            _claimPaymentStarknet(orderId, destAddress, amount);
+            _verifyTransferExistsStarknet(orderId, destAddress, amount);
 
             uint32 base_idx = 1 + 5 * idx;
             payload[base_idx] = uint128(orderId); // low
@@ -134,7 +134,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         emit ClaimPaymentBatch(orderIds, destAddresses, amounts, Chain.Starknet);
     }
 
-    function _claimPaymentStarknet(uint256 orderId, uint256 destAddress, uint256 amount) internal view {
+    function _verifyTransferExistsStarknet(uint256 orderId, uint256 destAddress, uint256 amount) internal view {
         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, Chain.Starknet));
         TransferInfo storage transferInfo = transfers[index];
         require(transferInfo.isUsed == true, "Transfer not found.");
