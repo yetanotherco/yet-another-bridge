@@ -20,13 +20,14 @@ class OrderService:
         """
         return self.order_dao.create_order(order)
 
-    def get_order(self, order_id) -> Order | None:
+    def get_order(self, order_id, origin_network) -> Order | None:
         """
         Get an order from the database with the given order_id
 
         :param order_id: the order_id of the order to get
+        :param origin_network: the origin_network of the order to get
         """
-        return self.order_dao.get_order(order_id)
+        return self.order_dao.get_order(order_id, origin_network)
 
     def get_incomplete_orders(self):
         """
@@ -41,13 +42,14 @@ class OrderService:
         """
         return self.order_dao.get_failed_orders()
 
-    def already_exists(self, order_id) -> bool:
+    def already_exists(self, order_id, origin_network) -> bool:
         """
         Check if an order with the given order_id already exists in the database
 
         :param order_id: the order_id of the order to check
+        :param origin_network: the origin_network of the order to check
         """
-        return self.order_dao.already_exists(order_id)
+        return self.order_dao.already_exists(order_id, origin_network)
 
     def set_order_processing(self, order: Order) -> Order:
         """
@@ -65,7 +67,7 @@ class OrderService:
         :param order: the order to update
         :param tx_hash: the tx_hash of the ethereum transfer transaction
         """
-        order.tx_hash = tx_hash
+        order.transfer_tx_hash = tx_hash
         order.status = OrderStatus.TRANSFERRING.name
         return self.order_dao.update_order(order)
 
@@ -101,7 +103,7 @@ class OrderService:
         :param order: the order to update
         :param tx_hash: the tx_hash of the ethereum claim_payment transaction
         """
-        order.eth_claim_tx_hash = tx_hash
+        order.claim_tx_hash = tx_hash
         order.status = OrderStatus.PROVING.name
         return self.order_dao.update_order(order)
 
