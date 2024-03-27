@@ -12,13 +12,13 @@ contract Deploy is Script {
 
         address STARKNET_MESSAGING_ADDRESS = vm.envAddress("STARKNET_MESSAGING_ADDRESS");
         uint256 STARKNET_CLAIM_PAYMENT_SELECTOR = vm.envUint("STARKNET_CLAIM_PAYMENT_SELECTOR");
-        address marketMaker = vm.envAddress("MM_ETHEREUM_WALLET_ADDRESS");
+        address MM_ETHEREUM_WALLET_ADDRESS = vm.envAddress("MM_ETHEREUM_WALLET_ADDRESS");
         address ZKSYNC_DIAMOND_PROXY_ADDRESS = vm.envAddress("ZKSYNC_DIAMOND_PROXY_ADDRESS");
         bytes4 ZKSYNC_CLAIM_PAYMENT_SELECTOR = bytes4(vm.envBytes("ZKSYNC_CLAIM_PAYMENT_SELECTOR"));
 
         PaymentRegistry yab = new PaymentRegistry();
         ERC1967Proxy proxy = new ERC1967Proxy(address(yab), "");
-        PaymentRegistry(address(proxy)).initialize(STARKNET_MESSAGING_ADDRESS, STARKNET_CLAIM_PAYMENT_SELECTOR, marketMaker, ZKSYNC_DIAMOND_PROXY_ADDRESS, ZKSYNC_CLAIM_PAYMENT_SELECTOR);
+        PaymentRegistry(address(proxy)).initialize(STARKNET_MESSAGING_ADDRESS, STARKNET_CLAIM_PAYMENT_SELECTOR, MM_ETHEREUM_WALLET_ADDRESS, ZKSYNC_DIAMOND_PROXY_ADDRESS, ZKSYNC_CLAIM_PAYMENT_SELECTOR);
 
         vm.stopBroadcast();
 

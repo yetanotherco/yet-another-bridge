@@ -7,7 +7,7 @@ import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.s
 
 contract TransferTest is Test {
     address public deployer = makeAddr('deployer');
-    address public marketMaker = makeAddr('marketMaker');
+    address public MM_ETHEREUM_WALLET_ADDRESS = makeAddr('marketMaker');
     uint256 public snEscrowAddress = 0x0;
 
     PaymentRegistry public yab;
@@ -26,14 +26,14 @@ contract TransferTest is Test {
         yab = new PaymentRegistry();
         proxy = new ERC1967Proxy(address(yab), "");
         yab_caller = PaymentRegistry(address(proxy));
-        yab_caller.initialize(STARKNET_MESSAGING_ADDRESS, STARKNET_CLAIM_PAYMENT_SELECTOR, marketMaker, ZKSYNC_DIAMOND_PROXY_ADDRESS, ZKSYNC_CLAIM_PAYMENT_SELECTOR);
+        yab_caller.initialize(STARKNET_MESSAGING_ADDRESS, STARKNET_CLAIM_PAYMENT_SELECTOR, MM_ETHEREUM_WALLET_ADDRESS, ZKSYNC_DIAMOND_PROXY_ADDRESS, ZKSYNC_CLAIM_PAYMENT_SELECTOR);
 
         vm.stopPrank();
     }
 
     function test_getMarketMaker() public {
         address mmAddress = yab_caller.marketMaker();
-        assertEq(mmAddress, marketMaker);
+        assertEq(mmAddress, MM_ETHEREUM_WALLET_ADDRESS);
     }
 
     function test_set_and_get_MMAddress_deployer() public {
