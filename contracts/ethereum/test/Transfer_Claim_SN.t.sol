@@ -6,6 +6,7 @@ import "../src/PaymentRegistry.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 contract TransferTest is Test {
+    event ClaimPaymentBatch(uint256[] orderIds, uint256[] destAddresses, uint256[] amounts, PaymentRegistry.Chain chainId);
 
     address public deployer = makeAddr('deployer');
     address public marketMaker = makeAddr("marketMaker");
@@ -107,7 +108,41 @@ contract TransferTest is Test {
         amounts[2] = 1;
 
         hoax(marketMaker);
+        vm.expectEmit(true, true, true, true);
+        emit ClaimPaymentBatch(orderIds, destAddresses, amounts, PaymentRegistry.Chain.Starknet);
         yab_caller.claimPaymentBatch(orderIds, destAddresses, amounts);
+
+        assertEq(address(0x1).balance, 3);
+        assertEq(address(0x3).balance, 2);
+        assertEq(address(0x5).balance, 1);
+    }
+
+    function testClaimPaymentBatchPartial() public {
+        hoax(marketMaker, 3 wei);
+        yab_caller.transfer{value: 3}(1, 0x1, PaymentRegistry.Chain.Starknet);
+        hoax(marketMaker, 2 wei);
+        yab_caller.transfer{value: 2}(2, 0x3, PaymentRegistry.Chain.Starknet);
+        hoax(marketMaker, 1 wei);
+        yab_caller.transfer{value: 1}(3, 0x5, PaymentRegistry.Chain.Starknet);
+
+        uint256[] memory orderIds = new uint256[](2);
+        uint256[] memory destAddresses = new uint256[](2);
+        uint256[] memory amounts = new uint256[](2);
+
+        orderIds[0] = 1;
+        orderIds[1] = 2;
+
+        destAddresses[0] = 0x1;
+        destAddresses[1] = 0x3;
+
+        amounts[0] = 3;
+        amounts[1] = 2;
+
+        hoax(marketMaker);
+        yab_caller.claimPaymentBatch(orderIds, destAddresses, amounts);
+
+        assertEq(address(0x1).balance, 3);
+        assertEq(address(0x3).balance, 2);
     }
 
     function testClaimPaymentBatch_fail_MissingTransfer() public {
@@ -134,7 +169,7 @@ contract TransferTest is Test {
 
         vm.expectRevert("Transfer not found.");
         hoax(marketMaker);
-        yab_caller.claimPaymentBatch(orderIds, destAddresses, amounts);(orderIds, destAddresses, amounts);
+        yab_caller.claimPaymentBatch(orderIds, destAddresses, amounts);
     }
 
     function testClaimPaymentBatch_fail_notOwnerOrMM() public {

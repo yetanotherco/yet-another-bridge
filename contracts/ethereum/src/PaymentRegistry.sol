@@ -23,6 +23,8 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     event ModifiedStarknetEscrowAddress(uint256 newEscrowAddress);
     event ModifiedStarknetClaimPaymentSelector(uint256 newEscrowClaimPaymentSelector);
     event ModifiedStarknetClaimPaymentBatchSelector(uint256 newEscrowClaimPaymentSelector);
+    event ClaimPayment(uint256 orderId, uint256 destAddress, uint256 amount, Chain chainId);
+    event ClaimPaymentBatch(uint256[] orderIds, uint256[] destAddresses, uint256[] amounts, Chain chainId);
 
     mapping(bytes32 => TransferInfo) public transfers;
     address public marketMaker;
@@ -80,7 +82,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
 //TODO change name to claimPaymentStarknet
     function claimPayment(uint256 orderId, uint256 destAddress, uint256 amount) external payable onlyOwnerOrMM {
-        _claimPaymentStarknet(orderId, destAddress, amount);
+        _verifyTransferExistsStarknet(orderId, destAddress, amount);
 
         uint256[] memory payload = new uint256[](5); //TODO why array of 256 if then filled with 128?
         payload[0] = uint128(orderId); // low
@@ -93,6 +95,8 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             StarknetEscrowAddress,
             StarknetEscrowClaimPaymentSelector,
             payload);
+
+        emit ClaimPayment(orderId, destAddress, amount, Chain.Starknet);
     }
 
     function claimPaymentBatch(
@@ -112,7 +116,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             uint256 destAddress = destAddresses[idx];
             uint256 amount = amounts[idx];
 
-            _claimPaymentStarknet(orderId, destAddress, amount);
+            _verifyTransferExistsStarknet(orderId, destAddress, amount);
 
             uint32 base_idx = 1 + 5 * idx;
             payload[base_idx] = uint128(orderId); // low
@@ -126,9 +130,11 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             StarknetEscrowAddress,
             StarknetEscrowClaimPaymentBatchSelector,
             payload);
+
+        emit ClaimPaymentBatch(orderIds, destAddresses, amounts, Chain.Starknet);
     }
 
-    function _claimPaymentStarknet(uint256 orderId, uint256 destAddress, uint256 amount) internal view {
+    function _verifyTransferExistsStarknet(uint256 orderId, uint256 destAddress, uint256 amount) internal view {
         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, Chain.Starknet));
         TransferInfo storage transferInfo = transfers[index];
         require(transferInfo.isUsed == true, "Transfer not found.");
@@ -139,17 +145,15 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         uint256 gasLimit,
         uint256 gasPerPubdataByteLimit
     ) external payable onlyOwnerOrMM {
-        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, Chain.ZKSync));
-        TransferInfo storage transferInfo = transfers[index];
-        require(transferInfo.isUsed == true, "Transfer not found.");
+        _verifyTransferExistsZKSync(orderId, destAddress, amount);
 
         //todo change place of this var
         bytes4 selector = 0xa5168739; //claim_payment selector in ZKSync //todo add in init, same as in SN
         bytes memory messageToL2 = abi.encodeWithSelector(
             selector,
             orderId,
-            transferInfo.destAddress,
-            transferInfo.amount
+            destAddress,
+            amount
         );
 
         _ZKSyncDiamondProxy.requestL2Transaction{value: msg.value}(
@@ -161,6 +165,8 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             new bytes[](0), //factory dependencies
             msg.sender //refund recipient
         );
+
+        emit ClaimPayment(orderId, destAddress, amount, Chain.ZKSync);
     }
 
     function claimPaymentBatchZKSync(
@@ -174,7 +180,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         require(orderIds.length == amounts.length, "Invalid lengths.");
 
         for (uint32 idx = 0; idx < orderIds.length; idx++) {
-            _claimPaymentZKSync(orderIds[idx], destAddresses[idx], amounts[idx]);
+            _verifyTransferExistsZKSync(orderIds[idx], destAddresses[idx], amounts[idx]);
         }
 
         //todo change place of this var
@@ -195,9 +201,11 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             new bytes[](0), //factory dependencies
             msg.sender //refund recipient
         );
+
+        emit ClaimPaymentBatch(orderIds, destAddresses, amounts, Chain.ZKSync);
     }
 
-    function _claimPaymentZKSync(uint256 orderId, uint256 destAddress, uint256 amount) internal view {
+    function _verifyTransferExistsZKSync(uint256 orderId, uint256 destAddress, uint256 amount) internal view {
         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, Chain.ZKSync));
         TransferInfo storage transferInfo = transfers[index];
         require(transferInfo.isUsed == true, "Transfer not found.");

@@ -10,7 +10,7 @@ from services.payment_claimer.payment_claimer import PaymentClaimer
 
 class HerodotusPaymentClaimer(PaymentClaimer):
 
-    async def send_payment_claim(self, order: Order, order_service: OrderService):
+    async def send_payment_claim(self, order: Order, order_service: OrderService):  # TODO remove order_service
         """
         Initialize the proof on herodotus
         """
@@ -25,7 +25,7 @@ class HerodotusPaymentClaimer(PaymentClaimer):
         order_service.set_order_proving_herodotus(order, task_id, block, slot)
         self.logger.info(f"[+] Block being proved with task id: {task_id}")
 
-    async def wait_for_payment_claim(self, order: Order, order_service: OrderService):
+    async def wait_for_payment_claim(self, order: Order, order_service: OrderService):  # TODO remove order_service
         """
         Wait for the proof to be done on herodotus
         """
@@ -37,7 +37,7 @@ class HerodotusPaymentClaimer(PaymentClaimer):
             order_service.set_order_proved(order)
             self.logger.info(f"[+] Task completed")
 
-    async def close_payment_claim(self, order: Order, order_service: OrderService):
+    async def close_payment_claim(self, order: Order, order_service: OrderService):  # TODO remove order_service
         """
         Makes the claim_payment on starknet
         """

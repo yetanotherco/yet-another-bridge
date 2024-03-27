@@ -1,4 +1,5 @@
 mod Escrow {
+    use core::array::ArrayTrait;
     use core::to_byte_array::FormatAsByteArray;
     use core::serde::Serde;
     use core::traits::Into;
@@ -18,7 +19,7 @@ mod Escrow {
 
     use yab::tests::utils::{
         constants::EscrowConstants::{
-            USER, OWNER, MM_STARKNET, MM_ETHEREUM, ETH_TRANSFER_CONTRACT, ETH_USER
+            USER, OWNER, MM_STARKNET, MM_ETHEREUM, ETH_TRANSFER_CONTRACT, ETH_USER, ETH_USER_2, ETH_USER_3
         },
     };
 
@@ -32,14 +33,6 @@ mod Escrow {
     fn setup() -> (IEscrowDispatcher, IERC20Dispatcher) {
         setup_general(BoundedInt::max(), BoundedInt::max())
     }
-
-    // fn setup_approved(approved: u256) -> (IEscrowDispatcher, IERC20Dispatcher){
-    //     setup_general(BoundedInt::max(), approved)
-    // }
-
-    // fn setup_balance(balance: u256) -> (IEscrowDispatcher, IERC20Dispatcher){
-    //     setup_general(balance, BoundedInt::max())
-    // }
 
     fn setup_general(balance: u256, approved: u256) -> (IEscrowDispatcher, IERC20Dispatcher){
         let eth_token = deploy_erc20('ETH', '$ETH', BoundedInt::max(), OWNER());
@@ -92,7 +85,7 @@ mod Escrow {
     }
 
     #[test]
-    fn test_happy_path() {
+    fn test_claim_payment() {
         let (escrow, eth_token) = setup();
 
         // check balance
@@ -100,7 +93,7 @@ mod Escrow {
         assert(eth_token.balanceOf(MM_STARKNET()) == 0, 'init: wrong balance');
 
         start_prank(CheatTarget::One(escrow.contract_address), USER());
-        let order = Order { recipient_address: 12345.try_into().unwrap(), amount: 500, fee: 0 };
+        let order = Order { recipient_address: ETH_USER(), amount: 500, fee: 0 };
         let order_id = escrow.set_order(order);
         stop_prank(CheatTarget::One(escrow.contract_address));
 
@@ -138,14 +131,14 @@ mod Escrow {
     }
 
     #[test]
-    fn test_claim_batch_happy() {
+    fn test_claim_payment_batch() {
         let (escrow, eth_token) = setup();
 
         // check balance
         assert(eth_token.balanceOf(escrow.contract_address) == 0, 'init: wrong balance');
         assert(eth_token.balanceOf(MM_STARKNET()) == 0, 'init: wrong balance');
 
-        let recipient_addresses = array![12345.try_into().unwrap(), 12346.try_into().unwrap(), 12347.try_into().unwrap()];
+        let recipient_addresses = array![ETH_USER(), ETH_USER_2(), ETH_USER_3()];
         let amounts = array![500, 501, 502];
         let fees = array![3, 2, 1];
 
@@ -207,6 +200,38 @@ mod Escrow {
         };
     }
 
+    #[test]
+    fn test_claim_batch_fail_missing_order_id() {
+        let (escrow, eth_token) = setup();
+
+        let mut orders = array![];
+
+        let amount = 500;
+        let order_id = _create_order(ETH_USER(), amount, 1, escrow);
+
+        orders.append((order_id, ETH_USER(), amount));
+        orders.append((order_id + 1, ETH_USER_2(), amount));
+
+        // Call withdraw_batch l1_handler
+        let mut l1_handler = L1HandlerTrait::new(
+            contract_address: escrow.contract_address,
+            function_name: 'claim_payment_batch'
+        );
+
+        let mut payload_buffer: Array<felt252> = ArrayTrait::new();
+        Serde::serialize(@orders, ref payload_buffer);
+
+        l1_handler.from_address = ETH_TRANSFER_CONTRACT().into();
+        l1_handler.payload = payload_buffer.span();
+
+        // same as "Should Panic" but for the L1 handler function
+        match l1_handler.execute() {
+            Result::Ok(_) => panic_with_felt252('shouldve panicked'),
+            Result::Err(RevertedTransaction) => {
+                assert(*RevertedTransaction.panic_data.at(0) == 'Order withdrew or nonexistent', *RevertedTransaction.panic_data.at(0));
+            }
+        } 
+    }
 
     #[test]
     fn test_fail_random_eth_user_calls_l1_handler() {
@@ -221,6 +246,66 @@ mod Escrow {
         l1_handler.from_address = ETH_USER().into();
 
         l1_handler.payload = payload_buffer.span();
+
+        // same as "Should Panic" but for the L1 handler function
+        match l1_handler.execute() {
+            Result::Ok(_) => panic_with_felt252('shouldve panicked'),
+            Result::Err(RevertedTransaction) => {
+                assert(*RevertedTransaction.panic_data.at(0) == 'Only PAYMENT_REGISTRY_CONTRACT', *RevertedTransaction.panic_data.at(0));
+            }
+        }
+    }
+
+    #[test]
+    fn test_fail_random_eth_user_calls_l1_handler_batch() {
+        let (escrow, eth_token) = setup();
+
+        assert(eth_token.balanceOf(escrow.contract_address) == 0, 'init: wrong balance');
+        assert(eth_token.balanceOf(MM_STARKNET()) == 0, 'init: wrong balance');
+
+        let recipient_addresses = array![ETH_USER(), ETH_USER_2(), ETH_USER_3()];
+        let amounts = array![500, 501, 502];
+        let fees = array![3, 2, 1];
+
+        let recipient_adresses_clone = recipient_addresses.clone();
+        let amounts_clone = amounts.clone();
+
+        let mut orders = array![];
+
+        start_prank(CheatTarget::One(escrow.contract_address), USER());
+
+        let mut idx = 0;
+        loop {
+            if idx >= 3 {
+                break;
+            }
+
+            let recipient_address = recipient_addresses.at(idx).clone();
+            let amount = amounts.at(idx).clone();
+            let fee = fees.at(idx).clone();
+
+            let order_id = _create_order(recipient_address, amount, fee, escrow);
+
+            orders.append((order_id, recipient_address, amount));
+            
+            idx += 1;
+        };
+
+        // check balance
+        assert(eth_token.balanceOf(escrow.contract_address) == 1509, 'set_order: wrong balance ');
+        assert(eth_token.balanceOf(MM_STARKNET()) == 0, 'set_order: wrong balance');
+
+        // Call withdraw_batch l1_handler
+        let mut l1_handler = L1HandlerTrait::new(
+            contract_address: escrow.contract_address,
+            function_name: 'claim_payment_batch'
+        );
+
+        let mut payload_buffer: Array<felt252> = ArrayTrait::new();
+        Serde::serialize(@orders, ref payload_buffer);
+
+        l1_handler.payload = payload_buffer.span();
+        l1_handler.from_address = ETH_USER().into();
 
         // same as "Should Panic" but for the L1 handler function
         match l1_handler.execute() {
