@@ -7,7 +7,7 @@ Smart Contract on L2 Starknet blockchain
 YAB's functionality is the Market Maker (MM for short).
 
 In the following sections, you will find information about:
-- [Escrow](escrow.md)
+- [Escrow](./escrow/escrow.md)
 - [Payment Registry](payment_registry.md)
 - [Deploy](deploy.md)
 - [Upgrade Contract](upgrade.md)

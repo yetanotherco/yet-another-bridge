@@ -84,3 +84,5 @@ for deployment is necessary:
   - Call the external **upgrade()** function, 
   from [OpenZeppellin's Upgradeable implementation](https://github.com/OpenZeppelin/cairo-contracts/blob/release-v0.8.0/src/upgrades/upgradeable.cairo), with the new class hash
 
+## Upgrade ZKSync
+[comment]: TODO, add when ZKSync is Upgradeable
