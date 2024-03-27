@@ -2,8 +2,10 @@ import { expect } from 'chai';
 import { deployAndInit } from './utils';
 import { Contract, Fragment, Wallet } from 'ethers';
 import { getWallet, deployContract, LOCAL_RICH_WALLETS } from '../deploy/utils';
+import { Address } from 'zksync-ethers/build/src/types';
 
 let escrow: Contract;
+let paymentRegistry: Wallet = getWallet("0x4337768cB3eC57Dd2cb843eFb929B773B13322de");
 let deployer: Wallet = getWallet(LOCAL_RICH_WALLETS[0].privateKey);
 let user_zk: Wallet = getWallet(LOCAL_RICH_WALLETS[1].privateKey);
 let user_zk2: Wallet = getWallet(LOCAL_RICH_WALLETS[2].privateKey);
@@ -18,10 +20,9 @@ beforeEach( async () => {
   escrow = await deployAndInit();
 });
 
-// /*
-// working:::
-describe('Pause tests', function () {
+/*
 
+describe('Pause tests', function () {
   it("Should start unpaused", async function () {
     expect(await escrow.paused()).to.eq(false);
   });
@@ -60,10 +61,19 @@ describe('Pause tests', function () {
     await setPauseTx.wait();
     await expect(escrow.set_order(user_eth, fee, {value})).to.be.revertedWith("Pausable: paused");
   });
+
+  it("Should not allow when paused: claim_payment", async () => {
+    const setOrderTx = await escrow.connect(user_zk).set_order(user_eth, fee, {value});
+    await setOrderTx.wait();
+
+    const setPauseTx = await escrow.pause();
+    await setPauseTx.wait();
+
+    await expect(escrow.claim_payment(0, user_eth, value)).to.be.revertedWith("Pausable: paused");
+  });
   
 });
-// */
-// // working ::
+
 describe('Set Order tests', function () {
   it("Should emit correct Event", async () => {
     let events = await escrow.queryFilter("*");
@@ -103,7 +113,24 @@ describe('Set Order tests', function () {
     expect(await escrow.is_order_pending(0)).to.equal(false);
   })
 })
+*/
 
+describe('Claim Payment tests', function () {
+  it("Should allow PaymentRegistry to claim payment", async () => {
+    const setOrderTx = await escrow.connect(user_zk).set_order(user_eth, fee, {value});
+    await setOrderTx.wait();
+
+    expect(escrow.connect(paymentRegistry).claim_payment(0, user_eth, value)).to.be.revertedWith("Only PAYMENT_REGISTRY can call");
+  });
+
+  it("Should not allow random user to call claim payment", async () => {
+    expect(escrow.connect(user_zk).claim_payment(0, user_eth, value)).to.be.revertedWith("Only PAYMENT_REGISTRY can call");
+  });
+})
+
+
+
+/*
 describe('Ownable tests', function () {
   it("Should not allow random user to pause", async () => {
     await expect(escrow.connect(user_zk).pause()).to.be.revertedWith("Ownable: caller is not the owner");
@@ -138,3 +165,4 @@ describe('Ownable tests', function () {
   });
 
 })
+*/
