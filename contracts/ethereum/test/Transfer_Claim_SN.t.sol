@@ -6,6 +6,7 @@ import "../src/PaymentRegistry.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 contract TransferTest is Test {
+    event ClaimPaymentBatch(uint256[] orderIds, uint256[] destAddresses, uint256[] amounts, PaymentRegistry.Chain chainId);
 
     address public deployer = makeAddr('deployer');
     address public marketMaker = makeAddr("marketMaker");
@@ -25,7 +26,7 @@ contract TransferTest is Test {
         yab = new PaymentRegistry();
         proxy = new ERC1967Proxy(address(yab), "");
         yab_caller = PaymentRegistry(address(proxy));
-        yab_caller.initialize(STARKNET_MESSAGING_ADDRESS, snEscrowAddress, SN_ESCROW_CLAIM_PAYMENT_SELECTOR, marketMaker, ZKSYNC_DIAMOND_PROXY_ADDRESS);
+        yab_caller.initialize(STARKNET_MESSAGING_ADDRESS, snEscrowAddress, SN_ESCROW_CLAIM_PAYMENT_SELECTOR, 0x0, marketMaker, ZKSYNC_DIAMOND_PROXY_ADDRESS);
 
         // Mock calls to Starknet Messaging contract
         vm.mockCall(
@@ -88,6 +89,114 @@ contract TransferTest is Test {
         yab_caller.transfer{value: 1}(1, address(0x1), PaymentRegistry.Chain.Starknet);
         hoax(marketMaker, 1 wei);
         yab_caller.claimPayment(1, address(0x1), 1);
+    }
+
+    function testClaimPaymentBatch() public {
+        hoax(marketMaker, 3 wei);
+        yab_caller.transfer{value: 3}(1, 0x1, PaymentRegistry.Chain.Starknet);
+        hoax(marketMaker, 2 wei);
+        yab_caller.transfer{value: 2}(2, 0x3, PaymentRegistry.Chain.Starknet);
+        hoax(marketMaker, 1 wei);
+        yab_caller.transfer{value: 1}(3, 0x5, PaymentRegistry.Chain.Starknet);
+
+        uint256[] memory orderIds = new uint256[](3);
+        uint256[] memory destAddresses = new uint256[](3);
+        uint256[] memory amounts = new uint256[](3);
+
+        orderIds[0] = 1;
+        orderIds[1] = 2;
+        orderIds[2] = 3;
+
+        destAddresses[0] = 0x1;
+        destAddresses[1] = 0x3;
+        destAddresses[2] = 0x5;
+
+        amounts[0] = 3;
+        amounts[1] = 2;
+        amounts[2] = 1;
+
+        hoax(marketMaker);
+        vm.expectEmit(true, true, true, true);
+        emit ClaimPaymentBatch(orderIds, destAddresses, amounts, PaymentRegistry.Chain.Starknet);
+        yab_caller.claimPaymentBatch(orderIds, destAddresses, amounts);
+
+        assertEq(address(0x1).balance, 3);
+        assertEq(address(0x3).balance, 2);
+        assertEq(address(0x5).balance, 1);
+    }
+
+    function testClaimPaymentBatchPartial() public {
+        hoax(marketMaker, 3 wei);
+        yab_caller.transfer{value: 3}(1, 0x1, PaymentRegistry.Chain.Starknet);
+        hoax(marketMaker, 2 wei);
+        yab_caller.transfer{value: 2}(2, 0x3, PaymentRegistry.Chain.Starknet);
+        hoax(marketMaker, 1 wei);
+        yab_caller.transfer{value: 1}(3, 0x5, PaymentRegistry.Chain.Starknet);
+
+        uint256[] memory orderIds = new uint256[](2);
+        uint256[] memory destAddresses = new uint256[](2);
+        uint256[] memory amounts = new uint256[](2);
+
+        orderIds[0] = 1;
+        orderIds[1] = 2;
+
+        destAddresses[0] = 0x1;
+        destAddresses[1] = 0x3;
+
+        amounts[0] = 3;
+        amounts[1] = 2;
+
+        hoax(marketMaker);
+        yab_caller.claimPaymentBatch(orderIds, destAddresses, amounts);
+
+        assertEq(address(0x1).balance, 3);
+        assertEq(address(0x3).balance, 2);
+    }
+
+    function testClaimPaymentBatch_fail_MissingTransfer() public {
+        hoax(marketMaker, 3 wei);
+        yab_caller.transfer{value: 3}(1, 0x1, PaymentRegistry.Chain.Starknet);
+        hoax(marketMaker, 2 wei);
+        yab_caller.transfer{value: 2}(2, 0x3, PaymentRegistry.Chain.Starknet);
+
+        uint256[] memory orderIds = new uint256[](3);
+        uint256[] memory destAddresses = new uint256[](3);
+        uint256[] memory amounts = new uint256[](3);
+
+        orderIds[0] = 1;
+        orderIds[1] = 2;
+        orderIds[2] = 3;
+
+        destAddresses[0] = 0x1;
+        destAddresses[1] = 0x3;
+        destAddresses[2] = 0x5;
+
+        amounts[0] = 3;
+        amounts[1] = 2;
+        amounts[2] = 1;
+
+        vm.expectRevert("Transfer not found.");
+        hoax(marketMaker);
+        yab_caller.claimPaymentBatch(orderIds, destAddresses, amounts);
+    }
+
+    function testClaimPaymentBatch_fail_notOwnerOrMM() public {
+        hoax(marketMaker, 3 wei);
+        yab_caller.transfer{value: 3}(1, 0x1, PaymentRegistry.Chain.Starknet);
+
+        uint256[] memory orderIds = new uint256[](1);
+        uint256[] memory destAddresses = new uint256[](1);
+        uint256[] memory amounts = new uint256[](1);
+
+        orderIds[0] = 1;
+
+        destAddresses[0] = 0x1;
+
+        amounts[0] = 3;
+
+        hoax(makeAddr("bob"), 100 wei);
+        vm.expectRevert("Only Owner or MM can call this function");
+        yab_caller.claimPaymentBatch(orderIds, destAddresses, amounts);
     }
 
     function test_claimPayment_fail_wrongChain() public {
