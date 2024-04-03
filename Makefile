@@ -60,6 +60,10 @@ starknet-test: starknet-clean
 starknet-deploy: starknet-build
 	@. ./contracts/starknet/.env && . ./contracts/starknet/deploy.sh
 
+starknet-connect:
+	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env && \
+	. ./contracts/ethereum/set_starknet_escrow.sh
+
 starknet-deploy-and-connect: starknet-build
 	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env && \
 	. ./contracts/starknet/deploy.sh && \
