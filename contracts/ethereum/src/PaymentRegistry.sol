@@ -28,7 +28,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     IZkSync private _ZKSyncDiamondProxy;
     IStarknetMessaging private _snMessaging;
 
-    //According to EIP-512, ChainIds are uint32, but as Starknet decided to not follow this EIP, we must store them as uint128.
+    //According to EIP-155, ChainIds are uint32, but as Starknet decided to not follow this EIP, we must store them as uint128.
     uint128 public StarknetChainId;
     uint128 public ZKSyncChainId;
 
