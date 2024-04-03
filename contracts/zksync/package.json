@@ -7,7 +7,7 @@
     "deploy-devnet": "hardhat deploy-zksync --network dockerizedNode --script deploy.ts",
     "compile": "hardhat compile",
     "clean": "hardhat clean",
-    "test": "hardhat test --network dockerizedNode --show-stack-traces"
+    "test": "hardhat test --network inMemoryNode --show-stack-traces"
   },
   "devDependencies": {
     "@matterlabs/hardhat-zksync-deploy": "^1.1.2",

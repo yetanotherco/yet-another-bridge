@@ -92,6 +92,38 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
         emit ClaimPayment(order_id, mm_zksync_wallet, amount);
     }
 
+    // l1 handler
+    function claim_payment_batch(
+        uint256[] calldata order_ids,
+        address[] calldata recipient_addresses,
+        uint256[] calldata amounts
+    ) public whenNotPaused {
+        require(msg.sender == ethereum_payment_registry, 'Only PAYMENT_REGISTRY can call');
+        require(order_ids.length == recipient_addresses.length, 'Invalid lengths');
+        require(order_ids.length == amounts.length, 'Invalid lengths');
+
+        for (uint32 idx = 0; idx < order_ids.length; idx++) {
+            uint256 order_id = order_ids[idx];
+            address recipient_address = recipient_addresses[idx];
+            uint256 amount = amounts[idx];
+
+            require(_orders_pending[order_id], 'Order claimed or nonexistent');
+
+            Order memory current_order = _orders[order_id]; //TODO check if order is memory or calldata
+            require(current_order.recipient_address == recipient_address, 'recipient_address not match L1');
+            require(current_order.amount == amount, 'amount not match L1');
+
+            _orders_pending[order_id] = false;
+            uint256 payment_amount = current_order.amount + current_order.fee;  // TODO check overflow
+
+            // TODO: Might be best to do only one transfer
+            (bool success,) = payable(address(uint160(mm_zksync_wallet))).call{value: payment_amount}("");
+            require(success, "Transfer failed.");
+
+            emit ClaimPayment(order_id, mm_zksync_wallet, amount);
+        }
+    }
+
     function is_order_pending(uint256 order_id) public view returns (bool) {
         return _orders_pending[order_id];
     }
