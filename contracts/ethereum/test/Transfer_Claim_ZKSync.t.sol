@@ -75,9 +75,9 @@ contract TransferTest is Test {
     }
 
     function test_claimPaymentBatch_zk() public {
-        hoax(marketMaker, 100 wei);
+        hoax(MM_ETHEREUM_WALLET_ADDRESS, 100 wei);
         yab_caller.transfer{value: 100}(1, address(0x1), PaymentRegistry.Chain.ZKSync);  
-        hoax(marketMaker, 101 wei);
+        hoax(MM_ETHEREUM_WALLET_ADDRESS, 101 wei);
         yab_caller.transfer{value: 100}(2, address(0x1), PaymentRegistry.Chain.ZKSync);  
 
         uint256[] memory orderIds = new uint256[](2);
@@ -96,12 +96,12 @@ contract TransferTest is Test {
             abi.encodeWithSelector(0x156be1ae, 0), //TODO add selector
             abi.encode(0x12345678901234567890123456789012) //TODO add return data
         );
-        hoax(marketMaker);
+        hoax(MM_ETHEREUM_WALLET_ADDRESS);
         yab_caller.claimPaymentBatchZKSync(orderIds, destAddresses, amounts, 1, 1);
     }
 
     function test_claimPaymentBatch_zk_fail_MissingTransfer() public {
-        hoax(marketMaker, 100 wei);
+        hoax(MM_ETHEREUM_WALLET_ADDRESS, 100 wei);
         yab_caller.transfer{value: 100}(1, address(0x1), PaymentRegistry.Chain.ZKSync);  
 
         uint256[] memory orderIds = new uint256[](2);
@@ -116,12 +116,12 @@ contract TransferTest is Test {
         amounts[1] = 100;
 
         vm.expectRevert("Transfer not found.");
-        hoax(marketMaker);
+        hoax(MM_ETHEREUM_WALLET_ADDRESS);
         yab_caller.claimPaymentBatchZKSync(orderIds, destAddresses, amounts, 1, 1);
     }
 
     function test_claimPaymentBatch_zk_fail_notOwnerOrMM() public {
-        hoax(marketMaker, 100 wei);
+        hoax(MM_ETHEREUM_WALLET_ADDRESS, 100 wei);
         yab_caller.transfer{value: 100}(1, address(0x1), PaymentRegistry.Chain.ZKSync);  
 
         uint256[] memory orderIds = new uint256[](2);
