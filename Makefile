@@ -70,10 +70,10 @@ starknet-upgrade: starknet-build
 	@. ./contracts/starknet/.env && . ./contracts/starknet/upgrade.sh
 
 starknet-pause:
-	@. ./contracts/starknet/.env && ./contracts/starknet/change_pause_state.sh pause
+	@. ./contracts/starknet/.env && ./contracts/starknet/scripts/change_pause_state.sh pause
 
 starknet-unpause:
-	@. ./contracts/starknet/.env && ./contracts/starknet/change_pause_state.sh unpause
+	@. ./contracts/starknet/.env && ./contracts/starknet/scripts/change_pause_state.sh unpause
 
 
 ### ZKSYNC ###
