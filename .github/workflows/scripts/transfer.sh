@@ -14,7 +14,7 @@ echo "Initial Destination balance: $DESTINATION_INITIAL_BALANCE"
 
 echo "Transferring $AMOUNT to $DESTINATION_ADDRESS"
 cast send --rpc-url $ETHEREUM_RPC --private-key $ETHEREUM_PRIVATE_KEY \
-  $PAYMENT_REGISTRY_PROXY_ADDRESS "transfer(uint256, uint256, uint8)" \
+  $PAYMENT_REGISTRY_PROXY_ADDRESS "transfer(uint256, address, uint8)" \
   "0" $DESTINATION_ADDRESS $STARKNET_CHAIN_ID \
   --value $AMOUNT >> /dev/null
 
