@@ -73,6 +73,71 @@ contract TransferTest is Test {
         assertEq(address(marketMaker).balance, 100);
     }
 
+    function test_claimPaymentBatch_zk() public {
+        hoax(marketMaker, 100 wei);
+        yab_caller.transfer{value: 100}(1, address(0x1), PaymentRegistry.Chain.ZKSync);  
+        hoax(marketMaker, 101 wei);
+        yab_caller.transfer{value: 100}(2, address(0x1), PaymentRegistry.Chain.ZKSync);  
+
+        uint256[] memory orderIds = new uint256[](2);
+        address[] memory destAddresses = new address[](2);
+        uint256[] memory amounts = new uint256[](2);
+
+        orderIds[0] = 1;
+        orderIds[1] = 2;
+        destAddresses[0] = address(0x1);
+        destAddresses[1] = address(0x1);
+        amounts[0] = 100;
+        amounts[1] = 100;
+
+        vm.mockCall(
+            ZKSYNC_DIAMOND_PROXY_ADDRESS,
+            abi.encodeWithSelector(0x156be1ae, 0), //TODO add selector
+            abi.encode(0x12345678901234567890123456789012) //TODO add return data
+        );
+        hoax(marketMaker);
+        yab_caller.claimPaymentBatchZKSync(orderIds, destAddresses, amounts, 1, 1);
+    }
+
+    function test_claimPaymentBatch_zk_fail_MissingTransfer() public {
+        hoax(marketMaker, 100 wei);
+        yab_caller.transfer{value: 100}(1, address(0x1), PaymentRegistry.Chain.ZKSync);  
+
+        uint256[] memory orderIds = new uint256[](2);
+        address[] memory destAddresses = new address[](2);
+        uint256[] memory amounts = new uint256[](2);
+
+        orderIds[0] = 1;
+        orderIds[1] = 2;
+        destAddresses[0] = address(0x1);
+        destAddresses[1] = address(0x1);
+        amounts[0] = 100;
+        amounts[1] = 100;
+
+        vm.expectRevert("Transfer not found.");
+        hoax(marketMaker);
+        yab_caller.claimPaymentBatchZKSync(orderIds, destAddresses, amounts, 1, 1);
+    }
+
+    function test_claimPaymentBatch_zk_fail_notOwnerOrMM() public {
+        hoax(marketMaker, 100 wei);
+        yab_caller.transfer{value: 100}(1, address(0x1), PaymentRegistry.Chain.ZKSync);  
+
+        uint256[] memory orderIds = new uint256[](2);
+        address[] memory destAddresses = new address[](2);
+        uint256[] memory amounts = new uint256[](2);
+
+        orderIds[0] = 1;
+        orderIds[1] = 2;
+        destAddresses[0] = address(0x1);
+        destAddresses[1] = address(0x1);
+        amounts[0] = 100;
+        amounts[1] = 100;
+
+        vm.expectRevert("Only Owner or MM can call this function");
+        yab_caller.claimPaymentBatchZKSync(orderIds, destAddresses, amounts, 0, 1);
+    }
+
     function test_claimPayment_zk_maxInt() public {
         uint256 maxInt = type(uint256).max;
         
