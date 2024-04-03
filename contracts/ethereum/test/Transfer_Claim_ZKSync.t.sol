@@ -17,6 +17,7 @@ contract TransferTest is Test {
 
     address STARKNET_MESSAGING_ADDRESS = 0xde29d060D45901Fb19ED6C6e959EB22d8626708e;
     uint256 STARKNET_CLAIM_PAYMENT_SELECTOR = 0x15511cc3694f64379908437d6d64458dc76d02482052bfb8a5b33a72c054c77;
+    uint256 STARKNET_CLAIM_PAYMENT_BATCH_SELECTOR = 0x0354a01e49fe07e43306a97ed84dbd5de8238c7d8ff616caa3444630cfc559e6;
     address ZKSYNC_DIAMOND_PROXY_ADDRESS = 0x2eD8eF54a16bBF721a318bd5a5C0F39Be70eaa65;
     bytes4 ZKSYNC_CLAIM_PAYMENT_SELECTOR = 0xa5168739;
 
@@ -26,8 +27,7 @@ contract TransferTest is Test {
         yab = new PaymentRegistry();
         proxy = new ERC1967Proxy(address(yab), "");
         yab_caller = PaymentRegistry(address(proxy));
-        yab_caller.initialize(STARKNET_MESSAGING_ADDRESS, STARKNET_CLAIM_PAYMENT_SELECTOR, MM_ETHEREUM_WALLET_ADDRESS, ZKSYNC_DIAMOND_PROXY_ADDRESS, ZKSYNC_CLAIM_PAYMENT_SELECTOR);
-
+        yab_caller.initialize(STARKNET_MESSAGING_ADDRESS, STARKNET_CLAIM_PAYMENT_SELECTOR, STARKNET_CLAIM_PAYMENT_BATCH_SELECTOR, MM_ETHEREUM_WALLET_ADDRESS, ZKSYNC_DIAMOND_PROXY_ADDRESS, ZKSYNC_CLAIM_PAYMENT_SELECTOR);
         //Mock calls to ZKSync Mailbox contract
         vm.mockCall(
             ZKSYNC_DIAMOND_PROXY_ADDRESS,
@@ -40,29 +40,37 @@ contract TransferTest is Test {
 
     function test_transfer_zk() public {
         hoax(MM_ETHEREUM_WALLET_ADDRESS, 100 wei);
-        yab_caller.transfer{value: 100}(1, 0x1, PaymentRegistry.Chain.ZKSync);
+        yab_caller.transfer{value: 100}(1, address(0x1), PaymentRegistry.Chain.ZKSync);
         assertEq(address(0x1).balance, 100);
+    }
+
+    function test_transfer_zk_fail_already_transferred() public {
+        hoax(MM_ETHEREUM_WALLET_ADDRESS, 100 wei);
+        yab_caller.transfer{value: 100}(1, address(0x1), PaymentRegistry.Chain.ZKSync);
+        hoax(MM_ETHEREUM_WALLET_ADDRESS, 100 wei);
+        vm.expectRevert("Transfer already processed.");
+        yab_caller.transfer{value: 100}(1, address(0x1), PaymentRegistry.Chain.ZKSync);
     }
 
     function test_claimPayment_zk_fail_noOrderId() public {
         hoax(MM_ETHEREUM_WALLET_ADDRESS, 100 wei);
         vm.expectRevert("Transfer not found."); //Won't match to a random transfer number
-        yab_caller.claimPaymentZKSync(1, 0x1, 100, 1, 1);
+        yab_caller.claimPaymentZKSync(1, address(0x1), 100, 1, 1);
     }
 
     function test_claimPayment_zk_fail_wrongOrderId() public {
         hoax(MM_ETHEREUM_WALLET_ADDRESS, 100 wei);
-        yab_caller.transfer{value: 100}(1, 0x1, PaymentRegistry.Chain.ZKSync);  
+        yab_caller.transfer{value: 100}(1, address(0x1), PaymentRegistry.Chain.ZKSync);  
         hoax(MM_ETHEREUM_WALLET_ADDRESS, 100 wei);
         vm.expectRevert("Transfer not found."); //Won't match to a wrong transfer number
-        yab_caller.claimPaymentZKSync(2, 0x1, 100, 1, 1);
+        yab_caller.claimPaymentZKSync(2, address(0x1), 100, 1, 1);
     }
 
     function test_claimPayment_zk() public {
         hoax(MM_ETHEREUM_WALLET_ADDRESS, 100 wei);
-        yab_caller.transfer{value: 100}(1, 0x1, PaymentRegistry.Chain.ZKSync);  
+        yab_caller.transfer{value: 100}(1, address(0x1), PaymentRegistry.Chain.ZKSync);  
         hoax(MM_ETHEREUM_WALLET_ADDRESS, 100 wei);
-        yab_caller.claimPaymentZKSync(1, 0x1, 100, 1, 1);
+        yab_caller.claimPaymentZKSync(1, address(0x1), 100, 1, 1);
         assertEq(address(MM_ETHEREUM_WALLET_ADDRESS).balance, 100);
     }
 
@@ -72,23 +80,23 @@ contract TransferTest is Test {
         vm.deal(MM_ETHEREUM_WALLET_ADDRESS, maxInt);
         vm.startPrank(MM_ETHEREUM_WALLET_ADDRESS);
 
-        yab_caller.transfer{value: maxInt}(1, 0x1, PaymentRegistry.Chain.ZKSync);
-        yab_caller.claimPaymentZKSync(1, 0x1, maxInt, 1, 1);
+        yab_caller.transfer{value: maxInt}(1, address(0x1), PaymentRegistry.Chain.ZKSync);
+        yab_caller.claimPaymentZKSync(1, address(0x1), maxInt, 1, 1);
         vm.stopPrank();
     }
 
     function test_claimPayment_zk_minInt() public {
         hoax(MM_ETHEREUM_WALLET_ADDRESS, 1 wei);
-        yab_caller.transfer{value: 1}(1, 0x1, PaymentRegistry.Chain.ZKSync);
+        yab_caller.transfer{value: 1}(1, address(0x1), PaymentRegistry.Chain.ZKSync);
         hoax(MM_ETHEREUM_WALLET_ADDRESS, 1 wei);
-        yab_caller.claimPaymentZKSync(1, 0x1, 1, 1, 1);
+        yab_caller.claimPaymentZKSync(1, address(0x1), 1, 1, 1);
     }
 
     function test_claimPayment_fail_wrongChain() public {
         hoax(MM_ETHEREUM_WALLET_ADDRESS, 1 wei);
-        yab_caller.transfer{value: 1}(1, 0x1, PaymentRegistry.Chain.ZKSync);
+        yab_caller.transfer{value: 1}(1, address(0x1), PaymentRegistry.Chain.ZKSync);
         hoax(MM_ETHEREUM_WALLET_ADDRESS, 1 wei);
         vm.expectRevert("Transfer not found."); //Won't match to a transfer made on the other chain
-        yab_caller.claimPayment(1, 0x1, 1);  
+        yab_caller.claimPayment(1, address(0x1), 1);  
     }
 }
