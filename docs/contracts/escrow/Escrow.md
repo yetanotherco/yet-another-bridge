@@ -28,6 +28,6 @@ Escrow will then cross-check this information to its own records, and if everyth
 check, Escrow will transfer the bridged amount of tokens, plus the fee, to MM's L2 
 address.
 
-Currently, we have 2 implementations of this contract, for 2 different Ethereum ZK L2 Rollups:
+Currently, we have 2 implementations of this contract, for 2 different Ethereum L2 Rollups:
 - For [Starknet](https://www.starknet.io/en) we have [escrow.cairo](../../../contracts/starknet/src/escrow.cairo), with [its own readme](./Starknet.md)
 - For [ZKSync](https://zksync.io/) we have [escrow.sol](../../../contracts/zksync/contracts/escrow.sol), with [its own readme](./ZKSync.md)

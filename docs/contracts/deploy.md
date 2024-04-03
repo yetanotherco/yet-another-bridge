@@ -199,7 +199,7 @@ template for creating your .env file, paying special attention to the formats pr
 
    1. make zksync-build; builds the project
    2. make zksync-deploy; deploys the Escrow on the ZKSync blockchain
-   3. ./set_zksync_escrow; sets the newly created ZKSync contract address on the 
+   3. ./set_zksync_escrow.sh; sets the newly created ZKSync contract address on the 
 Ethereum Payment Registry, so that the L1 contract can communicate with the L2 contract
 
 ### Second alternative: manual deploy and connect of Escrow and Payment Registry
