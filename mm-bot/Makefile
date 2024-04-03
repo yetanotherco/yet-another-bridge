@@ -9,9 +9,9 @@ database = mm-bot-db
 
 # Application Commands
 deps:
-    @echo "Installing dependencies..."
-    @. venv/bin/activate && pip install -r requirements.txt
-    @echo "Dependencies installed successfully!"
+	@echo "Installing dependencies..."
+	@. venv/bin/activate && pip install -r requirements.txt
+	@echo "Dependencies installed successfully!"
 
 run:
 	@echo "Running application..."
