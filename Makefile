@@ -58,11 +58,11 @@ starknet-test: starknet-clean
 	@cd ./contracts/starknet/ && snforge test
 
 starknet-deploy: starknet-build
-	@. ./contracts/starknet/.env && . ./contracts/starknet/deploy.sh
+	@. ./contracts/starknet/.env && . ./contracts/starknet/scripts/deploy.sh
 
 starknet-deploy-and-connect: starknet-build
 	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env && \
-	. ./contracts/starknet/deploy.sh && \
+	. ./contracts/starknet/scripts/deploy.sh && \
 	. ./contracts/ethereum/set_starknet_escrow.sh && \
 	. ./contracts/ethereum/set_starknet_claim_payment_selector.sh
 
@@ -132,7 +132,7 @@ ethereum-and-starknet-deploy:
 	make ethereum-build && \
 	make starknet-build && \
 	. ./contracts/ethereum/deploy.sh && \
-	. ./contracts/starknet/deploy.sh && \
+	. ./contracts/starknet/scripts/deploy.sh && \
 	. ./contracts/ethereum/set_starknet_escrow.sh && \
 	. ./contracts/ethereum/set_starknet_claim_payment_selector.sh && \
 	. ./contracts/utils/display_info.sh
@@ -142,7 +142,7 @@ deploy-all:
 	make ethereum-build && \
 	. ./contracts/ethereum/deploy.sh && \
 	make starknet-build && \
-	. ./contracts/starknet/deploy.sh && \
+	. ./contracts/starknet/scripts/deploy.sh && \
 	. ./contracts/ethereum/set_starknet_escrow.sh && \
 	. ./contracts/ethereum/set_starknet_claim_payment_selector.sh && \
 	. ./contracts/utils/display_info.sh && \

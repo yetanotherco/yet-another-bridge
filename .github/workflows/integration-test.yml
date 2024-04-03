@@ -164,7 +164,7 @@ jobs:
           
           export STARKNET_RPC=${{vars.STARKNET_RPC}}
           source ./contracts/starknet/.env.test
-          . ./contracts/starknet/deploy.sh
+          . ./contracts/starknet/scripts/deploy.sh
           
           . ./contracts/ethereum/set_starknet_escrow.sh
           . ./contracts/ethereum/set_starknet_claim_payment_selector.sh
