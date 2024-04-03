@@ -67,7 +67,7 @@ starknet-deploy-and-connect: starknet-build
 	. ./contracts/ethereum/set_starknet_claim_payment_selector.sh
 
 starknet-upgrade: starknet-build
-	@. ./contracts/starknet/.env && . ./contracts/starknet/upgrade.sh
+	@. ./contracts/starknet/.env && . ./contracts/starknet/scripts/upgrade.sh
 
 starknet-pause:
 	@. ./contracts/starknet/.env && ./contracts/starknet/scripts/change_pause_state.sh pause
