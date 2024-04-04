@@ -44,7 +44,7 @@ You can also override the default using the `--network` option. For example:
 
 This contract recieves User's new orders with the function:
 ```solidity
-    function set_order(address recipient_address, uint256 fee) public payable whenNotPaused returns (uint256)
+function set_order(address recipient_address, uint256 fee) public payable whenNotPaused returns (uint256)
 ```
 
 Which returns the new order's ID.

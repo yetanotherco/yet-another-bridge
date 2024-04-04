@@ -46,7 +46,7 @@ template for creating your .env file, paying special attention to the formats pr
 
    ZKSYNC_DIAMOND_PROXY_ADDRESS = ZKSync Diamond Proxy address in L1
 
-   ZKSYNC_CLAIM_PAYMENT_SELECTOR = hex value of ZKSync's claim_payment selct
+   ZKSYNC_CLAIM_PAYMENT_SELECTOR = hex value of ZKSync's claim_payment selector
    ```
 
    **NOTE**:

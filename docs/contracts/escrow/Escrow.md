@@ -21,8 +21,7 @@ this information so that MMs can decide if they want to accept this offer.
 The user must wait until an MM picks its order, which should be almost instantaneous 
 if the transfer fee is the suggested one.
 
-After an MM consolidates an order, Escrow will receive a `claim_payment` call from the Payment Registry, containing the information about how MM has indeed bridged the funds 
-to the User's L1 address, and where does MM want to receive it's L2 tokens.
+After an MM consolidates an order, Escrow will receive a `claim_payment` call from the Payment Registry, using the native mesagging system of the rollup, containing the information about how MM has indeed bridged the funds to the User's L1 address, and where does MM want to receive it's L2 tokens.
 
 Escrow will then cross-check this information to its own records, and if everything is in 
 check, Escrow will transfer the bridged amount of tokens, plus the fee, to MM's L2 
