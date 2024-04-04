@@ -13,7 +13,6 @@ let user_zk2: Wallet = getWallet(LOCAL_RICH_WALLETS[2].privateKey);
 let user_eth: Wallet = getWallet(LOCAL_RICH_WALLETS[1].privateKey);
 let user_eth2: Wallet = getWallet(LOCAL_RICH_WALLETS[2].privateKey);
 
-// let mm: Wallet = getWallet(LOCAL_RICH_WALLETS[4].privateKey);
 
 
 const fee = 1; //TODO check, maybe make fuzz
