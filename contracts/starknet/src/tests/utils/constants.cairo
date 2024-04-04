@@ -24,4 +24,12 @@ mod EscrowConstants {
     fn ETH_USER() -> EthAddress {
         99.try_into().unwrap()
     }
+
+    fn ETH_USER_2() -> EthAddress {
+        100.try_into().unwrap()
+    }
+
+    fn ETH_USER_3() -> EthAddress {
+        101.try_into().unwrap()
+    }
 }

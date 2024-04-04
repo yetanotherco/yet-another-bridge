@@ -15,7 +15,7 @@ export const getProvider = () => {
   if (!rpcUrl) throw `⛔️ RPC URL wasn't found in "${hre.network.name}"! Please add a "url" field to the network config in hardhat.config.ts`;
   
   // Initialize zkSync Provider
-  const provider = new Provider(rpcUrl);
+  const provider = new Provider(rpcUrl, undefined, {cacheTimeout: -1});
 
   return provider;
 }

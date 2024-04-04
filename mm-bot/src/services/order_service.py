@@ -141,7 +141,7 @@ class OrderService:
         :param error_message: the error message to store in the database
         """
         order = self.set_failed(order, True)
-        error = Error(order_id=order.order_id, message=error_message)
+        error = Error(order_id=order.order_id, origin_network=order.origin_network, message=error_message)
         self.error_dao.create_error(error)
         return order
 
