@@ -100,9 +100,11 @@ zksync-deploy-and-connect: zksync-build
 	. ./contracts/zksync/deploy.sh && \
 	. ./contracts/ethereum/set_zksync_escrow.sh
 
-
 zksync-test: zksync-build
 	@cd ./contracts/zksync/ && yarn test
+
+zksync-test-in-memory: zksync-build
+	@cd ./contracts/zksync/ && yarn test-in-memory
 
 #wip:
 zksync-test-integration:
