@@ -63,3 +63,13 @@ fn claim_payment(
     amount: u256
 )
 ```
+
+Alternatevly, the `claim_payment_batch` function is called, only by our [Payment Registry](../payment_registry.md), in order for the MM to retrieve many payments from the Escrow at once:
+```cairo
+#[l1_handler]
+fn claim_payment_batch(
+    ref self: ContractState,
+    from_address: felt252,
+    orders: Array<(u256, EthAddress, u256)>
+)
+```

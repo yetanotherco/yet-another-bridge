@@ -67,4 +67,12 @@ function claim_payment(
 ) public whenNotPaused
 ```
 
+Alternatevly, the `claim_payment_batch` function is called, only by our [Payment Registry](../payment_registry.md), in order for the MM to retrieve many payments from the Escrow at once:
+```solidity
+function claim_payment_batch(
+    uint256[] calldata order_ids,
+    address[] calldata recipient_addresses,
+    uint256[] calldata amounts
+) public whenNotPaused
+```
 
