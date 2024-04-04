@@ -44,9 +44,13 @@ template for creating your .env file, paying special attention to the formats pr
 
    STARKNET_CLAIM_PAYMENT_SELECTOR = hex value of starknet\'s claim_payment selector
 
+   STARKNET_CLAIM_PAYMENT_BATCH_SELECTOR = hex value of starknet\'s claim_payment_batch selector
+
    ZKSYNC_DIAMOND_PROXY_ADDRESS = ZKSync Diamond Proxy address in L1
 
-   ZKSYNC_CLAIM_PAYMENT_SELECTOR = hex value of ZKSync's claim_payment selector
+   ZKSYNC_CLAIM_PAYMENT_SELECTOR = hex value of ZKSync\'s claim_payment selector
+   
+   ZKSYNC_CLAIM_PAYMENT_BATCH_SELECTOR = hex value of ZKSync\'s claim_payment_batch selector
    ```
 
    **NOTE**:
@@ -62,14 +66,16 @@ template for creating your .env file, paying special attention to the formats pr
    - ZKSYNC_DIAMOND_PROXY_ADDRESS is for when a L1 contract initiates a message to a L2 contract on ZKSync. It does so by calling the requestL2Transaction function on the ZKSync Core Contract with the message parameters. ZKSync Diamond Proxy's addresses are the following:
       - Sepolia: `0x9A6DE0f62Aa270A8bCB1e2610078650D539B1Ef9`
       - Mainnet: `0x32400084C286CF3E17e7B677ea9583e60a000324`
-   - You can generate the STARKNET_CLAIM_PAYMENT_SELECTOR value with `starkli`, by running, for example:
+   - You can generate the STARKNET_CLAIM_PAYMENT_SELECTOR value and the STARKNET_CLAIM_PAYMENT_BATHC_SELECTOR with `starkli`, by running, for example:
    ```bash
    stakli selector claim_payment
+   stakli selector claim_payment_batch
    ```
 
-   - You can generate the ZKSYNC_CLAIM_PAYMENT_SELECTOR value by using `cast sig`, by running, for example:
+   - You can generate the ZKSYNC_CLAIM_PAYMENT_SELECTOR and the ZKSYNC_CLAIM_PAYMENT_BATCH_SELECTOR value by using `cast sig`, by running, for example:
    ```bash
    cast sig "claim_payment(uint256 order_id, address recipient_address, uint256 amount)"
+   cast sig "claim_payment_batch(uint256[] order_ids, address[] recipient_addresses, uint256[] amounts)"
    ```
 
 2. Deploy Ethereum contract
