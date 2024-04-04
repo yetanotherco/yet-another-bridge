@@ -81,7 +81,7 @@ template for creating your .env file, paying special attention to the formats pr
 2. Deploy Ethereum contract
 
    ```bash
-      make ethereum-deploy
+   make ethereum-deploy
    ```
 
 This will deploy a [ERC1967 Proxy](https://docs.openzeppelin.com/contracts/4.x/api/proxy#ERC1967Proxy) smart contract, a [Payment Registry](../../contracts/ethereum/src/PaymentRegistry.sol) smart 
@@ -134,7 +134,7 @@ to our Ethereum Payment Registry.
 ### First alternative: automatic deploy and connect of Escrow and Payment Registry
 
    ```bash
-      make starknet-deploy-and-connect
+   make starknet-deploy-and-connect
    ```
 
    This make target consists of 3 steps:
@@ -198,7 +198,7 @@ template for creating your .env file, paying special attention to the formats pr
 ### First alternative: automatic deploy and connect of Escrow and Payment Registry
 
    ```bash
-      make zksync-deploy-and-connect
+   make zksync-deploy-and-connect
    ```
 
    This make target consists of 3 steps:
@@ -220,7 +220,7 @@ declared variables, or if you simply want to make sure you understand the proces
    We sequentially declare and deploy the contracts. This also builds the project beforehand.
 
    ```bash
-    make zksync-deploy
+   make zksync-deploy
    ```
 
    This script also defines an important variable, **ZKSYNC_ESCROW_CONTRACT_ADDRESS**
@@ -232,7 +232,7 @@ declared variables, or if you simply want to make sure you understand the proces
    To do this, you can use
 
    ```bash
-    make zksync-connect
+   make zksync-connect
    ```
 
    This script uses the previously set variable, **ZKSYNC_ESCROW_CONTRACT_ADDRESS**
