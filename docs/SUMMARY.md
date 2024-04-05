@@ -14,24 +14,19 @@
 
 * [📜 Introduction](contracts/README.md)
 
-### Escrow
 * [🏦 Escrow](contracts/escrow/escrow.md)
 
-* [🏦 Starknet](contracts/escrow/starknet.md)
-
-* [🏦 Zksync](contracts/escrow/zksync.md)
-
-### Payment Registry
-
+  * [🏦 Starknet](contracts/escrow/starknet.md)
+  
+  * [🏦 Zksync](contracts/escrow/zksync.md)
+  
 * [🧾 Payment Registry](contracts/payment_registry.md)
 
-### Operation
+* [🔨 Deploy](contracts/deploy.md)
 
-* [🔨 Deploying](contracts/deploy.md)
+* [📈 Upgrade](contracts/upgrade.md)
 
-* [📈 Upgrading](contracts/upgrade.md)
-
-* [⛔️ Pausing](contracts/pause.md)
+* [⛔️ Pause](contracts/pause.md)
 
 ## Market Maker Bot
 
