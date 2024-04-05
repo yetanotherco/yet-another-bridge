@@ -159,6 +159,8 @@ jobs:
           export STARKNET_MESSAGING_ADDRESS=${{vars.STARKNET_MESSAGING_ADDRESS}}
           export MM_ETHEREUM_WALLET_ADDRESS=${{vars.MM_ETHEREUM_WALLET_ADDRESS}}
           export ZKSYNC_DIAMOND_PROXY_ADDRESS=${{vars.ZKSYNC_DIAMOND_PROXY_ADDRESS}}
+          export STARKNET_CHAIN_ID=${{vars.STARKNET_CHAIN_ID}}
+          export ZKSYNC_CHAIN_ID=${{vars.ZKSYNC_CHAIN_ID}}
           export SKIP_VERIFY=true
           . ./contracts/ethereum/deploy.sh
           
