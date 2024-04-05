@@ -121,8 +121,6 @@ to our Ethereum smart contract.
    2. make starknet-deploy; deploys the smart contract on the blockchain
    3. make ethereum-set-escrow; sets the newly created Starknet contract address on the 
 Ethereum smart contract, so that the L1 contract can communicate with the L2 contract
-   4. make ethereum-set-claim-payment-selector; sets the Starknet _claim_payment_ function name on 
-the Ethereum smart contract, so that the L1 contract can communicate with the L2 contract
 
 ### Second alternative: manual deploy and connect of Escrow and Payment Registry
 
@@ -152,21 +150,6 @@ Starknet smart contract address.
    ```
 
    This script uses the previously set variable, **ESCROW_CONTRACT_ADDRESS**
-
-3. Setting _EscrowClaimPaymentSelector_
-
-   Ethereum's smart contract has another variable that must be configured, 
-_EscrowClaimPaymentSelector_, which is for specifying the _claim_payment_ function's name in the 
-Starknet Escrow smart contract.
-
-   You can set and change Ethereum's _EscrowClaimPaymentSelector_ variable, doing the following:
-
-   ```bash
-    make ethereum-set-claim-payment-selector
-   ```
-
-   This script uses the CLAIM_PAYMENT_NAME .env variable to automatically generate the 
-selector in the necessary format
 
 ## Recap
 

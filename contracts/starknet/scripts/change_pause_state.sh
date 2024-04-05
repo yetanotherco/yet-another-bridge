@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 if [ -z "$STARKNET_ACCOUNT" ]; then
     echo "\n${RED}ERROR:${COLOR_RESET}"
     echo "STARKNET_ACCOUNT Variable is empty. Aborting execution.\n"
@@ -15,7 +16,7 @@ fi
 # we avoid adding flags such as --account, --keystore, and --rpc.
 export STARKNET_ACCOUNT=$STARKNET_ACCOUNT
 export STARKNET_KEYSTORE=$STARKNET_KEYSTORE
-# export STARKNET_RPC=$STARKNET_RPC #todo: this must remain commented until we find a reliable and compatible rpc
+export STARKNET_RPC=$STARKNET_RPC
 
 if [ -z "$ESCROW_CONTRACT_ADDRESS" ]; then
     printf "\n${RED}ERROR:${COLOR_RESET}\n"
