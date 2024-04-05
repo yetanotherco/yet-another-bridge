@@ -20,6 +20,7 @@ contract TransferTest is Test {
     uint256 STARKNET_CLAIM_PAYMENT_BATCH_SELECTOR = 0x0354a01e49fe07e43306a97ed84dbd5de8238c7d8ff616caa3444630cfc559e6;
     address ZKSYNC_DIAMOND_PROXY_ADDRESS = 0x2eD8eF54a16bBF721a318bd5a5C0F39Be70eaa65;
     bytes4 ZKSYNC_CLAIM_PAYMENT_SELECTOR = 0xa5168739;
+    bytes4 ZKSYNC_CLAIM_PAYMENT_BATCH_SELECTOR = 0x156be1ae;
 
     function setUp() public {
         vm.startPrank(deployer);
@@ -27,7 +28,7 @@ contract TransferTest is Test {
         yab = new PaymentRegistry();
         proxy = new ERC1967Proxy(address(yab), "");
         yab_caller = PaymentRegistry(address(proxy));
-        yab_caller.initialize(STARKNET_MESSAGING_ADDRESS, STARKNET_CLAIM_PAYMENT_SELECTOR, STARKNET_CLAIM_PAYMENT_BATCH_SELECTOR, MM_ETHEREUM_WALLET_ADDRESS, ZKSYNC_DIAMOND_PROXY_ADDRESS, ZKSYNC_CLAIM_PAYMENT_SELECTOR);
+        yab_caller.initialize(STARKNET_MESSAGING_ADDRESS, STARKNET_CLAIM_PAYMENT_SELECTOR, STARKNET_CLAIM_PAYMENT_BATCH_SELECTOR, MM_ETHEREUM_WALLET_ADDRESS, ZKSYNC_DIAMOND_PROXY_ADDRESS, ZKSYNC_CLAIM_PAYMENT_SELECTOR, ZKSYNC_CLAIM_PAYMENT_BATCH_SELECTOR);
         // Mock calls to Starknet Messaging contract
         vm.mockCall(
             STARKNET_MESSAGING_ADDRESS,
