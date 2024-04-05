@@ -40,7 +40,6 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
         __Ownable_init();
         // __UUPSUpgradeable_init();
 
-        _current_order_id = 0;
         ethereum_payment_registry = ethereum_payment_registry_;
         mm_zksync_wallet = mm_zksync_wallet_;
     }
