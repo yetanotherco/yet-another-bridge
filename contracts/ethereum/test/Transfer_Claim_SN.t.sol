@@ -42,16 +42,16 @@ contract TransferTest is Test {
 
     function test_transfer_sn() public {
         hoax(marketMaker, 100 wei);
-        yab_caller.transfer{value: 100}(1, address(0x1), 0x534e5f5345504f4c4941);
+        yab_caller.transfer{value: 100}(1, address(0x1), STARKNET_CHAIN_ID);
         assertEq(address(0x1).balance, 100);
     }
 
     function test_transfer_sn_fail_already_transferred() public {
         hoax(marketMaker, 100 wei);
-        yab_caller.transfer{value: 100}(1, address(0x1), 0x534e5f5345504f4c4941);
+        yab_caller.transfer{value: 100}(1, address(0x1), STARKNET_CHAIN_ID);
         hoax(marketMaker, 100 wei);
         vm.expectRevert("Transfer already processed.");
-        yab_caller.transfer{value: 100}(1, address(0x1), 0x534e5f5345504f4c4941);
+        yab_caller.transfer{value: 100}(1, address(0x1), STARKNET_CHAIN_ID);
     }
 
     function test_claimPayment_sn_fail_noOrderId() public {
@@ -62,7 +62,7 @@ contract TransferTest is Test {
 
     function test_claimPayment_sn_fail_wrongOrderId() public {
         hoax(marketMaker, 100 wei);
-        yab_caller.transfer{value: 100}(1, address(0x1), 0x534e5f5345504f4c4941);  
+        yab_caller.transfer{value: 100}(1, address(0x1), STARKNET_CHAIN_ID);  
         hoax(marketMaker, 100 wei);
         vm.expectRevert("Transfer not found."); //Won't match to a wrong transfer number
         yab_caller.claimPayment(2, address(0x1), 100);
@@ -70,7 +70,7 @@ contract TransferTest is Test {
 
     function test_claimPayment_sn() public {
         hoax(marketMaker, 100 wei);
-        yab_caller.transfer{value: 100}(1, address(0x1), 0x534e5f5345504f4c4941);  
+        yab_caller.transfer{value: 100}(1, address(0x1), STARKNET_CHAIN_ID);  
         hoax(marketMaker, 100 wei);
         yab_caller.claimPayment(1, address(0x1), 100);
         assertEq(address(marketMaker).balance, 100);
@@ -82,25 +82,25 @@ contract TransferTest is Test {
         vm.deal(marketMaker, maxInt);
         vm.startPrank(marketMaker);
 
-        yab_caller.transfer{value: maxInt}(1, address(0x1), 0x534e5f5345504f4c4941);
+        yab_caller.transfer{value: maxInt}(1, address(0x1), STARKNET_CHAIN_ID);
         yab_caller.claimPayment(1, address(0x1), maxInt);
         vm.stopPrank();
     }
 
     function test_claimPayment_sn_minInt() public {
         hoax(marketMaker, 1 wei);
-        yab_caller.transfer{value: 1}(1, address(0x1), 0x534e5f5345504f4c4941);
+        yab_caller.transfer{value: 1}(1, address(0x1), STARKNET_CHAIN_ID);
         hoax(marketMaker, 1 wei);
         yab_caller.claimPayment(1, address(0x1), 1);
     }
 
     function testClaimPaymentBatch() public {
         hoax(marketMaker, 3 wei);
-        yab_caller.transfer{value: 3}(1,address(0x1), 0x534e5f5345504f4c4941);
+        yab_caller.transfer{value: 3}(1,address(0x1), STARKNET_CHAIN_ID);
         hoax(marketMaker, 2 wei);
-        yab_caller.transfer{value: 2}(2, address(0x3), 0x534e5f5345504f4c4941);
+        yab_caller.transfer{value: 2}(2, address(0x3), STARKNET_CHAIN_ID);
         hoax(marketMaker, 1 wei);
-        yab_caller.transfer{value: 1}(3, address(0x5), 0x534e5f5345504f4c4941);
+        yab_caller.transfer{value: 1}(3, address(0x5), STARKNET_CHAIN_ID);
 
         uint256[] memory orderIds = new uint256[](3);
         address[] memory destAddresses = new address[](3);
@@ -120,7 +120,7 @@ contract TransferTest is Test {
 
         hoax(marketMaker);
         vm.expectEmit(true, true, true, true);
-        emit ClaimPaymentBatch(orderIds, destAddresses, amounts, 0x534e5f5345504f4c4941);
+        emit ClaimPaymentBatch(orderIds, destAddresses, amounts, STARKNET_CHAIN_ID);
         yab_caller.claimPaymentBatch(orderIds, destAddresses, amounts);
 
         assertEq(address(0x1).balance, 3);
@@ -130,11 +130,11 @@ contract TransferTest is Test {
 
     function testClaimPaymentBatchPartial() public {
         hoax(marketMaker, 3 wei);
-        yab_caller.transfer{value: 3}(1, address(0x1), 0x534e5f5345504f4c4941);
+        yab_caller.transfer{value: 3}(1, address(0x1), STARKNET_CHAIN_ID);
         hoax(marketMaker, 2 wei);
-        yab_caller.transfer{value: 2}(2, address(0x3), 0x534e5f5345504f4c4941);
+        yab_caller.transfer{value: 2}(2, address(0x3), STARKNET_CHAIN_ID);
         hoax(marketMaker, 1 wei);
-        yab_caller.transfer{value: 1}(3, address(0x5), 0x534e5f5345504f4c4941);
+        yab_caller.transfer{value: 1}(3, address(0x5), STARKNET_CHAIN_ID);
 
         uint256[] memory orderIds = new uint256[](2);
         address[] memory destAddresses = new address[](2);
@@ -158,9 +158,9 @@ contract TransferTest is Test {
 
     function testClaimPaymentBatch_fail_MissingTransfer() public {
         hoax(marketMaker, 3 wei);
-        yab_caller.transfer{value: 3}(1, address(0x1), 0x534e5f5345504f4c4941);
+        yab_caller.transfer{value: 3}(1, address(0x1), STARKNET_CHAIN_ID);
         hoax(marketMaker, 2 wei);
-        yab_caller.transfer{value: 2}(2, address(0x3), 0x534e5f5345504f4c4941);
+        yab_caller.transfer{value: 2}(2, address(0x3), STARKNET_CHAIN_ID);
 
         uint256[] memory orderIds = new uint256[](3);
         address[] memory destAddresses = new address[](3);
@@ -185,7 +185,7 @@ contract TransferTest is Test {
 
     function testClaimPaymentBatch_fail_notOwnerOrMM() public {
         hoax(marketMaker, 3 wei);
-        yab_caller.transfer{value: 3}(1, address(0x1), 0x534e5f5345504f4c4941);
+        yab_caller.transfer{value: 3}(1, address(0x1), STARKNET_CHAIN_ID);
 
         uint256[] memory orderIds = new uint256[](1);
         address[] memory destAddresses = new address[](1);
@@ -204,7 +204,7 @@ contract TransferTest is Test {
 
     function test_claimPayment_fail_wrongChain() public {
         hoax(marketMaker, 1 wei);
-        yab_caller.transfer{value: 1}(1, address(0x1), 0x534e5f5345504f4c4941);
+        yab_caller.transfer{value: 1}(1, address(0x1), STARKNET_CHAIN_ID);
         hoax(marketMaker, 1 wei);
         vm.expectRevert("Transfer not found."); //Won't match to a transfer made on the other chain
         yab_caller.claimPaymentZKSync(1, address(0x1), 1, 1 ,1);  

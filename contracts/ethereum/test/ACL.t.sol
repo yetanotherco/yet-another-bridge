@@ -59,7 +59,7 @@ contract TransferTest is Test {
     function test_transfer_sn_fail_notOwnerOrMM() public {
         hoax(makeAddr("bob"), 100 wei);
         vm.expectRevert("Only Owner or MM can call this function");
-        yab_caller.transfer{value: 100}(1, address(0x1), 0x534e5f5345504f4c4941);
+        yab_caller.transfer{value: 100}(1, address(0x1), STARKNET_CHAIN_ID);
     }
 
     function test_claimPayment_sn_fail_notOwnerOrMM() public {
