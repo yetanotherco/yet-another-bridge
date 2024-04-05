@@ -9,11 +9,9 @@ import {IZkSync} from "@matterlabs/interfaces/IZkSync.sol";
 
 contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
-    enum Chain { Starknet, ZKSync } //todo add canonic chainID
-
-    event Transfer(uint256 indexed orderId, address srcAddress, address destAddress, uint256 amount, Chain chainId);
-    event ClaimPayment(uint256 indexed orderId, address destAddress, uint256 amount, Chain chainId);
-    event ClaimPaymentBatch(uint256[] orderIds, address[] destAddresses, uint256[] amounts, Chain chainId);
+    event Transfer(uint256 indexed orderId, address srcAddress, address destAddress, uint256 amount, uint128 chainId);
+    event ClaimPayment(uint256 indexed orderId, address destAddress, uint256 amount, uint128 chainId);
+    event ClaimPaymentBatch(uint256[] orderIds, address[] destAddresses, uint256[] amounts, uint128 chainId);
 
     event ModifiedZKSyncEscrowAddress(address newEscrowAddress);
     event ModifiedStarknetEscrowAddress(uint256 newEscrowAddress);
@@ -34,6 +32,9 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     IZkSync private _ZKSyncDiamondProxy;
     IStarknetMessaging private _snMessaging;
 
+    //According to EIP-155, ChainIds are uint32, but as Starknet decided to not follow this EIP, we must store them as uint128.
+    uint128 public StarknetChainId;
+    uint128 public ZKSyncChainId;
 
     constructor() {
         _disableInitializers();
@@ -47,7 +48,9 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         address marketMaker_,
         address ZKSyncDiamondProxyAddress,
         bytes4 ZKSyncEscrowClaimPaymentSelector_,
-        bytes4 ZKSyncEscrowClaimPaymentBatchSelector_) public initializer { 
+        bytes4 ZKSyncEscrowClaimPaymentBatchSelector_,
+        uint128 StarknetChainId_,
+        uint128 ZKSyncChainId_) public initializer { 
         __Ownable_init(msg.sender);
         __UUPSUpgradeable_init();
 
@@ -59,11 +62,14 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         ZKSyncEscrowClaimPaymentSelector = ZKSyncEscrowClaimPaymentSelector_;
         ZKSyncEscrowClaimPaymentBatchSelector = ZKSyncEscrowClaimPaymentBatchSelector_;
 
+        StarknetChainId = StarknetChainId_;
+        ZKSyncChainId = ZKSyncChainId_;
+
         marketMaker = marketMaker_;
     }
 
     //TODO: change orderID to uint32
-    function transfer(uint256 orderId, address destAddress, Chain chainId) external payable onlyOwnerOrMM {
+    function transfer(uint256 orderId, address destAddress, uint128 chainId) external payable onlyOwnerOrMM {
         require(msg.value > 0, "Invalid amount, should be higher than 0.");
 
         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, msg.value, chainId));
@@ -93,7 +99,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             StarknetEscrowClaimPaymentSelector,
             payload);
 
-        emit ClaimPayment(orderId, destAddress, amount, Chain.Starknet);
+        emit ClaimPayment(orderId, destAddress, amount, StarknetChainId);
     }
 
     function claimPaymentBatch(
@@ -128,11 +134,11 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             StarknetEscrowClaimPaymentBatchSelector,
             payload);
 
-        emit ClaimPaymentBatch(orderIds, destAddresses, amounts, Chain.Starknet);
+        emit ClaimPaymentBatch(orderIds, destAddresses, amounts, StarknetChainId);
     }
 
     function _verifyTransferExistsStarknet(uint256 orderId, address destAddress, uint256 amount) internal view {
-        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, Chain.Starknet));
+        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, StarknetChainId));
         require(transfers[index] == true, "Transfer not found.");
     }
 
@@ -160,7 +166,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             msg.sender //refund recipient
         );
 
-        emit ClaimPayment(orderId, destAddress, amount, Chain.ZKSync); //2100 gas
+        emit ClaimPayment(orderId, destAddress, amount, ZKSyncChainId); //2100 gas
     }
 
     function claimPaymentBatchZKSync(
@@ -194,11 +200,11 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             msg.sender //refund recipient
         );
 
-        emit ClaimPaymentBatch(orderIds, destAddresses, amounts, Chain.ZKSync);
+        emit ClaimPaymentBatch(orderIds, destAddresses, amounts, ZKSyncChainId);
     }
 
     function _verifyTransferExistsZKSync(uint256 orderId, address destAddress, uint256 amount) internal view {
-        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, Chain.ZKSync));
+        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, ZKSyncChainId));
         require(transfers[index] == true, "Transfer not found."); //if this is claimed twice, Escrow will know
     }
 

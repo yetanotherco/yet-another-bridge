@@ -18,6 +18,9 @@ contract Deploy is Script {
         bytes4 ZKSYNC_CLAIM_PAYMENT_SELECTOR = bytes4(vm.envBytes("ZKSYNC_CLAIM_PAYMENT_SELECTOR"));
         bytes4 ZKSYNC_CLAIM_PAYMENT_BATCH_SELECTOR = bytes4(vm.envBytes("ZKSYNC_CLAIM_PAYMENT_BATCH_SELECTOR"));
 
+        uint128 STARKNET_CHAIN_ID = uint128(vm.envUint("STARKNET_CHAIN_ID"));
+        uint128 ZKSYNC_CHAIN_ID = uint128(vm.envUint("ZKSYNC_CHAIN_ID"));
+
         PaymentRegistry yab = new PaymentRegistry();
         ERC1967Proxy proxy = new ERC1967Proxy(address(yab), "");
         PaymentRegistry(address(proxy)).initialize(
@@ -27,7 +30,9 @@ contract Deploy is Script {
             MM_ETHEREUM_WALLET_ADDRESS,
             ZKSYNC_DIAMOND_PROXY_ADDRESS,
             ZKSYNC_CLAIM_PAYMENT_SELECTOR,
-            ZKSYNC_CLAIM_PAYMENT_BATCH_SELECTOR
+            ZKSYNC_CLAIM_PAYMENT_BATCH_SELECTOR,
+            STARKNET_CHAIN_ID,
+            ZKSYNC_CHAIN_ID
         );
 
         vm.stopBroadcast();

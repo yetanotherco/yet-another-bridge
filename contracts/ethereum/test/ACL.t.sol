@@ -20,13 +20,16 @@ contract TransferTest is Test {
     bytes4 ZKSYNC_CLAIM_PAYMENT_SELECTOR = 0xa5168739;
     bytes4 ZKSYNC_CLAIM_PAYMENT_BATCH_SELECTOR = 0x156be1ae;
 
+    uint128 STARKNET_CHAIN_ID = 0x534e5f5345504f4c4941;
+    uint128 ZKSYNC_CHAIN_ID = 300;
+
     function setUp() public {
         vm.startPrank(deployer);
 
         yab = new PaymentRegistry();
         proxy = new ERC1967Proxy(address(yab), "");
         yab_caller = PaymentRegistry(address(proxy));
-        yab_caller.initialize(STARKNET_MESSAGING_ADDRESS, STARKNET_CLAIM_PAYMENT_SELECTOR, STARKNET_CLAIM_PAYMENT_BATCH_SELECTOR, MM_ETHEREUM_WALLET_ADDRESS, ZKSYNC_DIAMOND_PROXY_ADDRESS, ZKSYNC_CLAIM_PAYMENT_SELECTOR, ZKSYNC_CLAIM_PAYMENT_BATCH_SELECTOR);
+        yab_caller.initialize(STARKNET_MESSAGING_ADDRESS, STARKNET_CLAIM_PAYMENT_SELECTOR, STARKNET_CLAIM_PAYMENT_BATCH_SELECTOR, MM_ETHEREUM_WALLET_ADDRESS, ZKSYNC_DIAMOND_PROXY_ADDRESS, ZKSYNC_CLAIM_PAYMENT_SELECTOR, ZKSYNC_CLAIM_PAYMENT_BATCH_SELECTOR, STARKNET_CHAIN_ID, ZKSYNC_CHAIN_ID);
 
         vm.stopPrank();
     }
@@ -58,7 +61,7 @@ contract TransferTest is Test {
     function test_transfer_sn_fail_notOwnerOrMM() public {
         hoax(makeAddr("bob"), 100 wei);
         vm.expectRevert("Only Owner or MM can call this function");
-        yab_caller.transfer{value: 100}(1, address(0x1), PaymentRegistry.Chain.Starknet);
+        yab_caller.transfer{value: 100}(1, address(0x1), STARKNET_CHAIN_ID);
     }
 
     function test_claimPayment_sn_fail_notOwnerOrMM() public {
@@ -70,7 +73,7 @@ contract TransferTest is Test {
     function test_transfer_zk_fail_notOwnerOrMM() public {
         hoax(makeAddr("bob"), 100 wei);
         vm.expectRevert("Only Owner or MM can call this function");
-        yab_caller.transfer{value: 100}(1, address(0x1), PaymentRegistry.Chain.ZKSync);
+        yab_caller.transfer{value: 100}(1, address(0x1), ZKSYNC_CHAIN_ID);
     }
 
     function test_claimPayment_zk_fail_notOwnerOrMM() public {
