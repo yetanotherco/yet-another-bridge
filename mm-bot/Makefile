@@ -17,7 +17,7 @@ create_env:
 
 create_python_venv:
 	@echo "Creating virtual environment..."
-	@python3 -m venv venv
+	@python3.10 -m venv venv
 	@echo "Virtual environment created successfully!"
 
 # Database Commands
