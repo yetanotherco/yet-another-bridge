@@ -83,7 +83,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         emit Transfer(orderId, msg.sender, destAddress, msg.value, chainId); //2400 gas
     }
 
-    function claimPayment(uint256 orderId, address destAddress, uint256 amount) external payable onlyOwnerOrMM {
+    function claimPaymentStarknet(uint256 orderId, address destAddress, uint256 amount) external payable onlyOwnerOrMM {
         _verifyTransferExistsStarknet(orderId, destAddress, amount);
 
         uint256[] memory payload = new uint256[](5); //this is not an array of u128 because sendMessageToL2 takes an array of uint256
@@ -102,7 +102,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         emit ClaimPayment(orderId, destAddress, amount, StarknetChainId);
     }
 
-    function claimPaymentBatch(
+    function claimPaymentBatchStarknet(
         uint256[] calldata orderIds,
         address[] calldata destAddresses,
         uint256[] calldata amounts

@@ -58,7 +58,7 @@ contract TransferTest is Test {
     function test_claimPayment_sn_fail_noOrderId() public {
         hoax(MM_ETHEREUM_WALLET_ADDRESS, 100 wei);
         vm.expectRevert("Transfer not found."); //Won't match to a random transfer number
-        yab_caller.claimPayment{value: 100}(1, address(0x1), 100);
+        yab_caller.claimPaymentStarknet{value: 100}(1, address(0x1), 100);
     }
 
     function test_claimPayment_sn_fail_wrongOrderId() public {
@@ -66,14 +66,14 @@ contract TransferTest is Test {
         yab_caller.transfer{value: 100}(1, address(0x1), STARKNET_CHAIN_ID);  
         hoax(MM_ETHEREUM_WALLET_ADDRESS, 100 wei);
         vm.expectRevert("Transfer not found."); //Won't match to a wrong transfer number
-        yab_caller.claimPayment(2, address(0x1), 100);
+        yab_caller.claimPaymentStarknet(2, address(0x1), 100);
     }
 
     function test_claimPayment_sn() public {
         hoax(MM_ETHEREUM_WALLET_ADDRESS, 100 wei);
         yab_caller.transfer{value: 100}(1, address(0x1), STARKNET_CHAIN_ID);  
         hoax(MM_ETHEREUM_WALLET_ADDRESS, 100 wei);
-        yab_caller.claimPayment(1, address(0x1), 100);
+        yab_caller.claimPaymentStarknet(1, address(0x1), 100);
         assertEq(address(MM_ETHEREUM_WALLET_ADDRESS).balance, 100);
     }
 
@@ -84,7 +84,7 @@ contract TransferTest is Test {
         vm.startPrank(MM_ETHEREUM_WALLET_ADDRESS);
 
         yab_caller.transfer{value: maxInt}(1, address(0x1), STARKNET_CHAIN_ID);
-        yab_caller.claimPayment(1, address(0x1), maxInt);
+        yab_caller.claimPaymentStarknet(1, address(0x1), maxInt);
         vm.stopPrank();
     }
 
@@ -92,10 +92,10 @@ contract TransferTest is Test {
         hoax(MM_ETHEREUM_WALLET_ADDRESS, 1 wei);
         yab_caller.transfer{value: 1}(1, address(0x1), STARKNET_CHAIN_ID);
         hoax(MM_ETHEREUM_WALLET_ADDRESS, 1 wei);
-        yab_caller.claimPayment(1, address(0x1), 1);
+        yab_caller.claimPaymentStarknet(1, address(0x1), 1);
     }
 
-    function testClaimPaymentBatch() public {
+    function testClaimPaymentBatch_sn() public {
         hoax(MM_ETHEREUM_WALLET_ADDRESS, 3 wei);
         yab_caller.transfer{value: 3}(1,address(0x1), STARKNET_CHAIN_ID);
         hoax(MM_ETHEREUM_WALLET_ADDRESS, 2 wei);
@@ -122,14 +122,14 @@ contract TransferTest is Test {
         hoax(MM_ETHEREUM_WALLET_ADDRESS);
         vm.expectEmit(true, true, true, true);
         emit ClaimPaymentBatch(orderIds, destAddresses, amounts, STARKNET_CHAIN_ID);
-        yab_caller.claimPaymentBatch(orderIds, destAddresses, amounts);
+        yab_caller.claimPaymentBatchStarknet(orderIds, destAddresses, amounts);
 
         assertEq(address(0x1).balance, 3);
         assertEq(address(0x3).balance, 2);
         assertEq(address(0x5).balance, 1);
     }
 
-    function testClaimPaymentBatchPartial() public {
+    function testClaimPaymentBatchPartial_sn() public {
         hoax(MM_ETHEREUM_WALLET_ADDRESS, 3 wei);
         yab_caller.transfer{value: 3}(1, address(0x1), STARKNET_CHAIN_ID);
         hoax(MM_ETHEREUM_WALLET_ADDRESS, 2 wei);
@@ -151,7 +151,7 @@ contract TransferTest is Test {
         amounts[1] = 2;
 
         hoax(MM_ETHEREUM_WALLET_ADDRESS);
-        yab_caller.claimPaymentBatch(orderIds, destAddresses, amounts);
+        yab_caller.claimPaymentBatchStarknet(orderIds, destAddresses, amounts);
 
         assertEq(address(0x1).balance, 3);
         assertEq(address(0x3).balance, 2);
@@ -181,7 +181,7 @@ contract TransferTest is Test {
 
         vm.expectRevert("Transfer not found.");
         hoax(MM_ETHEREUM_WALLET_ADDRESS);
-        yab_caller.claimPaymentBatch(orderIds, destAddresses, amounts);
+        yab_caller.claimPaymentBatchStarknet(orderIds, destAddresses, amounts);
     }
 
     function testClaimPaymentBatch_fail_notOwnerOrMM() public {
@@ -200,7 +200,7 @@ contract TransferTest is Test {
 
         hoax(makeAddr("bob"), 100 wei);
         vm.expectRevert("Only Owner or MM can call this function");
-        yab_caller.claimPaymentBatch(orderIds, destAddresses, amounts);
+        yab_caller.claimPaymentBatchStarknet(orderIds, destAddresses, amounts);
     }
 
     function test_claimPayment_fail_wrongChain() public {

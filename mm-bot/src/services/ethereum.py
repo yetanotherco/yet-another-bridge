@@ -99,7 +99,7 @@ def claim_payment(deposit_id, dst_addr, amount, value):  # TODO rename parameter
 
 @use_fallback(rpc_nodes, logger, "Failed to create claim payment eth")
 def create_claim_payment(deposit_id, destination_address, amount, value, rpc_node=main_rpc_node):
-    unsent_tx = rpc_node.contract.functions.claimPayment(deposit_id, Web3.to_checksum_address(destination_address), amount).build_transaction({
+    unsent_tx = rpc_node.contract.functions.claimPaymentStarknet(deposit_id, Web3.to_checksum_address(destination_address), amount).build_transaction({
         "chainId": ETHEREUM_CHAIN_ID,
         "from": rpc_node.account.address,
         "nonce": get_nonce(rpc_node.w3, rpc_node.account.address),
