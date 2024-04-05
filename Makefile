@@ -55,21 +55,25 @@ starknet-test: starknet-clean
 	@cd ./contracts/starknet/ && snforge test
 
 starknet-deploy: starknet-build
-	@. ./contracts/starknet/.env && . ./contracts/starknet/deploy.sh
+	@. ./contracts/starknet/.env && . ./contracts/starknet/scripts/deploy.sh
+
+starknet-connect:
+	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env && \
+	. ./contracts/ethereum/set_starknet_escrow.sh
 
 starknet-deploy-and-connect: starknet-build
 	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env && \
-	. ./contracts/starknet/deploy.sh && \
+	. ./contracts/starknet/scripts/deploy.sh && \
 	. ./contracts/ethereum/set_starknet_escrow.sh
 
 starknet-upgrade: starknet-build
-	@. ./contracts/starknet/.env && . ./contracts/starknet/upgrade.sh
+	@. ./contracts/starknet/.env && . ./contracts/starknet/scripts/upgrade.sh
 
 starknet-pause:
-	@. ./contracts/starknet/.env && ./contracts/starknet/change_pause_state.sh pause
+	@. ./contracts/starknet/.env && . ./contracts/starknet/scripts/change_pause_state.sh pause
 
 starknet-unpause:
-	@. ./contracts/starknet/.env && ./contracts/starknet/change_pause_state.sh unpause
+	@. ./contracts/starknet/.env && . ./contracts/starknet/scripts/change_pause_state.sh unpause
 
 
 ### ZKSYNC ###
@@ -94,6 +98,9 @@ zksync-deploy-and-connect: zksync-build
 
 zksync-test: zksync-build
 	@cd ./contracts/zksync/ && yarn test
+
+zksync-test-in-memory: zksync-build
+	@cd ./contracts/zksync/ && yarn test-in-memory
 
 #wip:
 zksync-test-integration:
@@ -127,7 +134,7 @@ ethereum-and-starknet-deploy:
 	make ethereum-build && \
 	make starknet-build && \
 	. ./contracts/ethereum/deploy.sh && \
-	. ./contracts/starknet/deploy.sh && \
+	. ./contracts/starknet/scripts/deploy.sh && \
 	. ./contracts/ethereum/set_starknet_escrow.sh && \
 	. ./contracts/utils/display_info.sh
 
@@ -136,7 +143,7 @@ deploy-all:
 	make ethereum-build && \
 	. ./contracts/ethereum/deploy.sh && \
 	make starknet-build && \
-	. ./contracts/starknet/deploy.sh && \
+	. ./contracts/starknet/scripts/deploy.sh && \
 	. ./contracts/ethereum/set_starknet_escrow.sh && \
 	. ./contracts/utils/display_info.sh && \
 	make zksync-build && \
