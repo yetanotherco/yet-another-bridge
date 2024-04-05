@@ -31,6 +31,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     IZkSync private _ZKSyncDiamondProxy;
     IStarknetMessaging private _snMessaging;
     bytes4 public ZKSyncEscrowClaimPaymentSelector;
+    bytes4 public ZKSyncEscrowClaimPaymentBatchSelector;
 
     constructor() {
         _disableInitializers();
@@ -43,7 +44,8 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         uint256 StarknetEscrowClaimPaymentBatchSelector_,
         address marketMaker_,
         address ZKSyncDiamondProxyAddress,
-        bytes4 ZKSyncEscrowClaimPaymentSelector_) public initializer { 
+        bytes4 ZKSyncEscrowClaimPaymentSelector_,
+        bytes4 ZKSyncEscrowClaimPaymentBatchSelector_) public initializer { 
         __Ownable_init(msg.sender);
         __UUPSUpgradeable_init();
 
@@ -53,6 +55,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         StarknetEscrowClaimPaymentSelector = StarknetEscrowClaimPaymentSelector_;
         StarknetEscrowClaimPaymentBatchSelector = StarknetEscrowClaimPaymentBatchSelector_;
         ZKSyncEscrowClaimPaymentSelector = ZKSyncEscrowClaimPaymentSelector_;
+        ZKSyncEscrowClaimPaymentBatchSelector = ZKSyncEscrowClaimPaymentBatchSelector_;
 
         marketMaker = marketMaker_;
     }
@@ -172,10 +175,8 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             _verifyTransferExistsZKSync(orderIds[idx], destAddresses[idx], amounts[idx]);
         }
 
-        //todo change place of this var
-        bytes4 selector = 0x156be1ae; //claim_payment_batch selector in ZKSync //todo add in init, same as in SN
         bytes memory messageToL2 = abi.encodeWithSelector(
-            selector,
+            ZKSyncEscrowClaimPaymentBatchSelector,
             orderIds,
             destAddresses,
             amounts
