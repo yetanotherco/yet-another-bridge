@@ -2,8 +2,8 @@
 
 ## What is YAB?
 
-Yet Another Bridge (YAB) is the cheapest, fastest and most secure bridge
-solution from Starknet to Ethereum.
+Yet Another Bridge (YAB) is the cheapest, fastest and most secure bridge solution 
+from Starknet and ZKSync to Ethereum, and from Ethereum to Starknet and ZKSync
 
 ## What makes YAB different from other bridge solutions?
 
@@ -35,9 +35,9 @@ bridge's final cost would be approximately $15.
 
 ## What chains are currently supported?
 
-Currently, Starknet is the only supported chain.
+Both Starknet and ZKSync are supported by YAB.
 
-We are working on integrating ZkSync in the near future, so stay tuned for further updates!
+We are working on integrating almost every other rollup in the near future, so stay tuned for further updates!
 
 ## How can I get in touch with the team?
 
