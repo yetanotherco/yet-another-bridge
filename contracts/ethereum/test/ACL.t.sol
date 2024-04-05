@@ -8,7 +8,6 @@ import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.s
 contract TransferTest is Test {
     address public deployer = makeAddr('deployer');
     address public MM_ETHEREUM_WALLET_ADDRESS = makeAddr('marketMaker');
-    uint256 public snEscrowAddress = 0x0;
 
     PaymentRegistry public yab;
     ERC1967Proxy public proxy;
