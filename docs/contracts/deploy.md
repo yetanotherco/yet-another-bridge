@@ -68,8 +68,8 @@ template for creating your .env file, paying special attention to the formats pr
       - Mainnet: `0x32400084C286CF3E17e7B677ea9583e60a000324`
    - You can generate the STARKNET_CLAIM_PAYMENT_SELECTOR value and the STARKNET_CLAIM_PAYMENT_BATHC_SELECTOR with `starkli`, by running, for example:
    ```bash
-   stakli selector claim_payment
-   stakli selector claim_payment_batch
+   starkli selector claim_payment
+   starkli selector claim_payment_batch
    ```
 
    - You can generate the ZKSYNC_CLAIM_PAYMENT_SELECTOR and the ZKSYNC_CLAIM_PAYMENT_BATCH_SELECTOR value by using `cast sig`, by running, for example:
