@@ -81,7 +81,8 @@ The following table describes each environment variable:
 |---------------------------|-------------------------------------------------------------------------------------------------------------------|
 | ENVIRONMENT               | The environment of the application. It can be `dev` or `prod`                                                     |
 | ETHEREUM_CHAIN_ID         | The chain ID of the Ethereum network. It can be `1` for Mainnet, 11155111 for Sepolia                             |
-| STARKNET_CHAIN_ID         | The chain ID of the Starknet network. It can be `SN_MAINNET` for Mainnet, `SN_SEPOLIA` for Sepolia                |
+| STARKNET_CHAIN_ID         | The chain ID of the Starknet network. It can be `0x534e5f4d41494e` for Mainnet, `0x534e5f5345504f4c4941` for Sepolia                |
+| ZKSYNC_CHAIN_ID           | The chain ID of the ZKSync network. I can be `324` for Mainnet, `300` for sepolia |
 | ETHEREUM_RPC              | The URL of the Ethereum RPC. You can get one at [Blast](https://blastapi.io/) or [Infure](https://www.infura.io/) |
 | STARKNET_RPC              | The URL of the Starknet RPC. You can get one at [Blast](https://blastapi.io/) or [Infure](https://www.infura.io/) |
 | ZKSYNC_RPC                | The URL of the ZkSync RPC. You can get one at [Blast](https://blastapi.io/)                                       |

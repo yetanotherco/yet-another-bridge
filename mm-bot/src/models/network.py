@@ -1,6 +1,7 @@
 from enum import Enum
+from config import constants
 
 
 class Network(Enum):
-    STARKNET = 0
-    ZKSYNC = 1
+    STARKNET = constants.STARKNET_CHAIN_ID
+    ZKSYNC = constants.ZKSYNC_CHAIN_ID
