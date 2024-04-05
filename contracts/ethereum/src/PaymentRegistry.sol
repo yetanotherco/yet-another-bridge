@@ -18,8 +18,9 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     event ModifiedZKSyncEscrowAddress(address newEscrowAddress);
     event ModifiedStarknetEscrowAddress(uint256 newEscrowAddress);
     event ModifiedStarknetClaimPaymentSelector(uint256 newEscrowClaimPaymentSelector);
-    event ModifiedZKSyncEscrowClaimPaymentSelector(bytes4 newZKSyncEscrowClaimPaymentSelector);
-    event ModifiedStarknetClaimPaymentBatchSelector(uint256 newEscrowClaimPaymentSelector);
+    event ModifiedStarknetClaimPaymentBatchSelector(uint256 newEscrowClaimPaymentBatchSelector);
+    event ModifiedZKSyncClaimPaymentSelector(bytes4 newZKSyncEscrowClaimPaymentSelector);
+    event ModifiedZKSyncClaimPaymentBatchSelector(bytes4 newZKSyncEscrowClaimPaymentBatchSelector);
 
     mapping(bytes32 => bool) public transfers;
     address public marketMaker;
@@ -27,11 +28,12 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     address public ZKSyncEscrowAddress;
     uint256 public StarknetEscrowClaimPaymentSelector;
     uint256 public StarknetEscrowClaimPaymentBatchSelector;
+    bytes4 public ZKSyncEscrowClaimPaymentSelector;
+    bytes4 public ZKSyncEscrowClaimPaymentBatchSelector;
 
     IZkSync private _ZKSyncDiamondProxy;
     IStarknetMessaging private _snMessaging;
-    bytes4 public ZKSyncEscrowClaimPaymentSelector;
-    bytes4 public ZKSyncEscrowClaimPaymentBatchSelector;
+
 
     constructor() {
         _disableInitializers();
@@ -205,28 +207,31 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         emit ModifiedStarknetEscrowAddress(newStarknetEscrowAddress);        
     }
 
-
     function setZKSyncEscrowAddress(address newZKSyncEscrowAddress) external onlyOwner {
         ZKSyncEscrowAddress = newZKSyncEscrowAddress;
         emit ModifiedZKSyncEscrowAddress(newZKSyncEscrowAddress);        
     }
 
-    //todo change name to something more starknet-ish
-    //this todo applies for this whole contract, but in a future change because MM-bot would need a refactor.
     function setStarknetClaimPaymentSelector(uint256 NewStarknetEscrowClaimPaymentSelector) external onlyOwner {
         StarknetEscrowClaimPaymentSelector = NewStarknetEscrowClaimPaymentSelector;
         emit ModifiedStarknetClaimPaymentSelector(StarknetEscrowClaimPaymentSelector);
-    }
-
-    function setZKSyncEscrowClaimPaymentSelector(bytes4 NewZKSyncEscrowClaimPaymentSelector) external onlyOwner {
-        ZKSyncEscrowClaimPaymentSelector = NewZKSyncEscrowClaimPaymentSelector;
-        emit ModifiedZKSyncEscrowClaimPaymentSelector(ZKSyncEscrowClaimPaymentSelector);
     }
 
     function setStarknetClaimPaymentBatchSelector(uint256 NewStarknetEscrowClaimPaymentBatchSelector) external onlyOwner {
         StarknetEscrowClaimPaymentBatchSelector = NewStarknetEscrowClaimPaymentBatchSelector;
         emit ModifiedStarknetClaimPaymentBatchSelector(StarknetEscrowClaimPaymentBatchSelector);
     }
+
+    function setZKSyncEscrowClaimPaymentSelector(bytes4 NewZKSyncEscrowClaimPaymentSelector) external onlyOwner {
+        ZKSyncEscrowClaimPaymentSelector = NewZKSyncEscrowClaimPaymentSelector;
+        emit ModifiedZKSyncClaimPaymentSelector(ZKSyncEscrowClaimPaymentSelector);
+    }
+
+    function setZKSyncEscrowClaimPaymentBatchSelector(bytes4 NewZKSyncEscrowClaimPaymentBatchSelector) external onlyOwner {
+        ZKSyncEscrowClaimPaymentBatchSelector = NewZKSyncEscrowClaimPaymentBatchSelector;
+        emit ModifiedZKSyncClaimPaymentBatchSelector(ZKSyncEscrowClaimPaymentBatchSelector);
+    }
+
     
     //// MM ACL:
 
