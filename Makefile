@@ -42,9 +42,6 @@ ethereum-upgrade: ethereum-build
 ethereum-set-escrow:
 	@. ./contracts/ethereum/.env && . ./contracts/ethereum/set_starknet_escrow.sh
 
-ethereum-set-claim-payment-selector:
-	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env && . ./contracts/ethereum/set_starknet_claim_payment_selector.sh
-
 
 ### STARKNET ###
 
@@ -67,8 +64,7 @@ starknet-connect:
 starknet-deploy-and-connect: starknet-build
 	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env && \
 	. ./contracts/starknet/scripts/deploy.sh && \
-	. ./contracts/ethereum/set_starknet_escrow.sh && \
-	. ./contracts/ethereum/set_starknet_claim_payment_selector.sh
+	. ./contracts/ethereum/set_starknet_escrow.sh
 
 starknet-upgrade: starknet-build
 	@. ./contracts/starknet/.env && . ./contracts/starknet/scripts/upgrade.sh
@@ -140,7 +136,6 @@ ethereum-and-starknet-deploy:
 	. ./contracts/ethereum/deploy.sh && \
 	. ./contracts/starknet/scripts/deploy.sh && \
 	. ./contracts/ethereum/set_starknet_escrow.sh && \
-	. ./contracts/ethereum/set_starknet_claim_payment_selector.sh && \
 	. ./contracts/utils/display_info.sh
 
 deploy-all:
@@ -150,7 +145,6 @@ deploy-all:
 	make starknet-build && \
 	. ./contracts/starknet/scripts/deploy.sh && \
 	. ./contracts/ethereum/set_starknet_escrow.sh && \
-	. ./contracts/ethereum/set_starknet_claim_payment_selector.sh && \
 	. ./contracts/utils/display_info.sh && \
 	make zksync-build && \
 	. ./contracts/zksync/deploy.sh && \

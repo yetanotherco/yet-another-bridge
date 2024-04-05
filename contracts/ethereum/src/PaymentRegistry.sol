@@ -13,12 +13,14 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
     event Transfer(uint256 indexed orderId, address srcAddress, address destAddress, uint256 amount, Chain chainId);
     event ClaimPayment(uint256 indexed orderId, address destAddress, uint256 amount, Chain chainId);
+    event ClaimPaymentBatch(uint256[] orderIds, address[] destAddresses, uint256[] amounts, Chain chainId);
 
     event ModifiedZKSyncEscrowAddress(address newEscrowAddress);
     event ModifiedStarknetEscrowAddress(uint256 newEscrowAddress);
     event ModifiedStarknetClaimPaymentSelector(uint256 newEscrowClaimPaymentSelector);
-    event ModifiedStarknetClaimPaymentBatchSelector(uint256 newEscrowClaimPaymentSelector);
-    event ClaimPaymentBatch(uint256[] orderIds, address[] destAddresses, uint256[] amounts, Chain chainId);
+    event ModifiedStarknetClaimPaymentBatchSelector(uint256 newEscrowClaimPaymentBatchSelector);
+    event ModifiedZKSyncClaimPaymentSelector(bytes4 newZKSyncEscrowClaimPaymentSelector);
+    event ModifiedZKSyncClaimPaymentBatchSelector(bytes4 newZKSyncEscrowClaimPaymentBatchSelector);
 
     mapping(bytes32 => bool) public transfers;
     address public marketMaker;
@@ -26,9 +28,12 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     address public ZKSyncEscrowAddress;
     uint256 public StarknetEscrowClaimPaymentSelector;
     uint256 public StarknetEscrowClaimPaymentBatchSelector;
+    bytes4 public ZKSyncEscrowClaimPaymentSelector;
+    bytes4 public ZKSyncEscrowClaimPaymentBatchSelector;
 
     IZkSync private _ZKSyncDiamondProxy;
     IStarknetMessaging private _snMessaging;
+
 
     constructor() {
         _disableInitializers();
@@ -37,20 +42,22 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     // no constructors can be used in upgradeable contracts. 
     function initialize(
         address snMessaging,
-        uint256 StarknetEscrowAddress_,
         uint256 StarknetEscrowClaimPaymentSelector_,
         uint256 StarknetEscrowClaimPaymentBatchSelector_,
         address marketMaker_,
-        address ZKSyncDiamondProxyAddress) public initializer { 
+        address ZKSyncDiamondProxyAddress,
+        bytes4 ZKSyncEscrowClaimPaymentSelector_,
+        bytes4 ZKSyncEscrowClaimPaymentBatchSelector_) public initializer { 
         __Ownable_init(msg.sender);
         __UUPSUpgradeable_init();
 
         _snMessaging = IStarknetMessaging(snMessaging);
         _ZKSyncDiamondProxy = IZkSync(ZKSyncDiamondProxyAddress);
 
-        StarknetEscrowAddress = StarknetEscrowAddress_;
-        StarknetEscrowClaimPaymentSelector = StarknetEscrowClaimPaymentSelector_; // TODO remove this or set the correct value in init
-        StarknetEscrowClaimPaymentBatchSelector = StarknetEscrowClaimPaymentBatchSelector_; // TODO remove this or set the correct value in init
+        StarknetEscrowClaimPaymentSelector = StarknetEscrowClaimPaymentSelector_;
+        StarknetEscrowClaimPaymentBatchSelector = StarknetEscrowClaimPaymentBatchSelector_;
+        ZKSyncEscrowClaimPaymentSelector = ZKSyncEscrowClaimPaymentSelector_;
+        ZKSyncEscrowClaimPaymentBatchSelector = ZKSyncEscrowClaimPaymentBatchSelector_;
 
         marketMaker = marketMaker_;
     }
@@ -136,10 +143,8 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     ) external payable onlyOwnerOrMM {
         _verifyTransferExistsZKSync(orderId, destAddress, amount);
 
-        //todo change place of this var
-        bytes4 selector = 0xa5168739; //claim_payment selector in ZKSync //todo add in init, same as in SN
         bytes memory messageToL2 = abi.encodeWithSelector(
-            selector,
+            ZKSyncEscrowClaimPaymentSelector,
             orderId,
             destAddress,
             amount
@@ -172,10 +177,8 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             _verifyTransferExistsZKSync(orderIds[idx], destAddresses[idx], amounts[idx]);
         }
 
-        //todo change place of this var
-        bytes4 selector = 0x156be1ae; //claim_payment_batch selector in ZKSync //todo add in init, same as in SN
         bytes memory messageToL2 = abi.encodeWithSelector(
-            selector,
+            ZKSyncEscrowClaimPaymentBatchSelector,
             orderIds,
             destAddresses,
             amounts
@@ -204,14 +207,11 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         emit ModifiedStarknetEscrowAddress(newStarknetEscrowAddress);        
     }
 
-
     function setZKSyncEscrowAddress(address newZKSyncEscrowAddress) external onlyOwner {
         ZKSyncEscrowAddress = newZKSyncEscrowAddress;
         emit ModifiedZKSyncEscrowAddress(newZKSyncEscrowAddress);        
     }
 
-    //todo change name to something more starknet-ish
-    //this todo applies for this whole contract, but in a future change because MM-bot would need a refactor.
     function setStarknetClaimPaymentSelector(uint256 NewStarknetEscrowClaimPaymentSelector) external onlyOwner {
         StarknetEscrowClaimPaymentSelector = NewStarknetEscrowClaimPaymentSelector;
         emit ModifiedStarknetClaimPaymentSelector(StarknetEscrowClaimPaymentSelector);
@@ -221,6 +221,17 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         StarknetEscrowClaimPaymentBatchSelector = NewStarknetEscrowClaimPaymentBatchSelector;
         emit ModifiedStarknetClaimPaymentBatchSelector(StarknetEscrowClaimPaymentBatchSelector);
     }
+
+    function setZKSyncEscrowClaimPaymentSelector(bytes4 NewZKSyncEscrowClaimPaymentSelector) external onlyOwner {
+        ZKSyncEscrowClaimPaymentSelector = NewZKSyncEscrowClaimPaymentSelector;
+        emit ModifiedZKSyncClaimPaymentSelector(ZKSyncEscrowClaimPaymentSelector);
+    }
+
+    function setZKSyncEscrowClaimPaymentBatchSelector(bytes4 NewZKSyncEscrowClaimPaymentBatchSelector) external onlyOwner {
+        ZKSyncEscrowClaimPaymentBatchSelector = NewZKSyncEscrowClaimPaymentBatchSelector;
+        emit ModifiedZKSyncClaimPaymentBatchSelector(ZKSyncEscrowClaimPaymentBatchSelector);
+    }
+
     
     //// MM ACL:
 
