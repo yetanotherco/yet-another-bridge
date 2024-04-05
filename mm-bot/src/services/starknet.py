@@ -14,9 +14,7 @@ from models.set_order_event import SetOrderEvent
 from services.decorators.use_fallback import use_async_fallback
 from services.mm_full_node_client import MmFullNodeClient
 
-STARKNET_CHAIN_ID = int_from_bytes(constants.STARKNET_CHAIN_ID.encode("utf-8"))
 SET_ORDER_EVENT_KEY = 0x2c75a60b5bdad73ebbf539cc807fccd09875c3cbf3f44041f852cdb96d8acd3
-
 
 class StarknetRpcNode:
     def __init__(self, rpc_url, private_key, wallet_address, contract_address, chain_id):
@@ -35,12 +33,12 @@ main_rpc_node = StarknetRpcNode(constants.STARKNET_RPC,
                                 constants.STARKNET_PRIVATE_KEY,
                                 constants.STARKNET_WALLET_ADDRESS,
                                 constants.STARKNET_CONTRACT_ADDRESS,
-                                STARKNET_CHAIN_ID)
+                                constants.STARKNET_CHAIN_ID)
 fallback_rpc_node = StarknetRpcNode(constants.STARKNET_FALLBACK_RPC,
                                     constants.STARKNET_PRIVATE_KEY,
                                     constants.STARKNET_WALLET_ADDRESS,
                                     constants.STARKNET_CONTRACT_ADDRESS,
-                                    STARKNET_CHAIN_ID)
+                                    constants.STARKNET_CHAIN_ID)
 rpc_nodes = [main_rpc_node, fallback_rpc_node]
 
 logger = logging.getLogger(__name__)

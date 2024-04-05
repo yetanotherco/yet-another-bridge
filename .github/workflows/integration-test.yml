@@ -150,7 +150,7 @@ jobs:
         run: |
           make starknet-build
 
-      # Deploy PaymentRegistry, Escrow, set escrow, set claimPayment selector and test complete flow
+      # Deploy PaymentRegistry, Escrow, set escrow, and test complete flow
       - name: Deploy and test complete flow
         run: |
           export ETHEREUM_RPC=${{vars.ETHEREUM_RPC}}
@@ -159,15 +159,20 @@ jobs:
           export STARKNET_MESSAGING_ADDRESS=${{vars.STARKNET_MESSAGING_ADDRESS}}
           export MM_ETHEREUM_WALLET_ADDRESS=${{vars.MM_ETHEREUM_WALLET_ADDRESS}}
           export ZKSYNC_DIAMOND_PROXY_ADDRESS=${{vars.ZKSYNC_DIAMOND_PROXY_ADDRESS}}
+          export STARKNET_CHAIN_ID=${{vars.STARKNET_CHAIN_ID}}
+          export ZKSYNC_CHAIN_ID=${{vars.ZKSYNC_CHAIN_ID}}
+          export STARKNET_CLAIM_PAYMENT_SELECTOR=${{vars.STARKNET_CLAIM_PAYMENT_SELECTOR}}
+          export STARKNET_CLAIM_PAYMENT_BATCH_SELECTOR=${{vars.STARKNET_CLAIM_PAYMENT_BATCH_SELECTOR}}
+          export ZKSYNC_CLAIM_PAYMENT_SELECTOR=${{vars.ZKSYNC_CLAIM_PAYMENT_SELECTOR}}
+          export ZKSYNC_CLAIM_PAYMENT_BATCH_SELECTOR=${{vars.ZKSYNC_CLAIM_PAYMENT_BATCH_SELECTOR}}
           export SKIP_VERIFY=true
           . ./contracts/ethereum/deploy.sh
           
           export STARKNET_RPC=${{vars.STARKNET_RPC}}
           source ./contracts/starknet/.env.test
-          . ./contracts/starknet/deploy.sh
+          . ./contracts/starknet/scripts/deploy.sh
           
           . ./contracts/ethereum/set_starknet_escrow.sh
-          . ./contracts/ethereum/set_starknet_claim_payment_selector.sh
           
           export AMOUNT=1000000000000000000
           . ./.github/workflows/scripts/set_order.sh

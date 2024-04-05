@@ -28,13 +28,13 @@ class FeeCalculator(ABC):
         return overall_fee
 
     def estimate_transfer_fee(self, order: Order) -> int:
-        dst_addr_bytes = int(order.recipient_address, 0)
         deposit_id = Web3.to_int(order.order_id)
+        destination_address = Web3.to_checksum_address(order.recipient_address)
         amount = Web3.to_int(order.get_int_amount())
         chain_id = order.origin_network.value
 
-        unsent_tx, signed_tx = create_transfer(deposit_id, dst_addr_bytes, amount, chain_id)
-
+        unsent_tx, signed_tx = create_transfer(deposit_id, destination_address, amount, chain_id)
+        # TODO rename parameters to order_id
         return estimate_transaction_fee(unsent_tx)
 
     def estimate_claim_payment_fee(self) -> int:
