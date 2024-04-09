@@ -67,5 +67,7 @@ jobs:
         run: |
           echo asd
           pwd
+          ls -la
+          cat Makefile
           echo qwe
           make zksync-test-integration:
