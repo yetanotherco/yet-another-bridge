@@ -42,15 +42,15 @@ jobs:
           cd local-setup
           ./start.sh &
 
-#   # Build Ethereum Contract
-#   - name: Build Ethereum Contract
-#     run: |
-#       make ethereum-build
+# # Build Ethereum Contract
+# - name: Build Ethereum Contract
+#   run: |
+#     make ethereum-build
 
-#   # Build Starknet Contract
-#   - name: Build ZKSync Contract
-#     run: |
-#       make zksync-build
+# # Build Starknet Contract
+# - name: Build ZKSync Contract
+#   run: |
+#     make zksync-build
 
 #zksync-test-integration:
 # @make ethereum-build && make zksync-build && \
@@ -65,4 +65,7 @@ jobs:
       # Deploy PaymentRegistry, Escrow, set escrow, and test complete flow
       - name: Deploy and test complete flow
         run: |
+          echo asd
+          pwd
+          echo qwe
           make zksync-test-integration:
