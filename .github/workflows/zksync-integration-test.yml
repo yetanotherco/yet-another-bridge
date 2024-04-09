@@ -31,35 +31,16 @@ jobs:
           forge install
 
       # ZKSync Setup
-      - name: Install scarb
-        uses: software-mansion/setup-scarb@v1
-        with:
-          scarb-version: "2.3.1"
-
-      - name: Install starkliup
-        run: curl https://get.starkli.sh | sh
-
-      - name: Install Starkli
+      - name: Install ZKSync libs
         run: |
-          /home/runner/.config/.starkli/bin/starkliup --version 0.1.20
-          sudo mv /home/runner/.config/.starkli/bin/starkli /usr/local/bin/
-
-      - name: Setup Katana .env
-        run: |
-          cp .github/workflows/katana/katana.env .env
-
-      - name: Download Katana
-        run: |
-          wget https://github.com/dojoengine/dojo/releases/download/v0.4.4/dojo_v0.4.4_linux_amd64.tar.gz
-          tar -xzvf dojo_v0.4.4_linux_amd64.tar.gz
-          rm sozo torii dojo-language-server
+          cd ./contracts/zksync/ && yarn install
 
       # Run Dockerized L1-L2
       - name: Setup Dockerized L1-L2
         run: |
           git clone https://github.com/matter-labs/local-setup.git
           cd local-setup
-          ./start.sh
+          ./start.sh &
 
 #   # Build Ethereum Contract
 #   - name: Build Ethereum Contract
