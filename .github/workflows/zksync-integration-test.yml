@@ -65,9 +65,4 @@ jobs:
       # Deploy PaymentRegistry, Escrow, set escrow, and test complete flow
       - name: Deploy and test complete flow
         run: |
-          echo asd
-          pwd
-          ls -la
-          cat Makefile
-          echo qwe
-          make zksync-test-integration:
+          make zksync-test-integration
