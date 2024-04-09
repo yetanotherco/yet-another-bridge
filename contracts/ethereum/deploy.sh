@@ -7,6 +7,7 @@ printf "${GREEN}\n=> [ETH] Deploying ERC1967Proxy & PaymentRegistry ${COLOR_RESE
 
 export ETHEREUM_PRIVATE_KEY=$ETHEREUM_PRIVATE_KEY
 export ZKSYNC_DIAMOND_PROXY_ADDRESS=$ZKSYNC_DIAMOND_PROXY_ADDRESS
+export SKIP_VERIFY=$SKIP_VERIFY
 
 RESULT_LOG=$(forge script ./script/Deploy.s.sol --rpc-url $ETHEREUM_RPC --broadcast ${SKIP_VERIFY:---verify})
 # echo "$RESULT_LOG" #uncomment this line for debugging in detail
