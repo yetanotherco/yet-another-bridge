@@ -45,6 +45,8 @@ jobs:
           git clone https://github.com/matter-labs/local-setup.git
           cd local-setup
           ./start.sh &
+          cd ..
+          make zksync-test-integration
 
 # # Build Ethereum Contract
 # - name: Build Ethereum Contract
@@ -66,7 +68,7 @@ jobs:
 # . ./contracts/zksync/test/transfer.sh && \
 # . ./contracts/zksync/test/claim_payment.sh
 
-      # Deploy PaymentRegistry, Escrow, set escrow, and test complete flow
-      - name: Deploy and test complete flow
-        run: |
-          make zksync-test-integration
+      # # Deploy PaymentRegistry, Escrow, set escrow, and test complete flow
+      # - name: Deploy and test complete flow
+      #   run: |
+      #     make zksync-test-integration
