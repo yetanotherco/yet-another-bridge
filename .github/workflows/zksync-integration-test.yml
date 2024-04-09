@@ -29,9 +29,13 @@ jobs:
         run: |
           cd contracts/ethereum
           forge install
+      
+      - name: Install Ethereum foundry
+        run: |
+          make install-ethereum-foundry
 
       # ZKSync Setup
-      - name: Install ZKSync libs
+      - name: Install ZKSync libraries
         run: |
           cd ./contracts/zksync/ && yarn install
 
