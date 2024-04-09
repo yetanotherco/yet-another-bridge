@@ -11,6 +11,12 @@ from web3.types import EventData
 from config import constants
 from models.set_order_event import SetOrderEvent
 from services.decorators.use_fallback import use_async_fallback
+from zksync2.account.wallet import Wallet
+from eth_account import Account
+from eth_account.signers.local import LocalAccount
+from web3 import Web3
+
+
 
 # Just for keep consistency with the ethereum and starknet
 # services it won't be a class. It will be a set of functions
@@ -40,6 +46,13 @@ fallback_rpc_node = EthereumAsyncRpcNode(constants.ZKSYNC_FALLBACK_RPC,
                                          None,
                                          constants.ZKSYNC_CONTRACT_ADDRESS,
                                          escrow_abi_file)
+
+# TODO: ver como hacer fallback de esto
+eth_web3 = Web3(Web3.HTTPProvider(constants.ETHEREUM_RPC))
+account: LocalAccount = Account.from_key(constants.ETHEREUM_PRIVATE_KEY)
+wallet = Wallet(main_rpc_node, eth_web3, account)
+
+
 rpc_nodes = [main_rpc_node, fallback_rpc_node]
 
 logger = logging.getLogger(__name__)
@@ -58,6 +71,11 @@ async def get_set_order_logs(from_block_number: int, to_block_number: int, rpc_n
         toBlock=hex(to_block_number)
     )
     return logs
+
+# TODO: ver como hacer fallback de esto
+@use_async_fallback(rpc_nodes, logger, "Failed to estimate message fee")
+async def estimate_message_fee(gas_price, l2_gas_limit):
+    return wallet.get_base_cost(gas_price=gas_price, l2_gas_limit=l2_gas_limit)
 
 
 async def get_set_order_events(from_block, to_block) -> list[SetOrderEvent]:
