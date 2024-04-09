@@ -17,7 +17,7 @@ class EthereumPaymentClaimer(PaymentClaimer):
     async def send_payment_claim(self, order: Order, order_service: OrderService):  # TODO remove order_service
         """
         Makes the payment claim on ethereum
-        Sends a 'claimPayment' transaction to ethereum smart contract
+        Sends a 'claimPaymentStarknet' transaction to ethereum smart contract
         """
         self.logger.info(f"[+] Sending payment claim tx to ethereum")
         order_id, recipient_address, amount = order.order_id, order.recipient_address, order.get_int_amount()

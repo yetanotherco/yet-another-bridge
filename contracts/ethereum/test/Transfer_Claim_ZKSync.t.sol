@@ -165,6 +165,6 @@ contract TransferTest is Test {
         yab_caller.transfer{value: 1}(1, address(0x1), ZKSYNC_CHAIN_ID);
         hoax(MM_ETHEREUM_WALLET_ADDRESS, 1 wei);
         vm.expectRevert("Transfer not found."); //Won't match to a transfer made on the other chain
-        yab_caller.claimPayment(1, address(0x1), 1);  
+        yab_caller.claimPaymentStarknet(1, address(0x1), 1);  
     }
 }
