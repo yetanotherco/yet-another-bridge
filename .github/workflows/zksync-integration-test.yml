@@ -1,0 +1,87 @@
+name: ZKSync Integration Test
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  Test:
+    runs-on: ubuntu-latest
+    environment: Test
+
+    steps:
+      - uses: actions/checkout@v4
+
+
+      # Ethereum Setup
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Install Forge
+        run: |
+          cd contracts/ethereum
+          forge install
+
+      # ZKSync Setup
+      - name: Install scarb
+        uses: software-mansion/setup-scarb@v1
+        with:
+          scarb-version: "2.3.1"
+
+      - name: Install starkliup
+        run: curl https://get.starkli.sh | sh
+
+      - name: Install Starkli
+        run: |
+          /home/runner/.config/.starkli/bin/starkliup --version 0.1.20
+          sudo mv /home/runner/.config/.starkli/bin/starkli /usr/local/bin/
+
+      - name: Setup Katana .env
+        run: |
+          cp .github/workflows/katana/katana.env .env
+
+      - name: Download Katana
+        run: |
+          wget https://github.com/dojoengine/dojo/releases/download/v0.4.4/dojo_v0.4.4_linux_amd64.tar.gz
+          tar -xzvf dojo_v0.4.4_linux_amd64.tar.gz
+          rm sozo torii dojo-language-server
+
+      # Run Dockerized L1-L2
+      - name: Setup Dockerized L1-L2
+        run: |
+          git clone https://github.com/matter-labs/local-setup.git
+          cd local-setup
+          ./start.sh
+
+#   # Build Ethereum Contract
+#   - name: Build Ethereum Contract
+#     run: |
+#       make ethereum-build
+
+#   # Build Starknet Contract
+#   - name: Build ZKSync Contract
+#     run: |
+#       make zksync-build
+
+#zksync-test-integration:
+# @make ethereum-build && make zksync-build && \
+# . ./contracts/ethereum/test/.env.test && . ./contracts/zksync/test/.env.test && \
+# . ./contracts/ethereum/deploy.sh && \
+# . ./contracts/zksync/deploy.sh && \
+# . ./contracts/ethereum/set_zksync_escrow.sh && \
+# . ./contracts/zksync/test/set_order.sh && \
+# . ./contracts/zksync/test/transfer.sh && \
+# . ./contracts/zksync/test/claim_payment.sh
+
+      # Deploy PaymentRegistry, Escrow, set escrow, and test complete flow
+      - name: Deploy and test complete flow
+        run: |
+          make zksync-test-integration:
