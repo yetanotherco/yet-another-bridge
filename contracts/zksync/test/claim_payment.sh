@@ -23,11 +23,6 @@ cast send --rpc-url $ETHEREUM_RPC --private-key $ETHEREUM_PRIVATE_KEY \
   "0" $USER_ETHEREUM_PUBLIC_ADDRESS $BRIDGE_AMOUNT_WEI 2000000 800 \
   --value 5000000000000000000
 
-
-#me revertea con info: None
-#no estoy seguro si existe un diamond proxy en la dada address.
-
-
 MM_INITIAL_BALANCE_L1=$(cast balance --rpc-url $ETHEREUM_RPC --ether $MM_ETHEREUM_WALLET_ADDRESS)
 echo "After MM balance L1:"
 echo "$MM_INITIAL_BALANCE_L1"
@@ -37,12 +32,3 @@ npx zksync-cli wallet balance --chain "dockerized-node" --address "$MM_ZKSYNC_WA
 
 echo "After Escrow balance:"
 npx zksync-cli wallet balance --chain "dockerized-node" --address "$ZKSYNC_ESCROW_CONTRACT_ADDRESS" | grep -E -o "\d+(\.\d+)? ETH"
-
-
-
-# starkli call $ESCROW_CONTRACT_ADDRESS get_order_pending u256:0
-
-# ESCROW_FINAL_BALANCE=$(starkli balance $ESCROW_CONTRACT_ADDRESS)
-# MM_FINAL_BALANCE=$(starkli balance $MM_SN_WALLET_ADDR)
-# echo "Final Escrow balance: $ESCROW_FINAL_BALANCE"
-# echo "Final MM balance: $MM_FINAL_BALANCE"
