@@ -30,7 +30,6 @@ jobs:
 
           cd local-setup
           ./start.sh &
-          cd ..
 
       # Ethereum Setup
       - name: Install Foundry
@@ -65,9 +64,9 @@ jobs:
         run: |
           export ETHERSCAN_API_KEY=${{vars.ETHERSCAN_API_KEY}}
 
-          echo starting sleep 600
-          sleep 600
-          echo done sleep 600, running make-test-integration-ci
+          echo starting sleep 100
+          sleep 100
+          echo done sleep 100, running make-test-integration-ci
           make zksync-test-integration-ci
 
 # export ETHERSCAN_API_KEY=${{vars.ETHERSCAN_API_KEY}}
