@@ -47,7 +47,7 @@ jobs:
           echo git cloned, starting:
 
           cd local-setup
-          ./start.sh & > /dev/null
+          ./start.sh > /dev/null &
           cd ..
 
           echo starting sleep 100
