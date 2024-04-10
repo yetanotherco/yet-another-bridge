@@ -52,8 +52,8 @@ jobs:
 
           echo starting sleep 100
           sleep 100
-          echo done sleep 100, running make-test-integration
-          make zksync-test-integration
+          echo done sleep 100, running make-test-integration-ci
+          make zksync-test-integration-ci
 
 # export ETHERSCAN_API_KEY=${{vars.ETHERSCAN_API_KEY}}
 # source ./.github/workflows/zksync-scripts/ci.env.test

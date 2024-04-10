@@ -103,10 +103,10 @@ zksync-test-in-memory: zksync-build
 	@cd ./contracts/zksync/ && yarn test-in-memory
 
 #wip CI:
-# @echo building eth && make ethereum-build && \
-# echo building zksync && make zksync-build && 
-zksync-test-integration:
+zksync-test-integration-ci:
 	@. ./.github/workflows/zksync-scripts/ci.env.test && \
+	echo building eth && make ethereum-build && \
+	echo building zksync && make zksync-build && 
 	echo deploying eth && . ./contracts/ethereum/deploy.sh && \
 	echo deploying zksync && . ./contracts/zksync/deploy.sh && \
 	. ./contracts/ethereum/set_zksync_escrow.sh && \
@@ -115,7 +115,7 @@ zksync-test-integration:
 	. ./contracts/zksync/test/claim_payment.sh
 
 #old version:
-zksync-local-test-integration:
+zksync-test-integration-local:
 	@make ethereum-build && make zksync-build && \
 	. ./contracts/ethereum/test/.env.test && . ./contracts/zksync/test/.env.test && \
 	. ./contracts/ethereum/deploy.sh && \
