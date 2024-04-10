@@ -31,15 +31,20 @@ jobs:
           cd local-setup
           echo starting:
           touch docker_output.log
+          ls
           ./start.sh &> docker_output.log &
 
       # test read file
       - name: test read file
         run: | 
-          sleep 30
+          ls
+          sleep 10
+          ls
+          sleep 10
+          ls
           echo catting log
           cat docker_output.log
-          
+
 # sleep 200
 # echo catting log
 # cat docker_output.log
