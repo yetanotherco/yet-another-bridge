@@ -42,6 +42,7 @@ jobs:
       # Run Dockerized L1-L2
       - name: Setup Dockerized L1-L2
         run: |
+          export ETHERSCAN_API_KEY=${{vars.ETHERSCAN_API_KEY}}
           git clone https://github.com/matter-labs/local-setup.git
           cd local-setup
           ./start.sh &
