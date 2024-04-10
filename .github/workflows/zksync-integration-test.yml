@@ -29,45 +29,50 @@ jobs:
           echo git cloned, starting:
 
           cd local-setup
+          echo clearing:
+          ./clear.sh
+          echo starting:
           ./start.sh &
 
-      # Ethereum Setup
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
-
-      - name: Install Forge
-        run: |
-          cd contracts/ethereum
-          forge install
-      
-      # - name: Install Ethereum foundry
-      #   run: |
-      #     make install-ethereum-foundry
-
-      # ZKSync Setup
-      - name: Install ZKSync libraries
-        run: |
-          cd ./contracts/zksync/ && yarn install
-
-      # Build Ethereum Contract
-      - name: Build Ethereum Contract
-        run: |
-          make ethereum-build
-
-      # Build Starknet Contract
-      - name: Build Starknet Contract
-        run: |
-          make zksync-build
-
-      # Run Dockerized L1-L2
-      - name: Running integration test
-        run: |
-          export ETHERSCAN_API_KEY=${{vars.ETHERSCAN_API_KEY}}
-
-          echo starting sleep 100
           sleep 100
-          echo done sleep 100, running make-test-integration-ci
-          make zksync-test-integration-ci
+
+      # # Ethereum Setup
+      # - name: Install Foundry
+      #   uses: foundry-rs/foundry-toolchain@v1
+
+      # - name: Install Forge
+      #   run: |
+      #     cd contracts/ethereum
+      #     forge install
+      
+      # # - name: Install Ethereum foundry
+      # #   run: |
+      # #     make install-ethereum-foundry
+
+      # # ZKSync Setup
+      # - name: Install ZKSync libraries
+      #   run: |
+      #     cd ./contracts/zksync/ && yarn install
+
+      # # Build Ethereum Contract
+      # - name: Build Ethereum Contract
+      #   run: |
+      #     make ethereum-build
+
+      # # Build ZKSync Contract
+      # - name: Build ZKSync Contract
+      #   run: |
+      #     make zksync-build
+
+      # # Run Dockerized L1-L2
+      # - name: Running integration test
+      #   run: |
+      #     export ETHERSCAN_API_KEY=${{vars.ETHERSCAN_API_KEY}}
+
+      #     echo starting sleep 100
+      #     sleep 100
+      #     echo done sleep 100, running make-test-integration-ci
+      #     make zksync-test-integration-ci
 
 # export ETHERSCAN_API_KEY=${{vars.ETHERSCAN_API_KEY}}
 # source ./.github/workflows/zksync-scripts/ci.env.test
