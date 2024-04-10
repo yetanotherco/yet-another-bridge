@@ -33,13 +33,13 @@ jobs:
           touch docker_output.log
           ls
           ./start.sh &> docker_output.log &
+          
+          sleep 20
 
       # test read file
       - name: test read file
         run: | 
-          ls
-          sleep 10
-          ls
+          cd local-setup
           sleep 10
           ls
           echo catting log
