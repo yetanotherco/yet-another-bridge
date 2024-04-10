@@ -20,24 +20,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Temporary comment during CI dev:
-      # # Ethereum Setup
-      # - name: Install Foundry
-      #   uses: foundry-rs/foundry-toolchain@v1
+      # Ethereum Setup
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
 
-      # - name: Install Forge
-      #   run: |
-      #     cd contracts/ethereum
-      #     forge install
+      - name: Install Forge
+        run: |
+          cd contracts/ethereum
+          forge install
       
-      # # - name: Install Ethereum foundry
-      # #   run: |
-      # #     make install-ethereum-foundry
-
-      # # ZKSync Setup
-      # - name: Install ZKSync libraries
+      # - name: Install Ethereum foundry
       #   run: |
-      #     cd ./contracts/zksync/ && yarn install
+      #     make install-ethereum-foundry
+
+      # ZKSync Setup
+      - name: Install ZKSync libraries
+        run: |
+          cd ./contracts/zksync/ && yarn install
 
       # Run Dockerized L1-L2
       - name: Setup Dockerized L1-L2
