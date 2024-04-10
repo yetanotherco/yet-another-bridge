@@ -15,10 +15,10 @@ echo "Initial Destination balance: $DESTINATION_INITIAL_BALANCE"
 
 echo "Transferring $BRIDGE_AMOUNT_WEI WEI to $USER_ETHEREUM_PUBLIC_ADDRESS"
 
-cast send --rpc-url $ETHEREUM_RPC --private-key $MM_ETHEREUM_PRIVATE_KEY \
+cast send --rpc-url $ETHEREUM_RPC --private-key $MM_ETHEREUM_PRIVATE_KEY --gas-price 2000000000 \
   $PAYMENT_REGISTRY_PROXY_ADDRESS "transfer(uint256, address, uint128)" \
   "0" $USER_ETHEREUM_PUBLIC_ADDRESS $ZKSYNC_CHAIN_ID \
-  --value $BRIDGE_AMOUNT_WEI >> /dev/null
+  --value $BRIDGE_AMOUNT_WEI #>> /dev/null
 
 
 MM_FINAL_BALANCE=$(cast balance --rpc-url $ETHEREUM_RPC --ether $MM_ETHEREUM_WALLET_ADDRESS)

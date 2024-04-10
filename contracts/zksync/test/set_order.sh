@@ -18,10 +18,8 @@ echo $ZKSYNC_ESCROW_CONTRACT_ADDRESS
 
 printf "${GREEN}\n=> [SN] Making Set Order on Escrow${COLOR_RESET}\n"
 echo "\nUser ZKSync funds before setOrder:"
-npx zksync-cli wallet balance --rpc http://localhost:3050 --address "$USER_ZKSYNC_PUBLIC_ADDRESS" | grep -E -o "\d+(\.\d+)? ETH"
 npx zksync-cli wallet balance --rpc http://localhost:3050 --address "$USER_ZKSYNC_PUBLIC_ADDRESS"
 echo "\nEscrow ZKSync funds before setOrder:"
-npx zksync-cli wallet balance --rpc http://localhost:3050 --address "$ZKSYNC_ESCROW_CONTRACT_ADDRESS" | grep -E -o "\d+(\.\d+)? ETH"
 npx zksync-cli wallet balance --rpc http://localhost:3050 --address "$ZKSYNC_ESCROW_CONTRACT_ADDRESS"
 
 
@@ -29,8 +27,6 @@ npx zksync-cli contract write --private-key $USER_ZKSYNC_PRIVATE_ADDRESS --rpc h
 
 
 echo "\nUser ZKSync funds after setOrder:"
-npx zksync-cli wallet balance --rpc http://localhost:3050 --address "$USER_ZKSYNC_PUBLIC_ADDRESS" | grep -E -o "\d+(\.\d+)? ETH"
 npx zksync-cli wallet balance --rpc http://localhost:3050 --address "$USER_ZKSYNC_PUBLIC_ADDRESS"
 echo "\nEscrow ZKSync funds after setOrder:"
-npx zksync-cli wallet balance --rpc http://localhost:3050 --address "$ZKSYNC_ESCROW_CONTRACT_ADDRESS" | grep -E -o "\d+(\.\d+)? ETH"
 npx zksync-cli wallet balance --rpc http://localhost:3050 --address "$ZKSYNC_ESCROW_CONTRACT_ADDRESS"
