@@ -32,14 +32,22 @@ jobs:
           echo starting:
           touch docker_output.log
           ./start.sh &> docker_output.log &
-          sleep 200
+
+      # test read file
+      - name: test read file
+        run: | 
+          sleep 30
           echo catting log
           cat docker_output.log
-          echo catting sed:
-          cat docker_output.log | sed -n 's/.*CONTRACTS_DIAMOND_PROXY_ADDR=\(0x[a-fA-F0-9]*\).*/\1/p'
-          export ZKSYNC_DIAMOND_PROXY_ADDRESS=$(cat docker_output.log | sed -n 's/.*CONTRACTS_DIAMOND_PROXY_ADDR=\(0x[a-fA-F0-9]*\).*/\1/p')
-          echo after cat docker_output 
-          echo $ZKSYNC_DIAMOND_PROXY_ADDRESS
+          
+# sleep 200
+# echo catting log
+# cat docker_output.log
+# echo catting sed:
+# cat docker_output.log | sed -n 's/.*CONTRACTS_DIAMOND_PROXY_ADDR=\(0x[a-fA-F0-9]*\).*/\1/p'
+# export ZKSYNC_DIAMOND_PROXY_ADDRESS=$(cat docker_output.log | sed -n 's/.*CONTRACTS_DIAMOND_PROXY_ADDR=\(0x[a-fA-F0-9]*\).*/\1/p')
+# echo after cat docker_output 
+# echo $ZKSYNC_DIAMOND_PROXY_ADDRESS
 
 
       # # Ethereum Setup
