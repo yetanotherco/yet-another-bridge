@@ -14,6 +14,12 @@ if [ "$TEST" == true ]; then
     DEPLOY="deploy-devnet"
 fi
 
+echo test
+echo $TEST
+
+echo deploy
+echo $DEPLOY
+
 export WALLET_PRIVATE_KEY=$WALLET_PRIVATE_KEY
 export PAYMENT_REGISTRY_PROXY_ADDRESS=$PAYMENT_REGISTRY_PROXY_ADDRESS
 export MM_ZKSYNC_WALLET=$MM_ZKSYNC_WALLET

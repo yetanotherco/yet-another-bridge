@@ -66,6 +66,7 @@ jobs:
       - name: Running integration test
         run: |
           export ETHERSCAN_API_KEY=${{vars.ETHERSCAN_API_KEY}}
+          export TEST=true
           ls
           cat docker_output.log
           echo sleeping 250 to wait for ./start to setup
