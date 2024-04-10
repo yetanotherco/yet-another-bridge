@@ -7,6 +7,9 @@
 
 printf "${GREEN}\n=> [ETH] Making transfer to Destination account${COLOR_RESET}\n"
 
+echo ZKSYNC_CHAIN_ID
+echo $ZKSYNC_CHAIN_ID
+
 MM_INITIAL_BALANCE=$(cast balance --rpc-url $ETHEREUM_RPC --ether $MM_ETHEREUM_WALLET_ADDRESS)
 DESTINATION_INITIAL_BALANCE=$(cast balance --rpc-url $ETHEREUM_RPC --ether $USER_ETHEREUM_PUBLIC_ADDRESS)
 echo "Initial MM balance: $MM_INITIAL_BALANCE"
