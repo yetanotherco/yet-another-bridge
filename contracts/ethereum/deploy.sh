@@ -22,7 +22,7 @@ export ZKSYNC_CHAIN_ID=$ZKSYNC_CHAIN_ID
 
 echo before running forge script
 RESULT_LOG=$(forge script ./script/Deploy.s.sol --rpc-url $ETHEREUM_RPC --broadcast ${SKIP_VERIFY:---verify})
-# echo "$RESULT_LOG" #uncomment this line for debugging in detail
+echo "$RESULT_LOG" #uncomment this line for debugging in detail
 echo after running forge script
 
 # Getting result addresses
