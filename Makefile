@@ -110,7 +110,8 @@ zksync-test-integration-ci:
 	. ./contracts/ethereum/set_zksync_escrow.sh && \
 	. ./contracts/zksync/test/set_order.sh && \
 	. ./contracts/zksync/test/transfer.sh && \
-	. ./contracts/zksync/test/claim_payment.sh
+	. ./contracts/zksync/test/claim_payment.sh && \
+	. ./.github/workflows/zksync-scripts/assert.sh
 
 #old version:
 zksync-test-integration-local:
@@ -121,7 +122,8 @@ zksync-test-integration-local:
 	. ./contracts/ethereum/set_zksync_escrow.sh && \
 	. ./contracts/zksync/test/set_order.sh && \
 	. ./contracts/zksync/test/transfer.sh && \
-	. ./contracts/zksync/test/claim_payment.sh
+	. ./contracts/zksync/test/claim_payment.sh && \
+	. ./.github/workflows/zksync-scripts/assert.sh
 
 # zksync-upgrade: WIP
 
