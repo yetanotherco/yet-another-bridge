@@ -31,8 +31,8 @@ jobs:
           cd local-setup
           echo starting:
           touch ../docker_output.log
-          ls
           ./start.sh &> ../docker_output.log &
+          cat ../docker_output.log
 
       # Ethereum Setup
       - name: Install Foundry
@@ -68,9 +68,14 @@ jobs:
           export ETHERSCAN_API_KEY=${{vars.ETHERSCAN_API_KEY}}
           ls
           cat docker_output.log
-          echo sleeping 200 to wait for ./start to setup
+          echo sleeping 150 to wait for ./start to setup
+          echo ''
+          sleep 150
+          echo ''
+          cat docker_output.log
+          echo ''
 
-          export ZKSYNC_DIAMOND_PROXY_ADDRESS=$(cat docker_output.log | sed -n 's/.*CONTRACTS_DIAMOND_PROXY_ADDR=\(0x[a-fA-F0-9]*\).*/\1/p'
+          export ZKSYNC_DIAMOND_PROXY_ADDRESS=$(cat docker_output.log | sed -n 's/.*CONTRACTS_DIAMOND_PROXY_ADDR=\(0x[a-fA-F0-9]*\).*/\1/p')
           echo stored ZKSYNC_DIAMOND_PROXY_ADDRESS variable:
           echo $ZKSYNC_DIAMOND_PROXY_ADDRESS
 
