@@ -43,11 +43,13 @@ jobs:
       - name: Setup Dockerized L1-L2
         run: |
           export ETHERSCAN_API_KEY=${{vars.ETHERSCAN_API_KEY}}
-          git clone https://github.com/matter-labs/local-setup.git
-          cd local-setup
+          . ./contracts/ethereum/test/.env.test && . ./contracts/zksync/test/.env.test && \ 
+          git clone https://github.com/matter-labs/local-setup.git && \
+          cd local-setup && \
           ./start.sh &
           cd ..
           sleep 100
+          . ./contracts/ethereum/test/.env.test && . ./contracts/zksync/test/.env.test && \ 
           make zksync-test-integration
 
 # # Build Ethereum Contract
