@@ -9,10 +9,10 @@ echo "Initial MM balance L1:"
 echo "$MM_INITIAL_BALANCE_L1"
 
 echo "Initial MM balance L2:"
-npx zksync-cli wallet balance --chain "dockerized-node" --address "$MM_ZKSYNC_WALLET" | grep -E -o "\d+(\.\d+)? ETH"
+npx zksync-cli wallet balance --rpc http://localhost:3050 --address "$MM_ZKSYNC_WALLET" | grep -E -o "\d+(\.\d+)? ETH"
 
 echo "Initial Escrow balance:"
-npx zksync-cli wallet balance --chain "dockerized-node" --address "$ZKSYNC_ESCROW_CONTRACT_ADDRESS" | grep -E -o "\d+(\.\d+)? ETH"
+npx zksync-cli wallet balance --rpc http://localhost:3050 --address "$ZKSYNC_ESCROW_CONTRACT_ADDRESS" | grep -E -o "\d+(\.\d+)? ETH"
 
 
 echo "Withdrawing $BRIDGE_AMOUNT_ETH ETH"
@@ -28,7 +28,7 @@ echo "After MM balance L1:"
 echo "$MM_INITIAL_BALANCE_L1"
 
 echo "After MM balance L2:"
-npx zksync-cli wallet balance --chain "dockerized-node" --address "$MM_ZKSYNC_WALLET" | grep -E -o "\d+(\.\d+)? ETH"
+npx zksync-cli wallet balance --rpc http://localhost:3050 --address "$MM_ZKSYNC_WALLET" | grep -E -o "\d+(\.\d+)? ETH"
 
 echo "After Escrow balance:"
-npx zksync-cli wallet balance --chain "dockerized-node" --address "$ZKSYNC_ESCROW_CONTRACT_ADDRESS" | grep -E -o "\d+(\.\d+)? ETH"
+npx zksync-cli wallet balance --rpc http://localhost:3050 --address "$ZKSYNC_ESCROW_CONTRACT_ADDRESS" | grep -E -o "\d+(\.\d+)? ETH"
