@@ -29,12 +29,13 @@ jobs:
           echo git cloned, starting:
 
           cd local-setup
-          echo clearing:
-          ./clear.sh
           echo starting:
-          ./start.sh &
-
+          touch docker_output.log
+          ./start.sh &> docker_output.log &
           sleep 100
+          export ZKSYNC_DIAMOND_PROXY_ADDRESS=$(cat output.log | sed -n 's/.*CONTRACTS_DIAMOND_PROXY_ADDR=\(0x[a-fA-F0-9]*\).*/\1/p'
+          echo hola
+          echo $ZKSYNC_DIAMOND_PROXY_ADDRESS
 
       # # Ethereum Setup
       # - name: Install Foundry
