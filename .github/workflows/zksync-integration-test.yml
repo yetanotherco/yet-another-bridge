@@ -30,20 +30,54 @@ jobs:
 
           cd local-setup
           echo starting:
-          touch docker_output.log
+          touch ../docker_output.log
           ls
-          ./start.sh &> docker_output.log &
-          
-          sleep 20
+          ./start.sh &> ../docker_output.log &
 
-      # test read file
-      - name: test read file
-        run: | 
-          cd local-setup
-          sleep 10
+      # Ethereum Setup
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Install Forge
+        run: |
+          cd contracts/ethereum
+          forge install
+      
+      # - name: Install Ethereum foundry
+      #   run: |
+      #     make install-ethereum-foundry
+
+      # ZKSync Setup
+      - name: Install ZKSync libraries
+        run: |
+          cd ./contracts/zksync/ && yarn install
+
+      # Build Ethereum Contract
+      - name: Build Ethereum Contract
+        run: |
+          make ethereum-build
+
+      # Build ZKSync Contract
+      - name: Build ZKSync Contract
+        run: |
+          make zksync-build
+
+      # Run Dockerized L1-L2
+      - name: Running integration test
+        run: |
+          export ETHERSCAN_API_KEY=${{vars.ETHERSCAN_API_KEY}}
           ls
-          echo catting log
           cat docker_output.log
+          echo sleeping 200 to wait for ./start to setup
+
+          export ZKSYNC_DIAMOND_PROXY_ADDRESS=$(cat docker_output.log | sed -n 's/.*CONTRACTS_DIAMOND_PROXY_ADDR=\(0x[a-fA-F0-9]*\).*/\1/p'
+          echo stored ZKSYNC_DIAMOND_PROXY_ADDRESS variable:
+          echo $ZKSYNC_DIAMOND_PROXY_ADDRESS
+
+          echo running make-test-integration-ci
+          make zksync-test-integration-ci
+
+      
 
 # sleep 200
 # echo catting log
@@ -53,46 +87,3 @@ jobs:
 # export ZKSYNC_DIAMOND_PROXY_ADDRESS=$(cat docker_output.log | sed -n 's/.*CONTRACTS_DIAMOND_PROXY_ADDR=\(0x[a-fA-F0-9]*\).*/\1/p')
 # echo after cat docker_output 
 # echo $ZKSYNC_DIAMOND_PROXY_ADDRESS
-
-
-      # # Ethereum Setup
-      # - name: Install Foundry
-      #   uses: foundry-rs/foundry-toolchain@v1
-
-      # - name: Install Forge
-      #   run: |
-      #     cd contracts/ethereum
-      #     forge install
-      
-      # # - name: Install Ethereum foundry
-      # #   run: |
-      # #     make install-ethereum-foundry
-
-      # # ZKSync Setup
-      # - name: Install ZKSync libraries
-      #   run: |
-      #     cd ./contracts/zksync/ && yarn install
-
-      # # Build Ethereum Contract
-      # - name: Build Ethereum Contract
-      #   run: |
-      #     make ethereum-build
-
-      # # Build ZKSync Contract
-      # - name: Build ZKSync Contract
-      #   run: |
-      #     make zksync-build
-
-      # Run Dockerized L1-L2
-      # - name: Running integration test
-      #   run: |
-      #     export ETHERSCAN_API_KEY=${{vars.ETHERSCAN_API_KEY}}
-
-      #     export ZKSYNC_DIAMOND_PROXY_ADDRESS=$(cat docker_output.log | sed -n 's/.*CONTRACTS_DIAMOND_PROXY_ADDR=\(0x[a-fA-F0-9]*\).*/\1/p'
-      #     echo after cat docker_output 
-      #     echo $ZKSYNC_DIAMOND_PROXY_ADDRESS
-
-      #     echo running make-test-integration-ci
-      #     make zksync-test-integration-ci
-
-      
