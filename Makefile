@@ -106,6 +106,7 @@ zksync-test-in-memory: zksync-build
 # @echo building eth && make ethereum-build && \
 # echo building zksync && make zksync-build && 
 zksync-test-integration:
+	@source ./.github/workflows/zksync-scripts/ci.env.test && \
 	echo deploying eth && . ./contracts/ethereum/deploy.sh && \
 	echo deploying zksync && . ./contracts/zksync/deploy.sh && \
 	. ./contracts/ethereum/set_zksync_escrow.sh && \
