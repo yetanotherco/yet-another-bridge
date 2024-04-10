@@ -47,12 +47,12 @@ jobs:
           echo git cloned, starting:
 
           cd local-setup
-          ./start.sh > /dev/null &
+          ./start.sh &
           cd ..
 
-          echo starting sleep 100
-          sleep 100
-          echo done sleep 100, running make-test-integration-ci
+          echo starting sleep 400
+          sleep 400
+          echo done sleep 400, running make-test-integration-ci
           make zksync-test-integration-ci
 
 # export ETHERSCAN_API_KEY=${{vars.ETHERSCAN_API_KEY}}
