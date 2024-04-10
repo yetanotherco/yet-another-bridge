@@ -4,6 +4,7 @@
 cd contracts/ethereum
 
 printf "${GREEN}\n=> [ETH] Deploying ERC1967Proxy & PaymentRegistry ${COLOR_RESET}\n"
+echo 'Deploying ERC1967Proxy & PaymentRegistry'
 
 export ETHEREUM_PRIVATE_KEY=$ETHEREUM_PRIVATE_KEY
 export ZKSYNC_DIAMOND_PROXY_ADDRESS=$ZKSYNC_DIAMOND_PROXY_ADDRESS
@@ -20,9 +21,11 @@ export STARKNET_CHAIN_ID=$STARKNET_CHAIN_ID
 export ZKSYNC_CHAIN_ID=$ZKSYNC_CHAIN_ID
 ###
 
+echo before before running forge script
 echo before running forge script
+
 RESULT_LOG=$(forge script ./script/Deploy.s.sol --rpc-url $ETHEREUM_RPC --broadcast ${SKIP_VERIFY:---verify})
-echo "$RESULT_LOG" #uncomment this line for debugging in detail
+# echo "$RESULT_LOG" #uncomment this line for debugging in detail
 echo after running forge script
 
 # Getting result addresses
