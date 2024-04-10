@@ -10,7 +10,7 @@ if [ -z "$PAYMENT_REGISTRY_PROXY_ADDRESS" ]; then
 fi
 
 DEPLOY="deploy"
-if [ "$TEST" == "true" ]; then
+if [ "$TEST" = "true" ]; then
     DEPLOY="deploy-devnet"
 fi
 
