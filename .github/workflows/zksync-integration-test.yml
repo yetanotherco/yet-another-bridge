@@ -47,7 +47,7 @@ jobs:
           cd local-setup
           ./start.sh &
           cd ..
-          sleep 300
+          sleep 100
           make zksync-test-integration
 
 # # Build Ethereum Contract
