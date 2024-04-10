@@ -20,31 +20,33 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Temporary comment during CI dev:
+      # # Ethereum Setup
+      # - name: Install Foundry
+      #   uses: foundry-rs/foundry-toolchain@v1
 
-      # Ethereum Setup
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
-
-      - name: Install Forge
-        run: |
-          cd contracts/ethereum
-          forge install
-      
-      # - name: Install Ethereum foundry
+      # - name: Install Forge
       #   run: |
-      #     make install-ethereum-foundry
+      #     cd contracts/ethereum
+      #     forge install
+      
+      # # - name: Install Ethereum foundry
+      # #   run: |
+      # #     make install-ethereum-foundry
 
-      # ZKSync Setup
-      - name: Install ZKSync libraries
-        run: |
-          cd ./contracts/zksync/ && yarn install
+      # # ZKSync Setup
+      # - name: Install ZKSync libraries
+      #   run: |
+      #     cd ./contracts/zksync/ && yarn install
 
       # Run Dockerized L1-L2
       - name: Setup Dockerized L1-L2
         run: |
           export ETHERSCAN_API_KEY=${{vars.ETHERSCAN_API_KEY}}
-          source ./github/workflows/zksync-scripts/ci.env.test
-          
+          pwd
+          ls -la
+          source ./.github/workflows/zksync-scripts/ci.env.test
+
           git clone https://github.com/matter-labs/local-setup.git
 
           cd local-setup
