@@ -33,8 +33,8 @@ jobs:
           touch docker_output.log
           ./start.sh &> docker_output.log &
           sleep 100
-          export ZKSYNC_DIAMOND_PROXY_ADDRESS=$(cat output.log | sed -n 's/.*CONTRACTS_DIAMOND_PROXY_ADDR=\(0x[a-fA-F0-9]*\).*/\1/p'
-          echo hola
+          export ZKSYNC_DIAMOND_PROXY_ADDRESS=$(cat docker_output.log | sed -n 's/.*CONTRACTS_DIAMOND_PROXY_ADDR=\(0x[a-fA-F0-9]*\).*/\1/p'
+          echo after cat docker_output 
           echo $ZKSYNC_DIAMOND_PROXY_ADDRESS
 
       # # Ethereum Setup
