@@ -4,7 +4,7 @@
 
 printf "${GREEN}\n=> [ETH] Making Claim Payment${COLOR_RESET}\n"
 
-export MM_INITIAL_BALANCE_L1=$(cast balance --rpc-url $ETHEREUM_RPC --ether $MM_ETHEREUM_WALLET_ADDRESS)
+MM_INITIAL_BALANCE_L1=$(cast balance --rpc-url $ETHEREUM_RPC $MM_ETHEREUM_WALLET_ADDRESS)
 echo "Initial MM balance L1:"
 echo "$MM_INITIAL_BALANCE_L1"
 
@@ -23,7 +23,7 @@ cast send --rpc-url $ETHEREUM_RPC --private-key $ETHEREUM_PRIVATE_KEY --gas-pric
   "0" $USER_ETHEREUM_PUBLIC_ADDRESS $BRIDGE_AMOUNT_WEI 2000000 800 \
   --value 5000000000000000000
 
-export MM_AFTER_BALANCE_L1=$(cast balance --rpc-url $ETHEREUM_RPC --ether $MM_ETHEREUM_WALLET_ADDRESS)
+MM_AFTER_BALANCE_L1=$(cast balance --rpc-url $ETHEREUM_RPC $MM_ETHEREUM_WALLET_ADDRESS)
 echo "After MM balance L1:"
 echo "$MM_AFTER_BALANCE_L1"
 
