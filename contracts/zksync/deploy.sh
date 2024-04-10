@@ -10,7 +10,7 @@ if [ -z "$PAYMENT_REGISTRY_PROXY_ADDRESS" ]; then
 fi
 
 DEPLOY="deploy"
-if [ "$TEST" == true ]; then
+if [ "$TEST" == "true" ]; then
     DEPLOY="deploy-devnet"
 fi
 
@@ -19,6 +19,8 @@ echo $TEST
 
 echo deploy
 echo $DEPLOY
+
+DEPLOY="deploy-devnet"
 
 export WALLET_PRIVATE_KEY=$WALLET_PRIVATE_KEY
 export PAYMENT_REGISTRY_PROXY_ADDRESS=$PAYMENT_REGISTRY_PROXY_ADDRESS
