@@ -89,7 +89,8 @@ jobs:
           echo running make-test-integration-ci
           make zksync-test-integration-ci
           
-          echo done make target
+          ./.github/workflows/zksync-scripts/assert.sh
+          
           exit 0
 
           
