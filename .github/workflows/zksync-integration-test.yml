@@ -45,7 +45,7 @@ jobs:
           export ETHERSCAN_API_KEY=${{vars.ETHERSCAN_API_KEY}}
           . ./contracts/ethereum/test/.env.test && . ./contracts/zksync/test/.env.test && \ 
           git clone https://github.com/matter-labs/local-setup.git && \
-          cd local-setup && \
+          cd local-setup
           ./start.sh &
           cd ..
           sleep 100
