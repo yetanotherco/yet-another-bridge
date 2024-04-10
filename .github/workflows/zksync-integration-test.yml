@@ -32,7 +32,7 @@ jobs:
           echo starting:
           touch docker_output.log
           ./start.sh &> docker_output.log &
-          sleep 100
+          sleep 200
           echo catting log
           cat docker_output.log
           echo catting sed:
