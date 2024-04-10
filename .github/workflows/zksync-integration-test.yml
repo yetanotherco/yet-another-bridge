@@ -20,44 +20,43 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # # Ethereum Setup
-      # - name: Install Foundry
-      #   uses: foundry-rs/foundry-toolchain@v1
+      # Ethereum Setup
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
 
-      # - name: Install Forge
-      #   run: |
-      #     cd contracts/ethereum
-      #     forge install
+      - name: Install Forge
+        run: |
+          cd contracts/ethereum
+          forge install
       
-      # # - name: Install Ethereum foundry
-      # #   run: |
-      # #     make install-ethereum-foundry
-
-      # # ZKSync Setup
-      # - name: Install ZKSync libraries
+      # - name: Install Ethereum foundry
       #   run: |
-      #     cd ./contracts/zksync/ && yarn install
+      #     make install-ethereum-foundry
+
+      # ZKSync Setup
+      - name: Install ZKSync libraries
+        run: |
+          cd ./contracts/zksync/ && yarn install
 
       # Run Dockerized L1-L2
       - name: Setup Dockerized L1-L2
         run: |
-          export ETHERSCAN_API_KEY=${{vars.ETHERSCAN_API_KEY}}
-          source ./.github/workflows/zksync-scripts/ci.env.test
-          echo sourced
+          echo startung dockerized setup
+          git clone https://github.com/matter-labs/local-setup.git
+          echo git cloned, starting:
+
+          cd local-setup
+          ./start.sh &
+          cd ..
+
+          echo starting sleep 100
+          sleep 100
+          echo done sleep 100, running make-test-integration
           make zksync-test-integration
 
-# this goes in Setup Dockerized L1-L2, here temprorarily for dev
-# git clone https://github.com/matter-labs/local-setup.git
-# echo git cloned, starting:
-
-# cd local-setup
-# ./start.sh &
-# cd ..
-
-# echo starting sleep 100
-# sleep 100
-# echo done sleep 100, running make-test-integration
-
+# export ETHERSCAN_API_KEY=${{vars.ETHERSCAN_API_KEY}}
+# source ./.github/workflows/zksync-scripts/ci.env.test
+# echo sourced
 
 # # Build Ethereum Contract
 # - name: Build Ethereum Contract

@@ -114,6 +114,7 @@ zksync-test-integration:
 	. ./contracts/zksync/test/transfer.sh && \
 	. ./contracts/zksync/test/claim_payment.sh
 
+#old version:
 zksync-local-test-integration:
 	@make ethereum-build && make zksync-build && \
 	. ./contracts/ethereum/test/.env.test && . ./contracts/zksync/test/.env.test && \
