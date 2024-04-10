@@ -33,7 +33,7 @@ jobs:
           touch docker_output.log
           ./start.sh &> docker_output.log &
           sleep 100
-          export ZKSYNC_DIAMOND_PROXY_ADDRESS=$(cat docker_output.log | sed -n 's/.*CONTRACTS_DIAMOND_PROXY_ADDR=\(0x[a-fA-F0-9]*\).*/\1/p'
+          export ZKSYNC_DIAMOND_PROXY_ADDRESS=$(cat docker_output.log | sed -n 's/.*CONTRACTS_DIAMOND_PROXY_ADDR=\(0x[a-fA-F0-9]*\).*/\1/p')
           echo after cat docker_output 
           echo $ZKSYNC_DIAMOND_PROXY_ADDRESS
 
@@ -65,41 +65,16 @@ jobs:
       #   run: |
       #     make zksync-build
 
-      # # Run Dockerized L1-L2
+      # Run Dockerized L1-L2
       # - name: Running integration test
       #   run: |
       #     export ETHERSCAN_API_KEY=${{vars.ETHERSCAN_API_KEY}}
 
-      #     echo starting sleep 100
-      #     sleep 100
-      #     echo done sleep 100, running make-test-integration-ci
+      #     export ZKSYNC_DIAMOND_PROXY_ADDRESS=$(cat docker_output.log | sed -n 's/.*CONTRACTS_DIAMOND_PROXY_ADDR=\(0x[a-fA-F0-9]*\).*/\1/p'
+      #     echo after cat docker_output 
+      #     echo $ZKSYNC_DIAMOND_PROXY_ADDRESS
+
+      #     echo running make-test-integration-ci
       #     make zksync-test-integration-ci
 
-# export ETHERSCAN_API_KEY=${{vars.ETHERSCAN_API_KEY}}
-# source ./.github/workflows/zksync-scripts/ci.env.test
-# echo sourced
-
-# # Build Ethereum Contract
-# - name: Build Ethereum Contract
-#   run: |
-#     make ethereum-build
-
-# # Build Starknet Contract
-# - name: Build ZKSync Contract
-#   run: |
-#     make zksync-build
-
-#zksync-test-integration:
-# @make ethereum-build && make zksync-build && \
-# . ./contracts/ethereum/test/.env.test && . ./contracts/zksync/test/.env.test && \
-# . ./contracts/ethereum/deploy.sh && \
-# . ./contracts/zksync/deploy.sh && \
-# . ./contracts/ethereum/set_zksync_escrow.sh && \
-# . ./contracts/zksync/test/set_order.sh && \
-# . ./contracts/zksync/test/transfer.sh && \
-# . ./contracts/zksync/test/claim_payment.sh
-
-      # # Deploy PaymentRegistry, Escrow, set escrow, and test complete flow
-      # - name: Deploy and test complete flow
-      #   run: |
-      #     make zksync-test-integration
+      
