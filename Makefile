@@ -103,9 +103,9 @@ zksync-test-in-memory: zksync-build
 	@cd ./contracts/zksync/ && yarn test-in-memory
 
 #wip CI:
+# @echo building eth && make ethereum-build && \
+# echo building zksync && make zksync-build && 
 zksync-test-integration:
-	@echo building eth && make ethereum-build && \
-	echo building zksync && make zksync-build && \
 	echo deploying eth && . ./contracts/ethereum/deploy.sh && \
 	echo deploying zksync && . ./contracts/zksync/deploy.sh && \
 	. ./contracts/ethereum/set_zksync_escrow.sh && \
