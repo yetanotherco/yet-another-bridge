@@ -27,7 +27,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: '**/.github/workflows/*.yml'
       
-      - name: npx test
+      - name: Download zksync-cli
         run: |
           npx zksync-cli --version
 
@@ -35,7 +35,6 @@ jobs:
       - name: Setup Dockerized L1-L2
         run: |
           export ETHERSCAN_API_KEY=${{vars.ETHERSCAN_API_KEY}}
-          echo startung dockerized setup
           git clone https://github.com/matter-labs/local-setup.git
 
           echo git cloned, starting:
@@ -78,7 +77,6 @@ jobs:
         run: |
           export ETHERSCAN_API_KEY=${{vars.ETHERSCAN_API_KEY}}
           export TEST=true
-          ls
           cat docker_output.log
           echo sleeping 250 to wait for ./start to setup
           sleep 250
@@ -91,13 +89,4 @@ jobs:
           echo running make-test-integration-ci
           make zksync-test-integration-ci
 
-      
-
-# sleep 200
-# echo catting log
-# cat docker_output.log
-# echo catting sed:
-# cat docker_output.log | sed -n 's/.*CONTRACTS_DIAMOND_PROXY_ADDR=\(0x[a-fA-F0-9]*\).*/\1/p'
-# export ZKSYNC_DIAMOND_PROXY_ADDRESS=$(cat docker_output.log | sed -n 's/.*CONTRACTS_DIAMOND_PROXY_ADDR=\(0x[a-fA-F0-9]*\).*/\1/p')
-# echo after cat docker_output 
-# echo $ZKSYNC_DIAMOND_PROXY_ADDRESS
+          
