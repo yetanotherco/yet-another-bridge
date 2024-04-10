@@ -50,6 +50,16 @@ jobs:
         run: |
           cd ./contracts/zksync/ && yarn install
 
+      # Build Ethereum Contract
+      - name: Build Ethereum Contract
+        run: |
+          make ethereum-build
+
+      # Build Starknet Contract
+      - name: Build Starknet Contract
+        run: |
+          make zksync-build
+
       # Run Dockerized L1-L2
       - name: Running integration test
         run: |
