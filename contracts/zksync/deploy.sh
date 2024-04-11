@@ -19,7 +19,7 @@ export PAYMENT_REGISTRY_PROXY_ADDRESS=$PAYMENT_REGISTRY_PROXY_ADDRESS
 export MM_ZKSYNC_WALLET=$MM_ZKSYNC_WALLET
 
 RESULT_LOG=$(yarn $DEPLOY)
-echo $RESULT_LOG
+# echo $RESULT_LOG #uncomment this line for debugging
 ZKSYNC_ESCROW_CONTRACT_ADDRESS=$(echo "$RESULT_LOG" | grep "Contract address:" | egrep -i -o '0x[a-zA-Z0-9]{40}')
 
 if [ -z "$ZKSYNC_ESCROW_CONTRACT_ADDRESS" ]; then

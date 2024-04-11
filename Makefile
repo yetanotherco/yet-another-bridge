@@ -105,8 +105,8 @@ zksync-test-in-memory: zksync-build
 #wip CI:
 zksync-test-integration-ci:
 	@. ./.github/workflows/zksync-scripts/ci.env.test && \
-	echo deploying eth && . ./contracts/ethereum/deploy.sh && \
-	echo deploying zksync && . ./contracts/zksync/deploy.sh && \
+	. ./contracts/ethereum/deploy.sh && \
+	. ./contracts/zksync/deploy.sh && \
 	. ./contracts/ethereum/set_zksync_escrow.sh && \
 	. ./contracts/zksync/test/set_order.sh && \
 	. ./contracts/zksync/test/transfer.sh && \
