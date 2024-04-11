@@ -9,11 +9,11 @@ BALANCE_MM_L1_BEFORE_CLAIMPAYMENT=$(cast balance --rpc-url $ETHEREUM_RPC $MM_ETH
 echo "$BALANCE_MM_L1_BEFORE_CLAIMPAYMENT"
 
 echo "\nMM L2 funds before Claim Payment"
-BALANCE_MM_L2_BEFORE_CLAIMPAYMENT=$(npx zksync-cli wallet balance --rpc http://localhost:3050 --address "$MM_ZKSYNC_WALLET" | grep -oE '[0-9]+(\.[0-9]+)?' | xargs -I {} echo "scale=0; {} * 1e18" | bc -l | sed 's/\.0*$//')
+BALANCE_MM_L2_BEFORE_CLAIMPAYMENT=$(cast balance --rpc-url http://localhost:3050 $MM_ZKSYNC_WALLET)
 echo $BALANCE_MM_L2_BEFORE_CLAIMPAYMENT
 
 echo "\nEscrow L2 funds before Claim Payment"
-BALANCE_ESCROW_L2_BEFORE_CLAIMPAYMENT=$(npx zksync-cli wallet balance --rpc http://localhost:3050 --address "$ZKSYNC_ESCROW_CONTRACT_ADDRESS" | grep -oE '[0-9]+(\.[0-9]+)?' | xargs -I {} echo "scale=0; {} * 1e18" | bc -l | sed 's/\.0*$//')
+BALANCE_ESCROW_L2_BEFORE_CLAIMPAYMENT=$(cast balance --rpc-url http://localhost:3050 $ZKSYNC_ESCROW_CONTRACT_ADDRESS)
 echo $BALANCE_ESCROW_L2_BEFORE_CLAIMPAYMENT
 
 echo "Withdrawing $BRIDGE_AMOUNT_ETH ETH == $BRIDGE_AMOUNT_WEI WEI"
@@ -27,9 +27,9 @@ BALANCE_MM_L1_AFTER_CLAIMPAYMENT=$(cast balance --rpc-url $ETHEREUM_RPC $MM_ETHE
 echo "$BALANCE_MM_L1_AFTER_CLAIMPAYMENT"
 
 echo "\nMM L2 funds after Claim Payment"
-BALANCE_MM_L2_AFTER_CLAIMPAYMENT=$(npx zksync-cli wallet balance --rpc http://localhost:3050 --address "$MM_ZKSYNC_WALLET" | grep -oE '[0-9]+(\.[0-9]+)?' | xargs -I {} echo "scale=0; {} * 1e18" | bc -l | sed 's/\.0*$//')
+BALANCE_MM_L2_AFTER_CLAIMPAYMENT=$(cast balance --rpc-url http://localhost:3050 $MM_ZKSYNC_WALLET)
 echo $BALANCE_MM_L2_AFTER_CLAIMPAYMENT
 
 echo "\nEscrow L2 funds after Claim Payment"
-BALANCE_ESCROW_L2_AFTER_CLAIMPAYMENT=$(npx zksync-cli wallet balance --rpc http://localhost:3050 --address "$ZKSYNC_ESCROW_CONTRACT_ADDRESS" | grep -oE '[0-9]+(\.[0-9]+)?' | xargs -I {} echo "scale=0; {} * 1e18" | bc -l | sed 's/\.0*$//')
+BALANCE_ESCROW_L2_AFTER_CLAIMPAYMENT=$(cast balance --rpc-url http://localhost:3050 $ZKSYNC_ESCROW_CONTRACT_ADDRESS)
 echo $BALANCE_ESCROW_L2_AFTER_CLAIMPAYMENT

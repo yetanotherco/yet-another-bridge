@@ -18,11 +18,11 @@ echo $ZKSYNC_ESCROW_CONTRACT_ADDRESS
 
 printf "${GREEN}\n=> [SN] Making Set Order on Escrow${COLOR_RESET}\n"
 echo "\nUser ZKSync funds before setOrder:"
-BALANCE_USER_L2_BEFORE_SETORDER=$(npx zksync-cli wallet balance --rpc http://localhost:3050 --address "$USER_ZKSYNC_PUBLIC_ADDRESS" | grep -oE '[0-9]+(\.[0-9]+)?' | xargs -I {} echo "scale=0; {} * 1e18" | bc -l | sed 's/\.0*$//')
+BALANCE_USER_L2_BEFORE_SETORDER=$(cast balance --rpc-url http://localhost:3050 $USER_ZKSYNC_PUBLIC_ADDRESS)
 echo $BALANCE_USER_L2_BEFORE_SETORDER
 
 echo "\nEscrow ZKSync funds before setOrder:"
-BALANCE_ESCROW_L2_BEFORE_SETORDER=$(npx zksync-cli wallet balance --rpc http://localhost:3050 --address "$ZKSYNC_ESCROW_CONTRACT_ADDRESS" | grep -oE '[0-9]+(\.[0-9]+)?' | xargs -I {} echo "scale=0; {} * 1e18" | bc -l | sed 's/\.0*$//')
+BALANCE_ESCROW_L2_BEFORE_SETORDER=$(cast balance --rpc-url http://localhost:3050 $ZKSYNC_ESCROW_CONTRACT_ADDRESS)
 echo $BALANCE_ESCROW_L2_BEFORE_SETORDER
 
 
@@ -31,9 +31,9 @@ npx zksync-cli contract write --private-key $USER_ZKSYNC_PRIVATE_ADDRESS --rpc h
 
 
 echo "\nUser ZKSync funds after setOrder:"
-BALANCE_USER_L2_AFTER_SETORDER=$(npx zksync-cli wallet balance --rpc http://localhost:3050 --address "$USER_ZKSYNC_PUBLIC_ADDRESS" | grep -oE '[0-9]+(\.[0-9]+)?' | xargs -I {} echo "scale=0; {} * 1e18" | bc -l | sed 's/\.0*$//')
+BALANCE_USER_L2_AFTER_SETORDER=$(cast balance --rpc-url http://localhost:3050 $USER_ZKSYNC_PUBLIC_ADDRESS)
 echo $BALANCE_USER_L2_AFTER_SETORDER
 
 echo "\nEscrow ZKSync funds after setOrder:"
-BALANCE_ESCROW_L2_AFTER_SETORDER=$(npx zksync-cli wallet balance --rpc http://localhost:3050 --address "$ZKSYNC_ESCROW_CONTRACT_ADDRESS" | grep -oE '[0-9]+(\.[0-9]+)?' | xargs -I {} echo "scale=0; {} * 1e18" | bc -l | sed 's/\.0*$//')
+BALANCE_ESCROW_L2_AFTER_SETORDER=$(cast balance --rpc-url http://localhost:3050 $ZKSYNC_ESCROW_CONTRACT_ADDRESS)
 echo $BALANCE_ESCROW_L2_AFTER_SETORDER
