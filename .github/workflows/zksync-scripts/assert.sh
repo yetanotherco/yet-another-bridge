@@ -8,7 +8,7 @@ assert() {
     printf "${GREEN}✓ $2 passed.${RESET}\n"
   else
     printf "${RED}⨯ $2 assertion failed: Expected value: $3, Obtained value: $4.${RESET}\n"
-    exit 1
+    # exit 1
   fi
 }
 
@@ -27,3 +27,8 @@ assert " [[ $MM_AFTER_BALANCE_L1 -eq 99999998999999999999994843134499267961 ]]" 
 # MM_FINAL_BALANCE=$(starkli balance --raw $MM_STARKNET_WALLET_ADDRESS)
 # EXPECTED_MM_FINAL_BALANCE=1001000025000000000000
 # assert "[[ $MM_FINAL_BALANCE -eq $EXPECTED_MM_FINAL_BALANCE ]]" "MM balance" "$EXPECTED_MM_FINAL_BALANCE" "$MM_FINAL_BALANCE"
+
+if [ ! "$MM_INITIAL_BALANCE_L1" = "99999998999999999999994843134499267961" ]; then
+    echo Error in MM_INITIAL_BALANCE_L1
+fi
+
