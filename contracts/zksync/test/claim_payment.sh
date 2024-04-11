@@ -32,3 +32,4 @@ echo $BALANCE_MM_L2_AFTER_CLAIMPAYMENT
 
 echo "\nEscrow L2 funds after Claim Payment"
 BALANCE_ESCROW_L2_AFTER_CLAIMPAYMENT=$(npx zksync-cli wallet balance --rpc http://localhost:3050 --address "$ZKSYNC_ESCROW_CONTRACT_ADDRESS" | grep -oE '[0-9]+(\.[0-9]+)?' | sed 's/\.//g')
+echo $BALANCE_ESCROW_L2_AFTER_CLAIMPAYMENT
