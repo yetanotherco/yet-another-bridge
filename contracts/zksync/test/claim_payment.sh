@@ -4,16 +4,17 @@
 
 printf "${GREEN}\n=> [ETH] Making Claim Payment${COLOR_RESET}\n"
 
-MM_INITIAL_BALANCE_L1=$(cast balance --rpc-url $ETHEREUM_RPC $MM_ETHEREUM_WALLET_ADDRESS)
 echo "Initial MM balance L1:"
-echo "$MM_INITIAL_BALANCE_L1"
+BALANCE_MM_L1_BEFORE_CLAIMPAYMENT=$(cast balance --rpc-url $ETHEREUM_RPC $MM_ETHEREUM_WALLET_ADDRESS)
+echo "$BALANCE_MM_L1_BEFORE_CLAIMPAYMENT"
 
 echo "Initial MM balance L2:"
-npx zksync-cli wallet balance --rpc http://localhost:3050 --address "$MM_ZKSYNC_WALLET"
+BALANCE_MM_L2_BEFORE_CLAIMPAYMENT=$(npx zksync-cli wallet balance --rpc http://localhost:3050 --address "$MM_ZKSYNC_WALLET" | grep -oE '[0-9]+\.[0-9]+' | sed 's/\.//g')
+echo $BALANCE_MM_L2_BEFORE_CLAIMPAYMENT
 
 echo "Initial Escrow balance:"
-npx zksync-cli wallet balance --rpc http://localhost:3050 --address "$ZKSYNC_ESCROW_CONTRACT_ADDRESS"
-
+BALANCE_ESCROW_L2_BEFORE_CLAIMPAYMENT=$(npx zksync-cli wallet balance --rpc http://localhost:3050 --address "$ZKSYNC_ESCROW_CONTRACT_ADDRESS" | grep -oE '[0-9]+\.[0-9]+' | sed 's/\.//g')
+echo $BALANCE_ESCROW_L2_BEFORE_CLAIMPAYMENT
 
 echo "Withdrawing $BRIDGE_AMOUNT_ETH ETH"
 echo "Withdrawing $BRIDGE_AMOUNT_WEI WEI"
@@ -23,12 +24,13 @@ cast send --rpc-url $ETHEREUM_RPC --private-key $ETHEREUM_PRIVATE_KEY --gas-pric
   "0" $USER_ETHEREUM_PUBLIC_ADDRESS $BRIDGE_AMOUNT_WEI 2000000 800 \
   --value 5000000000000000000
 
-MM_AFTER_BALANCE_L1=$(cast balance --rpc-url $ETHEREUM_RPC $MM_ETHEREUM_WALLET_ADDRESS)
 echo "After MM balance L1:"
-echo "$MM_AFTER_BALANCE_L1"
+BALANCE_MM_L1_AFTER_CLAIMPAYMENT=$(cast balance --rpc-url $ETHEREUM_RPC $MM_ETHEREUM_WALLET_ADDRESS)
+echo "$BALANCE_MM_L1_AFTER_CLAIMPAYMENT"
 
 echo "After MM balance L2:"
-npx zksync-cli wallet balance --rpc http://localhost:3050 --address "$MM_ZKSYNC_WALLET"
+BALANCE_MM_L2_AFTER_CLAIMPAYMENT=$(npx zksync-cli wallet balance --rpc http://localhost:3050 --address "$MM_ZKSYNC_WALLET" | grep -oE '[0-9]+\.[0-9]+' | sed 's/\.//g')
+echo $BALANCE_MM_L2_AFTER_CLAIMPAYMENT
 
 echo "After Escrow balance:"
-npx zksync-cli wallet balance --rpc http://localhost:3050 --address "$ZKSYNC_ESCROW_CONTRACT_ADDRESS"
+BALANCE_ESCROW_L2_AFTER_CLAIMPAYMENT=$(npx zksync-cli wallet balance --rpc http://localhost:3050 --address "$ZKSYNC_ESCROW_CONTRACT_ADDRESS" | grep -oE '[0-9]+\.[0-9]+' | sed 's/\.//g')
