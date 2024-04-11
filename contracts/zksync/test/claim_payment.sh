@@ -17,7 +17,6 @@ BALANCE_ESCROW_L2_BEFORE_CLAIMPAYMENT=$(npx zksync-cli wallet balance --rpc http
 echo $BALANCE_ESCROW_L2_BEFORE_CLAIMPAYMENT
 
 echo "Withdrawing $BRIDGE_AMOUNT_ETH ETH == $BRIDGE_AMOUNT_WEI WEI"
-
 cast send --rpc-url $ETHEREUM_RPC --private-key $ETHEREUM_PRIVATE_KEY --gas-price 2000000000 \
   $PAYMENT_REGISTRY_PROXY_ADDRESS "claimPaymentZKSync(uint256, address, uint256, uint256, uint256)" \
   "0" $USER_ETHEREUM_PUBLIC_ADDRESS $BRIDGE_AMOUNT_WEI 2000000 800 \

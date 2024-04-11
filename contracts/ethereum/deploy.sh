@@ -4,7 +4,6 @@
 cd contracts/ethereum
 
 printf "${GREEN}\n=> [ETH] Deploying ERC1967Proxy & PaymentRegistry ${COLOR_RESET}\n"
-echo 'Deploying ERC1967Proxy & PaymentRegistry'
 
 ### These values are not correctly interpreted by the CI environment otherwise.
 ### Locally, this has no effect
