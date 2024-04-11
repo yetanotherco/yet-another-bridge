@@ -3,13 +3,15 @@
 . contracts/utils/colors.sh #for ANSI colors
 
 echo "Asserting values"
+FAILED=false
 
 assert() {
-  #Usage: assert <variable_name> <expected> <obtained>
+  #Usage: assert <variable_name> <obtained> <expected>
   if [ $2 = $3 ] ; then
     printf "${GREEN}✓ $1 passed.${RESET}\n"
   else
-    printf "${RED}x $1 assertion failed: Expected value: $2, Obtained value: $3.${RESET}\n"
+    printf "${RED}x $1 assertion failed: Obtained value: $2, Expected value: $3.${RESET}\n"
+    FAILED=true
   fi
 }
 
@@ -34,4 +36,9 @@ assert BALANCE_MM_L2_BEFORE_CLAIMPAYMENT $BALANCE_MM_L2_BEFORE_CLAIMPAYMENT 1000
 assert BALANCE_ESCROW_L2_BEFORE_CLAIMPAYMENT $BALANCE_ESCROW_L2_BEFORE_CLAIMPAYMENT 2
 assert BALANCE_MM_L1_AFTER_CLAIMPAYMENT $BALANCE_MM_L1_AFTER_CLAIMPAYMENT 99999998999999999999994843134499267961
 assert BALANCE_MM_L2_AFTER_CLAIMPAYMENT $BALANCE_MM_L2_AFTER_CLAIMPAYMENT 1000000000002002977607
+assert BALANCE_MM_L2_CHANGE_CLAIMPAYMENT $(($BALANCE_MM_L2_AFTER_CLAIMPAYMENT-$BALANCE_MM_L2_BEFORE_CLAIMPAYMENT)) 2000000000
 assert BALANCE_ESCROW_L2_AFTER_CLAIMPAYMENT $BALANCE_ESCROW_L2_AFTER_CLAIMPAYMENT 0
+
+if $FAILED; then
+  exit 1
+fi
