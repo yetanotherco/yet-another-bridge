@@ -15,6 +15,22 @@ assert() {
   fi
 }
 
+# assert_aprox() {
+#   #Usage: assert <variable_name> <obtained> <expected> <error_accepted>
+#   lower_bound=$(echo "$3 - $4)" | bc)
+#   upper_bound=$(echo "$3 + $4)" | bc)
+
+#   echo $lower_bound
+#   echo $upper_bound
+
+#   if (( $2 >= lower_bound && $2 <= upper_bound )); then
+#     printf "${GREEN}✓ $1 passed.${RESET}\n"
+#   else
+#     printf "${RED}x $1 assertion failed: Obtained value: $2, Expected value: $3.${RESET}\n"
+#     FAILED=true
+#   fi
+# }
+
 #setorder
 echo setOrder
 assert BALANCE_USER_L2_BEFORE_SETORDER $BALANCE_USER_L2_BEFORE_SETORDER 1000000000000002977607 #
