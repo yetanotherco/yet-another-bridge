@@ -45,3 +45,12 @@ CREATE TABLE IF NOT EXISTS error
 
     FOREIGN KEY (order_id, origin_network) REFERENCES orders (order_id, origin_network) ON DELETE CASCADE
 );
+
+CREATE INDEX IF NOT EXISTS orders_transferred_at_idx ON public.orders USING btree (transferred_at);
+CREATE INDEX IF NOT EXISTS orders_amount_idx ON public.orders USING btree (amount);
+CREATE INDEX IF NOT EXISTS orders_origin_network_idx ON public.orders USING btree (origin_network);
+CREATE INDEX IF NOT EXISTS orders_recipient_address_idx ON public.orders USING btree (recipient_address);
+CREATE INDEX IF NOT EXISTS orders_order_id_idx ON public.orders USING btree (order_id);
+CREATE INDEX IF NOT EXISTS orders_status_idx ON public.orders USING btree (status);
+CREATE INDEX IF NOT EXISTS orders_created_at_idx ON public.orders USING btree (created_at);
+CREATE INDEX IF NOT EXISTS orders_completed_at_idx ON public.orders USING btree (completed_at);
