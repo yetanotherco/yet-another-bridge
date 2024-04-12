@@ -8,8 +8,8 @@ class SetOrderEvent:
 
     def __init__(self,
                  order_id,
-                 from_address,
                  origin_network,
+                 from_address,
                  set_order_tx_hash,
                  recipient_address,
                  amount,
@@ -17,8 +17,8 @@ class SetOrderEvent:
                  block_number,
                  is_used=False):
         self.order_id = order_id
-        self.from_address = from_address
         self.origin_network = origin_network
+        self.from_address = from_address
         self.set_order_tx_hash = set_order_tx_hash
         self.recipient_address = recipient_address
         self.amount = amount
@@ -47,8 +47,8 @@ class SetOrderEvent:
                                           Network.STARKNET.value)
         return SetOrderEvent(
             order_id=order_id,
-            from_address=event.from_address,
             origin_network=Network.STARKNET,
+            from_address=event.from_address,
             set_order_tx_hash=set_order_tx_hash,
             recipient_address=recipient_address,
             amount=amount,
@@ -84,8 +84,8 @@ class SetOrderEvent:
 
         return SetOrderEvent(
             order_id=order_id,
-            from_address=log['from_address'],
             origin_network=Network.ZKSYNC,
+            from_address=log['from_address'],
             set_order_tx_hash=set_order_tx_hash,
             recipient_address=recipient_address,
             amount=amount,

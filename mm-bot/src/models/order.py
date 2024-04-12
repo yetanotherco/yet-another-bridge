@@ -57,8 +57,8 @@ class Order(Base):
     def from_set_order_event(set_order_event: SetOrderEvent):
         return Order(
             order_id=set_order_event.order_id,
-            from_address=set_order_event.from_address,
             origin_network=set_order_event.origin_network,
+            from_address=set_order_event.from_address,
             recipient_address=set_order_event.recipient_address,
             amount=set_order_event.amount,
             fee=set_order_event.fee,
