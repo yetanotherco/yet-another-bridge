@@ -8,6 +8,7 @@ class SetOrderEvent:
 
     def __init__(self,
                  order_id,
+                 from_address,
                  origin_network,
                  set_order_tx_hash,
                  recipient_address,
@@ -16,6 +17,7 @@ class SetOrderEvent:
                  block_number,
                  is_used=False):
         self.order_id = order_id
+        self.from_address = from_address
         self.origin_network = origin_network
         self.set_order_tx_hash = set_order_tx_hash
         self.recipient_address = recipient_address
@@ -28,7 +30,8 @@ class SetOrderEvent:
     async def from_starknet(event):
         """
         event = {
-            "tx_hash": "0x
+            "from_address": "0x",
+            "tx_hash": "0x",
             "block_number": 0,
             "data": [0, 0, 0, 0, 0, 0, 0]
         }
@@ -40,9 +43,11 @@ class SetOrderEvent:
         recipient_address = hex(event.data[2])
         amount = SetOrderEvent.parse_u256_from_double_u128(event.data[3], event.data[4])
         fee = SetOrderEvent.parse_u256_from_double_u128(event.data[5], event.data[6])
-        is_used = await asyncio.to_thread(ethereum.get_is_used_order, order_id, recipient_address, amount, Network.STARKNET.value)
+        is_used = await asyncio.to_thread(ethereum.get_is_used_order, order_id, recipient_address, amount,
+                                          Network.STARKNET.value)
         return SetOrderEvent(
             order_id=order_id,
+            from_address=event.from_address,
             origin_network=Network.STARKNET,
             set_order_tx_hash=set_order_tx_hash,
             recipient_address=recipient_address,
@@ -56,6 +61,7 @@ class SetOrderEvent:
     async def from_zksync(log):
         """
         log = {
+            "from_address": "0x",
             "transactionHash": "0x",
             "blockNumber": 0,
             "args": {
@@ -68,20 +74,23 @@ class SetOrderEvent:
         transactionHash: HexBytes
         recipient_address: str
         """
-        order_id = log.args.order_id
-        set_order_tx_hash = log.transactionHash
-        recipient_address = log.args.recipient_address
-        amount = log.args.amount
-        fee = log.args.fee
-        is_used = await asyncio.to_thread(ethereum.get_is_used_order, order_id, recipient_address, amount, Network.ZKSYNC.value)  # TODO change to new contract signature
+        order_id = log['args'].order_id
+        set_order_tx_hash = log['transactionHash']
+        recipient_address = log['args'].recipient_address
+        amount = log['args'].amount
+        fee = log['args'].fee
+        is_used = await asyncio.to_thread(ethereum.get_is_used_order, order_id, recipient_address, amount,
+                                          Network.ZKSYNC.value)  # TODO change to new contract signature
+
         return SetOrderEvent(
             order_id=order_id,
+            from_address=log['from_address'],
             origin_network=Network.ZKSYNC,
             set_order_tx_hash=set_order_tx_hash,
             recipient_address=recipient_address,
             amount=amount,
             fee=fee,
-            block_number=log.blockNumber,
+            block_number=log['blockNumber'],
             is_used=is_used
         )
 
@@ -90,8 +99,9 @@ class SetOrderEvent:
         return high << 128 | low
 
     def __str__(self):
-        return f"Order: {self.order_id} - Origin: {self.origin_network} - Amount: {self.amount} - Fee: {self.fee} - " \
-               f"Recipient: {self.recipient_address} - Is used: {self.is_used} - Block: {self.block_number}"
+        return f"Order: {self.order_id} - From Address: {self.from_address} - Origin: {self.origin_network} - Amount:" \
+               f" {self.amount} - Fee: {self.fee} - Recipient: {self.recipient_address} - Is used: {self.is_used} -" \
+               f" Block: {self.block_number}"
 
     def __repr__(self):
         return self.__str__()
