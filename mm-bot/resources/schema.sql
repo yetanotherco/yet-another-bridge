@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS orders
     order_id          INT            NOT NULL,
     origin_network    VARCHAR(32)    NOT NULL,
 
-    from_address      VARCHAR(64)    NOT NULL, -- 64 chars to allow Starknet and zkSync compatibility
+    from_address      VARCHAR(66)    NOT NULL, -- 66 chars to allow Starknet and zkSync compatibility
     recipient_address VARCHAR(42)    NOT NULL, -- 0x + 40 bytes
     amount            NUMERIC(78, 0) NOT NULL, -- uint 256
     fee               NUMERIC(78, 0) NOT NULL, -- uint 256
