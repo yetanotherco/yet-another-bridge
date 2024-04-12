@@ -1,5 +1,4 @@
 import asyncio
-import copy
 import json
 import logging
 import os
@@ -8,13 +7,13 @@ from typing import cast
 from web3 import AsyncWeb3
 from web3.eth.async_eth import AsyncContract
 from web3.types import EventData
+from hexbytes import HexBytes
+
 
 from config import constants
 from models.set_order_event import SetOrderEvent
 from models.zksync_log import ZksyncLog
 from services.decorators.use_fallback import use_async_fallback
-
-from hexbytes import HexBytes
 
 # Just for keep consistency with the ethereum and starknet
 # services it won't be a class. It will be a set of functions
