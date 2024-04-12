@@ -15,6 +15,7 @@ class Order(Base):
     order_id: int = Column(Integer, primary_key=True, nullable=False)
     origin_network: Network = Column(Enum(Network), primary_key=True, nullable=False)
 
+    from_address: str = Column(String(64), nullable=False)
     recipient_address: str = Column(String(42), nullable=False)
     amount: decimal = Column(Numeric(78, 0), nullable=False)
     fee: decimal = Column(Numeric(78, 0), nullable=False)
@@ -56,6 +57,7 @@ class Order(Base):
     def from_set_order_event(set_order_event: SetOrderEvent):
         return Order(
             order_id=set_order_event.order_id,
+            from_address=set_order_event.from_address,
             origin_network=set_order_event.origin_network,
             recipient_address=set_order_event.recipient_address,
             amount=set_order_event.amount,
