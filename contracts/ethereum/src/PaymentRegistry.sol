@@ -68,7 +68,6 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         marketMaker = marketMaker_;
     }
 
-    //TODO: change orderID to uint32
     function transfer(uint256 orderId, address destAddress, uint128 chainId) external payable onlyOwnerOrMM {
         require(msg.value > 0, "Invalid amount, should be higher than 0.");
 
