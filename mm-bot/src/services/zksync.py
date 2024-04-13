@@ -68,16 +68,24 @@ async def get_set_order_events(from_block, to_block) -> list[SetOrderEvent]:
     Get set_orders events from the escrow
     """
     set_order_logs: list[EventData] = await get_set_order_logs(from_block, to_block)
-    tasks = []
+    log_tasks = []
+    order_tasks = []
 
-    # Create a list of tasks to parallelize the creation of the SetOrderEvent list
     for log in set_order_logs:
-        transaction = await get_tx(log['transactionHash'])
+        log_task = asyncio.create_task(get_tx(log['transactionHash']))
+        log_tasks.append(log_task)
+
+    transactions = await asyncio.gather(*log_tasks)
+
+    # asyncio.gather() returns the results in the same order as the input list, so we can zip the two lists
+    # https://docs.python.org/3/library/asyncio-task.html#running-tasks-concurrently
+    for transaction, log in zip(transactions, set_order_logs):
         from_address = transaction['from']
         zksync_log = ZksyncLog(**log, from_address=from_address)
-        tasks.append(asyncio.create_task(SetOrderEvent.from_zksync(zksync_log)))
+        # Create a list of tasks to parallelize the creation of the SetOrderEvent list
+        order_tasks.append(asyncio.create_task(SetOrderEvent.from_zksync(zksync_log)))
 
-    set_order_events = await asyncio.gather(*tasks)
+    set_order_events = await asyncio.gather(*order_tasks)
     return cast(list[SetOrderEvent], set_order_events)
 
 
