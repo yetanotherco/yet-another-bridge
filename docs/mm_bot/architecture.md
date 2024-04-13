@@ -16,11 +16,15 @@ The following diagram shows the mm classes and how they interact with each other
 
 ![mm_diagram_class.svg](images%2Fmm_diagram_class.svg)
 
+> **_NOTE:_**  To make the diagram more readable, some relationships were omitted.
+
 ### Full Class Diagram
 The following diagram is a detailed version of the previous diagram, 
 showing the attributes and methods of each class.
 
 ![mm_diagram_class_full.svg](images%2Fmm_diagram_class_full.svg)
+
+> **_NOTE:_**  To make the diagram more readable, some relationships were omitted.
 
 ## Process View
 ### Non-Functional Requirements
