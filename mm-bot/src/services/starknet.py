@@ -91,6 +91,7 @@ async def get_order_events(from_block_number, to_block_number) -> list[SetOrderE
     transactions = await asyncio.gather(*event_tasks)
 
     # asyncio.gather() returns the results in the same order as the input list, so we can zip the two lists
+    # https://docs.python.org/3/library/asyncio-task.html#running-tasks-concurrently
     for transaction, event in zip(transactions, events):
         transaction = cast(InvokeTransaction, transaction)
         from_address = f'0x{transaction.sender_address:064x}'
