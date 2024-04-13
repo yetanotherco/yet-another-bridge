@@ -74,8 +74,9 @@ async def get_is_used_order(order_id, rpc_node=main_rpc_node) -> bool:
 async def get_order_events(from_block_number, to_block_number) -> list[SetOrderEvent]:
     continuation_token = None
     events = []
+    event_tasks = []
     order_events = []
-    tasks = []
+    order_tasks = []
     while True:
         events_response = await get_starknet_events(from_block_number, to_block_number, continuation_token)
         events.extend(events_response.events)
@@ -84,15 +85,20 @@ async def get_order_events(from_block_number, to_block_number) -> list[SetOrderE
             break
 
     for event in events:
-        transaction = cast(InvokeTransaction, await get_transaction(event.tx_hash))
-        # transaction is an int. We need to store it as a string.
-        # Complete the address with zeroes to match the length of a 64 hex string
+        event_task = asyncio.create_task(get_transaction(event.tx_hash))
+        event_tasks.append(event_task)
+
+    transactions = await asyncio.gather(*event_tasks)
+
+    # asyncio.gather() returns the results in the same order as the input list, so we can zip the two lists
+    for transaction, event in zip(transactions, events):
+        transaction = cast(InvokeTransaction, transaction)
         from_address = f'0x{transaction.sender_address:064x}'
         event.from_address = from_address
-        tasks.append(asyncio.create_task(SetOrderEvent.from_starknet(event)))
+        order_tasks.append(asyncio.create_task(SetOrderEvent.from_starknet(event)))
 
-    for task in tasks:
-        order = await task
+    for order_task in order_tasks:
+        order = await order_task
         order_events.append(order)
     return order_events
 
