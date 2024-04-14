@@ -8,7 +8,7 @@ box Ethereum #99e6ff
 entity "Payment Registry" as PR #blue
 end box
 box "Market Maker"
-control "Order Processor" as OP
+control "Order Executor" as OP
 control "Order from Accepted Blocks Processor" as ABP
 database Database
 end box

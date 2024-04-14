@@ -85,9 +85,6 @@ And each has the following states:
 ![state_diagram.svg](images%2Fstate_diagram.svg)
 
 ### 2. Failed Orders Reprocessing
-When an order fails, the bot stores the error, and marks the order as failed. This way, the `Failed
-Orders Processor` is able to retry the failed orders. The following diagram shows the flow of a 
-failed order through the bot.
 
 ![failed_orders.svg](images%2Ffailed_orders.svg)
 
@@ -95,8 +92,5 @@ failed order through the bot.
 When the bot starts, it retrieves incomplete orders from the database and continues their processing.
 
 ### 4. Accepted Blocks Indexation
-The Main Order Indexer processes orders from pending blocks. The `Orders from
-Accepted Blocks Processor` will index the orders that belong to accepted blocks. This way, if the `Main Order
-Indexer` loses an order, it will be captured and processed by the `Orders from Accepted Blocks Processor`.
 
 ![accepted_blocks.svg](images%2Faccepted_blocks.svg)
