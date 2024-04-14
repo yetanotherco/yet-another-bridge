@@ -99,7 +99,7 @@ class SetOrderEvent:
         return high << 128 | low
 
     def __str__(self):
-        return f"Order: {self.order_id} - Origin: {self.origin_network} - From Address: {self.from_address} - "\
+        return f"Order: {self.order_id} - Origin: {self.origin_network} - From: {self.from_address} - "\
                f"Amount: {self.amount} - Fee: {self.fee} - Recipient: {self.recipient_address} - " \
                f"Is used: {self.is_used} - Block: {self.block_number}"
 
