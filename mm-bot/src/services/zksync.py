@@ -72,8 +72,7 @@ async def get_set_order_events(from_block, to_block) -> list[SetOrderEvent]:
     order_tasks = []
 
     for log in set_order_logs:
-        log_task = asyncio.create_task(get_tx(log['transactionHash']))
-        log_tasks.append(log_task)
+        log_tasks.append(asyncio.create_task(get_tx(log['transactionHash'])))
 
     transactions = await asyncio.gather(*log_tasks)
 
