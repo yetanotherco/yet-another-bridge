@@ -96,10 +96,9 @@ async def get_order_events(from_block_number, to_block_number) -> list[SetOrderE
         event.from_address = f'0x{transaction.sender_address:064x}'
         order_tasks.append(asyncio.create_task(SetOrderEvent.from_starknet(event)))
 
-    for order_task in order_tasks:
-        order = await order_task
-        order_events.append(order)
-    return order_events
+    order_events = await asyncio.gather(*order_tasks)
+
+    return cast(list[SetOrderEvent], order_events)
 
 
 @use_async_fallback(rpc_nodes, logger, "Failed to get latest block number")
