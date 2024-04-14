@@ -85,8 +85,7 @@ async def get_order_events(from_block_number, to_block_number) -> list[SetOrderE
             break
 
     for event in events:
-        event_task = asyncio.create_task(get_transaction(event.tx_hash))
-        event_tasks.append(event_task)
+        event_tasks.append(asyncio.create_task(get_transaction(event.tx_hash)))
 
     transactions = await asyncio.gather(*event_tasks)
 
