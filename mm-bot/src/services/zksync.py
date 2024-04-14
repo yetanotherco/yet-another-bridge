@@ -78,7 +78,7 @@ async def get_set_order_events(from_block, to_block) -> list[SetOrderEvent]:
 
     # asyncio.gather() returns the results in the same order as the input list, so we can zip the two lists
     # https://docs.python.org/3/library/asyncio-task.html#running-tasks-concurrently
-    for transaction, log in zip(transactions, set_order_logs):
+    for log, transaction in zip(set_order_logs, transactions):
         from_address = transaction['from']
         zksync_log = ZksyncLog(**log, from_address=from_address)
         # Create a list of tasks to parallelize the creation of the SetOrderEvent list
