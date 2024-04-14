@@ -94,8 +94,7 @@ async def get_order_events(from_block_number, to_block_number) -> list[SetOrderE
     # https://docs.python.org/3/library/asyncio-task.html#running-tasks-concurrently
     for transaction, event in zip(transactions, events):
         transaction = cast(InvokeTransaction, transaction)
-        from_address = f'0x{transaction.sender_address:064x}'
-        event.from_address = from_address
+        event.from_address = f'0x{transaction.sender_address:064x}'
         order_tasks.append(asyncio.create_task(SetOrderEvent.from_starknet(event)))
 
     for order_task in order_tasks:
