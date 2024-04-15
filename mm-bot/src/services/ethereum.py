@@ -130,7 +130,6 @@ def create_claim_payment_zksync(order_id: int, destination_address: str, amount:
         "nonce": get_nonce(rpc_node.w3, rpc_node.account.address),
         "value": value,
     })
-    print(unsent_tx)
     signed_tx = rpc_node.w3.eth.account.sign_transaction(unsent_tx, private_key=rpc_node.account.key)
     return unsent_tx, signed_tx
 
