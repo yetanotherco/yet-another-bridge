@@ -22,7 +22,15 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
         uint256 fee;
     }
 
+    struct ERC20Order {
+        address recipient_address;
+        uint256 amount;
+        uint256 fee;
+        address erc20Address;
+    }
+
     event SetOrder(uint256 order_id, address recipient_address, uint256 amount, uint256 fee);
+    event SetOrderERC20(uint256 order_id, address recipient_address, uint256 amount, uint256 fee, address erc20Address);
     
     event ClaimPayment(uint256 order_id, address claimerAddress, uint256 amount);
     event ClaimPaymentERC20(uint256 order_id, address claimerAddress, uint256 amount, address erc20Address);
@@ -31,6 +39,7 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
     //storage
     uint256 private _current_order_id; 
     mapping(uint256 => Order) private _orders;
+    mapping(uint256 => ERC20Order) private _orders_erc20;
     mapping(uint256 => bool) private _orders_pending;
     mapping(uint256 => address) private _orders_senders;
     mapping(uint256 => uint256) private _orders_timestamps;
@@ -74,6 +83,27 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
         return _current_order_id-1;
     }
 
+    //Function recieves in msg.value the total fee for MM, and in amout the total tokens he wants to bridge
+    function set_order_erc20(address recipient_address, uint256 amount, address erc20Address) public payable whenNotPaused returns (uint256) {
+        require(msg.value > 0, 'some ETH must be sent as MM fees');
+        require(amount > 0, 'some tokens must be sent to bridge');
+        
+        //the following needs allowance, which is not set yet
+        require(IERC20(erc20Address).allowance(msg.sender, address(this)) >= amount, "Insuficient Allowance");
+        IERC20(erc20Address).safeTransferFrom(msg.sender, address(this), amount); //will revert if failed
+
+        ERC20Order memory new_order = ERC20Order({recipient_address: recipient_address, amount: amount, fee: msg.value, erc20Address: erc20Address});
+        _orders_erc20[_current_order_id] = new_order;
+        _orders_pending[_current_order_id] = true;
+        _orders_senders[_current_order_id] = msg.sender;
+        _orders_timestamps[_current_order_id] = block.timestamp;
+        _current_order_id++; //this here to follow CEI pattern
+
+        emit SetOrderERC20(_current_order_id-1, recipient_address, amount, msg.value, erc20Address);
+
+        return _current_order_id-1;
+    }
+
     // l1 handler
     function claim_payment(
         uint256 order_id,
@@ -106,23 +136,17 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
         require(msg.sender == ethereum_payment_registry, 'Only PAYMENT_REGISTRY can call');
         require(_orders_pending[order_id], 'Order claimed or nonexistent');
 
-        Order memory current_order = _orders[order_id]; //TODO check if order is memory or calldata
+        ERC20Order memory current_order = _orders_erc20[order_id]; //TODO check if order is memory or calldata
         require(current_order.recipient_address == recipient_address, 'recipient_address not match L1');
         require(current_order.amount == amount, 'amount not match L1');
+        require(current_order.erc20Address == erc20Address, 'erc20Address does not match L1');
 
         _orders_pending[order_id] = false;
-        // uint256 payment_amount = current_order.amount + current_order.fee;  // TODO check overflow
 
-
-        // Implement only 1 of these two:
         //amount + fee in ETH:
-        IERC20(erc20Address).safeTransfer(mm_zksync_wallet, current_order.amount);
+        IERC20(erc20Address).safeTransfer(mm_zksync_wallet, current_order.amount); //will revert if failed
         (bool success,) = payable(address(uint160(mm_zksync_wallet))).call{value: current_order.fee}("");
-        // //amount + fee in ERC20:
-        // IERC20(erc20Address).safeTransfer(mm_zksync_wallet, current_order.amount + current_order.fee);
-
-
-        require(success, "Transfer failed.");
+        require(success, "Fee transfer failed.");
 
         emit ClaimPaymentERC20(order_id, mm_zksync_wallet, amount, erc20Address);
     }
