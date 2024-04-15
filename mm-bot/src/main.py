@@ -10,6 +10,7 @@ from models.network import Network
 from persistence.block_dao import BlockDao
 from persistence.error_dao import ErrorDao
 from persistence.order_dao import OrderDao
+from services.block_service import BlockService
 from services.executors.order_executor import OrderExecutor
 from services.fee_calculators.starknet_fee_calculator import StarknetFeeCalculator
 from services.fee_calculators.zksync_fee_calculator import ZksyncFeeCalculator
@@ -46,6 +47,10 @@ async def run():
 
     # Initialize services
     order_service = OrderService(order_dao, error_dao)
+    block_service = BlockService(block_dao)
+
+    # Insert the first block of the zkSync and Starknet networks
+    block_service.init_blocks()
 
     # Initialize concurrency primitives
     eth_lock = asyncio.Lock()
