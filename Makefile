@@ -107,9 +107,9 @@ zksync-test-integration-ci:
 	. ./contracts/ethereum/deploy.sh && \
 	. ./contracts/zksync/deploy.sh && \
 	. ./contracts/ethereum/set_zksync_escrow.sh && \
-	. ./contracts/zksync/test/set_order.sh && \
-	. ./contracts/zksync/test/transfer.sh && \
-	. ./contracts/zksync/test/claim_payment.sh && \
+	. ./.github/workflows/zksync-scripts/set_order.sh && \
+	. ./.github/workflows/zksync-scripts/transfer.sh && \
+	. ./.github/workflows/zksync-scripts/claim_payment.sh && \
 	. ./.github/workflows/zksync-scripts/assert.sh
 
 zksync-test-integration-local:
@@ -118,9 +118,9 @@ zksync-test-integration-local:
 	. ./contracts/ethereum/deploy.sh && \
 	. ./contracts/zksync/deploy.sh && \
 	. ./contracts/ethereum/set_zksync_escrow.sh && \
-	. ./contracts/zksync/test/set_order.sh && \
-	. ./contracts/zksync/test/transfer.sh && \
-	. ./contracts/zksync/test/claim_payment.sh && \
+	. ./.github/workflows/zksync-scripts/set_order.sh && \
+	. ./.github/workflows/zksync-scripts/transfer.sh && \
+	. ./.github/workflows/zksync-scripts/claim_payment.sh && \
 	. ./.github/workflows/zksync-scripts/assert.sh
 
 # zksync-upgrade: WIP
