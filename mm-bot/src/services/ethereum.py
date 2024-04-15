@@ -39,7 +39,7 @@ def get_latest_block(rpc_node=main_rpc_node) -> int:
 
 @use_fallback(rpc_nodes, logger, "Failed to get order status")
 def get_is_used_order(order_id, recipient_address, amount, chain_id, rpc_node=main_rpc_node) -> bool:
-    order_data = Web3.solidity_keccak(['uint256', 'address', 'uint256', 'uint8'],
+    order_data = Web3.solidity_keccak(['uint256', 'address', 'uint256', 'uint128'],
                                       [order_id, Web3.to_checksum_address(recipient_address), amount, chain_id])
     is_used = rpc_node.contract.functions.transfers(order_data).call()
     return is_used

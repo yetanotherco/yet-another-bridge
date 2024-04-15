@@ -22,6 +22,7 @@ from services.payment_claimer.herodotus_payment_claimer import HerodotusPaymentC
 from services.payment_claimer.payment_claimer import PaymentClaimer
 from services.processors.accepted_blocks_orders_processor import AcceptedBlocksOrdersProcessor
 from services.processors.failed_orders_processor import FailedOrdersProcessor
+from services.processors.long_range_orders_processor import LongRangeOrdersProcessor
 from services.processors.orders_processor import OrdersProcessor
 from services.senders.ethereum_sender import EthereumSender
 
@@ -30,6 +31,7 @@ logger = logging.getLogger(__name__)
 SLEEP_TIME = 5
 PROCESS_FAILED_ORDERS_MINUTES_TIMER = 5
 PROCESS_ACCEPTED_BLOCKS_MINUTES_TIMER = 5
+PROCESS_LONG_RANGE_ORDERS_MINUTES_TIMER = 5
 MAX_ETH_TRANSFER_WEI = 100000000000000000  # TODO move to env variable
 
 
@@ -82,10 +84,16 @@ async def run():
     accepted_blocks_orders_processor = AcceptedBlocksOrdersProcessor(starknet_order_indexer, starknet_order_executor,
                                                                      block_dao)
 
+    # Initialize long range orders processor for zksync
+    long_range_orders_processor = LongRangeOrdersProcessor(zksync_order_indexer, zksync_order_executor, block_dao)
+
     (schedule.every(PROCESS_FAILED_ORDERS_MINUTES_TIMER).minutes
      .do(failed_orders_processor.process_orders_job))
     (schedule.every(PROCESS_ACCEPTED_BLOCKS_MINUTES_TIMER).minutes
      .do(accepted_blocks_orders_processor.process_orders_job))
+
+    (schedule.every(PROCESS_LONG_RANGE_ORDERS_MINUTES_TIMER).minutes
+     .do(long_range_orders_processor.process_orders_job))
 
     try:
         # Get all orders that are not completed from the db
