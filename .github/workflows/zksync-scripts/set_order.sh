@@ -34,5 +34,6 @@ npx zksync-cli contract write --private-key $USER_ZKSYNC_PRIVATE_ADDRESS --rpc h
 # echo $BALANCE_USER_L2_AFTER_SETORDER
 
 # echo "\nEscrow ZKSync funds after setOrder:"
-BALANCE_ESCROW_L2_AFTER_SETORDER=$(cast balance --rpc-url http://localhost:3050 $ZKSYNC_ESCROW_CONTRACT_ADDRESS)
+# BALANCE_ESCROW_L2_AFTER_SETORDER=$(cast balance --rpc-url http://localhost:3050 $ZKSYNC_ESCROW_CONTRACT_ADDRESS)
+BALANCE_ESCROW_L2_AFTER_SETORDER_WEI=$(cast balance --rpc-url http://localhost:3050 $ZKSYNC_ESCROW_CONTRACT_ADDRESS)
 # echo $BALANCE_ESCROW_L2_AFTER_SETORDER
