@@ -7,11 +7,14 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {PausableUpgradeable} from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 // import {Ownable2StepUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
 // import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 // TODO make upgradeable
 
 contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //}, UUPSUpgradeable {
+
+    using SafeERC20 for IERC20;
 
     struct Order {
         address recipient_address;
@@ -22,6 +25,7 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
     event SetOrder(uint256 order_id, address recipient_address, uint256 amount, uint256 fee);
     
     event ClaimPayment(uint256 order_id, address claimerAddress, uint256 amount);
+    event ClaimPaymentERC20(uint256 order_id, address claimerAddress, uint256 amount, address erc20Address);
 
 
     //storage
@@ -90,6 +94,37 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
         require(success, "Transfer failed.");
 
         emit ClaimPayment(order_id, mm_zksync_wallet, amount);
+    }
+
+    // l1 handler
+    function claim_payment_ERC20(
+        uint256 order_id,
+        address recipient_address,
+        uint256 amount,
+        address erc20Address
+    ) public whenNotPaused {
+        require(msg.sender == ethereum_payment_registry, 'Only PAYMENT_REGISTRY can call');
+        require(_orders_pending[order_id], 'Order claimed or nonexistent');
+
+        Order memory current_order = _orders[order_id]; //TODO check if order is memory or calldata
+        require(current_order.recipient_address == recipient_address, 'recipient_address not match L1');
+        require(current_order.amount == amount, 'amount not match L1');
+
+        _orders_pending[order_id] = false;
+        // uint256 payment_amount = current_order.amount + current_order.fee;  // TODO check overflow
+
+
+        // Implement only 1 of these two:
+        //amount + fee in ETH:
+        IERC20(erc20Address).safeTransfer(mm_zksync_wallet, current_order.amount);
+        (bool success,) = payable(address(uint160(mm_zksync_wallet))).call{value: current_order.fee}("");
+        // //amount + fee in ERC20:
+        // IERC20(erc20Address).safeTransfer(mm_zksync_wallet, current_order.amount + current_order.fee);
+
+
+        require(success, "Transfer failed.");
+
+        emit ClaimPaymentERC20(order_id, mm_zksync_wallet, amount, erc20Address);
     }
 
     // l1 handler
