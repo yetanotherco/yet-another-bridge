@@ -34,8 +34,6 @@ CREATE TABLE IF NOT EXISTS block
     created_at   TIMESTAMP NOT NULL DEFAULT clock_timestamp()
 );
 
-INSERT INTO block (latest_block) VALUES (0) ON CONFLICT DO NOTHING;
-
 CREATE TABLE IF NOT EXISTS error
 (
     id         SERIAL PRIMARY KEY,
