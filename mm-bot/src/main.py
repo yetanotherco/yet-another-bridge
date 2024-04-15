@@ -84,13 +84,13 @@ async def run():
     accepted_blocks_orders_processor = AcceptedBlocksOrdersProcessor(starknet_order_indexer, starknet_order_executor,
                                                                      block_dao)
 
+    # Initialize long range orders processor for zksync
+    long_range_orders_processor = LongRangeOrdersProcessor(zksync_order_indexer, zksync_order_executor, block_dao)
+
     (schedule.every(PROCESS_FAILED_ORDERS_MINUTES_TIMER).minutes
      .do(failed_orders_processor.process_orders_job))
     (schedule.every(PROCESS_ACCEPTED_BLOCKS_MINUTES_TIMER).minutes
      .do(accepted_blocks_orders_processor.process_orders_job))
-
-    # Initialize long range orders processor for ZkSync
-    long_range_orders_processor = LongRangeOrdersProcessor(zksync_order_indexer, zksync_order_executor, block_dao)
 
     (schedule.every(PROCESS_LONG_RANGE_ORDERS_MINUTES_TIMER).minutes
      .do(long_range_orders_processor.process_orders_job))
