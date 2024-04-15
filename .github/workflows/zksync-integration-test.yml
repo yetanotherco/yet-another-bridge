@@ -80,6 +80,8 @@ jobs:
           export ZKSYNC_CLAIM_PAYMENT_BATCH_SELECTOR=${{vars.ZKSYNC_CLAIM_PAYMENT_BATCH_SELECTOR}}
           export STARKNET_CHAIN_ID=${{vars.STARKNET_CHAIN_ID}}
           export ZKSYNC_CHAIN_ID=${{vars.ZKSYNC_CHAIN_ID}}
+          
+          export MM_ETHEREUM_WALLET_ADDRESS=${{vars.MM_ETHEREUM_WALLET_ADDRESS}}
           export TEST=true
 
           echo sleeping 250 to wait for ./start to setup
