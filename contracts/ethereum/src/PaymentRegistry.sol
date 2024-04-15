@@ -14,6 +14,8 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     using SafeERC20 for IERC20;
 
     event Transfer(uint256 indexed orderId, address srcAddress, address destAddress, uint256 amount, uint128 chainId);
+    event TransferERC20(uint256 indexed orderId, address srcAddress, address destAddress, uint256 amount, uint128 chainId, address erc20Address);
+
     event ClaimPayment(uint256 indexed orderId, address destAddress, uint256 amount, uint128 chainId);
     event ClaimPaymentBatch(uint256[] orderIds, address[] destAddresses, uint256[] amounts, uint128 chainId);
 
@@ -96,6 +98,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         // // If paid in ETH:
         // // It is easy for MM to calculate how much fee is desirable for him to bridge the tokens
         // // But An extra tx is needed containing this gas.
+        // // // actually the same tx could contain the mm fee in --value
         // // it is more expensive
 
         // // If paid in ERC20:
@@ -126,7 +129,15 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         // // This unlimited allowance should be set in a separate function. MM will allow to brdige x or y ERC20.
         // // // we could even find new uses for this allowance. PaymentRegistry could be more intertwined with MM. Maybe automatically doing transfers in its name.
         
-        IERC20(erc20Address).safeTransferFrom(msg.sender, destAddress, amount); //this needs allowance
+        require(amount > 0, "Invalid amount, should be higher than 0.");
+
+        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, chainId, erc20Address)); //added erc20Address
+
+        require(transfers[index] == false, "Transfer already processed.");
+        transfers[index] = true; //now this transfer is in progress
+
+        IERC20(erc20Address).safeTransferFrom(msg.sender, destAddress, amount); //this needs allowance, this reverts if failed
+        emit TransferERC20(orderId, msg.sender, destAddress, amount, chainId, erc20Address);
     }
 
     function claimPaymentStarknet(uint256 orderId, address destAddress, uint256 amount) external payable onlyOwnerOrMM {
