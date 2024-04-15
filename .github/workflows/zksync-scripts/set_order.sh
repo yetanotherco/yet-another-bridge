@@ -16,24 +16,18 @@ echo $ZKSYNC_ESCROW_CONTRACT_ADDRESS
 printf "${GREEN}\n=> [SN] Making Set Order on Escrow${COLOR_RESET}\n"
 echo "$ZKSYNC_ESCROW_CONTRACT_ADDRESS\n"
 
-# echo "\nUser ZKSync funds before setOrder:"
-# BALANCE_USER_L2_BEFORE_SETORDER=$(cast balance --rpc-url http://localhost:3050 $USER_ZKSYNC_PUBLIC_ADDRESS)
-# echo $BALANCE_USER_L2_BEFORE_SETORDER
+BALANCE_USER_L2_BEFORE_SETORDER=$(cast balance --rpc-url http://localhost:3050 $USER_ZKSYNC_PUBLIC_ADDRESS)
+echo "\nInitial User funds: $BALANCE_USER_L2_BEFORE_SETORDER"
 
-# echo "\nEscrow ZKSync funds before setOrder:"
-# BALANCE_ESCROW_L2_BEFORE_SETORDER=$(cast balance --rpc-url http://localhost:3050 $ZKSYNC_ESCROW_CONTRACT_ADDRESS)
-# echo $BALANCE_ESCROW_L2_BEFORE_SETORDER
+BALANCE_ESCROW_L2_BEFORE_SETORDER=$(cast balance --rpc-url http://localhost:3050 $ZKSYNC_ESCROW_CONTRACT_ADDRESS)
+echo "\nInitial Escrow funds: $BALANCE_ESCROW_L2_BEFORE_SETORDER"
 
-
-# echo "\nExecuting Set Order"
 npx zksync-cli contract write --private-key $USER_ZKSYNC_PRIVATE_ADDRESS --rpc http://localhost:3050 --contract "$ZKSYNC_ESCROW_CONTRACT_ADDRESS" --method "set_order(address recipient_address, uint256 fee)" --args "$USER_ETHEREUM_PUBLIC_ADDRESS" "$FEE" --value "$VALUE" >> /dev/null
 
+BALANCE_USER_L2_AFTER_SETORDER=$(cast balance --rpc-url http://localhost:3050 $USER_ZKSYNC_PUBLIC_ADDRESS)
+echo "\nFinal User funds: $BALANCE_USER_L2_AFTER_SETORDER"
 
-# echo "\nUser ZKSync funds after setOrder:"
-# BALANCE_USER_L2_AFTER_SETORDER=$(cast balance --rpc-url http://localhost:3050 $USER_ZKSYNC_PUBLIC_ADDRESS)
-# echo $BALANCE_USER_L2_AFTER_SETORDER
 
-# echo "\nEscrow ZKSync funds after setOrder:"
-# BALANCE_ESCROW_L2_AFTER_SETORDER=$(cast balance --rpc-url http://localhost:3050 $ZKSYNC_ESCROW_CONTRACT_ADDRESS)
-BALANCE_ESCROW_L2_AFTER_SETORDER_WEI=$(cast balance --rpc-url http://localhost:3050 $ZKSYNC_ESCROW_CONTRACT_ADDRESS)
-# echo $BALANCE_ESCROW_L2_AFTER_SETORDER
+BALANCE_ESCROW_L2_AFTER_SETORDER_WEI=$(cast balance --rpc-url http://localhost:3050 $ZKSYNC_ESCROW_CONTRACT_ADDRESS) #for assert.sh
+BALANCE_ESCROW_L2_AFTER_SETORDER=$(cast balance --rpc-url http://localhost:3050 $ZKSYNC_ESCROW_CONTRACT_ADDRESS) #for logging
+echo "\nFinal Escrow funds:$BALANCE_ESCROW_L2_AFTER_SETORDER"
