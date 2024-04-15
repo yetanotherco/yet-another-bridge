@@ -12,6 +12,7 @@ EXCLUDE = "exclude"
 @dataclass
 class MmEvent(Event):
     tx_hash: str
+    from_address: str
     block_number: int
 
 

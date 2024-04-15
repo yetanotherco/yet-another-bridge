@@ -7,9 +7,12 @@ from typing import cast
 from web3 import AsyncWeb3
 from web3.eth.async_eth import AsyncContract
 from web3.types import EventData
+from hexbytes import HexBytes
+
 
 from config import constants
 from models.set_order_event import SetOrderEvent
+from models.zksync_log import ZksyncLog
 from services.decorators.use_fallback import use_async_fallback
 
 # Just for keep consistency with the ethereum and starknet
@@ -65,7 +68,26 @@ async def get_set_order_events(from_block, to_block) -> list[SetOrderEvent]:
     Get set_orders events from the escrow
     """
     set_order_logs: list[EventData] = await get_set_order_logs(from_block, to_block)
-    # Create a list of tasks to parallelize the creation of the SetOrderEvent list
-    tasks = [asyncio.create_task(SetOrderEvent.from_zksync(log)) for log in set_order_logs]
-    set_order_events = await asyncio.gather(*tasks)
+    log_tasks = []
+    order_tasks = []
+
+    for log in set_order_logs:
+        log_tasks.append(asyncio.create_task(get_tx(log['transactionHash'])))
+
+    transactions = await asyncio.gather(*log_tasks)
+
+    # asyncio.gather() returns the results in the same order as the input list, so we can zip the two lists
+    # https://docs.python.org/3/library/asyncio-task.html#running-tasks-concurrently
+    for log, transaction in zip(set_order_logs, transactions):
+        from_address = transaction['from']
+        zksync_log = ZksyncLog(**log, from_address=from_address)
+        # Create a list of tasks to parallelize the creation of the SetOrderEvent list
+        order_tasks.append(asyncio.create_task(SetOrderEvent.from_zksync(zksync_log)))
+
+    set_order_events = await asyncio.gather(*order_tasks)
     return cast(list[SetOrderEvent], set_order_events)
+
+
+@use_async_fallback(rpc_nodes, logger, "Failed to get the tx")
+async def get_tx(tx_hash: HexBytes, rpc_node=main_rpc_node):
+    return await rpc_node.w3.eth.get_transaction(tx_hash)
