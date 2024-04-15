@@ -1,6 +1,4 @@
 #!/bin/bash
-# cast call 0x97589bcE7727f5D0C8082440681DB6092b6Dda1a "getNames()(string)" --rpc-url http://localhost:8545
-# exit
 
 . contracts/utils/colors.sh #for ANSI colors
 
