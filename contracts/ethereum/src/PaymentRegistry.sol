@@ -17,6 +17,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     event TransferERC20(uint256 indexed orderId, address srcAddress, address destAddress, uint256 amount, uint128 chainId, address erc20Address);
 
     event ClaimPayment(uint256 indexed orderId, address destAddress, uint256 amount, uint128 chainId);
+    event ClaimPaymentERC20(uint256 indexed orderId, address destAddress, uint256 amount, uint128 chainId, address erc20Address);
     event ClaimPaymentBatch(uint256[] orderIds, address[] destAddresses, uint256[] amounts, uint128 chainId);
 
     event ModifiedZKSyncEscrowAddress(address newEscrowAddress);
@@ -226,6 +227,34 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         emit ClaimPayment(orderId, destAddress, amount, ZKSyncChainId); //2100 gas
     }
 
+    function claimPaymentZKSyncERC20(
+        uint256 orderId, address destAddress, uint256 amount,
+        uint256 gasLimit,
+        uint256 gasPerPubdataByteLimit, address erc20Address
+    ) external payable onlyOwnerOrMM {
+        _verifyTransferExistsZKSyncERC20(orderId, destAddress, amount, erc20Address);
+
+        bytes memory messageToL2 = abi.encodeWithSelector(
+            ZKSyncEscrowClaimPaymentSelector,
+            orderId,
+            destAddress,
+            amount,
+            erc20Address
+        );
+
+        _ZKSyncDiamondProxy.requestL2Transaction{value: msg.value}(
+            ZKSyncEscrowAddress, //L2 contract called
+            0, //msg.value
+            messageToL2, //msg.calldata
+            gasLimit, 
+            gasPerPubdataByteLimit, 
+            new bytes[](0), //factory dependencies
+            msg.sender //refund recipient
+        );
+
+        emit ClaimPaymentERC20(orderId, destAddress, amount, ZKSyncChainId, erc20Address);
+    }
+
     function claimPaymentBatchZKSync(
         uint256[] calldata orderIds,
         address[] calldata destAddresses, 
@@ -258,6 +287,11 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         );
 
         emit ClaimPaymentBatch(orderIds, destAddresses, amounts, ZKSyncChainId);
+    }
+
+    function _verifyTransferExistsZKSyncERC20(uint256 orderId, address destAddress, uint256 amount, address erc20Address) internal view {
+        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, ZKSyncChainId, erc20Address));
+        require(transfers[index] == true, "Transfer not found."); //if this is claimed twice, Escrow will know
     }
 
     function _verifyTransferExistsZKSync(uint256 orderId, address destAddress, uint256 amount) internal view {
