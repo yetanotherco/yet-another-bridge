@@ -2,7 +2,7 @@
 
 . contracts/utils/colors.sh #for ANSI colors
 
-echo "Asserting values"
+echo "\n"
 FAILED=false
 
 assert() {
