@@ -1,7 +1,7 @@
 @startuml
 hide footbox
 actor User as U
-box L1 #ebc7ff
+box L2 #ebc7ff
 entity Escrow as E #purple
 end box
 box Ethereum #99e6ff

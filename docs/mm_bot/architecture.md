@@ -40,37 +40,37 @@ The bot architecture is as follows:
 
 ![architecture.png](images/architecture.png)
 
-For processing the orders from a specific L2 is needed an `Orders Processor` for each L2.
+An `Orders Processor`  is needed to process the orders for each L2.
 Each `Orders Processor` has an `Orders Indexer` and an `Order Executor`.
 
-The `Orders Indexer` is responsible for indexing the orders from the L2 Escrow. It indexes orders reading the events, 
+The `Orders Indexer` is responsible for indexing the orders from the L2 Escrow. It indexes orders by reading Escrow's events, 
 and when it finds a new order, it stores it in the database. Then, `Orders Processor` is able to assign the new order 
 to an `Order Executor`.
 
-The `Order Executor` is responsible for processing and individual order. It means, it will transfer the funds to the 
-recipient in L1 and claim the funds in the L2.
+The `Order Executor` is responsible for processing an individual order. It means, it will transfer the funds to the 
+recipient in L1 and claim the funds in L2.
 
 To ensure that the orders are not lost, the bot has an `Accepted Blocks Processor` that indexes the orders that belong
-to accepted blocks and stores them in the database. This way, if the `Orders Processor` loses an order, it will be
+to already accepted blocks, and stores them in the database. This way, if the `Orders Processor` loses an order, it will be
 captured and processed by the `Accepted Blocks Processor`.
 
 The bot has a `Failed Orders Processor` that is responsible for retrying the failed orders. When an order fails, the bot
 stores the error, and marks the order as failed. This way, the `Failed Orders Processor` is able to retry the failed orders.
 
-An important aspect of the bot is that it must be able to process multiple orders at the same time.
+An important aspect of this bot is that it must be able to process multiple orders at the same time.
 For that reason, the bot uses the library 'asyncio' to handle orders concurrently. This approach, 
 preferred over using threads, is particularly suitable for the bot's I/O-bound nature and the potential 
 high volume of orders it could potentially need to manage.
 
 Another important requirement is that the bot must have a reliable network connection to communicate
-with Ethereum's and L2 networks' RPCs. So, the bot has two RPC provider for each network. If the primary
+with Ethereum's and L2 networks' RPCs. So, the bot has two RPC providers for each network. If the primary
 provider fails, the bot will switch to the secondary provider.
 
 ## Physical View
-There is a server to run the MM Bot Main Process.
+A server is needed to run the MM Bot's Main Process.
 
-There are two servers for the database, one for the main database and another for a read replica.
-The read replica is for external applications like explorers, so they don't affect the main database performance.
+Also, two servers are needed for the database, one for the main database and another one to act as its read replica.
+This read replica is for external applications, like explorers, so that these don't affect the main database's performance and/or implicate any security concerns.
 
 ![physical_view.png](images/physical_view.png)
 
