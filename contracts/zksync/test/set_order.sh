@@ -9,7 +9,6 @@ VALUE=2 #in ETH
 VALUE_WEI=$(echo "scale=0; $VALUE * 10^18" | bc)
 BRIDGE_AMOUNT_WEI=$(echo "scale=0; $VALUE_WEI - $FEE" | bc)
 BRIDGE_AMOUNT_ETH=$(echo "scale=18; $BRIDGE_AMOUNT_WEI / 10^18" | bc)
-# BRIDGE_AMOUNT_WEI=$(printf "%.0f" "$BRIDGE_AMOUNT_WEI")
 
 echo USER_ZKSYNC_PUBLIC_ADDRESS
 echo $USER_ZKSYNC_PUBLIC_ADDRESS

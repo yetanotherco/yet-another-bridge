@@ -20,8 +20,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-
-
       # Run Dockerized L1-L2, goes first because it takes a lot of time
       - name: Setup Dockerized L1-L2
         run: |
@@ -87,5 +85,3 @@ jobs:
           make zksync-test-integration-ci
           
           exit 0
-
-          
