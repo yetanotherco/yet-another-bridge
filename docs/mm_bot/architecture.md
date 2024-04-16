@@ -47,7 +47,7 @@ The `Orders Indexer` is responsible for indexing the orders from the L2 Escrow. 
 and when it finds a new order, it stores it in the database. Then, `Orders Processor` is able to assign the new order 
 to an `Order Executor`.
 
-The `Order Executor` is responsible for processing an individual order. It means, it will transfer the funds to the 
+The `Order Executor` is responsible for processing an individual order. This means, it will transfer the funds to the 
 recipient in L1 and claim the funds in L2.
 
 To ensure that the orders are not lost, the bot has an `Accepted Blocks Processor` that indexes the orders that belong
@@ -63,8 +63,8 @@ preferred over using threads, is particularly suitable for the bot's I/O-bound n
 high volume of orders it could potentially need to manage.
 
 Another important requirement is that the bot must have a reliable network connection to communicate
-with Ethereum's and L2 networks' RPCs. So, the bot has two RPC providers for each network. If the primary
-provider fails, the bot will switch to the secondary provider.
+with Ethereum's and the L2 networks' RPCs. Accordingly, the bot has two RPC providers for each network. If the 
+primary provider fails, the bot will switch to the secondary provider.
 
 ## Physical View
 A server is needed to run the MM Bot's Main Process.
