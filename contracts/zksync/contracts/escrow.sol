@@ -61,9 +61,8 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
 
     // FUNCTIONS :
 
+    //I think this is not OK. here, the caller of safeIncreaseAllowance isPaymentRegistry
     function increase_erc20_allowance(address l2_erc20_address, uint256 amount) public whenNotPaused {
-        //this is wrongggggg, i think there is no way of increasing allowance like this
-        // F
         IERC20(l2_erc20_address).safeIncreaseAllowance(msg.sender, amount); //do allow max amount? same price to execute and saves a posterior need of execution
     }
 
@@ -106,7 +105,7 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
 
         _orders_pending[order_id] = false;
 
-        //amount + fee in ETH:
+        //transfer amount + fee in ETH:
         IERC20(current_order.l2_erc20_address).safeTransfer(mm_zksync_wallet, amount); //will revert if failed
         (bool success,) = payable(address(uint160(mm_zksync_wallet))).call{value: current_order.fee}("");
         require(success, "Fee transfer failed.");

@@ -79,6 +79,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         marketMaker = marketMaker_;
     }
 
+    //I think this is not OK. here, the caller of safeIncreaseAllowance isPaymentRegistry
     function registerMMerc20Allowance(address erc20) external onlyOwnerOrMM() {
         IERC20(erc20).safeIncreaseAllowance(address(this), type(uint256).max);
     }
@@ -88,7 +89,6 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         // // If paid in ETH:
         // // It is easy for MM to calculate how much fee is desirable for him to bridge the tokens
         // // But An extra tx is needed containing this gas.
-        // // // actually the same tx could contain the mm fee in --value
         // // it is more expensive
 
         // // If paid in ERC20:
@@ -97,31 +97,18 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         // // No extra tx is needed to pay this gas fee, MM will simply transfer less ERC20 tokens than what he recieved.
         // // It is cheaper
 
-
-        // Transfer process:
-        // analyzed alternative:
-        // transfer from MM to PaymentRegistry
-        // transfer from PaymentRegistry to User
-        // // This solution makes 2 ERC20 transfers, very expensive and unnecessary
-        // IERC20(erc20Address).safeTransferFrom(msg.sender, PaymentRegistry, amount); //this needs allowance
-        // IERC20(erc20Address).safeTransfer(destAddress, amount); //from this contract. should recieve the erc20 tokens first. Calling a TransferFrom(MM, to YAB)
-
-        // Better alternative:
-        // directly transfer from MM to User
-        // // This solution seems appropriate. TransferFrom was built for exactly this.
-
-        // before transferFrom I should check funds + allowance? or safeTransfer checks this?
-        // // Funds:
-        // // We shouldnt check for funds: MM shouldn't call Transfer if he doesnt have enough ERC20 tokens for the bridge.
-
         // // Allowance:
-        // // We have only 1 MM, we should allow PaymentRegistry to send all MM tokens. Set PaymentRegistry allowance of MM to unlimited.
         // // This unlimited allowance should be set in a separate function. MM will allow to brdige x or y ERC20.
         // // // we could even find new uses for this allowance. PaymentRegistry could be more intertwined with MM. Maybe automatically doing transfers in its name.
         
         require(amount > 0, "Invalid amount, should be higher than 0.");
-        require(IERC20(l1_erc20_address).balanceOf(msg.sender) >= amount, "MM has insufficient balance");
-        require(IERC20(l1_erc20_address).allowance(msg.sender, address(this)) >= amount, "PaymentRegistry has insufficient allowance");
+
+        // these 2 checks are made and reverted accordingly by SafeTransfer
+        // but if made now, if reverted, user doesnt spend the gas of calculating keccak
+        // I think appropriate users should not pay for shitty users's mustakes
+        // require(IERC20(l1_erc20_address).balanceOf(msg.sender) >= amount, "MM has insufficient balance");
+        // require(IERC20(l1_erc20_address).allowance(msg.sender, address(this)) >= amount, "PaymentRegistry has insufficient allowance");
+        //TODO check if there is a way to increment allowance directly from here, i think there is not.
 
         bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, chainId, l1_erc20_address)); //added erc20Address
 
