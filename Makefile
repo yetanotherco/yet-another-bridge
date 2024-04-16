@@ -42,6 +42,9 @@ ethereum-upgrade: ethereum-build
 ethereum-set-escrow:
 	@. ./contracts/ethereum/.env && . ./contracts/ethereum/set_starknet_escrow.sh
 
+ethereum-deploy-erc20: ethereum-build
+	@. ./contracts/ethereum/.env && . ./contracts/ethereum/deploy_erc20.sh
+
 
 ### STARKNET ###
 
@@ -112,6 +115,10 @@ zksync-test-integration:
 	. ./contracts/zksync/test/set_order.sh && \
 	. ./contracts/zksync/test/transfer.sh && \
 	. ./contracts/zksync/test/claim_payment.sh
+
+zksync-deploy-erc20:
+	@make zksync-build && \
+	. ./contracts/zksync/deploy_erc20.sh
 
 # zksync-upgrade: WIP
 
