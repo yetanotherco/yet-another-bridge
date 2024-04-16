@@ -7,7 +7,7 @@ import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Ini
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {IZkSync} from "@matterlabs/interfaces/IZkSync.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-
+ 
 
 contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
@@ -26,6 +26,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     event ModifiedStarknetClaimPaymentBatchSelector(uint256 newEscrowClaimPaymentBatchSelector);
     event ModifiedZKSyncClaimPaymentSelector(bytes4 newZKSyncEscrowClaimPaymentSelector);
     event ModifiedZKSyncClaimPaymentBatchSelector(bytes4 newZKSyncEscrowClaimPaymentBatchSelector);
+    event ModifiedZKSyncClaimPaymentERC20Selector(bytes4 newZKSyncEscrowClaimPaymentERC20Selector);
 
     mapping(bytes32 => bool) public transfers;
     address public marketMaker;
@@ -35,6 +36,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     uint256 public StarknetEscrowClaimPaymentBatchSelector;
     bytes4 public ZKSyncEscrowClaimPaymentSelector;
     bytes4 public ZKSyncEscrowClaimPaymentBatchSelector;
+    bytes4 public ZKSyncEscrowClaimPaymentERC20Selector;
 
     IZkSync private _ZKSyncDiamondProxy;
     IStarknetMessaging private _snMessaging;
@@ -56,6 +58,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         address ZKSyncDiamondProxyAddress,
         bytes4 ZKSyncEscrowClaimPaymentSelector_,
         bytes4 ZKSyncEscrowClaimPaymentBatchSelector_,
+        bytes4 ZKSyncEscrowClaimPaymentERC20Selector_,
         uint128 StarknetChainId_,
         uint128 ZKSyncChainId_) public initializer { 
         __Ownable_init(msg.sender);
@@ -68,6 +71,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         StarknetEscrowClaimPaymentBatchSelector = StarknetEscrowClaimPaymentBatchSelector_;
         ZKSyncEscrowClaimPaymentSelector = ZKSyncEscrowClaimPaymentSelector_;
         ZKSyncEscrowClaimPaymentBatchSelector = ZKSyncEscrowClaimPaymentBatchSelector_;
+        ZKSyncEscrowClaimPaymentERC20Selector = ZKSyncEscrowClaimPaymentERC20Selector_;
 
         StarknetChainId = StarknetChainId_;
         ZKSyncChainId = ZKSyncChainId_;
@@ -75,26 +79,11 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         marketMaker = marketMaker_;
     }
 
-    //TODO: change orderID to uint32
-    function transfer(uint256 orderId, address destAddress, uint128 chainId) external payable onlyOwnerOrMM {
-        require(msg.value > 0, "Invalid amount, should be higher than 0.");
-
-        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, msg.value, chainId));
-
-        require(transfers[index] == false, "Transfer already processed.");
-        transfers[index] = true; //now this transfer is in progress
-
-        (bool success,) = payable(destAddress).call{value: msg.value}(""); //34000 gas
-
-        require(success, "Transfer failed.");
-        emit Transfer(orderId, msg.sender, destAddress, msg.value, chainId); //2400 gas
-    }
-
     function registerMMerc20Allowance(address erc20) external onlyOwnerOrMM() {
-        IERC20(erc20).safeIncreaseAllowance(PaymentRegistry, type(uint256).max);
+        IERC20(erc20).safeIncreaseAllowance(address(this), type(uint256).max);
     }
 
-    function transferERC20(uint256 orderId, address destAddress, uint128 chainId, address erc20Address, uint256 amount) external onlyOwnerOrMM {
+    function transferERC20(uint256 orderId, address destAddress, uint128 chainId, address l1_erc20_address, uint256 amount) external onlyOwnerOrMM {
         // Decide if MM fees are paid in ERC20 or in ETH.
         // // If paid in ETH:
         // // It is easy for MM to calculate how much fee is desirable for him to bridge the tokens
@@ -131,14 +120,62 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         // // // we could even find new uses for this allowance. PaymentRegistry could be more intertwined with MM. Maybe automatically doing transfers in its name.
         
         require(amount > 0, "Invalid amount, should be higher than 0.");
+        require(IERC20(l1_erc20_address).balanceOf(msg.sender) >= amount, "MM has insufficient balance");
+        require(IERC20(l1_erc20_address).allowance(msg.sender, address(this)) >= amount, "PaymentRegistry has insufficient allowance");
 
-        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, chainId, erc20Address)); //added erc20Address
+        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, chainId, l1_erc20_address)); //added erc20Address
 
         require(transfers[index] == false, "Transfer already processed.");
         transfers[index] = true; //now this transfer is in progress
 
-        IERC20(erc20Address).safeTransferFrom(msg.sender, destAddress, amount); //this needs allowance, this reverts if failed
-        emit TransferERC20(orderId, msg.sender, destAddress, amount, chainId, erc20Address);
+        IERC20(l1_erc20_address).safeTransferFrom(msg.sender, destAddress, amount); //this reverts if failed
+        emit TransferERC20(orderId, msg.sender, destAddress, amount, chainId, l1_erc20_address);
+    }
+
+    function claimPaymentZKSyncERC20(
+        uint256 orderId,
+        address destAddress,
+        uint256 amount,
+        uint256 gasLimit,
+        uint256 gasPerPubdataByteLimit,
+        address l1_erc20_address
+    ) external payable onlyOwnerOrMM {
+        _verifyTransferExistsZKSyncERC20(orderId, destAddress, amount, l1_erc20_address);
+
+        bytes memory messageToL2 = abi.encodeWithSelector(
+            ZKSyncEscrowClaimPaymentERC20Selector,
+            orderId,
+            destAddress,    
+            amount,
+            l1_erc20_address
+        );
+
+        _ZKSyncDiamondProxy.requestL2Transaction{value: msg.value}(
+            ZKSyncEscrowAddress, //L2 contract called
+            0, //msg.value
+            messageToL2, //msg.calldata
+            gasLimit, 
+            gasPerPubdataByteLimit, 
+            new bytes[](0), //factory dependencies
+            msg.sender //refund recipient
+        );
+
+        emit ClaimPaymentERC20(orderId, destAddress, amount, ZKSyncChainId, l1_erc20_address);
+    }
+
+    //TODO: change orderID to uint32
+    function transfer(uint256 orderId, address destAddress, uint128 chainId) external payable onlyOwnerOrMM {
+        require(msg.value > 0, "Invalid amount, should be higher than 0.");
+
+        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, msg.value, chainId));
+
+        require(transfers[index] == false, "Transfer already processed.");
+        transfers[index] = true; //now this transfer is in progress
+
+        (bool success,) = payable(destAddress).call{value: msg.value}(""); //34000 gas
+
+        require(success, "Transfer failed.");
+        emit Transfer(orderId, msg.sender, destAddress, msg.value, chainId); //2400 gas
     }
 
     function claimPaymentStarknet(uint256 orderId, address destAddress, uint256 amount) external payable onlyOwnerOrMM {
@@ -227,34 +264,6 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         emit ClaimPayment(orderId, destAddress, amount, ZKSyncChainId); //2100 gas
     }
 
-    function claimPaymentZKSyncERC20(
-        uint256 orderId, address destAddress, uint256 amount,
-        uint256 gasLimit,
-        uint256 gasPerPubdataByteLimit, address erc20Address
-    ) external payable onlyOwnerOrMM {
-        _verifyTransferExistsZKSyncERC20(orderId, destAddress, amount, erc20Address);
-
-        bytes memory messageToL2 = abi.encodeWithSelector(
-            ZKSyncEscrowClaimPaymentSelector,
-            orderId,
-            destAddress,
-            amount,
-            erc20Address
-        );
-
-        _ZKSyncDiamondProxy.requestL2Transaction{value: msg.value}(
-            ZKSyncEscrowAddress, //L2 contract called
-            0, //msg.value
-            messageToL2, //msg.calldata
-            gasLimit, 
-            gasPerPubdataByteLimit, 
-            new bytes[](0), //factory dependencies
-            msg.sender //refund recipient
-        );
-
-        emit ClaimPaymentERC20(orderId, destAddress, amount, ZKSyncChainId, erc20Address);
-    }
-
     function claimPaymentBatchZKSync(
         uint256[] calldata orderIds,
         address[] calldata destAddresses, 
@@ -289,8 +298,8 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         emit ClaimPaymentBatch(orderIds, destAddresses, amounts, ZKSyncChainId);
     }
 
-    function _verifyTransferExistsZKSyncERC20(uint256 orderId, address destAddress, uint256 amount, address erc20Address) internal view {
-        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, ZKSyncChainId, erc20Address));
+    function _verifyTransferExistsZKSyncERC20(uint256 orderId, address destAddress, uint256 amount, address l1_erc20_address) internal view {
+        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, ZKSyncChainId, l1_erc20_address));
         require(transfers[index] == true, "Transfer not found."); //if this is claimed twice, Escrow will know
     }
 
@@ -327,6 +336,12 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     function setZKSyncEscrowClaimPaymentBatchSelector(bytes4 NewZKSyncEscrowClaimPaymentBatchSelector) external onlyOwner {
         ZKSyncEscrowClaimPaymentBatchSelector = NewZKSyncEscrowClaimPaymentBatchSelector;
         emit ModifiedZKSyncClaimPaymentBatchSelector(ZKSyncEscrowClaimPaymentBatchSelector);
+    }
+
+    function setZKSyncEscrowClaimPaymentERC20Selector(bytes4 NewZKSyncEscrowClaimPaymentERC20Selector) external onlyOwner {
+        ZKSyncEscrowClaimPaymentERC20Selector = NewZKSyncEscrowClaimPaymentERC20Selector;
+        emit ModifiedZKSyncClaimPaymentERC20Selector(ZKSyncEscrowClaimPaymentERC20Selector);
+
     }
 
     
