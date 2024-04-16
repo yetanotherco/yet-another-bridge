@@ -82,7 +82,7 @@ async def estimate_message_fee(gas_price, l2_gas_limit, rpc_node=main_rpc_node):
     return await asyncio.to_thread(rpc_node.wallet.get_base_cost, gas_price=gas_price, l2_gas_limit=l2_gas_limit)
 
 
-@use_async_fallback(rpc_nodes, logger, "Failed to estimate message fee")
+@use_async_fallback(rpc_nodes, logger, "Failed to estimate gas limit")
 async def estimate_gas_limit(recipient, rpc_node=main_rpc_node):
     meta = EIP712Meta(gas_per_pub_data=DEPOSIT_GAS_PER_PUBDATA_LIMIT)
     return await asyncio.to_thread(rpc_node.zksync.zks_estimate_gas_l1_to_l2, transaction={
