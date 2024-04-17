@@ -117,6 +117,10 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
         return _orders[order_id];
     }
 
+    function get_order_erc20(uint256 order_id) public view returns (OrderERC20 memory) {
+        return _orders_erc20[order_id];
+    }
+
     //Function recieves in msg.value the total value, and in fee the user specifies what portion of that msg.value is fee for MM
     function set_order(address recipient_address, uint256 fee) public payable whenNotPaused returns (uint256) {
         require(msg.value > 0, 'some ETH must be sent');
