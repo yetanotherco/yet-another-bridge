@@ -34,7 +34,7 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
     event SetOrderERC20(uint256 order_id, address recipient_address, uint256 amount, uint256 fee, address l1_erc20_address, address l2_erc20_address);
     
     event ClaimPayment(uint256 order_id, address claimer_address, uint256 amount);
-    event ClaimPaymentERC20(uint256 order_id, address claimer_address, uint256 amount, address l2_erc20_address);
+    event ClaimPaymentERC20(uint256 order_id, address claimer_address, uint256 amount, uint256 fee, address l2_erc20_address);
 
 
     //storage
@@ -110,7 +110,7 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
         (bool success,) = payable(address(uint160(mm_zksync_wallet))).call{value: current_order.fee}("");
         require(success, "Fee transfer failed.");
 
-        emit ClaimPaymentERC20(order_id, mm_zksync_wallet, amount, current_order.l2_erc20_address);
+        emit ClaimPaymentERC20(order_id, mm_zksync_wallet, amount, current_order.fee, current_order.l2_erc20_address);
     }
 
     function get_order(uint256 order_id) public view returns (Order memory) {
