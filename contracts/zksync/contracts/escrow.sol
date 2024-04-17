@@ -22,7 +22,7 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
         uint256 fee;
     }
 
-    struct ERC20Order {
+    struct OrderERC20 {
         address recipient_address;
         uint256 amount;
         uint256 fee;
@@ -34,13 +34,13 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
     event SetOrderERC20(uint256 order_id, address recipient_address, uint256 amount, uint256 fee, address l1_erc20_address, address l2_erc20_address);
     
     event ClaimPayment(uint256 order_id, address claimer_address, uint256 amount);
-    event ClaimPaymentERC20(uint256 order_id, address claimer_address, uint256 amount, address l1_erc20_address);
+    event ClaimPaymentERC20(uint256 order_id, address claimer_address, uint256 amount, address l2_erc20_address);
 
 
     //storage
     uint256 private _current_order_id; 
     mapping(uint256 => Order) private _orders;
-    mapping(uint256 => ERC20Order) private _orders_erc20;
+    mapping(uint256 => OrderERC20) private _orders_erc20;
     mapping(uint256 => bool) private _orders_pending;
     mapping(uint256 => address) private _orders_senders;
     mapping(uint256 => uint256) private _orders_timestamps;
@@ -76,7 +76,7 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
         require(IERC20(l2_erc20_address).allowance(msg.sender, address(this)) >= amount, "Escrow has insuficient allowance");
         IERC20(l2_erc20_address).safeTransferFrom(msg.sender, address(this), amount); //will revert if failed
 
-        ERC20Order memory new_order = ERC20Order({recipient_address: recipient_address, amount: amount, fee: msg.value, l1_erc20_address: l1_erc20_address, l2_erc20_address: l2_erc20_address});
+        OrderERC20 memory new_order = OrderERC20({recipient_address: recipient_address, amount: amount, fee: msg.value, l1_erc20_address: l1_erc20_address, l2_erc20_address: l2_erc20_address});
         _orders_erc20[_current_order_id] = new_order;
         _orders_pending[_current_order_id] = true;
         _orders_senders[_current_order_id] = msg.sender;
@@ -98,7 +98,7 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
         require(msg.sender == ethereum_payment_registry, 'Only PAYMENT_REGISTRY can call');
         require(_orders_pending[order_id], 'Order claimed or nonexistent');
 
-        ERC20Order memory current_order = _orders_erc20[order_id]; //TODO check if order is memory or calldata
+        OrderERC20 memory current_order = _orders_erc20[order_id]; //TODO check if order is memory or calldata
         require(current_order.recipient_address == recipient_address, 'recipient_address not match L1');
         require(current_order.amount == amount, 'amount not match L1');
         require(current_order.l1_erc20_address == l1_erc20_address, 'l1_erc20_address does not match L1');
