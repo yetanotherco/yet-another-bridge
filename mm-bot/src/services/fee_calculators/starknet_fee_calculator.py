@@ -15,7 +15,7 @@ class StarknetFeeCalculator(FeeCalculator):
         we cannot estimate the gas fee of the claim payment transaction
         So we will use fixed values for the gas
         """
-        eth_claim_payment_gas = 94642  # TODO this is a fixed value, if the contract changes, this should be updated
+        eth_claim_payment_gas = 94_642  # TODO this is a fixed value, if the contract changes, this should be updated
         return eth_claim_payment_gas * get_gas_price()
 
     async def estimate_message_fee(self, order: Order) -> int:

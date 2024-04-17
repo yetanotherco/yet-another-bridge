@@ -14,7 +14,7 @@ class ZksyncFeeCalculator(FeeCalculator):
         we cannot estimate the gas fee of the claim payment transaction
         So we will use fixed values for the gas
         """
-        eth_claim_payment_gas = 143_785
+        eth_claim_payment_gas = 143_785 # TODO this is a fixed value, if the contract changes, this should be updated
         return eth_claim_payment_gas * get_gas_price()
 
     async def estimate_message_fee(self, order: Order) -> int:
