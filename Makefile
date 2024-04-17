@@ -78,6 +78,9 @@ starknet-pause:
 starknet-unpause:
 	@. ./contracts/starknet/.env && . ./contracts/starknet/scripts/change_pause_state.sh unpause
 
+starknet-deploy-erc20: starknet-build
+	@. ./contracts/starknet/.env && . ./contracts/starknet/scripts/deploy_erc20.sh
+
 
 ### ZKSYNC ###
 

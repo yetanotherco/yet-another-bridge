@@ -51,13 +51,14 @@ mod ERC20 {
     #[constructor]
     fn constructor(
         ref self: ContractState,
-        name: felt252,
-        symbol: felt252,
-        initial_supply: u256,
+        // name: felt252,
+        // symbol: felt252,
+        // initial_supply: u256,
         recipient: ContractAddress
     ) {
-        self.initializer(name, symbol);
-        self._mint(recipient, initial_supply);
+        // self.initializer(name, symbol);
+        self.initializer('URICOIN', 'URI');
+        self._mint(recipient, 1000000);
     }
 
     //
