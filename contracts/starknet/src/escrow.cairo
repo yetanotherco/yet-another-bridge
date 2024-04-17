@@ -128,6 +128,7 @@ mod Escrow {
         order_id: u256,
         address: ContractAddress,
         amount: u256,
+        fee: u256,
         l2_erc20_address: ContractAddress
     }
 
@@ -329,6 +330,22 @@ mod Escrow {
     }
 
     #[l1_handler]
+    fn claim_payment_erc20(
+        ref self: ContractState,
+        from_address: felt252,
+        order_id: u256,
+        recipient_address: EthAddress,
+        amount: u256,
+        l1_erc20_address: EthAddress
+    ) {
+        self.pausable.assert_not_paused();
+        let eth_transfer_contract_felt: felt252 = self.eth_transfer_contract.read().into();
+        assert(from_address == eth_transfer_contract_felt, 'Only PAYMENT_REGISTRY_CONTRACT');
+
+        _claim_payment_erc20(ref self, from_address, order_id, recipient_address, amount, l1_erc20_address);
+    }
+
+    #[l1_handler]
     fn claim_payment_batch(
         ref self: ContractState,
         from_address: felt252,
@@ -358,20 +375,50 @@ mod Escrow {
         order_id: u256,
         recipient_address: EthAddress,
         amount: u256
-        ) {
-            assert(self.orders_pending.read(order_id), 'Order withdrew or nonexistent');
+    ) {
+        assert(self.orders_pending.read(order_id), 'Order withdrew or nonexistent');
+        
+        let order = self.orders.read(order_id);
+        assert(order.recipient_address == recipient_address, 'recipient_address not match L1');
+        assert(order.amount == amount, 'amount not match L1');
+        
+        self.orders_pending.write(order_id, false);
+        let payment_amount = order.amount + order.fee;
+        
+        // TODO: In batch, it might be best to transfer all at once
+        IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
+            .transfer(self.mm_starknet_wallet.read(), payment_amount);
             
-            let order = self.orders.read(order_id);
-            assert(order.recipient_address == recipient_address, 'recipient_address not match L1');
-            assert(order.amount == amount, 'amount not match L1');
+        self.emit(ClaimPayment { order_id, address: self.mm_starknet_wallet.read(), amount });
+    }
 
-            self.orders_pending.write(order_id, false);
-            let payment_amount = order.amount + order.fee;
+    fn _claim_payment_erc20(
+        ref self: ContractState,
+        from_address: felt252,
+        order_id: u256,
+        recipient_address: EthAddress,
+        amount: u256,
+        l1_erc20_address: EthAddress
+    ) {
+        assert(self.orders_pending.read(order_id), 'Order withdrew or nonexistent');
+        
+        let order_erc20 = self.orders_erc20.read(order_id);
+        assert(order_erc20.recipient_address == recipient_address, 'recipient_address not match L1');
+        assert(order_erc20.amount == amount, 'amount not match L1');
+        assert(order_erc20.l1_erc20_address == l1_erc20_address, 'l1_erc20_address not match L1');
 
-            // TODO: Might be best to transfer all at once
-            IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
-                .transfer(self.mm_starknet_wallet.read(), payment_amount);
+        self.orders_pending.write(order_id, false);
 
-            self.emit(ClaimPayment { order_id, address: self.mm_starknet_wallet.read(), amount });
-        }
+        // let payment_amount = order.amount + order.fee;
+
+        //Fee (ETH):
+        IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
+            .transfer(self.mm_starknet_wallet.read(), order_erc20.fee);
+
+        //Amount (ERC20):
+        IERC20Dispatcher { contract_address: order_erc20.l2_erc20_address.read() }
+            .transfer(self.mm_starknet_wallet.read(), order_erc20.amount);
+
+        self.emit(ClaimPaymentERC20 { order_id, address: self.mm_starknet_wallet.read(), amount, fee: order_erc20.fee.read(), l2_erc20_address: order_erc20.l2_erc20_address.read() } );
+    }
 }
