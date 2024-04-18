@@ -27,7 +27,7 @@ jobs:
           git clone https://github.com/uri-99/zksync-local-setup.git
 
           echo git cloned
-          cd local-setup
+          cd zksync-local-setup
           
           echo starting:\n
           touch ../docker_output.log
