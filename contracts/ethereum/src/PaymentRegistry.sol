@@ -34,6 +34,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     address public ZKSyncEscrowAddress;
     uint256 public StarknetEscrowClaimPaymentSelector;
     uint256 public StarknetEscrowClaimPaymentBatchSelector;
+    uint256 public StarknetEscrowClaimPaymentERC20Selector;
     bytes4 public ZKSyncEscrowClaimPaymentSelector;
     bytes4 public ZKSyncEscrowClaimPaymentBatchSelector;
     bytes4 public ZKSyncEscrowClaimPaymentERC20Selector;
@@ -54,6 +55,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         address snMessaging,
         uint256 StarknetEscrowClaimPaymentSelector_,
         uint256 StarknetEscrowClaimPaymentBatchSelector_,
+        uint256 StarknetEscrowClaimPaymentERC20Selector_,
         address marketMaker_,
         address ZKSyncDiamondProxyAddress,
         bytes4 ZKSyncEscrowClaimPaymentSelector_,
@@ -69,6 +71,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
         StarknetEscrowClaimPaymentSelector = StarknetEscrowClaimPaymentSelector_;
         StarknetEscrowClaimPaymentBatchSelector = StarknetEscrowClaimPaymentBatchSelector_;
+        StarknetEscrowClaimPaymentERC20Selector = StarknetEscrowClaimPaymentERC20Selector_;
         ZKSyncEscrowClaimPaymentSelector = ZKSyncEscrowClaimPaymentSelector_;
         ZKSyncEscrowClaimPaymentBatchSelector = ZKSyncEscrowClaimPaymentBatchSelector_;
         ZKSyncEscrowClaimPaymentERC20Selector = ZKSyncEscrowClaimPaymentERC20Selector_;
@@ -77,11 +80,6 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         ZKSyncChainId = ZKSyncChainId_;
 
         marketMaker = marketMaker_;
-    }
-
-    //I think this is not OK. here, the caller of safeIncreaseAllowance isPaymentRegistry
-    function registerMMerc20Allowance(address erc20) external onlyOwnerOrMM() {
-        IERC20(erc20).safeIncreaseAllowance(address(this), type(uint256).max);
     }
 
     function transferERC20(uint256 orderId, address destAddress, uint128 chainId, address l1_erc20_address, uint256 amount) external onlyOwnerOrMM {
@@ -148,6 +146,30 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         );
 
         emit ClaimPaymentERC20(orderId, destAddress, amount, ZKSyncChainId, l1_erc20_address);
+    }
+
+    function claimPaymentStarknetERC20(
+        uint256 orderId,
+        address destAddress,
+        uint256 amount,
+        address l1_erc20_address
+    ) external payable onlyOwnerOrMM {
+        _verifyTransferExistsStarknetERC20(orderId, destAddress, amount, l1_erc20_address);
+
+        uint256[] memory payload = new uint256[](6); //this is not an array of u128 because sendMessageToL2 takes an array of uint256
+        payload[0] = uint128(orderId); // low
+        payload[1] = uint128(orderId >> 128); // high
+        payload[2] = uint256(uint160(destAddress));
+        payload[3] = uint128(amount); // low
+        payload[4] = uint128(amount >> 128); // high
+        payload[5] = uint256(uint160(l1_erc20_address));
+
+        _snMessaging.sendMessageToL2{value: msg.value}(
+            StarknetEscrowAddress,
+            StarknetEscrowClaimPaymentERC20Selector, //TODO set erc20 variable
+            payload);
+
+        emit ClaimPaymentERC20(orderId, destAddress, amount, StarknetChainId, l1_erc20_address);
     }
 
     //TODO: change orderID to uint32
@@ -219,11 +241,6 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         emit ClaimPaymentBatch(orderIds, destAddresses, amounts, StarknetChainId);
     }
 
-    function _verifyTransferExistsStarknet(uint256 orderId, address destAddress, uint256 amount) internal view {
-        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, StarknetChainId));
-        require(transfers[index] == true, "Transfer not found.");
-    }
-
     function claimPaymentZKSync(
         uint256 orderId, address destAddress, uint256 amount,
         uint256 gasLimit,
@@ -283,6 +300,16 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         );
 
         emit ClaimPaymentBatch(orderIds, destAddresses, amounts, ZKSyncChainId);
+    }
+
+    function _verifyTransferExistsStarknetERC20(uint256 orderId, address destAddress, uint256 amount, address l1_erc20_address) internal view {
+        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, StarknetChainId, l1_erc20_address));
+        require(transfers[index] == true, "Transfer not found."); //if this is claimed twice, Escrow will know
+    }
+
+    function _verifyTransferExistsStarknet(uint256 orderId, address destAddress, uint256 amount) internal view {
+        bytes32 index = keccak256(abi.encodePacked(orderId, destAddress, amount, StarknetChainId));
+        require(transfers[index] == true, "Transfer not found."); //if this is claimed twice, Escrow will know
     }
 
     function _verifyTransferExistsZKSyncERC20(uint256 orderId, address destAddress, uint256 amount, address l1_erc20_address) internal view {
