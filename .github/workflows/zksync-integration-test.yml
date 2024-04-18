@@ -26,8 +26,9 @@ jobs:
           export ETHERSCAN_API_KEY=${{vars.ETHERSCAN_API_KEY}}
           git clone https://github.com/matter-labs/local-setup.git
 
-          echo git cloned, starting:
+          echo git cloned, moving to a stable commit:
           cd local-setup
+          git checkout f16f1843b5740ca8456432123badafa137daaa02
           
           echo starting:
           touch ../docker_output.log
