@@ -151,15 +151,15 @@ ethereum-and-starknet-deploy:
 deploy-all:
 	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env && . ./contracts/zksync/.env && \
 	make ethereum-build && \
-	. ./contracts/ethereum/deploy.sh && \
 	make starknet-build && \
+	make zksync-build && \
+	. ./contracts/ethereum/deploy.sh && \
 	. ./contracts/starknet/scripts/deploy.sh && \
 	. ./contracts/ethereum/set_starknet_escrow.sh && \
-	. ./contracts/utils/display_info.sh && \
-	make zksync-build && \
 	. ./contracts/zksync/deploy.sh && \
-	. ./contracts/ethereum/set_zksync_escrow.sh
-
+	. ./contracts/ethereum/set_zksync_escrow.sh && \
+	. ./contracts/utils/display_info.sh
+	
 test: 
 	make starknet-test
 	make ethereum-test
