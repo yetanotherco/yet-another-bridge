@@ -20,9 +20,6 @@ cast send --rpc-url $ETHEREUM_RPC --private-key $ETHEREUM_PRIVATE_KEY --gas-pric
   "0" $USER_ETHEREUM_PUBLIC_ADDRESS $BRIDGE_AMOUNT_WEI 2000000 800 \
   --value 5000000000000000000 > /dev/null
 
-# echo "\nMM L1 funds after Claim Payment"
-# BALANCE_MM_L1_AFTER_CLAIMPAYMENT=$(cast balance --rpc-url $ETHEREUM_RPC $MM_ETHEREUM_WALLET_ADDRESS)
-# echo "$BALANCE_MM_L1_AFTER_CLAIMPAYMENT"
 
 BALANCE_ESCROW_L2_AFTER_CLAIMPAYMENT_WEI=$(cast balance --rpc-url http://localhost:3050 $ZKSYNC_ESCROW_CONTRACT_ADDRESS) #for assert.sh
 BALANCE_ESCROW_L2_AFTER_CLAIMPAYMENT=$(cast balance --rpc-url http://localhost:3050 --ether $ZKSYNC_ESCROW_CONTRACT_ADDRESS) #for logging
