@@ -24,13 +24,12 @@ jobs:
       - name: Setup Dockerized L1-L2
         run: |
           export ETHERSCAN_API_KEY=${{vars.ETHERSCAN_API_KEY}}
-          git clone https://github.com/matter-labs/local-setup.git
+          git clone https://github.com/uri-99/zksync-local-setup.git
 
-          echo git cloned, moving to a stable commit:
+          echo git cloned
           cd local-setup
-          git checkout f16f1843b5740ca8456432123badafa137daaa02
           
-          echo starting:
+          echo starting:\n
           touch ../docker_output.log
           ./start.sh &> ../docker_output.log &
 
