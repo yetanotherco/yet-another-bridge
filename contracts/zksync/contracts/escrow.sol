@@ -66,7 +66,7 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
     //          in amount_l2, the total tokens he will give to MM in L2
     //          in amount_l1, the total tokens he will receive from MM in L1
     //          this way, the user is able to bridge tokens cross-erc20, giving, for example, WETH and recieving USDC
-    //          the extra computational costs of this is neglegible, only 1 extra param and 1 extra uint256 stored per ERC20 order in L2, and NO EXTRA COSTS in L1
+    //          the extra computational costs of this is neglegible: only 1 extra param and 1 extra uint256 stored per ERC20 order in L2, and NO EXTRA COSTS in L1
     function set_order_erc20(address recipient_address, uint256 amount_l2, uint256 amount_l1, address l2_erc20_address, address l1_erc20_address) public payable whenNotPaused returns (uint256) {
         require(msg.value > 0, 'some ETH must be sent as MM fees');
         require(amount_l2 > 0, 'some tokens must be sent to MM in L2');

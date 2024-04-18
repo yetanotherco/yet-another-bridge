@@ -10,10 +10,11 @@ struct Order {
 #[derive(Copy, Drop, Serde, starknet::Store)]
 struct OrderERC20 {
     recipient_address: EthAddress,
-    amount: u256,
+    amount_l2: u256,
+    amount_l1: u256,
     fee: u256,
-    l1_erc20_address: EthAddress,
-    l2_erc20_address: ContractAddress
+    l2_erc20_address: ContractAddress,
+    l1_erc20_address: EthAddress
 }
 
 #[starknet::interface]
@@ -112,10 +113,11 @@ mod Escrow {
     struct SetOrderERC20 {
         order_id: u256,
         recipient_address: EthAddress,
-        amount: u256,
+        amount_l2: u256,
+        amount_l1: u256,
         fee: u256,
-        l1_erc20_address: EthAddress,
-        l2_erc20_address: ContractAddress
+        l2_erc20_address: ContractAddress,
+        l1_erc20_address: EthAddress
     }
 
     #[derive(Drop, starknet::Event)]
@@ -129,7 +131,7 @@ mod Escrow {
     struct ClaimPaymentERC20 {
         order_id: u256,
         address: ContractAddress,
-        amount: u256,
+        amount_l2: u256,
         fee: u256,
         l2_erc20_address: ContractAddress
     }
@@ -142,7 +144,7 @@ mod Escrow {
         orders_pending: LegacyMap::<u256, bool>,
         orders_senders: LegacyMap::<u256, ContractAddress>,
         orders_timestamps: LegacyMap::<u256, u64>,
-        eth_transfer_contract: EthAddress, // our transfer contract in L1
+        eth_transfer_contract: EthAddress, // our transfer (PaymentRegistry) contract in L1
         mm_ethereum_wallet: EthAddress,
         mm_starknet_wallet: ContractAddress,
         native_token_eth_starknet: ContractAddress,
@@ -221,9 +223,16 @@ mod Escrow {
             order_id
         }
 
+
+    // Recieves in order.fee the total fee for MM
+    //          in order.amount_l2, the total tokens he will give to MM in L2
+    //          in order.amount_l1, the total tokens he will receive from MM in L1
+    //          this way, the user is able to bridge tokens cross-erc20, giving, for example, WETH and recieving USDC
+    //          the extra computational costs of this is neglegible: only 1 extra param and 1 extra uint256 stored per ERC20 order in L2, and NO EXTRA COSTS in L1
         fn set_order_erc20(ref self: ContractState, order_erc20: OrderERC20) -> u256 {
             self.pausable.assert_not_paused();
-            assert(order_erc20.amount > 0, 'Amount must be greater than 0'); //in ERC20
+            assert(order_erc20.amount_l2 > 0, 'Amount_l2 must be greater than 0'); //in ERC20
+            assert(order_erc20.amount_l1 > 0, 'Amount_l1 must be greater than 0'); //in ERC20
             assert(order_erc20.fee > 0, 'Fee must be greater than 0'); //in ETH
 
             // Fee (ETH):
@@ -233,8 +242,8 @@ mod Escrow {
 
             // Amount (ERC20):
             let erc20_dispatcher = IERC20Dispatcher { contract_address: order_erc20.l2_erc20_address };
-            assert(erc20_dispatcher.allowance(get_caller_address(), get_contract_address()) >= order_erc20.amount, 'Not enough allowance for amount');
-            assert(erc20_dispatcher.balanceOf(get_caller_address()) >= order_erc20.amount, 'Not enough balance for amount');
+            assert(erc20_dispatcher.allowance(get_caller_address(), get_contract_address()) >= order_erc20.amount_l2, 'Not enough allowance for amount_l2');
+            assert(erc20_dispatcher.balanceOf(get_caller_address()) >= order_erc20.amount_l2, 'Not enough balance for amount_l2');
 
             let mut order_id = self.current_order_id.read();
             self.orders_erc20.write(order_id, order_erc20);
@@ -244,17 +253,18 @@ mod Escrow {
             self.current_order_id.write(order_id + 1);
 
             eth_dispatcher.transferFrom(get_caller_address(), get_contract_address(), order_erc20.fee);
-            erc20_dispatcher.transferFrom(get_caller_address(), get_contract_address(), order_erc20.amount);
+            erc20_dispatcher.transferFrom(get_caller_address(), get_contract_address(), order_erc20.amount_l2);
 
             self
                 .emit(
                     SetOrderERC20 {
                         order_id,
                         recipient_address: order_erc20.recipient_address,
-                        amount: order_erc20.amount,
+                        amount_l2: order_erc20.amount_l2,
+                        amount_l1: order_erc20.amount_l1,
                         fee: order_erc20.fee,
-                        l1_erc20_address: order_erc20.l1_erc20_address,
-                        l2_erc20_address: order_erc20.l2_erc20_address
+                        l2_erc20_address: order_erc20.l2_erc20_address,
+                        l1_erc20_address: order_erc20.l1_erc20_address
                     }
                 );
 
@@ -337,14 +347,14 @@ mod Escrow {
         from_address: felt252,
         order_id: u256,
         recipient_address: EthAddress,
-        amount: u256,
+        amount_l1: u256,
         l1_erc20_address: EthAddress
     ) {
         self.pausable.assert_not_paused();
         let eth_transfer_contract_felt: felt252 = self.eth_transfer_contract.read().into();
         assert(from_address == eth_transfer_contract_felt, 'Only PAYMENT_REGISTRY_CONTRACT');
 
-        _claim_payment_erc20(ref self, from_address, order_id, recipient_address, amount, l1_erc20_address);
+        _claim_payment_erc20(ref self, from_address, order_id, recipient_address, amount_l1, l1_erc20_address);
     }
 
     #[l1_handler]
@@ -399,19 +409,17 @@ mod Escrow {
         from_address: felt252,
         order_id: u256,
         recipient_address: EthAddress,
-        amount: u256,
+        amount_l1: u256,
         l1_erc20_address: EthAddress
     ) {
         assert(self.orders_pending.read(order_id), 'Order withdrew or nonexistent');
         
         let order_erc20 = self.orders_erc20.read(order_id);
         assert(order_erc20.recipient_address == recipient_address, 'recipient_address not match L1');
-        assert(order_erc20.amount == amount, 'amount not match L1');
+        assert(order_erc20.amount_l1 == amount_l1, 'amount_l1 not match L1');
         assert(order_erc20.l1_erc20_address == l1_erc20_address, 'l1_erc20_address not match L1');
 
         self.orders_pending.write(order_id, false);
-
-        // let payment_amount = order.amount + order.fee;
 
         //Fee (ETH):
         IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() }
@@ -419,8 +427,8 @@ mod Escrow {
 
         //Amount (ERC20):
         IERC20Dispatcher { contract_address: order_erc20.l2_erc20_address }
-            .transfer(self.mm_starknet_wallet.read(), order_erc20.amount);
+            .transfer(self.mm_starknet_wallet.read(), order_erc20.amount_l2);
 
-        self.emit(ClaimPaymentERC20 { order_id, address: self.mm_starknet_wallet.read(), amount, fee: order_erc20.fee, l2_erc20_address: order_erc20.l2_erc20_address } );
+        self.emit(ClaimPaymentERC20 { order_id, address: self.mm_starknet_wallet.read(), amount_l2: order_erc20.amount_l2, fee: order_erc20.fee, l2_erc20_address: order_erc20.l2_erc20_address } );
     }
 }
