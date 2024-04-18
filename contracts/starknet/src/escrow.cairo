@@ -194,7 +194,7 @@ mod Escrow {
 
         fn set_order(ref self: ContractState, order: Order) -> u256 {
             self.pausable.assert_not_paused();
-            assert(order.amount > 0, 'Amount must be greater than 0');
+            assert(order.amount > 0, 'Amount must > 0');
 
             let payment_amount = order.amount + order.fee;
             let dispatcher = IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() };
@@ -231,19 +231,19 @@ mod Escrow {
     //          the extra computational costs of this is neglegible: only 1 extra param and 1 extra uint256 stored per ERC20 order in L2, and NO EXTRA COSTS in L1
         fn set_order_erc20(ref self: ContractState, order_erc20: OrderERC20) -> u256 {
             self.pausable.assert_not_paused();
-            assert(order_erc20.amount_l2 > 0, 'Amount_l2 must be greater than 0'); //in ERC20
-            assert(order_erc20.amount_l1 > 0, 'Amount_l1 must be greater than 0'); //in ERC20
-            assert(order_erc20.fee > 0, 'Fee must be greater than 0'); //in ETH
+            assert(order_erc20.amount_l2 > 0, 'Amount_l2 must > 0'); //in ERC20
+            assert(order_erc20.amount_l1 > 0, 'Amount_l1 must > 0'); //in ERC20
+            assert(order_erc20.fee > 0, 'Fee must > 0'); //in ETH
 
             // Fee (ETH):
             let eth_dispatcher = IERC20Dispatcher { contract_address: self.native_token_eth_starknet.read() };
-            assert(eth_dispatcher.allowance(get_caller_address(), get_contract_address()) >= order_erc20.fee, 'Not enough allowance for fee');
-            assert(eth_dispatcher.balanceOf(get_caller_address()) >= order_erc20.fee, 'Not enough balance for fee');
+            assert(eth_dispatcher.allowance(get_caller_address(), get_contract_address()) >= order_erc20.fee, 'Need allowance for fee');
+            assert(eth_dispatcher.balanceOf(get_caller_address()) >= order_erc20.fee, 'Need balance for fee');
 
             // Amount (ERC20):
             let erc20_dispatcher = IERC20Dispatcher { contract_address: order_erc20.l2_erc20_address };
-            assert(erc20_dispatcher.allowance(get_caller_address(), get_contract_address()) >= order_erc20.amount_l2, 'Not enough allowance for amount_l2');
-            assert(erc20_dispatcher.balanceOf(get_caller_address()) >= order_erc20.amount_l2, 'Not enough balance for amount_l2');
+            assert(erc20_dispatcher.allowance(get_caller_address(), get_contract_address()) >= order_erc20.amount_l2, 'Need allowance for amount_l2');
+            assert(erc20_dispatcher.balanceOf(get_caller_address()) >= order_erc20.amount_l2, 'Need balance for amount_l2');
 
             let mut order_id = self.current_order_id.read();
             self.orders_erc20.write(order_id, order_erc20);
