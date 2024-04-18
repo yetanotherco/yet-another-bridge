@@ -4,7 +4,7 @@ Market Maker Bot is a bot that provides liquidity to the Yet Another
 Bridge (YAB).
 
 When a user wants to bridge tokens using YAB, the user must call the `set_order` function from the Escrow contract.
-If successful, the Escrow emits a `SetOrder` event with the order information.
+If successful, the Escrow emits a `SetOrder` event with the newly placed order information.
 
 The Market Maker Bot listens to the `SetOrder` events and creates a new order in its database.
 This way, the Market Maker Bot is able to fulfill all user's order.
