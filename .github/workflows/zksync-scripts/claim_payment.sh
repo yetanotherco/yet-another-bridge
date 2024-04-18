@@ -7,9 +7,6 @@ printf "${GREEN}\n=> [ETH] Making Claim Payment${COLOR_RESET}\n"
 BALANCE_ESCROW_L2_BEFORE_CLAIMPAYMENT=$(cast balance --rpc-url http://localhost:3050 $ZKSYNC_ESCROW_CONTRACT_ADDRESS)
 echo "Initial Escrow balance: $BALANCE_ESCROW_L2_BEFORE_CLAIMPAYMENT"
 
-# BALANCE_MM_L1_BEFORE_CLAIMPAYMENT=$(cast balance --rpc-url $ETHEREUM_RPC $MM_ETHEREUM_WALLET_ADDRESS)
-# echo "\nInitial MM balance: $BALANCE_MM_L1_BEFORE_CLAIMPAYMENT"
-
 BALANCE_MM_L2_BEFORE_CLAIMPAYMENT_WEI=$(cast balance --rpc-url http://localhost:3050 $MM_ZKSYNC_WALLET) #for assert.sh
 BALANCE_MM_L2_BEFORE_CLAIMPAYMENT=$(cast balance --rpc-url http://localhost:3050 --ether $MM_ZKSYNC_WALLET) #for logging
 echo "Initial MM balance: $BALANCE_MM_L2_BEFORE_CLAIMPAYMENT"
