@@ -20,9 +20,11 @@ const value = 10; //TODO check, maybe make fuzz
 
 beforeEach( async () => {
   escrow = await deployAndInit();
-  erc20 = await deployContract("ERC20", deployer, [1000]);
+  // erc20 = await deployContract("ERC20", deployer, [1000]);
   provider = getProvider();
 });
+
+
 
 describe('ERC20 Set Order tests', function () {
   // it("Should emit correct Event", async () => {
