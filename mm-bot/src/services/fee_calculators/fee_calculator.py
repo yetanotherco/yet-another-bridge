@@ -18,7 +18,7 @@ class FeeCalculator(ABC):
         This includes:
             calling the transfer (from PaymentRegistry) +
             claimPayment (from PaymentRegistry) +
-            msg fee paid to Starknet (when calling claim_payment)
+            msg fee paid to L2 (when calling claim_payment)
         """
         transfer_fee = await asyncio.to_thread(self.estimate_transfer_fee, order)
         message_fee = await self.estimate_message_fee(order)
@@ -37,14 +37,11 @@ class FeeCalculator(ABC):
         # TODO rename parameters to order_id
         return estimate_transaction_fee(unsent_tx)
 
+    @abstractmethod
     def estimate_claim_payment_fee(self) -> int:
         """
-        Due to the deposit does not exist on ethereum at this point,
-        we cannot estimate the gas fee of the claim payment transaction
-        So we will use fixed values for the gas
         """
-        eth_claim_payment_gas = 86139  # TODO this is a fixed value, if the contract changes, this should be updated
-        return eth_claim_payment_gas * get_gas_price()
+        pass
 
     @abstractmethod
     async def estimate_message_fee(self, order: Order) -> int:
