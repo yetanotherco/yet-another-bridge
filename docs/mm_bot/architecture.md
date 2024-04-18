@@ -40,10 +40,10 @@ The bot architecture is as follows:
 
 ![architecture.png](images/architecture.png)
 
-An `Orders Processor`  is needed to process the orders for each L2.
+One `Orders Processor` is needed to process the orders for each L2.
 Each `Orders Processor` has an `Orders Indexer` and an `Order Executor`.
 
-The `Orders Indexer` is responsible for indexing the orders from the L2 Escrow. It indexes orders by reading Escrow's events, 
+The `Orders Indexer` is responsible for indexing the orders made on the L2 Escrow. It indexes orders by reading Escrow's events, 
 and when it finds a new order, it stores it in the database. Then, `Orders Processor` is able to assign the new order 
 to an `Order Executor`.
 
@@ -51,11 +51,11 @@ The `Order Executor` is responsible for processing an individual order. This mea
 recipient in L1 and claim the funds in L2.
 
 To ensure that the orders are not lost, the bot has an `Accepted Blocks Processor` that indexes the orders that belong
-to already accepted blocks, and stores them in the database. This way, if the `Orders Processor` loses an order, it will be
+to already accepted blocks, and stores them in the database. This way, if the `Orders Processor` looses an order, it will be
 captured and processed by the `Accepted Blocks Processor`.
 
 The bot has a `Failed Orders Processor` that is responsible for retrying the failed orders. When an order fails, the bot
-stores the error, and marks the order as failed. This way, the `Failed Orders Processor` is able to retry the failed orders.
+stores the error, and marks the order as failed. This way, the `Failed Orders Processor` will be able to retry any failed order.
 
 An important aspect of this bot is that it must be able to process multiple orders at the same time.
 For that reason, the bot uses the library 'asyncio' to handle orders concurrently. This approach, 
@@ -70,7 +70,7 @@ primary provider fails, the bot will switch to the secondary provider.
 A server is needed to run the MM Bot's Main Process.
 
 Also, two servers are needed for the database, one for the main database and another one to act as its read replica.
-This read replica is for external applications, like explorers, so that these don't affect the main database's performance and/or implicate any security concerns.
+This read replica is for external applications, like transaction explorers or data analyzers, so that these don't affect the main database's performance and/or implicate any security concerns.
 
 ![physical_view.png](images/physical_view.png)
 
