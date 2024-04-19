@@ -19,7 +19,7 @@ mod Escrow {
 
     use yab::tests::utils::{
         constants::EscrowConstants::{
-            USER, OWNER, MM_STARKNET, MM_ETHEREUM, ETH_TRANSFER_CONTRACT, ETH_USER, ETH_USER_2, ETH_USER_3
+            USER, OWNER, MM_STARKNET, MM_ETHEREUM, ETH_TRANSFER_CONTRACT, ETH_USER, ETH_USER_2, ETH_USER_3, L1_ERC20_ADDRESS
         },
     };
 
@@ -149,7 +149,7 @@ mod Escrow {
 
     #[test]
     fn test_fail_random_eth_user_calls_l1_handler() {
-        let (escrow, _) = setup();
+        let (escrow, _, _) = setup_with_erc20();
         let data: Array<felt252> = array![1, MM_ETHEREUM().into(), 3, L1_ERC20_ADDRESS().into(), 5];
         let mut payload_buffer: Array<felt252> = ArrayTrait::new();
         data.serialize(ref payload_buffer);
