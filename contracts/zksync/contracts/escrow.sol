@@ -85,7 +85,6 @@ contract Escrow is Initializable, OwnableUpgradeable, PausableUpgradeable { //},
         _current_order_id++; //this here to follow CEI pattern
 
         emit SetOrderERC20(_current_order_id-1, recipient_address, amount_l2, amount_l1, msg.value, l2_erc20_address, l1_erc20_address);
-
         return _current_order_id-1;
     }
 
