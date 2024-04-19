@@ -48,17 +48,30 @@ mod ERC20 {
         const MINT_TO_ZERO: felt252 = 'ERC20: mint to 0';
     }
 
+//hardcoded one
+    // #[constructor]
+    // fn constructor(
+    //     ref self: ContractState,
+    //     // name: felt252,
+    //     // symbol: felt252,
+    //     // initial_supply: u256,
+    //     recipient: ContractAddress
+    // ) {
+    //     // self.initializer(name, symbol);
+    //     self.initializer('URICOIN', 'URI');
+    //     self._mint(recipient, 1000000);
+    // }
+
     #[constructor]
     fn constructor(
         ref self: ContractState,
-        // name: felt252,
-        // symbol: felt252,
-        // initial_supply: u256,
+        name: felt252,
+        symbol: felt252,
+        initial_supply: u256,
         recipient: ContractAddress
     ) {
-        // self.initializer(name, symbol);
-        self.initializer('URICOIN', 'URI');
-        self._mint(recipient, 1000000);
+        self.initializer(name, symbol);
+        self._mint(recipient, initial_supply);
     }
 
     //

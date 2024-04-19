@@ -147,7 +147,7 @@ mod Escrow {
         stop_prank(CheatTarget::One(escrow.contract_address));
 
         // check balance
-        assert(eth_token.balanceOf(escrow.contract_address) == 500, 'set_order: wrong balance ');
+        assert(eth_token.balanceOf(escrow.contract_address) == 500, 'set_order: wrong balance');
         assert(eth_token.balanceOf(MM_STARKNET()) == 0, 'set_order: wrong balance');
     }
 
