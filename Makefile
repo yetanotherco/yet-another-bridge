@@ -102,16 +102,26 @@ zksync-test: zksync-build
 zksync-test-in-memory: zksync-build
 	@cd ./contracts/zksync/ && yarn test-in-memory
 
-#wip:
-zksync-test-integration:
+zksync-test-integration-ci:
+	@. ./.github/workflows/zksync-scripts/ci.env.test && \
+	. ./contracts/ethereum/deploy.sh && \
+	. ./contracts/zksync/deploy.sh && \
+	. ./contracts/ethereum/set_zksync_escrow.sh && \
+	. ./.github/workflows/zksync-scripts/set_order.sh && \
+	. ./.github/workflows/zksync-scripts/transfer.sh && \
+	. ./.github/workflows/zksync-scripts/claim_payment.sh && \
+	. ./.github/workflows/zksync-scripts/assert.sh
+
+zksync-test-integration-local:
 	@make ethereum-build && make zksync-build && \
 	. ./contracts/ethereum/test/.env.test && . ./contracts/zksync/test/.env.test && \
 	. ./contracts/ethereum/deploy.sh && \
 	. ./contracts/zksync/deploy.sh && \
 	. ./contracts/ethereum/set_zksync_escrow.sh && \
-	. ./contracts/zksync/test/set_order.sh && \
-	. ./contracts/zksync/test/transfer.sh && \
-	. ./contracts/zksync/test/claim_payment.sh
+	. ./.github/workflows/zksync-scripts/set_order.sh && \
+	. ./.github/workflows/zksync-scripts/transfer.sh && \
+	. ./.github/workflows/zksync-scripts/claim_payment.sh && \
+	. ./.github/workflows/zksync-scripts/assert.sh
 
 # zksync-upgrade: WIP
 
