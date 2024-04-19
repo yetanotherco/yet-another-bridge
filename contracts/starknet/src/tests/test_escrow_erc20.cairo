@@ -78,8 +78,8 @@ mod Escrow {
         return IEscrowDispatcher { contract_address: address };
     }
 
-    fn deploy_erc20_2(
-        name: felt252, symbol: felt252, initial_supply: u256, recipent: ContractAddress, name2: felt252, symbol_2: felt252, initial_supply_2: u256, recipent_2: ContractAddress
+    fn deploy_erc20_2( //without this, the declare('ERC20') line is called twice, causing the execution to crash
+        name: felt252, symbol: felt252, initial_supply: u256, recipent: ContractAddress, name_2: felt252, symbol_2: felt252, initial_supply_2: u256, recipent_2: ContractAddress
     ) -> (IERC20Dispatcher, IERC20Dispatcher) {
         let erc20 = declare('ERC20');
         let mut calldata = array![name, symbol];
