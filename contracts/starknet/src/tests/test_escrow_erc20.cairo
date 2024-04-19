@@ -19,7 +19,7 @@ mod Escrow {
 
     use yab::tests::utils::{
         constants::EscrowConstants::{
-            USER, OWNER, MM_STARKNET, MM_ETHEREUM, ETH_TRANSFER_CONTRACT, ETH_USER, ETH_USER_2, ETH_USER_3, L1_ERC20_ADDRESS
+            USER, OWNER, MM_STARKNET, MM_ETHEREUM, ETH_TRANSFER_CONTRACT, ETH_USER, ETH_USER_2, ETH_USER_3, L1_ERC20_ADDRESS, L1_ERC20_ADDRESS_2
         },
     };
 
