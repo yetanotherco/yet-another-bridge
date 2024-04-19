@@ -37,6 +37,7 @@ mod Escrow {
     fn setup_general_with_erc20(balance: u256, approved: u256) -> (IEscrowDispatcher, IERC20Dispatcher, IERC20Dispatcher){
         let eth_token = deploy_erc20('ETH', '$ETH', BoundedInt::max(), OWNER());
         let uri_token = deploy_erc20('UriCoin', '$Uri', BoundedInt::max(), USER());
+
         let escrow = deploy_escrow(
             OWNER(),
             ETH_TRANSFER_CONTRACT(),
@@ -52,6 +53,10 @@ mod Escrow {
         start_prank(CheatTarget::One(eth_token.contract_address), USER());
         eth_token.approve(escrow.contract_address, approved);
         stop_prank(CheatTarget::One(eth_token.contract_address));
+
+        start_prank(CheatTarget::One(uri_token.contract_address), USER());
+        eth_token.approve(escrow.contract_address, approved);
+        stop_prank(CheatTarget::One(uri_token.contract_address));
 
         (escrow, eth_token, uri_token)
     }
