@@ -41,42 +41,42 @@ beforeEach( async () => {
 
 describe('ERC20 basic tests', function () {
   it("Should airdrop correctly", async () => {
-    const balanceOf = await erc20.balanceOf(user_zk.address);
+    const balanceOf = await erc20_l2.balanceOf(user_zk.address);
     expect(balanceOf).to.eq(initial_erc20_balance)
   });
 
   it("Should transfer correctly", async () => {
-    const transferTx = await erc20.connect(user_zk).transfer(user_zk2.address, value);
+    const transferTx = await erc20_l2.connect(user_zk).transfer(user_zk2.address, value);
     await transferTx.wait();
 
-    const balanceOf = await erc20.balanceOf(user_zk2.address);
+    const balanceOf = await erc20_l2.balanceOf(user_zk2.address);
     expect(balanceOf).to.eq(value)
   });
 
   it("Should not transfer more than balance", async () => {
-    expect(erc20.connect(user_zk).transfer(user_zk2.address, initial_erc20_balance+1)).to.be.revertedWith("ERC20: transfer amount exceeds balance");
+    expect(erc20_l2.connect(user_zk).transfer(user_zk2.address, initial_erc20_balance+1)).to.be.revertedWith("ERC20: transfer amount exceeds balance");
   });
 
   it("Should not transfer without allowance", async () => {
-    expect(erc20.connect(user_zk2).transferFrom(user_zk.address, user_zk2.address, value)).to.be.revertedWith("ERC20: transfer amount exceeds allowance");
+    expect(erc20_l2.connect(user_zk2).transferFrom(user_zk.address, user_zk2.address, value)).to.be.revertedWith("ERC20: transfer amount exceeds allowance");
   });
 
   it("Should approve correctly", async () => {
-    const approveTx = await erc20.connect(user_zk).approve(user_zk2.address, value);
+    const approveTx = await erc20_l2.connect(user_zk).approve(user_zk2.address, value);
     await approveTx.wait();
 
-    const allowance = await erc20.allowance(user_zk.address, user_zk2.address);
+    const allowance = await erc20_l2.allowance(user_zk.address, user_zk2.address);
     expect(allowance).to.eq(value)
   });
 
   it("Should transferFrom correctly", async () => {
-    const approveTx = await erc20.connect(user_zk).approve(user_zk2.address, value);
+    const approveTx = await erc20_l2.connect(user_zk).approve(user_zk2.address, value);
     await approveTx.wait();
 
-    const transferFromTx = await erc20.connect(user_zk2).transferFrom(user_zk.address, user_zk2.address, value);
+    const transferFromTx = await erc20_l2.connect(user_zk2).transferFrom(user_zk.address, user_zk2.address, value);
     await transferFromTx.wait();
 
-    const balanceOf = await erc20.balanceOf(user_zk2.address);
+    const balanceOf = await erc20_l2.balanceOf(user_zk2.address);
     expect(balanceOf).to.eq(value)
   });
 })
