@@ -178,7 +178,7 @@ mod Escrow {
         Serde::serialize(@order_id, ref payload_buffer);
         Serde::serialize(@order_erc20.recipient_address, ref payload_buffer);
         Serde::serialize(@order_erc20.amount_l1, ref payload_buffer);
-        Serde::serialize(@order_erc20.l2_erc20_address, ref payload_buffer); //wrong, sent to l2_erc20_address instead of l1_erc20_address
+        Serde::serialize(@L1_ERC20_ADDRESS_2(), ref payload_buffer); //wrong, sent to l2_erc20_address instead of l1_erc20_address
 
         l1_handler.from_address = ETH_TRANSFER_CONTRACT().into();
         l1_handler.payload = payload_buffer.span();
