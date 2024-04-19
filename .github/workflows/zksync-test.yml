@@ -29,7 +29,6 @@ jobs:
       - name: Download zksync-cli
         run: |
           npx zksync-cli --version
-          npx zksync-cli dev start &
      
       # Build ZKSync Contract
       - name: Build ZKSync Contract
@@ -38,6 +37,10 @@ jobs:
 
       - name: Run make zksync-test
         run: |
-          echo sleeping 90 for in-memory-node setup
-          sleep 90
+          echo "Starting ZKSync in-memory node"
+          npx zksync-cli dev start
+          echo sleeping 30 for in-memory-node setup
+          sleep 30
           make zksync-test-in-memory
+
+          exit 0
