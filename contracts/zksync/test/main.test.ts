@@ -165,6 +165,25 @@ describe('Claim Payment tests', function () {
   it("Should not allow random user to call claim payment", async () => {
     expect(escrow.connect(user_zk).claim_payment(0, user_eth, value)).to.be.revertedWith("Only PAYMENT_REGISTRY can call");
   });
+  it("Should not allow PaymentRegistry to claim claimed payment", async () => {
+    const setOrderTx = await escrow.connect(user_zk).set_order(user_eth, fee, {value});
+    await setOrderTx.wait();
+
+    const claimPaymentTx = await escrow.connect(paymentRegistry).claim_payment(0, user_eth, value-fee);
+    await claimPaymentTx.wait();
+
+    expect(escrow.connect(paymentRegistry).claim_payment(0, user_eth, value)).to.be.revertedWith("Order claimed or nonexistent");
+  });
+
+  it("Should not get the pending order after being claimed", async () => {
+        const setOrderTx = await escrow.connect(user_zk).set_order(user_eth, fee, {value});
+        await setOrderTx.wait();
+    
+        const claimPaymentTx = await escrow.connect(paymentRegistry).claim_payment(0, user_eth, value-fee);
+        await claimPaymentTx.wait();
+
+        expect(await escrow.is_order_pending(0)).to.equal(false);
+    });
 })
 
 
