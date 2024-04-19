@@ -1,26 +1,10 @@
 @startuml
 
 title MM Diagram Class
-hide members
+'hide members
 
 class MM {
-  run()
-  process_order_events(order_events: list, order_service: OrderService,
-                         eth_lock: asyncio.Lock, herodotus_semaphore: asyncio.Semaphore)
-  create_order_tasks(order: Order, order_service: OrderService, eth_lock: asyncio.Lock,
-                      herodotus_semaphore: asyncio.Semaphore)
-  process_order(order: Order, order_service: OrderService,
-                        eth_lock: asyncio.Lock, herodotus_semaphore: asyncio.Semaphore)
-  failed_orders_job(order_service: OrderService,
-                      eth_lock: asyncio.Lock, herodotus_semaphore: asyncio.Semaphore)
-  process_failed_orders(order_service: OrderService,
-                                eth_lock: asyncio.Lock, herodotus_semaphore: asyncio.Semaphore)
-  set_order_events_from_accepted_blocks_job(order_service: OrderService, block_dao: BlockDao,
-                                              eth_lock: asyncio.Lock, herodotus_semaphore: asyncio.Semaphore)
-  process_orders_from_accepted_blocks(order_service: OrderService, block_dao: BlockDao,
-                                              eth_lock: asyncio.Lock, herodotus_semaphore: asyncio.Semaphore)
-  transfer(order: Order, order_service: OrderService)
-  wait_transfer(order: Order, order_service: OrderService)
+  + run()
 }
 
 package services {
@@ -29,6 +13,7 @@ package services {
       __ main methods __
       + transfer(deposit_id, dst_addr, amount)
       + claim_payment(deposit_id, dst_addr, amount, value)
+      + claim_payment_zksync(order_id, destination_address, amount, value, gas_limit, gas_per_pub_data_byte_limit)
       + get_is_used_order(order_id, recipient_address, amount, rpc_node): bool
 
       __ auxiliary methods __
@@ -37,6 +22,7 @@ package services {
       + has_funds(amount: int): bool
       + create_transfer(deposit_id, dst_addr_bytes, amount, rpc_node)
       + create_claim_payment(deposit_id, dst_addr_bytes, amount, value, rpc_node)
+      + create_claim_payment_zksync(order_id, destination_address, amount, value, gas_limit, gas_per_pub_data_byte_limit, rpc_node)
       + get_nonce(w3: Web3, address)
       + estimate_transaction_fee(transaction, rpc_node)
       + get_gas_price(rpc_node)
@@ -44,15 +30,14 @@ package services {
       + send_raw_transaction(signed_tx, rpc_node)
       + wait_for_transaction_receipt(tx_hash, rpc_node)
     }
-    MM *-- Ethereum
 
     class EthereumRpcNode {
       + w3
       + account
       + contract
     }
-    Ethereum *-- EthereumRpcNode
   }
+
   class Herodotus {
     + herodotus_prove(block, order_id, slot): str
     + herodotus_status(task_id): str
@@ -61,10 +46,10 @@ package services {
 
   class OrderService {
     + create_order(order: Order): Order
-    + get_order(order_id): Order | None
-    + get_order(order_id): Order | None
-    + get_failed_orders()
-    + already_exists(order_id): bool
+    + get_order(order_id, origin_network): Order | None
+    + get_incomplete_orders(): list[Order]
+    + get_failed_orders(): list[Order]
+    + already_exists(order_id, origin_network): bool
     + set_order_processing(order: Order): Order
     + set_order_transferring(order: Order, tx_hash): Order
     + set_order_fulfilled(order: Order): Order
@@ -77,15 +62,8 @@ package services {
     + reset_failed_order(order: Order): Order
     + set_failed(order: Order, failed: bool): Order
   }
-  MM *-- OrderService
 
-  class OverallFeeCalculator {
-    estimate_overall_fee(order: Order): int
-    estimate_transfer_fee(order: Order): int
-    estimate_yab_claim_payment_fee(): int
-    estimate_message_fee(order: Order):
-  }
-  MM *-- OverallFeeCalculator
+
   package starknet {
     class Starknet {
       __ main methods __
@@ -96,122 +74,216 @@ package services {
       + claim_payment(order_id, block, slot): bool
 
       __ auxiliary methods __
-      + create_set_order_event(event)
-      + get_order_id(event): int
-      + get_recipient_address(event): str
-      + get_amount(event): int
-      + parse_u256_from_double_u128(low, high): int
-      + get_fee(event): int
       + get_latest_block(rpc_node): int
       + sign_invoke_transaction(call: Call, max_fee: int, rpc_node)
       + estimate_message_fee(from_address, to_address, entry_point_selector, payload, rpc_node)
       + send_transaction(transaction, rpc_node)
       + wait_for_tx(transaction_hash, rpc_node)
     }
-    MM *-- Starknet
 
     class StarknetRpcNode {
       + full_node_client
       + account
       + contract_address
     }
-    Starknet *-- StarknetRpcNode
 
     class MMFullNodeClient {
     }
-    StarknetRpcNode *-- MMFullNodeClient
+  }
 
-    class SetOrderEvent {
-      + order_id
-      + starknet_tx_hash
-      + recipient_address
-      + amount
-      + fee
-      + block_number
-      + is_used
+  package zksync {
+    class Zksync {
+      __ main methods __
+      + get_set_order_events(from_block_number, to_block_number): list[SetOrderEvent]
+
+      __ auxiliary methods __
+      + get_latest_block(rpc_node): int
+      + get_set_order_logs(from_block_number, to_block_number, rpc_node): list[EventData]
+    }
+
+  	class EthereumAsyncRpcNode {
+      + w3
+      + contract
+  	}
+
+  }
+
+  package executors {
+    class OrderExecutor {
+      - logger
+      - order_service
+      - sender
+      - payment_claimer
+      - fee_calculator
+      - eth_lock
+      - herodotus_semaphore
+      - MAX_ETH_TRANSFER_WEI
+
+      + execute(order)
+      - process_order(order)
+    }
+  }
+
+  package fee_calculators {
+    abstract FeeCalculator {
+      + estimate_overall_fee(order: Order): int
+      + estimate_transfer_fee(order: Order): int
+      + estimate_claim_payment_fee(order: Order): int
+      + {abstract} estimate_message_fee(order: Order): int
+    }
+
+    class StarknetFeeCalculator {
+    }
+
+    class ZksyncFeeCalculator {
+      + estimate_gas_limit(order: Order): int
+      + estimate_gas_per_pub_data_byte_limit(order: Order): int
+    }
+  }
+
+  package indexers {
+    abstract OrderIndexer {
+      - logger
+      - order_service
+
+      + {abstract} get_orders(from_block, to_block): list[Order]
+      + {abstract} get_new_orders(): list[Order]
+      + save_orders(set_order_events: list[SetOrderEvent]): list[Order]
+    }
+
+    class StarknetOrderIndexer {
+    }
+
+    class ZksyncOrderIndexer {
     }
   }
 
   package payment_claimer {
    abstract PaymentClaimer {
-    + send_payment_claim(order: Order, order_service: OrderService)
-    + wait_for_payment_claim(order: Order, order_service: OrderService)
-    + close_payment_claim(order: Order, order_service: OrderService)
+      - logger
+
+      + {abstract} send_payment_claim(order: Order, order_service: OrderService)
+      + {abstract} wait_for_payment_claim(order: Order, order_service: OrderService)
+      + {abstract} close_payment_claim(order: Order, order_service: OrderService)
     }
-    MM *-right- PaymentClaimer
 
     class EthereumPaymentClaimer {
-      {static} estimate_claim_payment_fallback_message_fee(order_id, recipient_address, amount)
+      - fee_calculator
     }
-    PaymentClaimer <|-- EthereumPaymentClaimer
+
+    class Ethereum2ZksyncPaymentClaimer {
+      - fee_calculator
+    }
 
     class HerodotusPaymentClaimer {
     }
-    PaymentClaimer <|-- HerodotusPaymentClaimer
-    HerodotusPaymentClaimer *-- Herodotus
+  }
+
+  package processors {
+    class OrdersProcessor {
+      - logger
+      - order_indexer
+      - order_executor
+
+      + process_orders()
+    }
+
+    class AcceptedBlocksOrderProcessor {
+      - logger
+      - order_indexer
+      - order_executor
+      - block_dao
+
+      + process_orders()
+      + process_orders_job()
+    }
+
+    class FailedOrdersProcessor {
+      - logger
+      - order_executor
+      - order_service
+
+      + process_orders()
+      + process_orders_job()
+    }
+  }
+
+  package senders {
+    class EthereumSender {
+      - logger
+      - order_service
+
+      + transfer(order: Order)
+      + wait_transfer(order: Order)
   }
 }
 
 package persistence <<Database>> {
   class BlockDao {
-    + get_latest_block(): int
-    + update_latest_block(latest_block: int)
+    + get_latest_block(network: Network): int
+    + update_latest_block(latest_block: int, network: Network)
   }
-  MM *-- BlockDao
 
   class ErrorDao {
     + create_error(error: Error): Error
   }
-  OrderService *-- ErrorDao
 
   class OrderDao {
     + create_order(order: Order): Order
-    + get_order(order_id: int): Order | None
+    + get_order(order_id: int, origin_network: Network): Order | None
     + get_orders(criteria): list[Type[Order]]
     + get_incomplete_orders() list[Type[Order]]
     + get_failed_orders(): list[Type[Order]]
-    + already_exists(order_id): bool
+    + already_exists(order_id: int, origin_network: Network): bool
     + update_order(order: Order): Order
   }
-  OrderService *-- OrderDao
 }
 
 package models {
   class Block {
-    + id
+    + id: int
+    + network: Network
     + latest_block
     + created_at
   }
 
   class Error {
-    + id
-    + order
-    + message
-    + created_at
+    + id: int
+    + order_id: int
+    + origin_network: Network
+    + order: Mapped[Order]
+    + message: str
+    + created_at: datetime
+  }
+
+  enum Network {
+    STARKNET
+    ZKSYNC
   }
 
   class Order {
-    + order_id
-    + starknet_tx_hash
-    + recipient_address
-    + amount
-    + fee
-    + status
-    + failed
-    + tx_hash
-    + transferred_at
-    + herodotus_task_id
-    + herodotus_block
-    + herodotus_slot
-    + eth_claim_tx_hash
-    + completed_at
-    + created_at
+    + order_id: int
+    + origin_network: Network
+    + recipient_address: str
+    + amount: decimal
+    + fee: decimal
+    + status: OrderStatus
+    + failed: bool
+    + set_order_tx_hash: HexBytes
+    + transfer_tx_hash: HexBytes
+    + claim_tx_hash: HexBytes
+    + herodotus_task_id: str
+    + herodotus_block: int
+    + herodotus_slot: int
+    + created_at: datetime
+    + transferred_at: datetime
+    + completed_at: datetime
 
-    + get_int_amount()
-    + get_int_fee()
+    + get_int_amount(): int
+    + get_int_fee(): int
+    + summary(): str
+    + {static} from_set_order_event(event: SetOrderEvent): Order
   }
-
-  Error *-- Order
 
   enum OrderStatus {
     PENDING
@@ -223,6 +295,94 @@ package models {
     COMPLETED
     DROPPED
   }
-  Order *-- OrderStatus
+
+  class SetOrderEvent {
+    + order_id: int
+    + origin_network: Network
+    + set_order_tx_hash: HexBytes
+    + recipient_address: str
+    + amount: int
+    + fee: int
+    + block_number: int
+    + is_used: bool
+
+    + {static} from_starknet(event): SetOrderEvent
+    + {static} from_zksync(event): SetOrderEvent
+    + {static} parse_u256_from_double_u128(low: int, high: int): int
+  }
 }
+
+' Relations
+' MM
+MM *-down- FailedOrdersProcessor
+MM *-down- AcceptedBlocksOrderProcessor
+MM *-down- OrdersProcessor
+
+' Services
+' Executors
+'OrderExecutor *-- OrderService
+OrderExecutor *-- EthereumSender
+OrderExecutor *-- PaymentClaimer
+OrderExecutor *-- FeeCalculator
+
+' Fee Calculator
+'FeeCalculator *-- Ethereum
+FeeCalculator <|-- StarknetFeeCalculator
+FeeCalculator <|-- ZksyncFeeCalculator
+
+'StarknetFeeCalculator *-- Starknet
+'ZksyncFeeCalculator *-- Zksync
+
+' Indexers
+'OrderIndexer *-- OrderService
+OrderIndexer <|-- StarknetOrderIndexer
+OrderIndexer <|-- ZksyncOrderIndexer
+
+'StarknetOrderIndexer *-- Starknet
+'ZksyncOrderIndexer *-- Zksync
+
+' Payment Claimer
+PaymentClaimer <|-- EthereumPaymentClaimer
+PaymentClaimer <|-- HerodotusPaymentClaimer
+PaymentClaimer <|-- Ethereum2ZksyncPaymentClaimer
+'EthereumPaymentClaimer *-- Ethereum
+'EthereumPaymentClaimer *-- StarknetFeeCalculator
+'Ethereum2ZksyncPaymentClaimer *-- Ethereum
+'Ethereum2ZksyncPaymentClaimer *-- ZksyncFeeCalculator
+'HerodotusPaymentClaimer *-- Herodotus
+
+' Processors
+OrdersProcessor *-- OrderIndexer
+OrdersProcessor *-- OrderExecutor
+
+'AcceptedBlocksOrderProcessor *-- OrderIndexer
+'AcceptedBlocksOrderProcessor *-- OrderExecutor
+'AcceptedBlocksOrderProcessor *-- BlockDao
+
+'FailedOrdersProcessor *-- OrderExecutor
+'FailedOrdersProcessor *-- OrderService
+
+' Senders
+'EthereumSender *-- OrderService
+'EthereumSender *-- Ethereum
+
+OrderService *-- OrderDao
+OrderService *-- ErrorDao
+
+Ethereum *-- EthereumRpcNode
+
+Starknet *-- StarknetRpcNode
+StarknetRpcNode *-- MMFullNodeClient
+
+Zksync *-- EthereumAsyncRpcNode
+
+' Models
+Order *-- SetOrderEvent
+Order *-- OrderStatus
+Order *-- Network
+
+Error *-- Order
+Error *-- Network
+
+Block *-- Network
 @enduml
