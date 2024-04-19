@@ -38,4 +38,6 @@ jobs:
 
       - name: Run make zksync-test
         run: |
+          echo sleeping 90 for in-memory-node setup
+          sleep 90
           make zksync-test-in-memory
