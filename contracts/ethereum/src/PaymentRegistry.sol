@@ -22,8 +22,11 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
     event ModifiedZKSyncEscrowAddress(address newEscrowAddress);
     event ModifiedStarknetEscrowAddress(uint256 newEscrowAddress);
+    
     event ModifiedStarknetClaimPaymentSelector(uint256 newEscrowClaimPaymentSelector);
     event ModifiedStarknetClaimPaymentBatchSelector(uint256 newEscrowClaimPaymentBatchSelector);
+    event ModifiedStarknetClaimPaymentERC20Selector(uint256 newEscrowClaimPaymentERC20Selector);
+
     event ModifiedZKSyncClaimPaymentSelector(bytes4 newZKSyncEscrowClaimPaymentSelector);
     event ModifiedZKSyncClaimPaymentBatchSelector(bytes4 newZKSyncEscrowClaimPaymentBatchSelector);
     event ModifiedZKSyncClaimPaymentERC20Selector(bytes4 newZKSyncEscrowClaimPaymentERC20Selector);
@@ -341,6 +344,11 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         emit ModifiedStarknetClaimPaymentBatchSelector(StarknetEscrowClaimPaymentBatchSelector);
     }
 
+    function setStarknetClaimPaymentERC20Selector(uint256 NewStarknetEscrowClaimPaymentERC20Selector) external onlyOwner {
+        StarknetEscrowClaimPaymentERC20Selector = NewStarknetEscrowClaimPaymentERC20Selector;
+        emit ModifiedStarknetClaimPaymentERC20Selector(StarknetEscrowClaimPaymentERC20Selector);
+    }
+
     function setZKSyncEscrowClaimPaymentSelector(bytes4 NewZKSyncEscrowClaimPaymentSelector) external onlyOwner {
         ZKSyncEscrowClaimPaymentSelector = NewZKSyncEscrowClaimPaymentSelector;
         emit ModifiedZKSyncClaimPaymentSelector(ZKSyncEscrowClaimPaymentSelector);
@@ -354,7 +362,6 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     function setZKSyncEscrowClaimPaymentERC20Selector(bytes4 NewZKSyncEscrowClaimPaymentERC20Selector) external onlyOwner {
         ZKSyncEscrowClaimPaymentERC20Selector = NewZKSyncEscrowClaimPaymentERC20Selector;
         emit ModifiedZKSyncClaimPaymentERC20Selector(ZKSyncEscrowClaimPaymentERC20Selector);
-
     }
 
     
