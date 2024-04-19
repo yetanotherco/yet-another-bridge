@@ -193,7 +193,7 @@ mod Escrow {
     }
 
     #[test]
-    fn test_fail_claim_erc20_wrong_erc20() {
+    fn test_fail_claim_erc20_wrong_amount_l2() {
         let (escrow, eth_token, uri_token) = setup_with_erc20();
 
         //set order
