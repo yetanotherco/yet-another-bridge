@@ -118,14 +118,14 @@ mod Escrow {
     #[should_panic(expected: ('Caller is not the owner',))]
     fn test_fail_set_mm_ethereum_contract() {
         let (escrow, _) = setup();
-        escrow.set_mm_ethereum_contract(MM_ETHEREUM());
+        escrow.set_mm_ethereum_wallet(MM_ETHEREUM());
     }
 
     #[test]
     fn test_set_mm_ethereum_contract() {
         let (escrow, _) = setup();
         start_prank(CheatTarget::One(escrow.contract_address), OWNER());
-        escrow.set_mm_ethereum_contract(MM_ETHEREUM());
+        escrow.set_mm_ethereum_wallet(MM_ETHEREUM());
     }
 
     #[test]
