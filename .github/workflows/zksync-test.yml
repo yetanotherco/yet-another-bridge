@@ -1,0 +1,19 @@
+name: ZKSync Escrow Tests
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  test-SN:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+     
+      - name: Run make zksync-test
+        run: |
+          make zksync-test
