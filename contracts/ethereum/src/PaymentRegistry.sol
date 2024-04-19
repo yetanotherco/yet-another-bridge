@@ -81,7 +81,7 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
         marketMaker = marketMaker_;
     }
-
+    
     function transferERC20(uint256 orderId, address destAddress, uint128 chainId, address l1_erc20_address, uint256 amount) external onlyOwnerOrMM {
         // Decide if MM fees are paid in ERC20 or in ETH.
         // // If paid in ETH:
@@ -172,7 +172,6 @@ contract PaymentRegistry is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         emit ClaimPaymentERC20(orderId, destAddress, amount, StarknetChainId, l1_erc20_address);
     }
 
-    //TODO: change orderID to uint32
     function transfer(uint256 orderId, address destAddress, uint128 chainId) external payable onlyOwnerOrMM {
         require(msg.value > 0, "Invalid amount, should be higher than 0.");
 

@@ -1,11 +1,11 @@
 import asyncio
 import logging
-from typing import Literal
+from typing import Literal, cast
 
 from starknet_py.common import int_from_bytes
 from starknet_py.hash.selector import get_selector_from_name
 from starknet_py.net.account.account import Account
-from starknet_py.net.client_models import Call
+from starknet_py.net.client_models import Call, InvokeTransaction
 from starknet_py.net.models.chains import StarknetChainId
 from starknet_py.net.signer.stark_curve_signer import KeyPair
 
@@ -15,6 +15,7 @@ from services.decorators.use_fallback import use_async_fallback
 from services.mm_full_node_client import MmFullNodeClient
 
 SET_ORDER_EVENT_KEY = 0x2c75a60b5bdad73ebbf539cc807fccd09875c3cbf3f44041f852cdb96d8acd3
+
 
 class StarknetRpcNode:
     def __init__(self, rpc_url, private_key, wallet_address, contract_address, chain_id):
@@ -73,8 +74,9 @@ async def get_is_used_order(order_id, rpc_node=main_rpc_node) -> bool:
 async def get_order_events(from_block_number, to_block_number) -> list[SetOrderEvent]:
     continuation_token = None
     events = []
+    event_tasks = []
     order_events = []
-    tasks = []
+    order_tasks = []
     while True:
         events_response = await get_starknet_events(from_block_number, to_block_number, continuation_token)
         events.extend(events_response.events)
@@ -83,12 +85,20 @@ async def get_order_events(from_block_number, to_block_number) -> list[SetOrderE
             break
 
     for event in events:
-        tasks.append(asyncio.create_task(SetOrderEvent.from_starknet(event)))
+        event_tasks.append(asyncio.create_task(get_transaction(event.tx_hash)))
 
-    for task in tasks:
-        order = await task
-        order_events.append(order)
-    return order_events
+    transactions = await asyncio.gather(*event_tasks)
+
+    # asyncio.gather() returns the results in the same order as the input list, so we can zip the two lists
+    # https://docs.python.org/3/library/asyncio-task.html#running-tasks-concurrently
+    for event, transaction in zip(events, transactions):
+        transaction = cast(InvokeTransaction, transaction)
+        event.from_address = f'0x{transaction.sender_address:064x}'
+        order_tasks.append(asyncio.create_task(SetOrderEvent.from_starknet(event)))
+
+    order_events = await asyncio.gather(*order_tasks)
+
+    return cast(list[SetOrderEvent], order_events)
 
 
 @use_async_fallback(rpc_nodes, logger, "Failed to get latest block number")
@@ -137,3 +147,7 @@ async def send_transaction(transaction, rpc_node=main_rpc_node):
 async def wait_for_tx(transaction_hash, rpc_node=main_rpc_node):
     await rpc_node.account.client.wait_for_tx(transaction_hash)
 
+
+@use_async_fallback(rpc_nodes, logger, "Failed to get the tx")
+async def get_transaction(transaction_hash, rpc_node=main_rpc_node):
+    return await rpc_node.account.client.get_transaction(transaction_hash)

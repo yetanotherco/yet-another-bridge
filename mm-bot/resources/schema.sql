@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS orders
     order_id          INT            NOT NULL,
     origin_network    VARCHAR(32)    NOT NULL,
 
+    from_address      VARCHAR(66)    NOT NULL, -- 66 chars to allow Starknet and zkSync compatibility
     recipient_address VARCHAR(42)    NOT NULL, -- 0x + 40 bytes
     amount            NUMERIC(78, 0) NOT NULL, -- uint 256
     fee               NUMERIC(78, 0) NOT NULL, -- uint 256
@@ -32,8 +33,6 @@ CREATE TABLE IF NOT EXISTS block
     latest_block BIGINT    NOT NULL DEFAULT 0,
     created_at   TIMESTAMP NOT NULL DEFAULT clock_timestamp()
 );
-
-INSERT INTO block (latest_block) VALUES (0) ON CONFLICT DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS error
 (
