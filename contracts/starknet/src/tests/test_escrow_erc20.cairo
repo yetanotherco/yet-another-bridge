@@ -30,7 +30,7 @@ mod Escrow {
         },
     };
 
-    fn setup() -> (IEscrowDispatcher, IERC20Dispatcher) {
+    fn setup_with_erc20() -> (IEscrowDispatcher, IERC20Dispatcher) {
         setup_general_with_erc20(BoundedInt::max(), BoundedInt::max())
     }
 
@@ -87,7 +87,7 @@ mod Escrow {
 
     #[test]
     fn test_claim_payment_erc20() {
-        let (escrow, eth_token, uri_token) = setup();
+        let (escrow, eth_token, uri_token) = setup_with_erc20();
 
         // check balance
         assert(eth_token.balanceOf(escrow.contract_address) == 0, 'init: wrong balance 1');
