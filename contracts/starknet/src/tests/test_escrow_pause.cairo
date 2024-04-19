@@ -18,7 +18,7 @@ mod Escrow {
 
     use yab::tests::utils::{
         constants::EscrowConstants::{
-            USER, OWNER, MM_STARKNET, MM_ETHEREUM, ETH_TRANSFER_CONTRACT, ETH_USER
+            USER, OWNER, MM_STARKNET, MM_ETHEREUM, ETH_TRANSFER_CONTRACT, ETH_USER, L1_ERC20_ADDRESS
         },
     };
 
@@ -258,6 +258,35 @@ mod Escrow {
             function_name: 'claim_payment',
         );
         l1_handler.from_address = ETH_TRANSFER_CONTRACT().into();
+        l1_handler.payload = payload_buffer.span();
+
+        // same as "Should Panic" but for the L1 handler function
+        match l1_handler.execute() {
+            Result::Ok(_) => panic_with_felt252('shouldve panicked'),
+            Result::Err(RevertedTransaction) => {
+                assert(*RevertedTransaction.panic_data.at(0) == 'Pausable: paused', *RevertedTransaction.panic_data.at(0));
+            }
+        }
+    }
+
+    #[test]
+    fn test_fail_call_erc20_l1_handler_while_paused() {
+        let (escrow, _) = setup();
+        let pausable = IPausableDispatcher { contract_address: escrow.contract_address };
+
+        start_prank(CheatTarget::One(escrow.contract_address), OWNER());
+        escrow.pause();
+        stop_prank(CheatTarget::One(escrow.contract_address));
+
+        let data: Array<felt252> = array![1, MM_ETHEREUM().into(), 3, L1_ERC20_ADDRESS().into(), 5];
+        let mut payload_buffer: Array<felt252> = ArrayTrait::new();
+        data.serialize(ref payload_buffer);
+        let mut l1_handler = L1HandlerTrait::new(
+            contract_address: escrow.contract_address,
+            function_name: 'claim_payment_erc20',
+        );
+        l1_handler.from_address = ETH_USER().into();
+
         l1_handler.payload = payload_buffer.span();
 
         // same as "Should Panic" but for the L1 handler function

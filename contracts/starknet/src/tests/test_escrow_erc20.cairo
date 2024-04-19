@@ -178,7 +178,7 @@ mod Escrow {
         Serde::serialize(@order_id, ref payload_buffer);
         Serde::serialize(@order_erc20.recipient_address, ref payload_buffer);
         Serde::serialize(@order_erc20.amount_l1, ref payload_buffer);
-        Serde::serialize(@order_erc20.uri_token.contract_address, ref payload_buffer); //wrong, sent to uri_token instead of l1_erc20_address
+        Serde::serialize(@order_erc20.l2_erc20_address, ref payload_buffer); //wrong, sent to l2_erc20_address instead of l1_erc20_address
 
         l1_handler.from_address = ETH_TRANSFER_CONTRACT().into();
         l1_handler.payload = payload_buffer.span();
@@ -188,6 +188,41 @@ mod Escrow {
             Result::Ok(_) => panic_with_felt252('shouldve panicked'),
             Result::Err(RevertedTransaction) => {
                 assert(*RevertedTransaction.panic_data.at(0) == 'l1_erc20_address not match L1', *RevertedTransaction.panic_data.at(0));
+            }
+        }
+    }
+
+    #[test]
+    fn test_fail_claim_erc20_wrong_erc20() {
+        let (escrow, eth_token, uri_token) = setup_with_erc20();
+
+        //set order
+        start_prank(CheatTarget::One(escrow.contract_address), USER());
+        let order_erc20 = OrderERC20 { recipient_address: ETH_USER(), amount_l2: 200, amount_l1: 100, fee: 10, l2_erc20_address: uri_token.contract_address, l1_erc20_address: L1_ERC20_ADDRESS() };
+        let order_id = escrow.set_order_erc20(order_erc20);
+        stop_prank(CheatTarget::One(escrow.contract_address));
+
+
+        let mut l1_handler = L1HandlerTrait::new(
+            contract_address: escrow.contract_address,
+            function_name: 'claim_payment_erc20'
+        );
+
+        //claim payment
+        let mut payload_buffer: Array<felt252> = ArrayTrait::new();
+        Serde::serialize(@order_id, ref payload_buffer);
+        Serde::serialize(@order_erc20.recipient_address, ref payload_buffer);
+        Serde::serialize(@order_erc20.amount_l2, ref payload_buffer); //wrong, sent amount_l2 instead of amount_l1
+        Serde::serialize(@order_erc20.l1_erc20_address, ref payload_buffer);
+
+        l1_handler.from_address = ETH_TRANSFER_CONTRACT().into();
+        l1_handler.payload = payload_buffer.span();
+
+        // same as "Should Panic" but for the L1 handler function
+        match l1_handler.execute() {
+            Result::Ok(_) => panic_with_felt252('shouldve panicked'),
+            Result::Err(RevertedTransaction) => {
+                assert(*RevertedTransaction.panic_data.at(0) == 'amount_l1 not match L1', *RevertedTransaction.panic_data.at(0));
             }
         }
     }
@@ -211,35 +246,6 @@ mod Escrow {
             Result::Ok(_) => panic_with_felt252('shouldve panicked'),
             Result::Err(RevertedTransaction) => {
                 assert(*RevertedTransaction.panic_data.at(0) == 'Only PAYMENT_REGISTRY_CONTRACT', *RevertedTransaction.panic_data.at(0));
-            }
-        }
-    }
-
-    #[test]
-    fn test_fail_call_erc20_l1_handler_while_paused() {
-        let (escrow, _, _) = setup_with_erc20();
-        let pausable = IPausableDispatcher { contract_address: escrow.contract_address };
-
-        start_prank(CheatTarget::One(escrow.contract_address), OWNER());
-        escrow.pause();
-        stop_prank(CheatTarget::One(escrow.contract_address));
-
-        let data: Array<felt252> = array![1, MM_ETHEREUM().into(), 3, L1_ERC20_ADDRESS().into(), 5];
-        let mut payload_buffer: Array<felt252> = ArrayTrait::new();
-        data.serialize(ref payload_buffer);
-        let mut l1_handler = L1HandlerTrait::new(
-            contract_address: escrow.contract_address,
-            function_name: 'claim_payment_erc20',
-        );
-        l1_handler.from_address = ETH_USER().into();
-
-        l1_handler.payload = payload_buffer.span();
-
-        // same as "Should Panic" but for the L1 handler function
-        match l1_handler.execute() {
-            Result::Ok(_) => panic_with_felt252('shouldve panicked'),
-            Result::Err(RevertedTransaction) => {
-                assert(*RevertedTransaction.panic_data.at(0) == 'Pausable: paused', *RevertedTransaction.panic_data.at(0));
             }
         }
     }
