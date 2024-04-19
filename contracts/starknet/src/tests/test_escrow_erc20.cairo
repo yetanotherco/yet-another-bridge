@@ -54,7 +54,7 @@ mod Escrow {
         stop_prank(CheatTarget::One(eth_token.contract_address));
 
         start_prank(CheatTarget::One(uri_token.contract_address), USER());
-        eth_token.approve(escrow.contract_address, approved);
+        uri_token.approve(escrow.contract_address, approved);
         stop_prank(CheatTarget::One(uri_token.contract_address));
 
         (escrow, eth_token, uri_token)
@@ -85,14 +85,14 @@ mod Escrow {
         let mut calldata = array![name, symbol];
         Serde::serialize(@initial_supply, ref calldata);
         calldata.append(recipent.into());
-        let address_1 = erc20.deploy(@calldata).unwrap();
+        let address = erc20.deploy(@calldata).unwrap();
 
         let mut calldata_2 = array![name_2, symbol_2];
         Serde::serialize(@initial_supply_2, ref calldata_2);
         calldata_2.append(recipent_2.into());
         let address_2 = erc20.deploy(@calldata_2).unwrap();
 
-        return (IERC20Dispatcher { contract_address: address_1 }, IERC20Dispatcher { contract_address: address_2 });
+        return (IERC20Dispatcher { contract_address: address }, IERC20Dispatcher { contract_address: address_2 });
     }
 
     #[test]
