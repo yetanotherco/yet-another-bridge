@@ -30,11 +30,11 @@ mod Escrow {
         },
     };
 
-    fn setup_with_erc20() -> (IEscrowDispatcher, IERC20Dispatcher) {
+    fn setup_with_erc20() -> (IEscrowDispatcher, IERC20Dispatcher, IERC20Dispatcher) {
         setup_general_with_erc20(BoundedInt::max(), BoundedInt::max())
     }
 
-    fn setup_general_with_erc20(balance: u256, approved: u256) -> (IEscrowDispatcher, IERC20Dispatcher){
+    fn setup_general_with_erc20(balance: u256, approved: u256) -> (IEscrowDispatcher, IERC20Dispatcher, IERC20Dispatcher){
         let eth_token = deploy_erc20('ETH', '$ETH', BoundedInt::max(), OWNER());
         let uri_token = deploy_erc20('UriCoin', '$Uri', BoundedInt::max(), USER());
         let escrow = deploy_escrow(
