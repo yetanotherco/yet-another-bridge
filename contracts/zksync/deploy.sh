@@ -10,7 +10,7 @@ if [ -z "$PAYMENT_REGISTRY_PROXY_ADDRESS" ]; then
 fi
 
 DEPLOY="deploy"
-if [ "$TEST" == true ]; then
+if [ "$TEST" = true ]; then
     DEPLOY="deploy-devnet"
 fi
 
@@ -18,7 +18,9 @@ export WALLET_PRIVATE_KEY=$WALLET_PRIVATE_KEY
 export PAYMENT_REGISTRY_PROXY_ADDRESS=$PAYMENT_REGISTRY_PROXY_ADDRESS
 export MM_ZKSYNC_WALLET=$MM_ZKSYNC_WALLET
 
-ZKSYNC_ESCROW_CONTRACT_ADDRESS=$(yarn $DEPLOY | grep "Contract address:" | egrep -i -o '0x[a-zA-Z0-9]{40}')
+RESULT_LOG=$(yarn $DEPLOY)
+# echo $RESULT_LOG #uncomment this line for debugging
+ZKSYNC_ESCROW_CONTRACT_ADDRESS=$(echo "$RESULT_LOG" | grep "Contract address:" | egrep -i -o '0x[a-zA-Z0-9]{40}')
 
 if [ -z "$ZKSYNC_ESCROW_CONTRACT_ADDRESS" ]; then
     printf "\n${RED}ERROR:${COLOR_RESET}\n"
