@@ -42,6 +42,9 @@ ethereum-upgrade: ethereum-build
 ethereum-set-escrow:
 	@. ./contracts/ethereum/.env && . ./contracts/ethereum/set_starknet_escrow.sh
 
+ethereum-deploy-erc20: ethereum-build
+	@. ./contracts/ethereum/.env && . ./contracts/ethereum/deploy_erc20.sh
+
 
 ### STARKNET ###
 
@@ -74,6 +77,9 @@ starknet-pause:
 
 starknet-unpause:
 	@. ./contracts/starknet/.env && . ./contracts/starknet/scripts/change_pause_state.sh unpause
+
+starknet-deploy-erc20: starknet-build
+	@. ./contracts/starknet/.env && . ./contracts/starknet/scripts/deploy_erc20.sh
 
 
 ### ZKSYNC ###
@@ -123,6 +129,10 @@ zksync-test-integration-local:
 	. ./.github/workflows/zksync-scripts/claim_payment.sh && \
 	. ./.github/workflows/zksync-scripts/assert.sh
 
+zksync-deploy-erc20:
+	@make zksync-build && \
+	. ./contracts/zksync/deploy_erc20.sh
+
 # zksync-upgrade: WIP
 
 
@@ -151,15 +161,15 @@ ethereum-and-starknet-deploy:
 deploy-all:
 	@. ./contracts/ethereum/.env && . ./contracts/starknet/.env && . ./contracts/zksync/.env && \
 	make ethereum-build && \
-	. ./contracts/ethereum/deploy.sh && \
 	make starknet-build && \
+	make zksync-build && \
+	. ./contracts/ethereum/deploy.sh && \
 	. ./contracts/starknet/scripts/deploy.sh && \
 	. ./contracts/ethereum/set_starknet_escrow.sh && \
-	. ./contracts/utils/display_info.sh && \
-	make zksync-build && \
 	. ./contracts/zksync/deploy.sh && \
-	. ./contracts/ethereum/set_zksync_escrow.sh
-
+	. ./contracts/ethereum/set_zksync_escrow.sh && \
+	. ./contracts/utils/display_info.sh
+	
 test: 
 	make starknet-test
 	make ethereum-test

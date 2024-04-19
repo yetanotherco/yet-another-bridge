@@ -32,4 +32,12 @@ mod EscrowConstants {
     fn ETH_USER_3() -> EthAddress {
         101.try_into().unwrap()
     }
+
+    fn L1_ERC20_ADDRESS() -> EthAddress {
+        111.try_into().unwrap()
+    }
+
+    fn L1_ERC20_ADDRESS_2() -> EthAddress {
+        112.try_into().unwrap()
+    }
 }

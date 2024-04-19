@@ -3,11 +3,12 @@
   "private": true,
   "packageManager": "yarn@1.22.21",
   "scripts": {
+    "deploy-erc20": "hardhat deploy-zksync --network zkSyncSepoliaTestnet --script deploy_erc20.ts",
     "deploy": "hardhat deploy-zksync --network zkSyncSepoliaTestnet --script deploy.ts",
     "deploy-devnet": "hardhat deploy-zksync --network dockerizedNode --script deploy.ts",
     "compile": "hardhat compile",
     "clean": "hardhat clean",
-    "test": "hardhat test --network dockerizedNode --show-stack-traces",
+    "test": "hardhat test --network dockerizedNode --show-stack-traces test/main.test.ts test/erc20.test.ts",
     "test-in-memory": "hardhat test --network inMemoryNode --show-stack-traces"
   },
   "devDependencies": {
