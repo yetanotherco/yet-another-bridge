@@ -35,8 +35,7 @@ mod Escrow {
     }
 
     fn setup_general_with_erc20(balance: u256, approved: u256) -> (IEscrowDispatcher, IERC20Dispatcher, IERC20Dispatcher){
-        let eth_token = deploy_erc20('ETH', '$ETH', BoundedInt::max(), OWNER());
-        let uri_token = deploy_erc20('UriCoin', '$Uri', BoundedInt::max(), USER());
+        let (eth_token, uri_token) = deploy_erc20_2('ETH', '$ETH', BoundedInt::max(), OWNER(), 'UriCoin', '$Uri', BoundedInt::max(), USER());
 
         let escrow = deploy_escrow(
             OWNER(),
@@ -79,15 +78,21 @@ mod Escrow {
         return IEscrowDispatcher { contract_address: address };
     }
 
-    fn deploy_erc20(
-        name: felt252, symbol: felt252, initial_supply: u256, recipent: ContractAddress
-    ) -> IERC20Dispatcher {
+    fn deploy_erc20_2(
+        name: felt252, symbol: felt252, initial_supply: u256, recipent: ContractAddress, name2: felt252, symbol_2: felt252, initial_supply_2: u256, recipent_2: ContractAddress
+    ) -> (IERC20Dispatcher, IERC20Dispatcher) {
         let erc20 = declare('ERC20');
         let mut calldata = array![name, symbol];
         Serde::serialize(@initial_supply, ref calldata);
         calldata.append(recipent.into());
-        let address = erc20.deploy(@calldata).unwrap();
-        return IERC20Dispatcher { contract_address: address };
+        let address_1 = erc20.deploy(@calldata).unwrap();
+
+        let mut calldata_2 = array![name_2, symbol_2];
+        Serde::serialize(@initial_supply_2, ref calldata_2);
+        calldata_2.append(recipent_2.into());
+        let address_2 = erc20.deploy(@calldata_2).unwrap();
+
+        return (IERC20Dispatcher { contract_address: address_1 }, IERC20Dispatcher { contract_address: address_2 });
     }
 
     #[test]
