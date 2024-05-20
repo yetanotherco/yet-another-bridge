@@ -46,6 +46,6 @@ create_db:
 	sleep 5  # Wait for the PostgreSQL container to start (you can adjust this as needed)
 	docker exec -it $(container) psql -U $(user) -c 'CREATE DATABASE "$(database)" WITH ENCODING "UTF-8";'
 
-tests:
+test:
 	@echo "Running tests..."
 	pytest ./tests/*_test.py
