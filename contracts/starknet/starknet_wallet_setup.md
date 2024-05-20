@@ -1,15 +1,14 @@
 # Setting up a Starknet Testnet Wallet
 
-**This guide will help you declare and deploy contracts on a testnet. Please
-note that you won't be able to use the commands in the Makefile unless you
-follow these instructions.**
+Accounts on Starknet are not like in Ethereum. Instead, they are a smart contract that act as a wallet for the user (commonly referred as a Smart Wallet).
 
-A smart wallet consists of two parts: a Signer and an Account Descriptor. The
-Signer is a smart contract capable of signing transactions (for which we need
-its private key). The Account Descriptor is a JSON file containing information
+A smart wallet consists of two parts: a Signer and an Account Descriptor:
+- The Signer is a smart contract capable of signing transactions (for which we need
+its private key).
+- The Account Descriptor is a JSON file containing information
 about the smart wallet, such as its address and public key.
 
-Follow the steps below to set up a smart wallet using `starkli`:
+## Follow the steps below to set up a smart wallet using `starkli`:
 
 1. **Connect to a Provider**: to interact with the network you need an RPC
    Provider. For our project we will be using Alchemy's free tier in Goerli

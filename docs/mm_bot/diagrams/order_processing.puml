@@ -1,13 +1,13 @@
 @startuml
 hide footbox
 actor User as U
-box Starknet #ebc7ff
+box L2 #ebc7ff
 entity Escrow as E #purple
 end box
 box Ethereum #99e6ff
 entity "Payment Registry" as PR #blue
 box "Market Maker"
-control "Order Processor" as OP
+control "Orders Processor" as OP
 database Database
 end box
 

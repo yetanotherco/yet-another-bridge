@@ -6,7 +6,8 @@ load_dotenv()
 ENVIRONMENT = os.getenv('ENVIRONMENT')
 
 ETHEREUM_CHAIN_ID = os.getenv('ETHEREUM_CHAIN_ID')
-STARKNET_CHAIN_ID = os.getenv('STARKNET_CHAIN_ID')
+STARKNET_CHAIN_ID = int(os.getenv('STARKNET_CHAIN_ID'), 16)
+ZKSYNC_CHAIN_ID = int(os.getenv('ZKSYNC_CHAIN_ID'))
 
 ETHEREUM_RPC = os.getenv('ETHEREUM_RPC')
 STARKNET_RPC = os.getenv('STARKNET_RPC')

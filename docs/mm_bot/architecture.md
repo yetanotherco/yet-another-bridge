@@ -16,11 +16,15 @@ The following diagram shows the mm classes and how they interact with each other
 
 ![mm_diagram_class.svg](images%2Fmm_diagram_class.svg)
 
+> **_NOTE:_**  To make the diagram more readable, some relationships were omitted.
+
 ### Full Class Diagram
 The following diagram is a detailed version of the previous diagram, 
 showing the attributes and methods of each class.
 
 ![mm_diagram_class_full.svg](images%2Fmm_diagram_class_full.svg)
+
+> **_NOTE:_**  To make the diagram more readable, some relationships were omitted.
 
 ## Process View
 ### Non-Functional Requirements
@@ -36,30 +40,37 @@ The bot architecture is as follows:
 
 ![architecture.png](images/architecture.png)
 
-The bot is composed of the following components:
-- **Main Process**: The main process of the bot. It has the following subcomponents:
-    - `Main Order Indexer`: The `Main Order Indexer` is responsible for indexing the orders from 
-    the pending blocks.
-  - `Order Processor`: Responsible for processing the orders.
-  - `Failed Orders Processor`: Responsible for retrying the failed orders.
-  It runs every 5 minutes.
-  - `Accepted Blocks Processor`: Responsible for indexing the orders that belong to accepted blocks. It runs every 5 minutes.
-- **Database**: The database is used to store the following data:
-  - Orders
-  - Errors
-  - Block numbers
+One `Orders Processor` is needed to process the orders for each L2.
+Each `Orders Processor` has an `Orders Indexer` and an `Order Executor`.
 
-An important aspect of the bot is that it must be able to handle multiple orders concurrently.
+The `Orders Indexer` is responsible for indexing the orders made on the L2 Escrow. It indexes orders by reading Escrow's events, 
+and when it finds a new order, it stores it in the database. Then, `Orders Processor` is able to assign the new order 
+to an `Order Executor`.
+
+The `Order Executor` is responsible for processing an individual order. This means, it will transfer the funds to the 
+recipient in L1 and claim the funds in L2.
+
+To ensure that the orders are not lost, the bot has an `Accepted Blocks Processor` that indexes the orders that belong
+to already accepted blocks, and stores them in the database. This way, if the `Orders Processor` looses an order, it will be
+captured and processed by the `Accepted Blocks Processor`.
+
+The bot has a `Failed Orders Processor` that is responsible for retrying the failed orders. When an order fails, the bot
+stores the error, and marks the order as failed. This way, the `Failed Orders Processor` will be able to retry any failed order.
+
+An important aspect of this bot is that it must be able to process multiple orders at the same time.
 For that reason, the bot uses the library 'asyncio' to handle orders concurrently. This approach, 
 preferred over using threads, is particularly suitable for the bot's I/O-bound nature and the potential 
 high volume of orders it could potentially need to manage.
 
 Another important requirement is that the bot must have a reliable network connection to communicate
-with Ethereum's and L2 networks' RPCs.
+with Ethereum's and the L2 networks' RPCs. Accordingly, the bot has two RPC providers for each network. If the 
+primary provider fails, the bot will switch to the secondary provider.
 
 ## Physical View
-There is a server to run the MM Bot Main Process as well as its
-database.
+A server is needed to run the MM Bot's Main Process.
+
+Also, two servers are needed for the database, one for the main database and another one to act as its read replica.
+This read replica is for external applications, like transaction explorers or data analyzers, so that these don't affect the main database's performance and/or implicate any security concerns.
 
 ![physical_view.png](images/physical_view.png)
 
@@ -74,9 +85,6 @@ And each has the following states:
 ![state_diagram.svg](images%2Fstate_diagram.svg)
 
 ### 2. Failed Orders Reprocessing
-When an order fails, the bot stores the error, and marks the order as failed. This way, the `Failed
-Orders Processor` is able to retry the failed orders. The following diagram shows the flow of a 
-failed order through the bot.
 
 ![failed_orders.svg](images%2Ffailed_orders.svg)
 
@@ -84,8 +92,5 @@ failed order through the bot.
 When the bot starts, it retrieves incomplete orders from the database and continues their processing.
 
 ### 4. Accepted Blocks Indexation
-The Main Order Indexer processes orders from pending blocks. The `Orders from
-Accepted Blocks Processor` will index the orders that belong to accepted blocks. This way, if the `Main Order
-Indexer` loses an order, it will be captured and processed by the `Orders from Accepted Blocks Processor`.
 
 ![accepted_blocks.svg](images%2Faccepted_blocks.svg)

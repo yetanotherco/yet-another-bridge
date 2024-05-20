@@ -39,11 +39,10 @@ def get_latest_block(rpc_node=main_rpc_node) -> int:
 
 @use_fallback(rpc_nodes, logger, "Failed to get order status")
 def get_is_used_order(order_id, recipient_address, amount, chain_id, rpc_node=main_rpc_node) -> bool:
-    is_used_index = 2
-    order_data = Web3.solidity_keccak(['uint256', 'uint256', 'uint256', 'uint8'],
-                                      [order_id, int(recipient_address, 0), amount, chain_id])
-    res = rpc_node.contract.functions.transfers(order_data).call()
-    return res[is_used_index]
+    order_data = Web3.solidity_keccak(['uint256', 'address', 'uint256', 'uint128'],
+                                      [order_id, Web3.to_checksum_address(recipient_address), amount, chain_id])
+    is_used = rpc_node.contract.functions.transfers(order_data).call()
+    return is_used
 
 
 @use_fallback(rpc_nodes, logger, "Failed to get balance")
@@ -56,11 +55,10 @@ def has_funds(amount: int) -> bool:
 
 
 def transfer(order_id: int, destination_address: str, amount: int, chain_id: Network):
-    destination_address_bytes = int(destination_address, 0)
     order_id = Web3.to_int(order_id)
     amount = Web3.to_int(amount)
 
-    unsent_tx, signed_tx = create_transfer(order_id, destination_address_bytes, amount, chain_id.value)
+    unsent_tx, signed_tx = create_transfer(order_id, destination_address, amount, chain_id.value)
 
     gas_fee = estimate_transaction_fee(unsent_tx)
     if not has_enough_funds(amount, gas_fee):
@@ -73,9 +71,9 @@ def transfer(order_id: int, destination_address: str, amount: int, chain_id: Net
 # we need amount so the transaction is valid with the transfer that will be transferred
 # TODO separate create_transfer_unsent_tx and sign_transaction
 @use_fallback(rpc_nodes, logger, "Failed to create ethereum transfer")
-def create_transfer(order_id: int, destination_address_bytes: int, amount: int, chain_id: int,
+def create_transfer(order_id: int, destination_address: str, amount: int, chain_id: int,
                     rpc_node=main_rpc_node):
-    unsent_tx = rpc_node.contract.functions.transfer(order_id, destination_address_bytes, chain_id).build_transaction({
+    unsent_tx = rpc_node.contract.functions.transfer(order_id, Web3.to_checksum_address(destination_address), chain_id).build_transaction({
         "chainId": ETHEREUM_CHAIN_ID,
         "from": rpc_node.account.address,
         "nonce": get_nonce(rpc_node.w3, rpc_node.account.address),
@@ -85,12 +83,11 @@ def create_transfer(order_id: int, destination_address_bytes: int, amount: int, 
     return unsent_tx, signed_tx
 
 
-def claim_payment(deposit_id, dst_addr, amount, value):
+def claim_payment(deposit_id, dst_addr, amount, value):  # TODO rename parameters to order_id and destination_address
     deposit_id = Web3.to_int(deposit_id)
-    dst_addr_bytes = int(dst_addr, 0)
     amount = Web3.to_int(amount)
 
-    unsent_tx, signed_tx = create_claim_payment(deposit_id, dst_addr_bytes, amount, value)
+    unsent_tx, signed_tx = create_claim_payment(deposit_id, dst_addr, amount, value)
 
     gas_fee = estimate_transaction_fee(unsent_tx)
     if not has_enough_funds(gas_fee=gas_fee):
@@ -101,8 +98,8 @@ def claim_payment(deposit_id, dst_addr, amount, value):
 
 
 @use_fallback(rpc_nodes, logger, "Failed to create claim payment eth")
-def create_claim_payment(deposit_id, dst_addr_bytes, amount, value, rpc_node=main_rpc_node):
-    unsent_tx = rpc_node.contract.functions.claimPayment(deposit_id, dst_addr_bytes, amount).build_transaction({
+def create_claim_payment(deposit_id, destination_address, amount, value, rpc_node=main_rpc_node):
+    unsent_tx = rpc_node.contract.functions.claimPaymentStarknet(deposit_id, Web3.to_checksum_address(destination_address), amount).build_transaction({
         "chainId": ETHEREUM_CHAIN_ID,
         "from": rpc_node.account.address,
         "nonce": get_nonce(rpc_node.w3, rpc_node.account.address),
@@ -115,20 +112,19 @@ def create_claim_payment(deposit_id, dst_addr_bytes, amount, value, rpc_node=mai
 def claim_payment_zksync(order_id: int, destination_address: str, amount: int,
                          value: int, gas_limit: int, gas_per_pub_data_byte_limit: int):
     order_id = Web3.to_int(order_id)  # I think it is not necessary because it is already an int
-    destination_address_bytes = int(destination_address, 0)
     amount = Web3.to_int(amount)
 
-    unsent_tx, signed_tx = create_claim_payment_zksync(order_id, destination_address_bytes, amount,
+    unsent_tx, signed_tx = create_claim_payment_zksync(order_id, destination_address, amount,
                                                        value, gas_limit, gas_per_pub_data_byte_limit)
 
     return send_raw_transaction(signed_tx)
 
 
 @use_fallback(rpc_nodes, logger, "Failed to create claim payment eth")
-def create_claim_payment_zksync(order_id: int, destination_address_bytes: int, amount: int,
+def create_claim_payment_zksync(order_id: int, destination_address: str, amount: int,
                                 value: int, gas_limit: int, gas_per_pub_data_byte_limit: int,
                                 rpc_node=main_rpc_node):
-    unsent_tx = rpc_node.contract.functions.claimPaymentZKSync(order_id, destination_address_bytes, amount, gas_limit, gas_per_pub_data_byte_limit).build_transaction({
+    unsent_tx = rpc_node.contract.functions.claimPaymentZKSync(order_id, Web3.to_checksum_address(destination_address), amount, gas_limit, gas_per_pub_data_byte_limit).build_transaction({
         "chainId": ETHEREUM_CHAIN_ID,
         "from": rpc_node.account.address,
         "nonce": get_nonce(rpc_node.w3, rpc_node.account.address),

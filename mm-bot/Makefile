@@ -1,3 +1,5 @@
+.PHONE: deps run create_env create_python_venv start_db stop_db create_db
+
 # Database variables
 container = mm-bot
 user = user
@@ -6,6 +8,11 @@ database = mm-bot-db
 
 
 # Application Commands
+deps:
+	@echo "Installing dependencies..."
+	@. venv/bin/activate && pip install -r requirements.txt
+	@echo "Dependencies installed successfully!"
+
 run:
 	@echo "Running application..."
 	@. venv/bin/activate && python3 src/main.py
@@ -17,16 +24,16 @@ create_env:
 
 create_python_venv:
 	@echo "Creating virtual environment..."
-	@python3 -m venv venv
+	@python3.10 -m venv venv
 	@echo "Virtual environment created successfully!"
 
 # Database Commands
 start_db:
-	@if [ "$(container)" = "postgres" ]; then echo "Using default container name: postgres."; fi
+	@if [ "$(container)" = "mm-bot" ]; then echo "Using default container name: mm-bot."; fi
 	docker start $(container)
 
 stop_db:
-	@if [ "$(container)" = "postgres" ]; then echo "Using default container name: postgres."; fi
+	@if [ "$(container)" = "mm-bot" ]; then echo "Using default container name: mm-bot."; fi
 	docker stop $(container)
 
 create_db:

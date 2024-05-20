@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS orders
     order_id          INT            NOT NULL,
     origin_network    VARCHAR(32)    NOT NULL,
 
+    from_address      VARCHAR(66)    NOT NULL, -- 66 chars to allow Starknet and zkSync compatibility
     recipient_address VARCHAR(42)    NOT NULL, -- 0x + 40 bytes
     amount            NUMERIC(78, 0) NOT NULL, -- uint 256
     fee               NUMERIC(78, 0) NOT NULL, -- uint 256
@@ -33,8 +34,6 @@ CREATE TABLE IF NOT EXISTS block
     created_at   TIMESTAMP NOT NULL DEFAULT clock_timestamp()
 );
 
-INSERT INTO block (latest_block) VALUES (0) ON CONFLICT DO NOTHING;
-
 CREATE TABLE IF NOT EXISTS error
 (
     id         SERIAL PRIMARY KEY,
@@ -45,3 +44,12 @@ CREATE TABLE IF NOT EXISTS error
 
     FOREIGN KEY (order_id, origin_network) REFERENCES orders (order_id, origin_network) ON DELETE CASCADE
 );
+
+CREATE INDEX IF NOT EXISTS orders_transferred_at_idx ON public.orders USING btree (transferred_at);
+CREATE INDEX IF NOT EXISTS orders_amount_idx ON public.orders USING btree (amount);
+CREATE INDEX IF NOT EXISTS orders_origin_network_idx ON public.orders USING btree (origin_network);
+CREATE INDEX IF NOT EXISTS orders_recipient_address_idx ON public.orders USING btree (recipient_address);
+CREATE INDEX IF NOT EXISTS orders_order_id_idx ON public.orders USING btree (order_id);
+CREATE INDEX IF NOT EXISTS orders_status_idx ON public.orders USING btree (status);
+CREATE INDEX IF NOT EXISTS orders_created_at_idx ON public.orders USING btree (created_at);
+CREATE INDEX IF NOT EXISTS orders_completed_at_idx ON public.orders USING btree (completed_at);

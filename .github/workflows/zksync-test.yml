@@ -1,0 +1,46 @@
+name: ZKSync Escrow Tests
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  test-ZKSync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      # ZKSync Setup
+      - name: Install ZKSync libraries
+        run: |
+          cd ./contracts/zksync/ && yarn install
+
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20.11.1'
+          cache: 'npm'
+          cache-dependency-path: '**/.github/workflows/*.yml'
+
+      - name: Download zksync-cli
+        run: |
+          npx zksync-cli --version
+     
+      # Build ZKSync Contract
+      - name: Build ZKSync Contract
+        run: |
+          make zksync-build
+
+      - name: Run make zksync-test
+        run: |
+          echo "Starting ZKSync in-memory node"
+          npx zksync-cli dev start
+          echo sleeping 30 for in-memory-node setup
+          sleep 30
+          make zksync-test-in-memory
+
+          exit 0
