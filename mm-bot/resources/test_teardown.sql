@@ -1,0 +1,3 @@
+DELETE FROM orders;
+DELETE FROM block;
+DELETE FROM error;
