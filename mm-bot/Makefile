@@ -49,3 +49,6 @@ create_db:
 test:
 	@echo "Running tests..."
 	pytest ./tests/*_test.py
+	@echo "Cleaning up..."
+	rm -rf ./tests/__pycache__
+	rm -rf ./.pytest_cache
