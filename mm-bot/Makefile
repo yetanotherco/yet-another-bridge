@@ -45,3 +45,7 @@ create_db:
 	docker run --name $(container) -e POSTGRES_PASSWORD=$(password) -e POSTGRES_USER=$(user) -p 5432:5432 -d postgres
 	sleep 5  # Wait for the PostgreSQL container to start (you can adjust this as needed)
 	docker exec -it $(container) psql -U $(user) -c 'CREATE DATABASE "$(database)" WITH ENCODING "UTF-8";'
+
+tests:
+	@echo "Running tests..."
+	pytest ./tests/*_test.py

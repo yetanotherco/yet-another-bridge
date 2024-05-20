@@ -120,9 +120,9 @@ To start the Bot, you can use the following command:
 make run
 ```
 
-## Test [TODO]
+## Test
 To run the tests, you can use the following command:
 
 ```bash
-
+make tests
 ```

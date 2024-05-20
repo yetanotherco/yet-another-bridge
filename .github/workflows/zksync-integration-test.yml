@@ -3,9 +3,9 @@ on:
   push:
     branches:
       - main
-      - develop
-  pull_request:
-    types: [opened, synchronize, reopened]
+      # - develop
+  # pull_request:
+  #   types: [opened, synchronize, reopened]
   workflow_dispatch:
 
 defaults:
@@ -86,6 +86,8 @@ jobs:
 
           echo sleeping 250 to wait for ./start to setup
           sleep 250
+
+          cat docker_output.log
 
           export ZKSYNC_DIAMOND_PROXY_ADDRESS=$(cat docker_output.log | sed -n 's/.*CONTRACTS_DIAMOND_PROXY_ADDR=\(0x[a-fA-F0-9]*\).*/\1/p')
           echo stored ZKSYNC_DIAMOND_PROXY_ADDRESS variable:
