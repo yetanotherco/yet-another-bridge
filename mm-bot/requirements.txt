@@ -7,3 +7,4 @@ psycopg2-binary==2.9.9
 schedule==1.2.1
 zksync2==1.1.0
 hexbytes==1.2.0
+pytest==8.2.1
