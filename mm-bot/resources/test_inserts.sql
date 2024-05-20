@@ -1,23 +1,24 @@
-INSERT INTO orders (order_id, origin_network, from_address, recipient_address, amount, fee, set_order_tx_hash)
+-- ZKSYNC mainnet -> network = 324
+-- STARKNET mainnet -> network = 0x534e5f4d41494e
+
+
+INSERT INTO orders (order_id, origin_network, from_address, recipient_address, amount, fee, status, failed, set_order_tx_hash)
 VALUES
-(1, 'NetworkA', '0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdef', '0x1234567890123456789012345678901234567890', 1000, 10, '0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdef'),
-(2, 'NetworkB', '0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdef', '0x2234567890123456789012345678901234567890', 2000, 20, '0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdef'),
-(3, 'NetworkA', '0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdef', '0x3234567890123456789012345678901234567890', 3000, 30, '0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdef'),
-(4, 'NetworkC', '0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdef', '0x4234567890123456789012345678901234567890', 4000, 40, '0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdef'),
-(5, 'NetworkB', '0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdef', '0x5234567890123456789012345678901234567890', 5000, 50, '0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdef');
+(1, '324', '0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdef', '0x1234567890123456789012345678901234567890', 1000, 10, 'PENDING', FALSE, '0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdef'),
+(2, '0x534e5f4d41494e', '0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdef', '0x2234567890123456789012345678901234567890', 2000, 20, 'COMPLETED', FALSE, '0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdef'),
+(3, '324', '0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdef', '0x3234567890123456789012345678901234567890', 3000, 30, 'DROPPED', TRUE, '0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdef'),
+(4, '0x534e5f4d41494e', '0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdef', '0x4234567890123456789012345678901234567890', 4000, 40, 'PENDING', FALSE, '0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdef');
 
 INSERT INTO block (network, latest_block)
 VALUES
-('NetworkA', 1000),
-('NetworkB', 2000),
-('NetworkC', 3000),
-('NetworkA', 4000),
-('NetworkB', 5000);
+('324', 1000),
+('0x534e5f4d41494e', 2000),
+('324', 3000),
+('0x534e5f4d41494e', 4000);
 
 INSERT INTO error (order_id, origin_network, message)
 VALUES
-(1, 'NetworkA', 'Error message 1 for order 1 on NetworkA'),
-(2, 'NetworkB', 'Error message 2 for order 2 on NetworkB'),
-(3, 'NetworkA', 'Error message 3 for order 3 on NetworkA'),
-(4, 'NetworkC', 'Error message 4 for order 4 on NetworkC'),
-(5, 'NetworkB', 'Error message 5 for order 5 on NetworkB');
+(1, '324', 'Error message 1 for order 1 on ZKSYNC mainnet'),
+(2, '0x534e5f4d41494e', 'Error message 2 for order 2 on STARKNET mainnet'),
+(3, '324', 'Error message 3 for order 3 on ZKSYNC mainnet'),
+(4, '0x534e5f4d41494e', 'Error message 4 for order 4 on STARKNET mainnet');
