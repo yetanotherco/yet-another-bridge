@@ -3,9 +3,9 @@ on:
   push:
     branches:
       - main
-      - develop
-  pull_request:
-    types: [opened, synchronize, reopened]
+      # - develop
+  # pull_request:
+  #   types: [opened, synchronize, reopened]
   workflow_dispatch:
 
 defaults:
