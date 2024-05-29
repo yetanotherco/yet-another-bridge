@@ -1,7 +1,7 @@
 import logging
 
-from models.network import Network
-from persistence.block_dao import BlockDao
+from src.models.network import Network
+from src.persistence.block_dao import BlockDao
 
 
 class BlockService:

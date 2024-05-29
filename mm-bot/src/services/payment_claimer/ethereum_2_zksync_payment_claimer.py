@@ -1,9 +1,9 @@
 import asyncio
 
-from config import constants
-from services import ethereum
-from services.fee_calculators.zksync_fee_calculator import ZksyncFeeCalculator
-from services.payment_claimer.payment_claimer import PaymentClaimer
+from src.config import constants
+from src.services import ethereum
+from src.services.fee_calculators.zksync_fee_calculator import ZksyncFeeCalculator
+from src.services.payment_claimer.payment_claimer import PaymentClaimer
 
 
 class Ethereum2ZksyncPaymentClaimer(PaymentClaimer):

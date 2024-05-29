@@ -1,7 +1,7 @@
 import asyncio
 
-from models.network import Network
-from services import ethereum
+from src.models.network import Network
+from src.services import ethereum
 
 
 class SetOrderEvent:

@@ -1,9 +1,9 @@
 import asyncio
 import logging
 
-from models.network import Network
-from services.executors.order_executor import OrderExecutor
-from services.order_service import OrderService
+from src.models.network import Network
+from src.services.executors.order_executor import OrderExecutor
+from src.services.order_service import OrderService
 
 
 class FailedOrdersProcessor:

@@ -10,11 +10,11 @@ from web3.types import EventData
 from hexbytes import HexBytes
 
 
-from config import constants
-from models.set_order_event import SetOrderEvent
-from models.zksync_log import ZksyncLog
-from services.decorators.use_fallback import use_async_fallback
-from services.ethereum import main_rpc_node as ethereum_main_rpc_node, fallback_rpc_node as ethereum_fallback_rpc_node
+from src.config import constants
+from src.models.set_order_event import SetOrderEvent
+from src.models.zksync_log import ZksyncLog
+from src.services.decorators.use_fallback import use_async_fallback
+from src.services.ethereum import main_rpc_node as ethereum_main_rpc_node, fallback_rpc_node as ethereum_fallback_rpc_node
 
 from zksync2.account.wallet import Wallet
 from zksync2.core.utils import DEPOSIT_GAS_PER_PUBDATA_LIMIT, apply_l1_to_l2_alias

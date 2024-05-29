@@ -3,9 +3,9 @@ from datetime import datetime
 from sqlalchemy import Column, Integer, ForeignKeyConstraint, String, DateTime, Enum
 from sqlalchemy.orm import relationship, Mapped
 
-from config.database_config import Base
-from models.network import Network
-from models.order import Order
+from src.config.database_config import Base
+from src.models.network import Network
+from src.models.order import Order
 
 
 class Error(Base):

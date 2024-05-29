@@ -1,9 +1,9 @@
 import logging
 from abc import ABC, abstractmethod
 
-from persistence.block_dao import BlockDao
-from services.executors.order_executor import OrderExecutor
-from services.indexers.order_indexer import OrderIndexer
+from src.persistence.block_dao import BlockDao
+from src.services.executors.order_executor import OrderExecutor
+from src.services.indexers.order_indexer import OrderIndexer
 
 
 class CatchUpOrdersProcessor(ABC):

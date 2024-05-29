@@ -1,9 +1,9 @@
 import asyncio
 import logging
 
-from models.order import Order
-from services import ethereum
-from services.order_service import OrderService
+from src.models.order import Order
+from src.services import ethereum
+from src.services.order_service import OrderService
 
 
 class EthereumSender:

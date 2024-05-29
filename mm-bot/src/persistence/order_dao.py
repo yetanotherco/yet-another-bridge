@@ -3,8 +3,8 @@ from typing import Type
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
-from models.order import Order
-from models.order_status import OrderStatus
+from src.models.order import Order
+from src.models.order_status import OrderStatus
 
 
 class OrderDao:

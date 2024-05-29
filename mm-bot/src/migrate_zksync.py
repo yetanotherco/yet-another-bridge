@@ -1,8 +1,8 @@
 import asyncio
 
-from config.database_config import get_db
-from models.order import Order
-from persistence.order_dao import OrderDao
+from src.config.database_config import get_db
+from src.models.order import Order
+from src.persistence.order_dao import OrderDao
 
 
 async def run():

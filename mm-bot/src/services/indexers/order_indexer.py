@@ -1,9 +1,9 @@
 import logging
 from abc import ABC, abstractmethod
 
-from models.order import Order
-from models.set_order_event import SetOrderEvent
-from services.order_service import OrderService
+from src.models.order import Order
+from src.models.set_order_event import SetOrderEvent
+from src.services.order_service import OrderService
 
 
 class OrderIndexer(ABC):

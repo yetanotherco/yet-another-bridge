@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
-from models.block import Block
-from models.network import Network
+from src.models.block import Block
+from src.models.network import Network
 
 
 class BlockDao:

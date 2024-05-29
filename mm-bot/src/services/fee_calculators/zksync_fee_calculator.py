@@ -1,9 +1,9 @@
 from zksync2.core.utils import DEPOSIT_GAS_PER_PUBDATA_LIMIT
 
-from models.order import Order
-from services import zksync
-from services.ethereum import get_gas_price
-from services.fee_calculators.fee_calculator import FeeCalculator
+from src.models.order import Order
+from src.services import zksync
+from src.services.ethereum import get_gas_price
+from src.services.fee_calculators.fee_calculator import FeeCalculator
 
 
 class ZksyncFeeCalculator(FeeCalculator):

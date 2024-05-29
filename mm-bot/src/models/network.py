@@ -1,5 +1,5 @@
 from enum import Enum
-from config import constants
+from src.config import constants
 
 
 class Network(Enum):

@@ -1,7 +1,7 @@
-from models.order import Order
-from models.set_order_event import SetOrderEvent
-from services import zksync
-from services.indexers.order_indexer import OrderIndexer
+from src.models.order import Order
+from src.models.set_order_event import SetOrderEvent
+from src.services import zksync
+from src.services.indexers.order_indexer import OrderIndexer
 
 
 class ZksyncOrderIndexer(OrderIndexer):

@@ -1,8 +1,8 @@
 import asyncio
 
-from models.network import Network
-from services import starknet
-from services.processors.catch_up_orders_processor import CatchUpOrdersProcessor
+from src.models.network import Network
+from src.services import starknet
+from src.services.processors.catch_up_orders_processor import CatchUpOrdersProcessor
 
 
 class AcceptedBlocksOrdersProcessor(CatchUpOrdersProcessor):

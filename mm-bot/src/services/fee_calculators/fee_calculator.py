@@ -3,8 +3,8 @@ import logging
 from abc import ABC, abstractmethod
 from web3 import Web3
 
-from models.order import Order
-from services.ethereum import create_transfer, estimate_transaction_fee, get_gas_price
+from src.models.order import Order
+from src.services.ethereum import create_transfer, estimate_transaction_fee, get_gas_price
 
 
 class FeeCalculator(ABC):

@@ -1,12 +1,12 @@
 import asyncio
 import logging
 
-from models.order import Order
-from models.order_status import OrderStatus
-from services.fee_calculators.fee_calculator import FeeCalculator
-from services.order_service import OrderService
-from services.payment_claimer.payment_claimer import PaymentClaimer
-from services.senders.ethereum_sender import EthereumSender
+from src.models.order import Order
+from src.models.order_status import OrderStatus
+from src.services.fee_calculators.fee_calculator import FeeCalculator
+from src.services.order_service import OrderService
+from src.services.payment_claimer.payment_claimer import PaymentClaimer
+from src.services.senders.ethereum_sender import EthereumSender
 
 
 class OrderExecutor:

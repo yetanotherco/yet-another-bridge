@@ -4,10 +4,10 @@ from datetime import datetime
 from hexbytes import HexBytes
 from sqlalchemy import Column, Integer, String, DateTime, Enum, Numeric, LargeBinary
 
-from config.database_config import Base
-from models.network import Network
-from models.order_status import OrderStatus
-from models.set_order_event import SetOrderEvent
+from src.config.database_config import Base
+from src.models.network import Network
+from src.models.order_status import OrderStatus
+from src.models.set_order_event import SetOrderEvent
 
 
 class Order(Base):

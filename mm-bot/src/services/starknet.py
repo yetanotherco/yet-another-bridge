@@ -9,10 +9,10 @@ from starknet_py.net.client_models import Call, InvokeTransaction
 from starknet_py.net.models.chains import StarknetChainId
 from starknet_py.net.signer.stark_curve_signer import KeyPair
 
-from config import constants
-from models.set_order_event import SetOrderEvent
-from services.decorators.use_fallback import use_async_fallback
-from services.mm_full_node_client import MmFullNodeClient
+from src.config import constants
+from src.models.set_order_event import SetOrderEvent
+from src.services.decorators.use_fallback import use_async_fallback
+from src.services.mm_full_node_client import MmFullNodeClient
 
 SET_ORDER_EVENT_KEY = 0x2c75a60b5bdad73ebbf539cc807fccd09875c3cbf3f44041f852cdb96d8acd3
 

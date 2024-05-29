@@ -1,10 +1,10 @@
 from datetime import datetime
 
-from models.error import Error
-from models.order import Order
-from models.order_status import OrderStatus
-from persistence.error_dao import ErrorDao
-from persistence.order_dao import OrderDao
+from src.models.error import Error
+from src.models.order import Order
+from src.models.order_status import OrderStatus
+from src.persistence.error_dao import ErrorDao
+from src.persistence.order_dao import OrderDao
 
 
 class OrderService:

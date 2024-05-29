@@ -2,10 +2,10 @@ import asyncio
 
 from web3 import Web3
 
-from models.order import Order
-from services import ethereum, herodotus, starknet
-from services.order_service import OrderService
-from services.payment_claimer.payment_claimer import PaymentClaimer
+from src.models.order import Order
+from src.services import ethereum, herodotus, starknet
+from src.services.order_service import OrderService
+from src.services.payment_claimer.payment_claimer import PaymentClaimer
 
 
 class HerodotusPaymentClaimer(PaymentClaimer):

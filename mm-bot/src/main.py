@@ -3,29 +3,29 @@ import logging
 
 import schedule
 
-from config import constants
-from config.database_config import get_db
-from config.logging_config import setup_logger
-from models.network import Network
-from persistence.block_dao import BlockDao
-from persistence.error_dao import ErrorDao
-from persistence.order_dao import OrderDao
-from services.block_service import BlockService
-from services.executors.order_executor import OrderExecutor
-from services.fee_calculators.starknet_fee_calculator import StarknetFeeCalculator
-from services.fee_calculators.zksync_fee_calculator import ZksyncFeeCalculator
-from services.indexers.starknet_order_indexer import StarknetOrderIndexer
-from services.indexers.zksync_order_indexer import ZksyncOrderIndexer
-from services.order_service import OrderService
-from services.payment_claimer.ethereum_2_zksync_payment_claimer import Ethereum2ZksyncPaymentClaimer
-from services.payment_claimer.ethereum_payment_claimer import EthereumPaymentClaimer
-from services.payment_claimer.herodotus_payment_claimer import HerodotusPaymentClaimer
-from services.payment_claimer.payment_claimer import PaymentClaimer
-from services.processors.accepted_blocks_orders_processor import AcceptedBlocksOrdersProcessor
-from services.processors.failed_orders_processor import FailedOrdersProcessor
-from services.processors.long_range_orders_processor import LongRangeOrdersProcessor
-from services.processors.orders_processor import OrdersProcessor
-from services.senders.ethereum_sender import EthereumSender
+from src.config import constants
+from src.config.database_config import get_db
+from src.config.logging_config import setup_logger
+from src.models.network import Network
+from src.persistence.block_dao import BlockDao
+from src.persistence.error_dao import ErrorDao
+from src.persistence.order_dao import OrderDao
+from src.services.block_service import BlockService
+from src.services.executors.order_executor import OrderExecutor
+from src.services.fee_calculators.starknet_fee_calculator import StarknetFeeCalculator
+from src.services.fee_calculators.zksync_fee_calculator import ZksyncFeeCalculator
+from src.services.indexers.starknet_order_indexer import StarknetOrderIndexer
+from src.services.indexers.zksync_order_indexer import ZksyncOrderIndexer
+from src.services.order_service import OrderService
+from src.services.payment_claimer.ethereum_2_zksync_payment_claimer import Ethereum2ZksyncPaymentClaimer
+from src.services.payment_claimer.ethereum_payment_claimer import EthereumPaymentClaimer
+from src.services.payment_claimer.herodotus_payment_claimer import HerodotusPaymentClaimer
+from src.services.payment_claimer.payment_claimer import PaymentClaimer
+from src.services.processors.accepted_blocks_orders_processor import AcceptedBlocksOrdersProcessor
+from src.services.processors.failed_orders_processor import FailedOrdersProcessor
+from src.services.processors.long_range_orders_processor import LongRangeOrdersProcessor
+from src.services.processors.orders_processor import OrdersProcessor
+from src.services.senders.ethereum_sender import EthereumSender
 
 setup_logger()
 logger = logging.getLogger(__name__)

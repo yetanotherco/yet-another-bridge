@@ -1,8 +1,8 @@
 import asyncio
 
-from models.network import Network
-from services import zksync
-from services.processors.catch_up_orders_processor import CatchUpOrdersProcessor
+from src.models.network import Network
+from src.services import zksync
+from src.services.processors.catch_up_orders_processor import CatchUpOrdersProcessor
 
 # The maximum number of blocks that can be queried in a single request is 500.
 # https://docs.blastapi.io/blast-documentation/apis-documentation/core-api/oktc/eth_getlogs#limits

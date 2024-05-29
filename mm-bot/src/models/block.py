@@ -2,8 +2,8 @@ from datetime import datetime
 
 from sqlalchemy import Column, Integer, DateTime, Enum
 
-from config.database_config import Base
-from models.network import Network
+from src.config.database_config import Base
+from src.models.network import Network
 
 
 class Block(Base):

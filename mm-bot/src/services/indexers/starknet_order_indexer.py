@@ -1,7 +1,7 @@
-from models.order import Order
-from services import starknet
-from services.indexers.order_indexer import OrderIndexer
-from services.starknet import SetOrderEvent
+from src.models.order import Order
+from src.services import starknet
+from src.services.indexers.order_indexer import OrderIndexer
+from src.services.starknet import SetOrderEvent
 
 
 class StarknetOrderIndexer(OrderIndexer):

@@ -1,8 +1,8 @@
 import logging
 from abc import ABC, abstractmethod
 
-from models.order import Order
-from services.order_service import OrderService
+from src.models.order import Order
+from src.services.order_service import OrderService
 
 
 class PaymentClaimer(ABC):

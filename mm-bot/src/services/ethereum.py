@@ -3,9 +3,9 @@ import json
 import os
 from web3 import Web3
 
-from config import constants
-from models.network import Network
-from services.decorators.use_fallback import use_fallback
+from src.config import constants
+from src.models.network import Network
+from src.services.decorators.use_fallback import use_fallback
 
 ETHEREUM_CHAIN_ID = int(constants.ETHEREUM_CHAIN_ID)
 # get only the abi not the entire file

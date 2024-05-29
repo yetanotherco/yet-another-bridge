@@ -2,7 +2,7 @@ import asyncio
 import logging
 import requests
 import time
-from config import constants
+from src.config import constants
 
 reqs = []
 logger = logging.getLogger(__name__)

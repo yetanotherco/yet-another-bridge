@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from models.error import Error
+from src.models.error import Error
 
 
 class ErrorDao:
