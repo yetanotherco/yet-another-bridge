@@ -50,5 +50,8 @@ test:
 	@echo "Running tests..."
 	pytest ./tests/*_test.py
 	@echo "Cleaning up..."
+	rm -rf ./src/__pycache__
+	rm -rf ./src/*/__pycache__
+	rm -rf ./src/*/*/__pycache__
 	rm -rf ./tests/__pycache__
 	rm -rf ./.pytest_cache
