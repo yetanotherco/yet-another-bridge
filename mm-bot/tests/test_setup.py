@@ -13,11 +13,11 @@ def setup_function():
     with Engine.connect() as conn:
         with conn.begin():
             with open("resources/test_inserts.sql", "r") as f:
-                create_table_sql = f.read()
-            conn.execute(text(create_table_sql))
+                inserts_sql = f.read()
+            conn.execute(text(inserts_sql))
     yield
     with Engine.connect() as conn:
         with conn.begin():
             with open("resources/test_teardown.sql", "r") as f:
-                create_table_sql = f.read()
-            conn.execute(text(create_table_sql))
+                teardown_sql = f.read()
+            conn.execute(text(teardown_sql))
