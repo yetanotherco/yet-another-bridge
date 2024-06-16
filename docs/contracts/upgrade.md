@@ -21,7 +21,7 @@ To do this you must:
       STARKNET_MESSAGING_ADDRESS = Starknet Messaging address
    ```
 
-   **NOTE:** This is a very similar configuration than the mentioned before, but 
+   **NOTE:** This is a very similar configuration than the one mentioned before, but 
 MM_ETHEREUM_WALLET_ADDRESS is not necessary
 
 2. Configure the address of the proxy to be upgraded:
