@@ -41,7 +41,7 @@ We are working on integrating ZkSync in the near future, so stay tuned for furth
 
 ## How can I get in touch with the team?
 
-You can contact us in:
+You can contact us at:
 
 - [Telegram Group](https://t.me/grindlabs)
 - Twitter/X

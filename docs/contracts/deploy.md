@@ -159,7 +159,7 @@ Starknet smart contract address.
 _EscrowClaimPaymentSelector_, which is for specifying the _claim_payment_ function's name in the 
 Starknet Escrow smart contract.
 
-   You can set and change Ethereum's _EscrowClaimPaymentSelector_ variable, doing the following:
+   You can set and change Ethereum's _EscrowClaimPaymentSelector_ variable, by doing the following:
 
    ```bash
     make ethereum-set-claim-payment-selector
