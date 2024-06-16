@@ -55,7 +55,7 @@ The following environment variables are used:
     PAYMENT_CLAIMER=<herodotus|ethereum>
 
 
-There is a example file called `.env.example` in the root of the project. 
+There is an example file called `.env.example` in the root of the project. 
 
 ## Database Setup
 ### Create Database Container
